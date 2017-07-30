@@ -1,0 +1,34 @@
+# Qt-es
+
+*.o
+*.obj
+
+*.pro.user
+*.pro.user.*
+*.qbs.user
+*.qbs.user.*
+*.error
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
+Makefile
+Makefile.*
+*-build-*
+*build-*
+.qmake.stash
+
+# ignore Qt-Makefile
+*.Debug
+*.Release
+
+#Temp files of LibreOffice
+.~lock.*
+
+#Notepad++ Backup files
+*.bak
+
+*.directory
+
+/build/*
+/OBJ/*
+
