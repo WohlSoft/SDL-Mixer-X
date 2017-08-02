@@ -23,7 +23,7 @@
 
 #ifdef CMD_MUSIC
 
-#include "audio_codec.h"
+#include "../audio_codec.h"
 
 int MusicCMD_init2(AudioCodec* codec, SDL_AudioSpec *mixerfmt);
 
