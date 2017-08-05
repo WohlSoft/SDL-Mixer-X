@@ -152,7 +152,7 @@ typedef enum
     MUS_MP3_MAD,
     MUS_FLAC,
     MUS_MODPLUG,
-    MUS_SPC,
+    MUS_SPC, /* Deprecated, use MUS_GME instead */
     MUS_GME = MUS_SPC,
     MUS_ADLMIDI,
     MUS_KnownCodecs     /* Count of codec types */

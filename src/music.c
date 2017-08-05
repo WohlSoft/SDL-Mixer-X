@@ -814,7 +814,7 @@ Mix_Music *SDLCALLCC Mix_LoadMUS(const char *file)
     }
     music_file = (char *)SDL_malloc(sizeof(char) * strlen(file) + 1);
     music_args = (char *)SDL_malloc(sizeof(char) * strlen(file) + 1);
-    strcpy(music_file, (char *)file);
+    strcpy(music_file, file);
     music_args[0] = '\0';
     #ifdef _WIN32
     if(music_file)
@@ -830,8 +830,7 @@ Mix_Music *SDLCALLCC Mix_LoadMUS(const char *file)
     if(split_path_and_params(music_file, music_args) == 0)
         return NULL;
 
-    if(strstr(music_file, "/"))
-        music_filename = strrchr(music_file, '/');
+    music_filename = (strstr(music_file, "/")) ? strrchr(music_file, '/') : music_file;
 
     if(strstr(music_filename, "."))
         ext = strrchr(music_filename, '.');
