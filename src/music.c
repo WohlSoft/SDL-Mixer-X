@@ -1919,16 +1919,14 @@ int SDLCALLCC Mix_EachSoundFont(int (*function)(const char *, void *), void *dat
         return 0;
     }
 
-    /* #if defined(__MINGW32__) || defined(__MINGW64__)
-    for(path = strtok(paths, ";"); path; path = strtok(NULL, ";"))
-    {
-    #elif defined(_WIN32)
-    for(path = strtok_s(paths, ";", &context); path; path = strtok_s(NULL, ";", &context))
-    {
-    #else*/
-    for(path = strtok_safe(paths, ":;", &context);
+    #if defined(_WIN32)
+    #define SEPARATOR ";"
+    #else
+    #define SEPARATOR ":;"
+    #endif
+    for(path = strtok_safe(paths, SEPARATOR, &context);
         path;
-        path = strtok_safe(NULL, ":;", &context))
+        path = strtok_safe(NULL, SEPARATOR, &context))
     {
         /*#endif*/
         if(!function(path, data))
@@ -1937,6 +1935,7 @@ int SDLCALLCC Mix_EachSoundFont(int (*function)(const char *, void *), void *dat
             return 0;
         }
     }
+    #undef SEPARATOR
 
     SDL_free(paths);
     return 1;
