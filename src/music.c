@@ -361,7 +361,7 @@ int open_music(SDL_AudioSpec *mixer)
 }
 
 /* Portable case-insensitive string compare function */
-int MIX_string_equals(const char *str1, const char *str2)
+static int MIX_string_equals(const char *str1, const char *str2)
 {
     while(*str1 && *str2)
     {
@@ -730,7 +730,7 @@ void parse_adlmidi_args(char *args)
                     #endif
 
                 case 's':
-                    MIX_SetMidiDevice(value);
+                    Mix_SetMidiDevice(value);
                     break;
                 case '\0':
                     break;
@@ -1897,7 +1897,7 @@ int SDLCALLCC Mix_EachSoundFont(int (*function)(const char *, void *), void *dat
 }
 #endif
 
-void SDLCALLCC MIX_Timidity_addToPathList(const char *path)
+void SDLCALLCC Mix_Timidity_addToPathList(const char *path)
 {
     #ifdef USE_TIMIDITY_MIDI
     Timidity_addToPathList(path);
@@ -1909,17 +1909,17 @@ void SDLCALLCC MIX_Timidity_addToPathList(const char *path)
 
 /* ADLMIDI Setup functions */
 
-int    SDLCALLCC  MIX_ADLMIDI_getTotalBanks()
+int    SDLCALLCC  Mix_ADLMIDI_getTotalBanks()
 {
     return ADLMIDI_getBanksCount();
 }
 
-const char *const *SDLCALLCC  MIX_ADLMIDI_getBankNames()
+const char *const *SDLCALLCC  Mix_ADLMIDI_getBankNames()
 {
     return ADLMIDI_getBankNames();
 }
 
-int SDLCALLCC MIX_ADLMIDI_getBankID()
+int SDLCALLCC Mix_ADLMIDI_getBankID()
 {
     #ifdef USE_ADL_MIDI
     return ADLMIDI_getBankID();
@@ -1929,7 +1929,7 @@ int SDLCALLCC MIX_ADLMIDI_getBankID()
     #endif
 }
 
-void SDLCALLCC MIX_ADLMIDI_setBankID(int bnk)
+void SDLCALLCC Mix_ADLMIDI_setBankID(int bnk)
 {
     need_reset_midi = 0;
     #ifdef USE_ADL_MIDI
@@ -1937,7 +1937,7 @@ void SDLCALLCC MIX_ADLMIDI_setBankID(int bnk)
     #endif
 }
 
-int SDLCALLCC MIX_ADLMIDI_getTremolo()
+int SDLCALLCC Mix_ADLMIDI_getTremolo()
 {
     #ifdef USE_ADL_MIDI
     return ADLMIDI_getTremolo();
@@ -1947,7 +1947,7 @@ int SDLCALLCC MIX_ADLMIDI_getTremolo()
     #endif
 }
 
-void SDLCALLCC MIX_ADLMIDI_setTremolo(int tr)
+void SDLCALLCC Mix_ADLMIDI_setTremolo(int tr)
 {
     need_reset_midi = 0;
     #ifdef USE_ADL_MIDI
@@ -1955,7 +1955,7 @@ void SDLCALLCC MIX_ADLMIDI_setTremolo(int tr)
     #endif
 }
 
-int SDLCALLCC MIX_ADLMIDI_getVibrato()
+int SDLCALLCC Mix_ADLMIDI_getVibrato()
 {
     #ifdef USE_ADL_MIDI
     return ADLMIDI_getVibrato();
@@ -1965,7 +1965,7 @@ int SDLCALLCC MIX_ADLMIDI_getVibrato()
     #endif
 }
 
-void SDLCALLCC MIX_ADLMIDI_setVibrato(int vib)
+void SDLCALLCC Mix_ADLMIDI_setVibrato(int vib)
 {
     need_reset_midi = 0;
     #ifdef USE_ADL_MIDI
@@ -1973,7 +1973,7 @@ void SDLCALLCC MIX_ADLMIDI_setVibrato(int vib)
     #endif
 }
 
-int SDLCALLCC MIX_ADLMIDI_getScaleMod()
+int SDLCALLCC Mix_ADLMIDI_getScaleMod()
 {
     #ifdef USE_ADL_MIDI
     return ADLMIDI_getScaleMod();
@@ -1983,7 +1983,7 @@ int SDLCALLCC MIX_ADLMIDI_getScaleMod()
     #endif
 }
 
-void SDLCALLCC MIX_ADLMIDI_setScaleMod(int sc)
+void SDLCALLCC Mix_ADLMIDI_setScaleMod(int sc)
 {
     need_reset_midi = 0;
     #ifdef USE_ADL_MIDI
@@ -1991,7 +1991,7 @@ void SDLCALLCC MIX_ADLMIDI_setScaleMod(int sc)
     #endif
 }
 
-int SDLCALLCC MIX_ADLMIDI_getAdLibMode()
+int SDLCALLCC Mix_ADLMIDI_getAdLibMode()
 {
     #ifdef USE_ADL_MIDI
     return ADLMIDI_getAdLibDrumsMode();
@@ -2001,7 +2001,7 @@ int SDLCALLCC MIX_ADLMIDI_getAdLibMode()
     #endif
 }
 
-void SDLCALLCC MIX_ADLMIDI_setAdLibMode(int sc)
+void SDLCALLCC Mix_ADLMIDI_setAdLibMode(int sc)
 {
     need_reset_midi = 0;
     #ifdef USE_ADL_MIDI
@@ -2009,7 +2009,7 @@ void SDLCALLCC MIX_ADLMIDI_setAdLibMode(int sc)
     #endif
 }
 
-void SDLCALLCC MIX_ADLMIDI_setSetDefaults()
+void SDLCALLCC Mix_ADLMIDI_setSetDefaults()
 {
     need_reset_midi = 1;
     #ifdef USE_ADL_MIDI
@@ -2017,7 +2017,7 @@ void SDLCALLCC MIX_ADLMIDI_setSetDefaults()
     #endif
 }
 
-int SDLCALLCC MIX_ADLMIDI_getLogarithmicVolumes()
+int SDLCALLCC Mix_ADLMIDI_getLogarithmicVolumes()
 {
     #ifdef USE_ADL_MIDI
     return ADLMIDI_getLogarithmicVolumes();
@@ -2027,14 +2027,14 @@ int SDLCALLCC MIX_ADLMIDI_getLogarithmicVolumes()
     #endif
 }
 
-void SDLCALLCC MIX_ADLMIDI_setLogarithmicVolumes(int lv)
+void SDLCALLCC Mix_ADLMIDI_setLogarithmicVolumes(int lv)
 {
     #ifdef USE_ADL_MIDI
     ADLMIDI_setLogarithmicVolumes(lv);
     #endif
 }
 
-int SDLCALLCC MIX_ADLMIDI_getVolumeModel()
+int SDLCALLCC Mix_ADLMIDI_getVolumeModel()
 {
     #ifdef USE_ADL_MIDI
     return ADLMIDI_getVolumeModel();
@@ -2044,7 +2044,7 @@ int SDLCALLCC MIX_ADLMIDI_getVolumeModel()
     #endif
 }
 
-void SDLCALLCC MIX_ADLMIDI_setVolumeModel(int vm)
+void SDLCALLCC Mix_ADLMIDI_setVolumeModel(int vm)
 {
     #ifdef USE_ADL_MIDI
     ADLMIDI_setVolumeModel(vm);
@@ -2052,7 +2052,7 @@ void SDLCALLCC MIX_ADLMIDI_setVolumeModel(int vm)
 }
 
 
-void SDLCALLCC MIX_OPNMIDI_setCustomBankFile(const char *bank_wonp_path)
+void SDLCALLCC Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path)
 {
     #ifdef USE_OPN2_MIDI
     OPNMIDI_setCustomBankFile(bank_wonp_path);
@@ -2060,7 +2060,7 @@ void SDLCALLCC MIX_OPNMIDI_setCustomBankFile(const char *bank_wonp_path)
 }
 
 
-int SDLCALLCC MIX_SetMidiDevice(int device)
+int SDLCALLCC Mix_SetMidiDevice(int device)
 {
     switch(device)
     {
@@ -2083,18 +2083,122 @@ int SDLCALLCC MIX_SetMidiDevice(int device)
         mididevice_next = device;
         need_reset_midi = 0;
         return 0;
-        break;
     #endif
 
     default:
         Mix_SetError("Unknown MIDI Device");
         return -1;
-        break;
     }
 }
 
-void SDLCALLCC MIX_SetLockMIDIArgs(int lock_midiargs)
+void SDLCALLCC Mix_SetLockMIDIArgs(int lock_midiargs)
 {
     lock_midi_args = lock_midiargs;
 }
 
+
+/* ----------------------------------------*
+ *           DEPRECATED ALIASES
+ * ----------------------------------------*/
+void SDLCALLCC MIX_Timidity_addToPathList(const char *path)
+{
+    Mix_Timidity_addToPathList(path);
+}
+
+
+const char *const *SDLCALLCC  MIX_ADLMIDI_getBankNames()
+{
+    return Mix_ADLMIDI_getBankNames();
+}
+
+int SDLCALLCC MIX_ADLMIDI_getBankID()
+{
+    return Mix_ADLMIDI_getBankID();
+}
+
+void SDLCALLCC MIX_ADLMIDI_setBankID(int bnk)
+{
+    Mix_ADLMIDI_setBankID(bnk);
+}
+
+int SDLCALLCC MIX_ADLMIDI_getTremolo()
+{
+    return Mix_ADLMIDI_getTremolo();
+}
+
+void SDLCALLCC MIX_ADLMIDI_setTremolo(int tr)
+{
+    Mix_ADLMIDI_setTremolo(tr);
+}
+
+int SDLCALLCC MIX_ADLMIDI_getVibrato()
+{
+    return Mix_ADLMIDI_getVibrato();
+}
+
+void SDLCALLCC MIX_ADLMIDI_setVibrato(int vib)
+{
+    Mix_ADLMIDI_setVibrato(vib);
+}
+
+int SDLCALLCC MIX_ADLMIDI_getScaleMod()
+{
+    return Mix_ADLMIDI_getScaleMod();
+}
+
+void SDLCALLCC MIX_ADLMIDI_setScaleMod(int sc)
+{
+    Mix_ADLMIDI_setScaleMod(sc);
+}
+
+int SDLCALLCC MIX_ADLMIDI_getAdLibMode()
+{
+    return Mix_ADLMIDI_getAdLibMode();
+}
+
+void SDLCALLCC MIX_ADLMIDI_setAdLibMode(int sc)
+{
+    Mix_ADLMIDI_setAdLibMode(sc);
+}
+
+void SDLCALLCC MIX_ADLMIDI_setSetDefaults()
+{
+    Mix_ADLMIDI_setSetDefaults();
+}
+
+int SDLCALLCC MIX_ADLMIDI_getLogarithmicVolumes()
+{
+    return Mix_ADLMIDI_getLogarithmicVolumes();
+}
+
+void SDLCALLCC MIX_ADLMIDI_setLogarithmicVolumes(int lv)
+{
+    Mix_ADLMIDI_setLogarithmicVolumes(lv);
+}
+
+int SDLCALLCC MIX_ADLMIDI_getVolumeModel()
+{
+    return Mix_ADLMIDI_getVolumeModel();
+}
+
+void SDLCALLCC MIX_ADLMIDI_setVolumeModel(int vm)
+{
+    Mix_ADLMIDI_setVolumeModel(vm);
+}
+
+
+void SDLCALLCC MIX_OPNMIDI_setCustomBankFile(const char *bank_wonp_path)
+{
+    Mix_OPNMIDI_setCustomBankFile(bank_wonp_path);
+}
+
+
+int SDLCALLCC MIX_SetMidiDevice(int device)
+{
+    return Mix_SetMidiDevice(device);
+}
+
+void SDLCALLCC MIX_SetLockMIDIArgs(int lock_midiargs)
+{
+    Mix_SetLockMIDIArgs(lock_midiargs);
+}

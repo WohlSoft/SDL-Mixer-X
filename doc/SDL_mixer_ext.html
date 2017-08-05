@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html401/loose.dtd">
 <html>
-<!-- Created on August 4, 2017 by texi2html 1.82
+<!-- Created on August 5, 2017 by texi2html 1.82
 texi2html was written by: 
             Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -424,7 +424,7 @@ Callbacks include Effects functions and other SDL_mixer audio hooks.
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fQuerySpec">4.1.8 Mix_QuerySpec</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">               Get output format
 </td></tr>
-<tr><td align="left" valign="top"><a href="#MIX_005fTimidity_005faddToPathList">4.1.9 MIX_Timidity_addToPathList</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">  Append extra patches search path. Must be ran before initialization!
+<tr><td align="left" valign="top"><a href="#Mix_005fTimidity_005faddToPathList">4.1.9 Mix_Timidity_addToPathList</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">  Append extra patches search path. Must be ran before initialization!
 </td></tr>
 </table>
 
@@ -815,7 +815,7 @@ from an SDL_mixer function call.
 <a name="Mix_005fQuerySpec"></a>
 <table cellpadding="1" cellspacing="1" border="0">
 <tr><td valign="middle" align="left">[<a href="#Mix_005fGetError" title="Previous section in reading order"> &lt; </a>]</td>
-<td valign="middle" align="left">[<a href="#MIX_005fTimidity_005faddToPathList" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Mix_005fTimidity_005faddToPathList" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Functions" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#General" title="Up section"> Up </a>]</td>
@@ -881,7 +881,7 @@ else {
 </p>
 
 <hr size="6">
-<a name="MIX_005fTimidity_005faddToPathList"></a>
+<a name="Mix_005fTimidity_005faddToPathList"></a>
 <table cellpadding="1" cellspacing="1" border="0">
 <tr><td valign="middle" align="left">[<a href="#Mix_005fQuerySpec" title="Previous section in reading order"> &lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#Samples" title="Next section in reading order"> &gt; </a>]</td>
@@ -898,17 +898,24 @@ else {
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
-<a name="MIX_005fTimidity_005faddToPathList-1"></a>
-<h3 class="subsection">4.1.9 MIX_Timidity_addToPathList</h3>
-<a name="index-MIX_005fTimidity_005faddToPathList"></a>
+<a name="Mix_005fTimidity_005faddToPathList-1"></a>
+<h3 class="subsection">4.1.9 Mix_Timidity_addToPathList</h3>
+<a name="index-Mix_005fTimidity_005faddToPathList"></a>
 
-<p><code>void <b>MIX_Timidity_addToPathList</b>(const char *path)</code>
+<p><code>void <b>Mix_Timidity_addToPathList</b>(const char *<var>path</var>)</code>
 </p>
-<p>Allows you to set up custom path for Timidify patches
+<dl compact="compact">
+<dt> <var>path</var></dt>
+<dd><p>An absolute or relative path to timidity config is presented
+</p></dd>
+</dl>
+
+<p>Allows you to set a custom path for Timidify patches if you don&rsquo;t want limit
+to use standard paths only
 </p>
 <table class="cartouche" border="1"><tr><td>
 <table><tr><td>&nbsp;</td><td><pre class="example">sprintf(mypath &quot;%s/timidity/&quot;, getMyDataPath());
-MIX_Timidity_addToPathList(mypath);
+Mix_Timidity_addToPathList(mypath);
 </pre></td></tr></table>
 </td></tr></table>
 
@@ -916,7 +923,7 @@ MIX_Timidity_addToPathList(mypath);
 <hr size="6">
 <a name="Samples"></a>
 <table cellpadding="1" cellspacing="1" border="0">
-<tr><td valign="middle" align="left">[<a href="#MIX_005fTimidity_005faddToPathList" title="Previous section in reading order"> &lt; </a>]</td>
+<tr><td valign="middle" align="left">[<a href="#Mix_005fTimidity_005faddToPathList" title="Previous section in reading order"> &lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#Mix_005fGetNumChunkDecoders" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Functions" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
@@ -5577,7 +5584,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <tr><td></td><td valign="top"><a href="#index-Mix_005fSetPosition"><code>Mix_SetPosition</code></a></td><td valign="top"><a href="#Mix_005fSetPosition">4.6.7 Mix_SetPosition</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fSetPostMix"><code>Mix_SetPostMix</code></a></td><td valign="top"><a href="#Mix_005fSetPostMix">4.6.4 Mix_SetPostMix</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fSetReverseStereo"><code>Mix_SetReverseStereo</code></a></td><td valign="top"><a href="#Mix_005fSetReverseStereo">4.6.8 Mix_SetReverseStereo</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-MIX_005fTimidity_005faddToPathList"><code>MIX_Timidity_addToPathList</code></a></td><td valign="top"><a href="#MIX_005fTimidity_005faddToPathList">4.1.9 MIX_Timidity_addToPathList</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fTimidity_005faddToPathList"><code>Mix_Timidity_addToPathList</code></a></td><td valign="top"><a href="#Mix_005fTimidity_005faddToPathList">4.1.9 Mix_Timidity_addToPathList</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fUnregisterAllEffects"><code>Mix_UnregisterAllEffects</code></a></td><td valign="top"><a href="#Mix_005fUnregisterAllEffects">4.6.3 Mix_UnregisterAllEffects</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fUnregisterEffect"><code>Mix_UnregisterEffect</code></a></td><td valign="top"><a href="#Mix_005fUnregisterEffect">4.6.2 Mix_UnregisterEffect</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fVolume"><code>Mix_Volume</code></a></td><td valign="top"><a href="#Mix_005fVolume">4.3.2 Mix_Volume</a></td></tr>
@@ -5625,7 +5632,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 </tr></table>
 <h1>About This Document</h1>
 <p>
-  This document was generated by <em>Vitaly</em> on <em>August 4, 2017</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
+  This document was generated by <em>Vitaly</em> on <em>August 5, 2017</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
 </p>
 <p>
   The buttons in the navigation panels have the following meaning:
@@ -5727,7 +5734,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <hr size="1">
 <p>
  <font size="-1">
-  This document was generated by <em>Vitaly</em> on <em>August 4, 2017</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
+  This document was generated by <em>Vitaly</em> on <em>August 5, 2017</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
  </font>
  <br>
 

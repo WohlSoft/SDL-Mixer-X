@@ -271,7 +271,7 @@ These functions are useful, as they are the only/best ways to work with SDL_mixe
 * Mix_GetError::                Get the current error string
 @b{Settings}
 * Mix_QuerySpec::               Get output format
-* MIX_Timidity_addToPathList::  Append extra patches search path. Must be ran before initialization!
+* Mix_Timidity_addToPathList::  Append extra patches search path. Must be ran before initialization!
 @end menu
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -612,20 +612,26 @@ else @{
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
-@node MIX_Timidity_addToPathList
-@subsection MIX_Timidity_addToPathList
-@findex MIX_Timidity_addToPathList
+@node Mix_Timidity_addToPathList
+@subsection Mix_Timidity_addToPathList
+@findex Mix_Timidity_addToPathList
 
 @noindent
-@code{void @b{MIX_Timidity_addToPathList}(const char *path)}
+@code{void @b{Mix_Timidity_addToPathList}(const char *@var{path})}
+
+@table @var
+@item path
+An absolute or relative path to timidity config is presented
+@end table
 
 @noindent
-Allows you to set up custom path for Timidify patches
+Allows you to set a custom path for Timidify patches if you don't want limit
+to use standard paths only
 
 @cartouche
 @example
 sprintf(mypath "%s/timidity/", getMyDataPath());
-MIX_Timidity_addToPathList(mypath);
+Mix_Timidity_addToPathList(mypath);
 @end example
 @end cartouche
 

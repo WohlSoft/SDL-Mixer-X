@@ -24,8 +24,8 @@
 
 /* $Id$ */
 
-#ifndef _SDL_MIXER_H
-#define _SDL_MIXER_H
+#ifndef SDL_MIXER_H_
+#define SDL_MIXER_H_
 
 #include <SDL2/SDL_stdinc.h>
 #include <SDL2/SDL_rwops.h>
@@ -42,6 +42,17 @@
 #define SDLCALLCC __stdcall
 #else
 #define SDLCALLCC
+#endif
+
+#ifndef DEPRECATED
+#ifdef __GNUC__
+#define DEPRECATED(func) func __attribute__ ((deprecated))
+#elif defined(_MSC_VER)
+#define DEPRECATED(func) __declspec(deprecated) func
+#else
+#pragma message("WARNING: You need to implement DEPRECATED for this compiler")
+#define DEPRECATED(func) func
+#endif
 #endif
 
 /* Set up for C function definitions, even when using C++ */
@@ -725,52 +736,81 @@ extern DECLSPEC Mix_Chunk *SDLCALL Mix_GetChunk(int channel);
 extern DECLSPEC void SDLCALL Mix_CloseAudio(void);
 
 /* Add additional Timidity bank path */
-extern DECLSPEC void SDLCALL MIX_Timidity_addToPathList(const char *path);
+extern DECLSPEC void SDLCALL Mix_Timidity_addToPathList(const char *path);
 
 /* ADLMIDI Setup functions */
 /* Get count of available hardcoded banks */
-extern DECLSPEC int    SDLCALL MIX_ADLMIDI_getTotalBanks();
+extern DECLSPEC int    SDLCALL Mix_ADLMIDI_getTotalBanks();
 /* Get array of the bank names */
-extern DECLSPEC const char *const *SDLCALL MIX_ADLMIDI_getBankNames();
+extern DECLSPEC const char *const *SDLCALL Mix_ADLMIDI_getBankNames();
 /* Get bank ID */
-extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getBankID();
+extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getBankID();
 /* Set bank ID (Applying on stop/play) */
-extern DECLSPEC void SDLCALL MIX_ADLMIDI_setBankID(int bnk);
+extern DECLSPEC void SDLCALL Mix_ADLMIDI_setBankID(int bnk);
 /* Get state of deep vibrato */
-extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getTremolo();
+extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getTremolo();
 /* Set deep tremolo mode (0 off, 1 on) (Applying on stop/play) */
-extern DECLSPEC void SDLCALL MIX_ADLMIDI_setTremolo(int tr);
+extern DECLSPEC void SDLCALL Mix_ADLMIDI_setTremolo(int tr);
 /* Get state of deep vibrato */
-extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getVibrato();
+extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getVibrato();
 /* Set deep vibrato mode (0 off, 1 on) (Applying on stop/play) */
-extern DECLSPEC void SDLCALL MIX_ADLMIDI_setVibrato(int vib);
+extern DECLSPEC void SDLCALL Mix_ADLMIDI_setVibrato(int vib);
 /* Get state of scalable modulation mode */
-extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getScaleMod();
+extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getScaleMod();
 /* Set scalable modulation mode (0 off, 1 on) (Applying on stop/play) */
-extern DECLSPEC void SDLCALL MIX_ADLMIDI_setScaleMod(int sc);
+extern DECLSPEC void SDLCALL Mix_ADLMIDI_setScaleMod(int sc);
 /* Get state of adlib drums mode */
-extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getAdLibMode();
+extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getAdLibMode();
 /* Set adlib drums mode mode (0 off, 1 on) (Applying on stop/play) */
-extern DECLSPEC void SDLCALL MIX_ADLMIDI_setAdLibMode(int tr);
+extern DECLSPEC void SDLCALL Mix_ADLMIDI_setAdLibMode(int tr);
 /* Get state of logarithmic mode */
-extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getLogarithmicVolumes();
+extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getLogarithmicVolumes();
 /* Set logarithmic volumes mode in the generic/CMF volume models (0 off, 1 on) (Applying on stop/play) */
-extern DECLSPEC void SDLCALL MIX_ADLMIDI_setLogarithmicVolumes(int lv);
+extern DECLSPEC void SDLCALL Mix_ADLMIDI_setLogarithmicVolumes(int lv);
 /* Get current volume model ID */
-extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getVolumeModel();
+extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getVolumeModel();
 /* Change current volumes model (Applying on stop/play) */
-extern DECLSPEC void SDLCALL MIX_ADLMIDI_setVolumeModel(int vm);
+extern DECLSPEC void SDLCALL Mix_ADLMIDI_setVolumeModel(int vm);
 /* Reset all ADLMIDI properties to default state */
-extern DECLSPEC void SDLCALL MIX_ADLMIDI_setSetDefaults();
+extern DECLSPEC void SDLCALL Mix_ADLMIDI_setSetDefaults();
 
 /* Sets WOPN bank file for OPNMIDI playing device, affects on MIDI file reopen */
-extern DECLSPEC void SDLCALL MIX_OPNMIDI_setCustomBankFile(const char *bank_wonp_path);
+extern DECLSPEC void SDLCALL Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path);
 
 /* Change MIDI playing device (ADLMIDI, Timidity, Native MIDI (if available) and FluidSynth) */
-extern DECLSPEC int  SDLCALL MIX_SetMidiDevice(int device);
+extern DECLSPEC int  SDLCALL Mix_SetMidiDevice(int device);
 
 /* Disables support of MIDI file arguments */
-extern DECLSPEC void SDLCALL MIX_SetLockMIDIArgs(int lock_midiargs);
+extern DECLSPEC void SDLCALL Mix_SetLockMIDIArgs(int lock_midiargs);
+
+/*  DEPRECATED NAMES for new-added SDL Mixer X functions
+    Those names are made with mistake - beginning with "MIX_" than "Mix_"
+    which makes confusion when you looking for Mix_ function in your IDE
+    because some applications are still use them, to don't break ABI we will keep those
+    aliases until we will remove all usages of them from applications and libraries are used them
+*/
+DEPRECATED(extern DECLSPEC void SDLCALL MIX_Timidity_addToPathList(const char *path));
+DEPRECATED(extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getTotalBanks());
+DEPRECATED(extern DECLSPEC const char *const *SDLCALL MIX_ADLMIDI_getBankNames());
+DEPRECATED(extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getBankID());
+DEPRECATED(extern DECLSPEC void SDLCALL MIX_ADLMIDI_setBankID(int bnk));
+DEPRECATED(extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getTremolo());
+DEPRECATED(extern DECLSPEC void SDLCALL MIX_ADLMIDI_setTremolo(int tr));
+DEPRECATED(extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getVibrato());
+DEPRECATED(extern DECLSPEC void SDLCALL MIX_ADLMIDI_setVibrato(int vib));
+DEPRECATED(extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getScaleMod());
+DEPRECATED(extern DECLSPEC void SDLCALL MIX_ADLMIDI_setScaleMod(int sc));
+DEPRECATED(extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getAdLibMode());
+DEPRECATED(extern DECLSPEC void SDLCALL MIX_ADLMIDI_setAdLibMode(int tr));
+DEPRECATED(extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getLogarithmicVolumes());
+DEPRECATED(extern DECLSPEC void SDLCALL MIX_ADLMIDI_setLogarithmicVolumes(int lv));
+DEPRECATED(extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getVolumeModel());
+DEPRECATED(extern DECLSPEC void SDLCALL MIX_ADLMIDI_setVolumeModel(int vm));
+DEPRECATED(extern DECLSPEC void SDLCALL MIX_ADLMIDI_setSetDefaults());
+DEPRECATED(extern DECLSPEC void SDLCALL MIX_OPNMIDI_setCustomBankFile(const char *bank_wonp_path));
+DEPRECATED(extern DECLSPEC int  SDLCALL MIX_SetMidiDevice(int device));
+DEPRECATED(extern DECLSPEC void SDLCALL MIX_SetLockMIDIArgs(int lock_midiargs));
+/* deprecated names */
 
 /* We'll use SDL for reporting errors */
 #define Mix_SetError    SDL_SetError
@@ -782,4 +822,4 @@ extern DECLSPEC void SDLCALL MIX_SetLockMIDIArgs(int lock_midiargs);
 #endif
 #include "close_code.h"
 
-#endif /* _SDL_MIXER_H */
+#endif /* SDL_MIXER_H_ */
