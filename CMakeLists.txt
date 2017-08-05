@@ -52,7 +52,7 @@ if(USE_OGG_VORBIS)
     include_directories(${AUDIO_CODECS_PATH}/libogg/include)
     include_directories(${AUDIO_CODECS_PATH}/libvorbis/include)
     list(APPEND SDLMixerX_LINK_LIBS vorbisfile vorbis)
-    set(LIBOGG_NEEDED)
+    set(LIBOGG_NEEDED ON)
     list(APPEND SDLMixerX_SOURCES
         ${SDLMixerX_SOURCE_DIR}/src/codecs/dynamic_ogg.c
         ${SDLMixerX_SOURCE_DIR}/src/codecs/load_ogg.c
@@ -64,7 +64,7 @@ if(USE_FLAC)
     add_definitions(-DFLAC_MUSIC -DFLAC__NO_DLL)
     include_directories(${AUDIO_CODECS_PATH}/libogg/include)
     include_directories(${AUDIO_CODECS_PATH}/libFLAC/include)
-    set(LIBOGG_NEEDED)
+    set(LIBOGG_NEEDED ON)
     list(APPEND SDLMixerX_LINK_LIBS FLAC)
     list(APPEND SDLMixerX_SOURCES
         ${SDLMixerX_SOURCE_DIR}/src/codecs/dynamic_flac.c
