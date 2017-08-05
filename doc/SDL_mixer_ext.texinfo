@@ -46,7 +46,9 @@ The latest copy of this document can be found at @url{http://www.jonatkins.org/S
 @top SDL Mixer X
 
 @menu
-* Overview::         The README from the SDL_mixer distribution
+* Overview::         The README from the SDL_mixer  SDL Mixer X distribution
+
+* SDL Mixer X::      About SDL Mixer X fork
 
 * Getting Started::  Using SDL_mixer
 
@@ -67,9 +69,21 @@ The latest copy of this document can be found at @url{http://www.jonatkins.org/S
 @node    Overview
 @chapter Overview
 
-@center @b{A Little Bit About Me}
+@center @b{A Little Bit About Me (author of original manual)}
 
-I am currently, as I write this document, a programmer for Raytheon.  There I do all sorts of communications, network, GUI, and other general programming tasks in C/C++ on the Solaris and sometimes Linux Operating Systems.  I have been programming sound code in my free time for only a little while now.  Sound is an integral part to any game.  The human senses are mostly starved during video game play.  there's only some tactile feedback on some controlers, and of course the eyes are in use but only for about 30% of their viewing area.  So to add more we do need sound to help the game player feel more in the action, and to set certain moods as the game progresses.  Sound ends up accounting for perhaps 50% or more of a gamers experience.  Music and sound effects are all integral parts of the gaming experience.  While this document doesn't explain how to get music and samples to use, it will explain how to use them with SDL_mixer.
+I am currently, as I write this document, a programmer for Raytheon.
+There I do all sorts of communications, network, GUI, and other general
+programming tasks in C/C++ on the Solaris and sometimes Linux Operating Systems.
+I have been programming sound code in my free time for only a little while now.
+Sound is an integral part to any game.  The human senses are mostly starved
+during video game play.  there's only some tactile feedback on some controlers,
+and of course the eyes are in use but only for about 30% of their viewing area.
+So to add more we do need sound to help the game player feel more in the action,
+and to set certain moods as the game progresses.  Sound ends up accounting
+for perhaps 50% or more of a gamers experience.  Music and sound effects
+are all integral parts of the gaming experience.  While this document
+doesn't explain how to get music and samples to use, it will explain how
+to use them with SDL_mixer.
 
 @noindent
 Feel free to contact me: @email{JonathanCAtkins@@gmail.com}@*
@@ -90,7 +104,7 @@ The latest version of this library is available from:@*
 @uref{https://github.com/WohlSoft/SDL-Mixer-X,SDL Mixer X GitHub repository}
 
 Due to popular demand, here is a simple multi-channel audio mixer.
-It supports 8 channels of 16 bit stereo audio, plus a single channel
+It supports 8 or more channels of 16 bit stereo audio, plus a single channel
 of music, mixed by the popular MikMod MOD, Timidity MIDI and SMPEG MP3
 libraries.
 
@@ -112,9 +126,42 @@ from:
 @uref{http://www.libsdl.org/projects/mixer/timidity/timidity.tar.gz,Timidity GUS Patches}
 and unpack them in /usr/local/lib under UNIX, and C:\ under Win32.
 
-This library is available under the GNU Library General Public License,
+The SDL_mixer 1.x library is available under the GNU Library General Public License,
 see the file "COPYING" for details.
+
+The SDL_mixer 2.x and SDL Mixer X fork library is available under
+the ZLib License, see the file "COPYING" for details.
 @end cartouche
+
+@c =============================================================================
+@page
+@node    SDL Mixer X
+@chapter SDL Mixer X
+
+It's an extended fork made by Vitaly Novichkov "Wohlstand" in 13 January 2015.
+SDL_mixer is a quick and stable high-quality audio library, however, it has own
+bunch of deffects such as broken resampling, incorrect playback of WAV files,
+inability to choose MIDI backend in runtime, inability to customize Timidty
+patches path, No support for cross-fade and parallel streams playing (has only
+one musical stream. Using of very long Chunks is ineffectively), etc. The goal
+of this fork is resolving those issues, providing more extended functionality
+than was originally, and providing support for more supported audio formats.
+
+In this documentation, new-added functions, definitions, and enums in this fork
+will be marked by @b{[Mixer X]} label. That means those functions are existing only
+in SDL Mixer X fork and wasn't existed in original SDL_mixer library.
+
+This fork is based on SDL_mixer 2.x unlike original documentation which is
+created for SDL_mixer 1.2. Some functions would be marked by @b{[Mixer X]} label
+which means those functions are not available in SDL_mixer 1.x, but available in
+SDL_mixer 2.0 and SDL Mixer X fork.
+
+@b{IMPORTANT}: The licenses for libADLMIDI, libOPNMIDI, and libGME  are LGPL2+
+and GPL2+. Using of those modules makes this library licensed under LGPL2+ and
+you must use it dynamically, or your application must also be GPL!
+
+@b{IMPORTANT}: The license for libMAD is GPL which means that in order to use
+it your application must also be GPL!
 
 @c =============================================================================
 @page
@@ -142,10 +189,10 @@ SDL Mixer X supports playing music and sound samples from the following formats:
 - WAVE/RIFF (.wav)@*
 - AIFF (.aiff)@*
 - VOC (.voc)@*
-- MOD (.mod .xm .s3m .669 .it .med and more) requiring libmikmod on system@*
+- MOD (.mod .xm .s3m .669 .it .med and more) requiring libmikmod or libmodplug built in package@*
 - MIDI (.mid) using timidity, ADLMIDI, OPNMIDI or native midi hardware@*
 - OggVorbis (.ogg) requiring ogg/vorbis libraries built in package@*
-- MP3 (.mp3) requiring MAD library built in package@*
+- MP3 (.mp3) requiring MAD or SMPEG libraries built in package@*
 - FLAC (.flac) requiring the FLAC library built in package@*
 - GME (.spc .nsf .hes .vgm and more) emulated chiptunes from various console games@*
 - also any command-line player, which is not mixed by SDL Mixer X...@*
@@ -277,7 +324,7 @@ These functions are useful, as they are the only/best ways to work with SDL_mixe
 
 @b{Settings}
 * Mix_QuerySpec::               Get output format
-* Mix_Timidity_addToPathList::  Append extra patches search path. Must be ran before initialization!
+* Mix_Timidity_addToPathList::  Append extra Timidity patches search path. Must be ran before initialization!  @b{[Mixer X]}
 @end menu
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -979,10 +1026,14 @@ These functions work with sound effect mixer channels.  Music is not affected by
 * Mix_Volume::             Set the mix volume of a channel
 
 @b{Playing}
-* Mix_PlayChannel::        Play loop
-* Mix_PlayChannelTimed::   Play loop and limit by time
-* Mix_FadeInChannel::      Play loop with fade in
-* Mix_FadeInChannelTimed:: Play loop with fade in and limit by time
+* Mix_PlayChannel::                 Play loop
+* Mix_PlayChannelTimed::            Play loop and limit by time
+* Mix_PlayChannelVol::              Play loop with seting of initial volume @b{[Mixer X]}
+* Mix_PlayChannelTimedVolume::      Play loop with seting of initial volume and limit by time @b{[Mixer X]}
+* Mix_FadeInChannel::               Play loop with fade in
+* Mix_FadeInChannelTimed::          Play loop with fade in and limit by time
+* Mix_FadeInChannelVolume::         Play loop with seting of initial volume and fade in @b{[Mixer X]}
+* Mix_FadeInChannelTimedVolume::    Play loop with seting of initial volume and fade in and limit by time @b{[Mixer X]}
 
 @b{Pausing}
 * Mix_Pause::              Pause a channel
@@ -1118,7 +1169,12 @@ if(Mix_PlayChannel(-1, sample, 0)==-1) @{
 @noindent
 @b{See Also}:@*
 @ref{Mix_PlayChannelTimed},
+@ref{Mix_PlayChannelVol},
+@ref{Mix_PlayChannelTimedVolume},
 @ref{Mix_FadeInChannel},
+@ref{Mix_FadeInChannelTimed},
+@ref{Mix_FadeInChannelVolume},
+@ref{Mix_FadeInChannelTimedVolume},
 @ref{Mix_HaltChannel},
 @ref{Mix_ExpireChannel},
 @ref{Mix_ReserveChannels}
@@ -1170,7 +1226,123 @@ if(Mix_PlayChannelTimed(-1, sample, -1 , 500)==-1) @{
 @noindent
 @b{See Also}:@*
 @ref{Mix_PlayChannel},
+@ref{Mix_PlayChannelVol},
+@ref{Mix_PlayChannelTimedVolume},
 @ref{Mix_FadeInChannelTimed},
+@ref{Mix_FadeInChannelVolume},
+@ref{Mix_FadeInChannelTimedVolume},
+@ref{Mix_FadeOutChannel},
+@ref{Mix_ReserveChannels}
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_PlayChannelVol
+@subsection Mix_PlayChannelVol
+@findex Mix_PlayChannelVol
+
+@noindent
+@code{int @b{Mix_PlayChannelVol}(int @var{channel}, Mix_Chunk *@var{chunk}, int @var{loops}, int @var{vol})}
+
+@table @var
+@item channel
+Channel to play on, or -1 for the first free unreserved channel.
+@item chunk
+Sample to play.
+@item loops
+Number of loops, -1 is infinite loops.@*
+Passing one here plays the sample twice (1 loop).
+@item vol
+Initial volume level between 0 and @b{MIX_MAX_VOLUME}
+@end table
+
+@noindent
+Play @var{chunk} on @var{channel}, or if @var{channel} is -1, pick the first free unreserved channel.
+The @var{vol} will set initial channel volume.
+The sample will play for @var{loops}+1 number of times, unless stopped by halt, or fade out, or setting a new expiration time of less time than it would have originally taken to play the loops, or closing the mixer.@*
+@b{Note}: this just calls @code{Mix_PlayChannelTimed()} with @var{ticks} set to -1.
+
+@noindent
+@b{Returns}: the channel the sample is played on.  On any errors, -1 is returned.
+
+@cartouche
+@example
+// play sample on first free unreserved channel
+// play it exactly once through
+// Mix_Chunk *sample; //previously loaded
+if(Mix_PlayChannelVol(-1, sample, 0, 56)==-1) @{
+    printf("Mix_PlayChannelVol: %s\n",Mix_GetError());
+    // may be critical error, or maybe just no channels were free.
+    // you could allocated another channel in that case...
+@}
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_PlayChannel},
+@ref{Mix_PlayChannelTimed},
+@ref{Mix_PlayChannelTimedVolume},
+@ref{Mix_FadeInChannel},
+@ref{Mix_FadeInChannelTimed},
+@ref{Mix_FadeInChannelVolume},
+@ref{Mix_FadeInChannelTimedVolume},
+@ref{Mix_HaltChannel},
+@ref{Mix_ExpireChannel},
+@ref{Mix_ReserveChannels}
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_PlayChannelTimedVolume
+@subsection Mix_PlayChannelTimedVolume
+@findex Mix_PlayChannelTimedVolume
+
+@noindent
+@code{int @b{Mix_PlayChannelTimedVolume}(int @var{channel}, Mix_Chunk *@var{chunk},
+int @var{loops}, int @var{ticks})}
+
+@table @var
+@item channel
+Channel to play on, or -1 for the first free unreserved channel.
+@item chunk
+Sample to play.
+@item loops
+Number of loops, -1 is infinite loops.@*
+Passing one here plays the sample twice (1 loop).
+@item ticks
+Millisecond limit to play sample, at most.@*
+If not enough @var{loops} or the sample @var{chunk} is not long enough, then the sample may stop before this timeout occurs.@*
+-1 means play forever.
+@item vol
+Initial volume level between 0 and @b{MIX_MAX_VOLUME}
+@end table
+
+@noindent
+If the sample is long enough and has enough loops then the sample will stop after @var{ticks} milliseconds.
+Otherwise this function is the same as @ref{Mix_PlayChannelVol}.
+
+@noindent
+@b{Returns}: the channel the sample is played on.  On any errors, -1 is returned.
+
+@cartouche
+@example
+// play sample on first free unreserved channel
+// play it for half a second
+// Mix_Chunk *sample; //previously loaded
+if(Mix_PlayChannelTimedVolume(-1, sample, -1 , 500, 80)==-1) @{
+    printf("Mix_PlayChannel: %s\n",Mix_GetError());
+    // may be critical error, or maybe just no channels were free.
+    // you could allocated another channel in that case...
+@}
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_PlayChannel},
+@ref{Mix_PlayChannelVol},
+@ref{Mix_FadeInChannelTimed},
+@ref{Mix_FadeInChannelVolume},
+@ref{Mix_FadeInChannelTimedVolume},
 @ref{Mix_FadeOutChannel},
 @ref{Mix_ReserveChannels}
 
@@ -1222,7 +1394,11 @@ if(Mix_FadeInChannel(-1, sample, 2, 1000)==-1) @{
 @noindent
 @b{See Also}:@*
 @ref{Mix_PlayChannel},
+@ref{Mix_PlayChannelVol},
+@ref{Mix_PlayChannelTimedVolume},
 @ref{Mix_FadeInChannelTimed},
+@ref{Mix_FadeInChannelVolume},
+@ref{Mix_FadeInChannelTimedVolume},
 @ref{Mix_FadingChannel},
 @ref{Mix_FadeOutChannel},
 @ref{Mix_ReserveChannels}
@@ -1277,7 +1453,132 @@ if(Mix_PlayChannelTimed(-1, sample, -1 , 500)==-1) @{
 @noindent
 @b{See Also}:@*
 @ref{Mix_PlayChannelTimed},
+@ref{Mix_PlayChannelVol},
+@ref{Mix_PlayChannelTimedVolume},
 @ref{Mix_FadeInChannel},
+@ref{Mix_FadeInChannelVolume},
+@ref{Mix_FadeInChannelTimedVolume},
+@ref{Mix_FadingChannel},
+@ref{Mix_HaltChannel},
+@ref{Mix_ExpireChannel},
+@ref{Mix_ReserveChannels}
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_FadeInChannelVolume
+@subsection Mix_FadeInChannelVolume
+@findex Mix_FadeInChannelVolume
+
+@noindent
+@code{int @b{Mix_FadeInChannelVolume}(int @var{channel}, Mix_Chunk *@var{chunk},
+int @var{loops}, int @var{ms}, int @var{vol})}
+
+@table @var
+@item channel
+Channel to play on, or -1 for the first free unreserved channel.
+@item chunk
+Sample to play.
+@item loops
+Number of loops, -1 is infinite loops.@*
+Passing one here plays the sample twice (1 loop).
+@item ms
+Milliseconds of time that the fade-in effect should take to go from silence to full volume.
+@item vol
+Initial volume level between 0 and @b{MIX_MAX_VOLUME}
+@end table
+
+@noindent
+Play @var{chunk} on @var{channel}, or if @var{channel} is -1, pick the first free unreserved channel.@*
+The channel volume starts at 0 and fades up to full volume over @var{ms} milliseconds of time.  The sample may end before the fade-in is complete if it is too short or doesn't have enough loops.
+The sample will play for @var{loops}+1 number of times, unless stopped by halt, or fade out, or setting a new expiration time of less time than it would have originally taken to play the loops, or closing the mixer.@*
+The @var{vol} will set initial channel volume.
+@b{Note}: this just calls @code{Mix_FadeInChannelTimed()} with @var{ticks} set to -1.
+
+@noindent
+@b{Returns}: the channel the sample is played on.  On any errors, -1 is returned.
+
+@cartouche
+@example
+// play sample on first free unreserved channel
+// play it exactly 3 times through
+// fade in over one second
+// Mix_Chunk *sample; //previously loaded
+if(Mix_FadeInChannelVolume(-1, sample, 2, 1000, 70)==-1) @{
+    printf("Mix_FadeInChannel: %s\n",Mix_GetError());
+    // may be critical error, or maybe just no channels were free.
+    // you could allocated another channel in that case...
+@}
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_PlayChannel},
+@ref{Mix_PlayChannelVol},
+@ref{Mix_PlayChannelTimedVolume},
+@ref{Mix_FadeInChannelTimed},
+@ref{Mix_FadeInChannelTimedVolume},
+@ref{Mix_FadingChannel},
+@ref{Mix_FadeOutChannel},
+@ref{Mix_ReserveChannels}
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_FadeInChannelTimedVolume
+@subsection Mix_FadeInChannelTimedVolume
+@findex Mix_FadeInChannelTimedVolume
+
+@example
+int @b{Mix_FadeInChannelTimedVolume}(int @var{channel}, Mix_Chunk *@var{chunk},
+                           int @var{loops}, int @var{ms}, int @var{ticks}, int @var{vol})
+@end example
+
+@table @var
+@item channel
+Channel to play on, or -1 for the first free unreserved channel.
+@item chunk
+Sample to play.
+@item loops
+Number of loops, -1 is infinite loops.@*
+Passing one here plays the sample twice (1 loop).
+@item ms
+Milliseconds of time that the fade-in effect should take to go from silence to full volume.
+@item ticks
+Millisecond limit to play sample, at most.@*
+If not enough @var{loops} or the sample @var{chunk} is not long enough, then the sample may stop before this timeout occurs.@*
+-1 means play forever.
+@item vol
+Initial volume level between 0 and @b{MIX_MAX_VOLUME}
+@end table
+
+@noindent
+If the sample is long enough and has enough loops then the sample will stop after @var{ticks} milliseconds.
+Otherwise this function is the same as @ref{Mix_FadeInChannelVolume}.
+
+@noindent
+@b{Returns}: the channel the sample is played on.  On any errors, -1 is returned.
+
+@cartouche
+@example
+// play sample on first free unreserved channel
+// play it for half a second
+// Mix_Chunk *sample; //previously loaded
+if(Mix_FadeInChannelTimedVolume(-1, sample, -1 , 500, 78)==-1) @{
+    printf("Mix_PlayChannel: %s\n",Mix_GetError());
+    // may be critical error, or maybe just no channels were free.
+    // you could allocated another channel in that case...
+@}
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_PlayChannelTimed},
+@ref{Mix_PlayChannelVol},
+@ref{Mix_PlayChannelTimedVolume},
+@ref{Mix_FadeInChannel},
+@ref{Mix_FadeInChannelTimed},
+@ref{Mix_FadeInChannelVolume},
 @ref{Mix_FadingChannel},
 @ref{Mix_HaltChannel},
 @ref{Mix_ExpireChannel},
@@ -2049,8 +2350,8 @@ Music is therefore manipulated separately, except in post-processing hooks.
 * Mix_GetMusicDecoder::      Name of enumerated music format type decoder
 * Mix_LoadMUS::              Load a music file into a Mix_Music
 * Mix_LoadMUS_RW::           Load Music through SDL RWops (not implemented yet)
-* Mix_LoadMUS_RW_ARG::       Load music through SDL RWops with passing of extra arguments string
-* Mix_LoadMUS_RW_GME::       Load music through SDL RWops with passing of GME track number
+* Mix_LoadMUS_RW_ARG::       Load music through SDL RWops with passing of extra arguments string @b{[Mixer X]}
+* Mix_LoadMUS_RW_GME::       Load music through SDL RWops with passing of GME track number @b{[Mixer X]}
 
 @b{Free}
 * Mix_FreeMusic::            Free a Mix_Music
@@ -2062,13 +2363,18 @@ Music is therefore manipulated separately, except in post-processing hooks.
 * Mix_HookMusic::            Hook for a custom music player
 
 @b{Settings}
-* Mix_VolumeMusic::          Set music volume
-* Mix_PauseMusic::           Pause music
-* Mix_ResumeMusic::          Resume paused music
-* Mix_RewindMusic::          Rewind music to beginning
-* Mix_SetMusicPosition::     Set position of playback in stream
-* Mix_SetMusicCMD::          Use external program for music playback
-@c Mix_SetSynchroValue::      seems useless! (return -1;)
+* Mix_VolumeMusic::             Set music volume
+* Mix_PauseMusic::              Pause music
+* Mix_ResumeMusic::             Resume paused music
+* Mix_RewindMusic::             Rewind music to beginning
+* Mix_SetMusicPosition::        Set position of playback in stream
+* Mix_GetMusicPosition::        Get the time current position of music stream @b{[Mixer X]}
+* Mix_GetMusicTotalTime::       Get the total time length of music stream @b{[Mixer X]}
+* Mix_GetMusicLoopStartTime::   Get the loop start time position of music stream @b{[Mixer X]}
+* Mix_GetMusicLoopEndTime::     Get the loop end time position of music stream @b{[Mixer X]}
+* Mix_GetMusicLoopLengthTime::  Get the loop time length of music stream @b{[Mixer X]}
+* Mix_SetMusicCMD::             Use external program for music playback
+@c Mix_SetSynchroValue::          seems useless! (return -1;)
 
 @b{MIDI settings}
 * Mix_SetMidiDevice::        Set a MIDI sequencer to play MIDI music
@@ -2088,11 +2394,38 @@ Music is therefore manipulated separately, except in post-processing hooks.
 @c Mix_GetSynchroValue::      seems useless! (return -1;)
 
 @b{Meta-Tags}
-* Mix_GetMusicTitle::        Retrieve the title meta-tag of currently playing @var{music}
-* Mix_GetMusicTitleTag::     Retrieve the title meta-tag of currently playing @var{music}
-* Mix_GetMusicArtistTag::    Retrieve the artist meta-tag of currently playing @var{music}
-* Mix_GetMusicAlbumTag::     Retrieve the album meta-tag of currently playing @var{music}
-* Mix_GetMusicCopyrightTag:: Retrieve the copyright meta-tag of currently playing @var{music}
+* Mix_GetMusicTitle::        Retrieve the title meta-tag of currently playing @var{music} @b{[Mixer X]}
+* Mix_GetMusicTitleTag::     Retrieve the title meta-tag of currently playing @var{music} @b{[Mixer X]}
+* Mix_GetMusicArtistTag::    Retrieve the artist meta-tag of currently playing @var{music} @b{[Mixer X]}
+* Mix_GetMusicAlbumTag::     Retrieve the album meta-tag of currently playing @var{music} @b{[Mixer X]}
+* Mix_GetMusicCopyrightTag:: Retrieve the copyright meta-tag of currently playing @var{music} @b{[Mixer X]}
+
+@b{FluidSynth Extra Settings}
+* Mix_SetSoundFonts::        Set SoundFonts paths to use by supported FluidSynth MIDI backend @b{[Mixer 2.0]}
+* Mix_GetSoundFonts::        Get SoundFonts paths to use by supported FluidSynth MIDI backend @b{[Mixer 2.0]}
+* Mix_EachSoundFont::        Iterate SoundFonts paths to use by supported FluidSynth MIDI backend @b{[Mixer 2.0]}
+
+@b{libADLMIDI Extra Settings}
+* Mix_ADLMIDI_getTotalBanks::               Get total count of available embedded banks @b{[Mixer X]}
+* Mix_ADLMIDI_getBankNames::                Get array of embedded bank titles @b{[Mixer X]}
+* Mix_ADLMIDI_getBankID::                   Get ID of currently set bank @b{[Mixer X]}
+* Mix_ADLMIDI_setBankID::                   Change current bank. Applying on MIDI file reopen. @b{[Mixer X]}
+* Mix_ADLMIDI_getTremolo::                  Get current state of "Deep Tremolo" OPL3 flag @b{[Mixer X]}
+* Mix_ADLMIDI_setTremolo::                  Set state of "Deep Tremolo" OPL3 flag. Applying on MIDI file reopen. @b{[Mixer X]}
+* Mix_ADLMIDI_getVibrato::                  Get current state of "Deep Vibrato" OPL3 flag @b{[Mixer X]}
+* Mix_ADLMIDI_setVibrato::                  Set state of "Deep Vibrato" OPL3 flag. Applying on MIDI file reopen. @b{[Mixer X]}
+* Mix_ADLMIDI_getScaleMod::                 Get current state of "Scalable modulation mode" flag @b{[Mixer X]}
+* Mix_ADLMIDI_setScaleMod::                 Turn on/off scalable modulation mode flag. Applying on MIDI file reopen. @b{[Mixer X]}
+* Mix_ADLMIDI_getAdLibMode::                Get current state of "Rythm Mode" OPL flag @b{[Mixer X]}
+* Mix_ADLMIDI_setAdLibMode::                Set state of "Rythm Mode" OPL flag. Applying on MIDI file reopen. @b{[Mixer X]}
+* Mix_ADLMIDI_getLogarithmicVolumes::       Get current state of "Logarithmic volumes" flag @b{[Mixer X]}
+* Mix_ADLMIDI_setLogarithmicVolumes::       Set state of "logarithmic volumes" flag. Applying on MIDI file reopen. @b{[Mixer X]}
+* Mix_ADLMIDI_getVolumeModel::              Get ID of current volumes model @b{[Mixer X]}
+* Mix_ADLMIDI_setVolumeModel::              Change current volume model. Applying on MIDI file reopen. @b{[Mixer X]}
+* Mix_ADLMIDI_setSetDefaults::              Reset ADLMIDI settings to default state. Applying on MIDI file reopen. @b{[Mixer X]}
+
+@b{libOPNMIDI Extra Settings}
+* Mix_OPNMIDI_setCustomBankFile::           Path to custom WOPN bank file. Applying on MIDI file reopen. @b{[Mixer X]}
 
 @end menu
 
@@ -2712,6 +3045,136 @@ if(Mix_SetMusicPosition(60.0)==-1) @{
 @noindent
 @b{See Also}:@*
 @ref{Mix_FadeInMusicPos}
+@ref{Mix_GetMusicPosition}
+@ref{Mix_GetMusicTotalTime}
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_GetMusicPosition
+@subsection Mix_GetMusicPosition
+@findex Mix_GetMusicPosition
+
+@noindent
+@code{double @b{Mix_GetMusicPosition}(Mix_Music *@var{music})}
+
+@table @var
+@item music
+A pointer to current music stream
+@end table
+
+@noindent
+Get the time current position of music stream. It only works on some of music sources listed in table shown in description of @ref{Mix_SetMusicPosition} function.
+
+@noindent
+@b{Returns}: seconds value of current music position or -1.0 if this feature is not supported for some codec
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_FadeInMusicPos}
+@ref{Mix_SetMusicPosition}
+@ref{Mix_GetMusicTotalTime}
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_GetMusicTotalTime
+@subsection Mix_GetMusicTotalTime
+@findex Mix_GetMusicTotalTime
+
+@noindent
+@code{double @b{Mix_GetMusicTotalTime}(Mix_Music *@var{music})}
+
+@table @var
+@item music
+A pointer to current music stream
+@end table
+
+@noindent
+Get the time current position of music stream. It only works on some of music sources listed in table shown in description of @ref{Mix_SetMusicPosition} function.
+
+@noindent
+@b{Returns}: seconds value of current music total length or -1.0 if this feature is not supported for some codec
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_FadeInMusicPos}
+@ref{Mix_GetMusicPosition}
+@ref{Mix_SetMusicPosition}
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_GetMusicLoopStartTime
+@subsection Mix_GetMusicLoopStartTime
+@findex Mix_GetMusicLoopStartTime
+
+@noindent
+@code{double @b{Mix_GetMusicLoopStartTime}(Mix_Music *@var{music})}
+
+@table @var
+@item music
+A pointer to current music stream
+@end table
+
+@noindent
+A part of loop points feature. Get the loop start time position of music stream. It only works on some of music sources.
+
+@noindent
+@b{Returns}: seconds value of current music loop start position or -1.0 if this feature is not supported for some codec
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_GetMusicLoopEndTime}
+@ref{Mix_GetMusicLoopLengthTime}
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_GetMusicLoopEndTime
+@subsection Mix_GetMusicLoopEndTime
+@findex Mix_GetMusicLoopEndTime
+
+@noindent
+@code{double @b{Mix_GetMusicLoopEndTime}(Mix_Music *@var{music})}
+
+@table @var
+@item music
+A pointer to current music stream
+@end table
+
+@noindent
+A part of loop points feature. Get the loop time length of music stream. It only works on some of music sources.
+
+@noindent
+@b{Returns}: seconds value of current music loop end position or -1.0 if this feature is not supported for some codec
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_GetMusicLoopStartTime}
+@ref{Mix_GetMusicLoopLengthTime}
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_GetMusicLoopLengthTime
+@subsection Mix_GetMusicLoopLengthTime
+@findex Mix_GetMusicLoopLengthTime
+
+@noindent
+@code{double @b{Mix_GetMusicLoopEndTime}(Mix_Music *@var{music})}
+
+@table @var
+@item music
+A pointer to current music stream
+@end table
+
+@noindent
+A part of loop points feature. Get the loop time length of music stream. It only works on some of music sources.
+
+@noindent
+@b{Returns}: seconds value of current music loop length time or -1.0 if this feature is not supported for some codec
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_GetMusicLoopStartTime}
+@ref{Mix_GetMusicLoopEndTime}
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
@@ -3134,9 +3597,9 @@ title=Mix_GetMusicTitle(myMusic);
 
 @noindent
 @b{See Also}:@*
-@ref{Mix_GetMusicTitleTag}
-@ref{Mix_GetMusicArtistTag}
-@ref{Mix_GetMusicAlbumTag}
+@ref{Mix_GetMusicTitleTag},
+@ref{Mix_GetMusicArtistTag},
+@ref{Mix_GetMusicAlbumTag},
 @ref{Mix_GetMusicCopyrightTag}
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -3164,9 +3627,9 @@ title=Mix_GetMusicTitleTag(myMusic);
 
 @noindent
 @b{See Also}:@*
-@ref{Mix_GetMusicTitle}
-@ref{Mix_GetMusicArtistTag}
-@ref{Mix_GetMusicAlbumTag}
+@ref{Mix_GetMusicTitle},
+@ref{Mix_GetMusicArtistTag},
+@ref{Mix_GetMusicAlbumTag},
 @ref{Mix_GetMusicCopyrightTag}
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -3194,9 +3657,9 @@ title=Mix_GetMusicArtistTag(myMusic);
 
 @noindent
 @b{See Also}:@*
-@ref{Mix_GetMusicTitle}
-@ref{Mix_GetMusicTitleTag}
-@ref{Mix_GetMusicAlbumTag}
+@ref{Mix_GetMusicTitle},
+@ref{Mix_GetMusicTitleTag},
+@ref{Mix_GetMusicAlbumTag},
 @ref{Mix_GetMusicCopyrightTag}
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -3224,9 +3687,9 @@ title=Mix_GetMusicAlbumTag(myMusic);
 
 @noindent
 @b{See Also}:@*
-@ref{Mix_GetMusicTitle}
-@ref{Mix_GetMusicTitleTag}
-@ref{Mix_GetMusicArtistTag}
+@ref{Mix_GetMusicTitle},
+@ref{Mix_GetMusicTitleTag},
+@ref{Mix_GetMusicArtistTag},
 @ref{Mix_GetMusicCopyrightTag}
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -3254,10 +3717,456 @@ title=Mix_GetMusicCopyrightTag(myMusic);
 
 @noindent
 @b{See Also}:@*
-@ref{Mix_GetMusicTitle}
-@ref{Mix_GetMusicTitleTag}
-@ref{Mix_GetMusicArtistTag}
+@ref{Mix_GetMusicTitle},
+@ref{Mix_GetMusicTitleTag},
+@ref{Mix_GetMusicArtistTag},
 @ref{Mix_GetMusicAlbumTag}
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_SetSoundFonts
+@subsection Mix_SetSoundFonts
+@findex Mix_SetSoundFonts
+
+@noindent
+@code{int @b{Mix_SetSoundFonts}(const char *@var{paths})}
+
+@table @var
+@item paths
+Semicolon separated paths to sound font files.@*
+@b{NULL} to use default sound font paths from environment.
+@end table
+
+@noindent
+Set the paths list to sound font files will be used by FluidSynth MIDI backend.
+
+@noindent
+@b{Returns}: 1 if path successfully set, or 0 if error has occouped.
+
+@cartouche
+@example
+if(Mix_SetSoundFonts("./myfonts/melodic.sf2;myfonts/drups.sf2")==0) @{
+    printf("Mix_SetSoundFonts: %s\n", Mix_GetError());
+    // this might be a critical error...
+@}
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_GetSoundFonts},
+@ref{Mix_EachSoundFont}
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_GetSoundFonts
+@subsection Mix_GetSoundFonts
+@findex Mix_GetSoundFonts
+
+@noindent
+@code{const char *@b{Mix_GetSoundFonts}()}
+
+@table @var
+@item paths
+Semicolon separated paths to sound font files.@*
+@b{NULL} to use default sound font paths from environment.
+@end table
+
+@noindent
+Get the current set of paths list to sound font files will be used by
+FluidSynth MIDI backend. If there are wasn't set by @ref{Mix_SetSoundFonts}
+function, there are will be tooken from @b{SDL_SOUNDFONTS} or
+@b{SDL_FORCE_SOUNDFONTS} environment variables.
+
+@noindent
+@b{Returns}: Semicolon-separated sound font paths.
+
+@cartouche
+@example
+//Print list of available sound fonts
+char *context, *path = NULL;
+char *fonts = Mix_GetSoundFonts();
+printf("Available sound fonts:\n");
+for(path = strtok_r(fonts, ";", &context); path; path = strtok_r(NULL, ";", &context)) @{
+    printf(" - %s\n", path);
+@}
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_SetSoundFonts},
+@ref{Mix_EachSoundFont}
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_EachSoundFont
+@subsection Mix_EachSoundFont
+@findex Mix_EachSoundFont
+
+@noindent
+@code{const char *@b{Mix_EachSoundFont}(int (*@var{function})(const char *, void *), void *@var{data})}
+
+@table @var
+@item function
+The callback function will be called for each sound font
+listed in the paths. Has arguments @var{path} and @var{data}.
+@item data
+User data passed to the callback
+@end table
+
+@noindent
+Iterate the current set of paths list to sound font files will be used by
+FluidSynth MIDI backend. If there are wasn't set by @ref{Mix_SetSoundFonts}
+function, there are will be tooken from @b{SDL_SOUNDFONTS} or
+@b{SDL_FORCE_SOUNDFONTS} environment variables.
+
+@noindent
+@b{Returns}: 1 if function successfully completed, or 0 if error has occouped.
+
+@cartouche
+@example
+int print_sound_font(const char *path, void *data) @{
+    printf(" - %s\n", path);
+    return 1;
+@}
+
+//...
+
+//Print list of available sound fonts
+char *fonts = Mix_GetSoundFonts();
+printf("Available sound fonts:\n");
+for(!Mix_EachSoundFont(print_sound_font, NULL)) @{
+    printf(" - %s\n", path);
+@}
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_SetSoundFonts},
+@ref{Mix_GetSoundFonts}
+
+
+
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_ADLMIDI_getTotalBanks
+@subsection Mix_ADLMIDI_getTotalBanks
+@findex Mix_ADLMIDI_getTotalBanks
+
+@noindent
+@code{int @b{Mix_ADLMIDI_getTotalBanks}()}
+
+@noindent
+@b{Returns}: Total count of embedded ADLMIDI banks.
+
+@noindent
+Get total count of available embedded banks.
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_ADLMIDI_getBankNames
+@subsection Mix_ADLMIDI_getBankNames
+@findex Mix_ADLMIDI_getBankNames
+
+@noindent
+@code{const char *const * @b{Mix_ADLMIDI_getBankNames}()}
+
+@noindent
+@b{Returns}: array of strings are names of embedded ADLMIDI banks.
+
+@noindent
+Get array of embedded bank titles.
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_ADLMIDI_getBankID
+@subsection Mix_ADLMIDI_getBankID
+@findex Mix_ADLMIDI_getBankID
+
+@noindent
+@code{int @b{Mix_ADLMIDI_getBankID}()}
+
+@noindent
+@b{Returns}: currently using ID of embedded ADLMIDI bank.
+
+@noindent
+Get currently using ID of embedded ADLMIDI bank.
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_ADLMIDI_setBankID
+@subsection Mix_ADLMIDI_setBankID
+@findex Mix_ADLMIDI_setBankID
+
+@noindent
+@code{void @b{Mix_ADLMIDI_setBankID}(int @var{bnk})}
+
+@table @var
+@item bnk
+Embedded ADLMIDI bank ID
+@end table
+
+@noindent
+Change current embedded ADLMIDI bank.
+@b{NOTE}: Applies on MIDI file reopen
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_ADLMIDI_getTremolo
+@subsection Mix_ADLMIDI_getTremolo
+@findex Mix_ADLMIDI_getTremolo
+
+@noindent
+@code{int @b{Mix_ADLMIDI_getTremolo}()}
+
+@noindent
+@b{Returns}: 0 if Deep Tremolo is inactive, or 1 if Deep Tremolo is activated.
+
+@noindent
+Get current state of "Deep Tremolo" OPL3 flag in ADLMIDI.
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_ADLMIDI_setTremolo
+@subsection Mix_ADLMIDI_setTremolo
+@findex Mix_ADLMIDI_setTremolo
+
+@noindent
+@code{void @b{Mix_ADLMIDI_setTremolo}(int @var{tr})}
+
+@table @var
+@item tr
+State of Deep Tremolo flag:
+0 if Deep Tremolo is inactive, or 1 if Deep Tremolo is activated
+@end table
+
+@noindent
+Set state of "Deep Tremolo" OPL3 flag.
+@b{NOTE}: Applies on MIDI file reopen
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_ADLMIDI_getVibrato
+@subsection Mix_ADLMIDI_getVibrato
+@findex Mix_ADLMIDI_getVibrato
+
+@noindent
+@code{int @b{Mix_ADLMIDI_getVibrato}()}
+
+@noindent
+@b{Returns}: 0 if Deep Vibrato is inactive, or 1 if Deep Vibrato is activated.
+
+@noindent
+Get current state of "Deep Vibrato" OPL3 flag in ADLMIDI.
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_ADLMIDI_setVibrato
+@subsection Mix_ADLMIDI_setVibrato
+@findex Mix_ADLMIDI_setVibrato
+
+@noindent
+@code{void @b{Mix_ADLMIDI_setVibrato}(int @var{vib})}
+
+@table @var
+@item vib
+State of Deep Vibrato flag:
+0 if Deep Vibrato is inactive, or 1 if Deep Vibrato is activated
+@end table
+
+@noindent
+Set state of "Deep Vibrato" OPL3 flag.
+@b{NOTE}: Applies on MIDI file reopen
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_ADLMIDI_getScaleMod
+@subsection Mix_ADLMIDI_getScaleMod
+@findex Mix_ADLMIDI_getScaleMod
+
+@noindent
+@code{int @b{Mix_ADLMIDI_getScaleMod}()}
+
+@noindent
+@b{Returns}: 0 if Scalable Modulation is inactive, or 1 if Scalable Modulation is activated.
+
+@noindent
+Get current state of "Scalable modulation mode" flag
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_ADLMIDI_setScaleMod
+@subsection Mix_ADLMIDI_setScaleMod
+@findex Mix_ADLMIDI_setScaleMod
+
+@noindent
+@code{void @b{Mix_ADLMIDI_setScaleMod}(int @var{sc})}
+
+@table @var
+@item sc
+State of Scalable Modulation flag:
+0 if Scalable Modulation is inactive, or 1 if Scalable Modulation is activated
+@end table
+
+@noindent
+Turn on/off scalable modulation mode flag.
+@b{NOTE}: Applies on MIDI file reopen
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_ADLMIDI_getAdLibMode
+@subsection Mix_ADLMIDI_getAdLibMode
+@findex Mix_ADLMIDI_getAdLibMode
+
+@noindent
+@code{int @b{Mix_ADLMIDI_getAdLibMode}()}
+
+@noindent
+@b{Returns}: 0 if OPL2 Rythm Mode is inactive, or 1 if OPL2 Rythm Mode is activated.
+
+@noindent
+Get current state of OPL2 Rythm Mode flag
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_ADLMIDI_setAdLibMode
+@subsection Mix_ADLMIDI_setAdLibMode
+@findex Mix_ADLMIDI_setAdLibMode
+
+@noindent
+@code{void @b{Mix_ADLMIDI_setAdLibMode}(int @var{al})}
+
+@table @var
+@item al
+State of flag:
+0 if OPL2 Rythm Mode is inactive, or 1 if OPL2 Rythm Mode is activated
+@end table
+
+@noindent
+Set state of OPL2 Rythm Mode mode.
+@b{NOTE}: Applies on MIDI file reopen
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_ADLMIDI_getLogarithmicVolumes
+@subsection Mix_ADLMIDI_getLogarithmicVolumes
+@findex Mix_ADLMIDI_getLogarithmicVolumes
+
+@noindent
+@code{int @b{Mix_ADLMIDI_getLogarithmicVolumes}()}
+
+@noindent
+@b{Returns}: 0 if Logarithmic volumes is inactive, or 1 if Logarithmic volumes is activated.
+
+@noindent
+Get current state of Logarithmic volumes flag
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_ADLMIDI_setLogarithmicVolumes
+@subsection Mix_ADLMIDI_setLogarithmicVolumes
+@findex Mix_ADLMIDI_setLogarithmicVolumes
+
+@noindent
+@code{void @b{Mix_ADLMIDI_setLogarithmicVolumes}(int @var{lv})}
+
+@table @var
+@item lv
+State of Logarithmic volumes flag:
+0 if Logarithmic volumes are inactive, or 1 if Logarithmic volumes are activated
+@end table
+
+@noindent
+Set state of Logarithmic volumes flag.
+@b{NOTE}: Affects only when @b{ADLMIDI_VM_GENERIC} or @b{ADLMIDI_VM_CMF} volume models are active.
+@b{NOTE}: Applies on MIDI file reopen.
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_ADLMIDI_getVolumeModel
+@subsection Mix_ADLMIDI_getVolumeModel
+@findex Mix_ADLMIDI_getVolumeModel
+
+@noindent
+@code{int @b{Mix_ADLMIDI_getVolumeModel}()}
+
+@noindent
+@b{Returns}: value of @b{Mix_ADLMIDI_VolumeModel} enum which a current volume model.
+
+@noindent
+Get ID of current volumes model of ADLMIDI
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_ADLMIDI_setVolumeModel
+@subsection Mix_ADLMIDI_setVolumeModel
+@findex Mix_ADLMIDI_setVolumeModel
+
+@noindent
+@code{void @b{Mix_ADLMIDI_setVolumeModel}(int @var{vm})}
+
+@table @var
+@item vm
+Value of @b{Mix_ADLMIDI_VolumeModel} enum.
+@end table
+
+@noindent
+Change current volume model.
+@b{NOTE}: Applies on MIDI file reopen
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_ADLMIDI_setSetDefaults
+@subsection Mix_ADLMIDI_setSetDefaults
+@findex Mix_ADLMIDI_setSetDefaults
+
+@noindent
+@code{int @b{Mix_ADLMIDI_setSetDefaults}()}
+
+@noindent
+Resets all settings of ADLMIDI into default state.
+@b{NOTE}: Applies on MIDI file reopen
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_OPNMIDI_setCustomBankFile
+@subsection Mix_OPNMIDI_setCustomBankFile
+@findex Mix_OPNMIDI_setCustomBankFile
+
+@noindent
+@code{void @b{Mix_OPNMIDI_setCustomBankFile}(const char *@var{bank_wonp_path})}
+
+@table @var
+@item bank_wonp_path
+Path to custom WOPN bank or NULL to use default bank.
+@end table
+
+@noindent
+Sets path to custom WOPN bank file.
+@b{NOTE}: Applies on MIDI file reopen
+
+@cartouche
+@example
+//Set custom OPNMIDI bank
+Mix_OPNMIDI_setCustomBankFile("./music/my-gm-bank.wonp");
+@end example
+@end cartouche
+
+
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
@@ -3646,13 +4555,14 @@ if(!Mix_SetReverseStereo(MIX_CHANNEL_POST, 1)) @{
 These types are defined and used by the SDL_mixer API.
 
 @menu
-* Mix_Chunk::            The internal format for an audio chunk
-* Mix_Music::            The internal format for a music chunk
-* Mix_MusicType::        Music type enumerations
-* Mix_MIDI_Device::      MIDI sequencer type enumerations
-* Mix_Fading::           Fader effect type enumerations
-* Mix_EffectFunc_t::     Special effect callback function pointer
-* Mix_EffectDone_t::     Special effect done callback function pointer
+* Mix_Chunk::               The internal format for an audio chunk
+* Mix_Music::               The internal format for a music chunk
+* Mix_MusicType::           Music type enumerations
+* Mix_MIDI_Device::         MIDI sequencer type enumerations @b{[Mixer X]}
+* Mix_ADLMIDI_VolumeModel:: Volume model of libADLMIDI MIDI sequencer @b{[Mixer X]}
+* Mix_Fading::              Fader effect type enumerations
+* Mix_EffectFunc_t::        Special effect callback function pointer
+* Mix_EffectDone_t::        Special effect done callback function pointer
 @end menu
 
 @c -----------------------------------------------------------------------------
@@ -3740,10 +4650,10 @@ typedef enum @{
     MUS_MP3_MAD,
     MUS_FLAC,
     MUS_MODPLUG,
-    MUS_SPC,
-    MUS_GME = MUS_SPC,
-    MUS_ADLMIDI,
-    MUS_KnownCodecs
+    MUS_SPC,/* Mixer X */
+    MUS_GME = MUS_SPC,/* Mixer X */
+    MUS_ADLMIDI,/* Mixer X */
+    MUS_KnownCodecs/* Mixer X */
 @} Mix_MusicType;
 @end example
 @end cartouche
@@ -3781,6 +4691,28 @@ typedef enum @{
 
 @c Return values from @code{Mix_GetMusicType} are of these enumerated values.@* @cNOT IMPLEMENTED YET
 @b{MIDI_KnuwnDevices} is a count of known MIDI sequencers. Used internally.@*
+Otherwise they are self explanatory.
+
+@c -----------------------------------------------------------------------------
+@page
+@node Mix_ADLMIDI_VolumeModel
+@section Mix_ADLMIDI_VolumeModel
+@tindex Mix_ADLMIDI_VolumeModel
+
+@cartouche
+@example
+typedef enum @{
+    ADLMIDI_VM_AUTO,
+    ADLMIDI_VM_GENERIC,
+    ADLMIDI_VM_CMF,
+    ADLMIDI_VM_DMX,
+    ADLMIDI_VM_APOGEE,
+    ADLMIDI_VM_9X
+@} Mix_ADLMIDI_VolumeModel;
+@end example
+@end cartouche
+
+@b{ADLMIDI_VM_AUTO} is automatical choice of volume model in dependence from selected bank.@*
 Otherwise they are self explanatory.
 
 @c -----------------------------------------------------------------------------
