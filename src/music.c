@@ -1928,7 +1928,6 @@ int SDLCALLCC Mix_EachSoundFont(int (*function)(const char *, void *), void *dat
         path;
         path = strtok_safe(NULL, SEPARATOR, &context))
     {
-        /*#endif*/
         if(!function(path, data))
         {
             SDL_free(paths);
