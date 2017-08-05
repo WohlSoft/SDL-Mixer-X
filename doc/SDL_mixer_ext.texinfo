@@ -21,6 +21,7 @@ All distributions of this file must be in an unaltered state, except for correct
 
 The latest copy of original document can be found at @url{http://www.jonatkins.org/SDL_mixer}
 @end ifinfo
+
 @titlepage
 @sp 10
 @title SDL Mixer X (a fork of SDL_mixer)
@@ -38,7 +39,8 @@ All distributions of this file must be in an unaltered state, except for correct
 
 The latest copy of this document can be found at @url{http://www.jonatkins.org/SDL_mixer}
 @end titlepage
-@ifinfo
+
+@c @ifinfo
 @c =============================================================================
 @node    Top
 @top SDL Mixer X
@@ -58,7 +60,8 @@ The latest copy of this document can be found at @url{http://www.jonatkins.org/S
 
 * Index::            Index of selected words
 @end menu
-@end ifinfo
+@c @end ifinfo
+
 @c =============================================================================
 @page
 @node    Overview
@@ -84,7 +87,7 @@ This is the README in the SDL_mixer source archive.
 SDL Mixer X
 
 The latest version of this library is available from:@*
-@uref{http://www.libsdl.org/projects/SDL_mixer/,SDL_mixer Homepage}
+@uref{https://github.com/WohlSoft/SDL-Mixer-X,SDL Mixer X GitHub repository}
 
 Due to popular demand, here is a simple multi-channel audio mixer.
 It supports 8 channels of 16 bit stereo audio, plus a single channel
@@ -165,7 +168,7 @@ To use SDL_mixer functions in a C/C++ source code file, you must use the
 SDL_mixer_ext.h include file:
 
 @cartouche
-@code{  #include <SDL_mixer_ext.h>}
+@code{  #include "SDL_mixer_ext.h"}
 @end cartouche
 
 @c -----------------------------------------------------------------------------
@@ -261,14 +264,17 @@ These functions are useful, as they are the only/best ways to work with SDL_mixe
 @menu
 @b{Info}
 * Mix_Linked_Version::    Get version number
+
 @b{Activation}
 * Mix_Init::                    Initialize SDL_mixer
 * Mix_Quit::                    Cleanup SDL_mixer
 * Mix_OpenAudio::               Open sound mixer
 * Mix_CloseAudio::              Close sound mixer
+
 @b{Errors}
 * Mix_SetError::                Set the current error string
 * Mix_GetError::                Get the current error string
+
 @b{Settings}
 * Mix_QuerySpec::               Get output format
 * Mix_Timidity_addToPathList::  Append extra patches search path. Must be ran before initialization!
@@ -652,8 +658,10 @@ These functions work with @t{Mix_Chunk} samples.
 * Mix_LoadWAV_RW::           Using RWops
 * Mix_QuickLoad_WAV::        From memory, in output format already
 * Mix_QuickLoad_RAW::        From memory, in output format already
+
 @b{Settings}
 * Mix_VolumeChunk::          Set mix volume
+
 @b{Freeing}
 * Mix_FreeChunk::            Free sample
 @end menu
@@ -969,19 +977,23 @@ These functions work with sound effect mixer channels.  Music is not affected by
 @b{Setup}
 * Mix_AllocateChannels::   Set the number of channels to mix
 * Mix_Volume::             Set the mix volume of a channel
+
 @b{Playing}
 * Mix_PlayChannel::        Play loop
 * Mix_PlayChannelTimed::   Play loop and limit by time
 * Mix_FadeInChannel::      Play loop with fade in
 * Mix_FadeInChannelTimed:: Play loop with fade in and limit by time
+
 @b{Pausing}
 * Mix_Pause::              Pause a channel
 * Mix_Resume::             Resume a paused channel
+
 @b{Stopping}
 * Mix_HaltChannel::        Stop playing on a channel
 * Mix_ExpireChannel::      Change the timed stoppage of a channel
 * Mix_FadeOutChannel::     Stop playing channel after timed fade out
 * Mix_ChannelFinished::    Set callback for when channel finishes playing
+
 @b{Info}
 * Mix_Playing::            Get the active playing status of a channel
 * Mix_Paused::             Get the pause status of a channel
@@ -1649,14 +1661,17 @@ The default group tag number of -1, which refers to ALL channels.
 @menu
 @b{Setup}
 * Mix_ReserveChannels::   Prevent channels from being used in default group
+
 @b{TODO}
 * Mix_GroupChannel::      Add/remove channel to/from group
 * Mix_GroupChannels::     Add/remove segment of channels to/from group
+
 @b{Info}
 * Mix_GroupCount::        Get number of channels in group
 * Mix_GroupAvailable::    Get first inactive channel in group
 * Mix_GroupOldest::       Get oldest busy channel in group
 * Mix_GroupNewer::        Get youngest busy channel in group
+
 @b{Stopping}
 * Mix_FadeOutGroup::      Fade out a group over time
 * Mix_HaltGroup::         Stop a group
@@ -2036,13 +2051,16 @@ Music is therefore manipulated separately, except in post-processing hooks.
 * Mix_LoadMUS_RW::           Load Music through SDL RWops (not implemented yet)
 * Mix_LoadMUS_RW_ARG::       Load music through SDL RWops with passing of extra arguments string
 * Mix_LoadMUS_RW_GME::       Load music through SDL RWops with passing of GME track number
+
 @b{Free}
 * Mix_FreeMusic::            Free a Mix_Music
+
 @b{Playing}
 * Mix_PlayMusic::            Play music, with looping
 * Mix_FadeInMusic::          Play music, with looping, and fade in
 * Mix_FadeInMusicPos::       Play music from a start point, with looping, and fade in
 * Mix_HookMusic::            Hook for a custom music player
+
 @b{Settings}
 * Mix_VolumeMusic::          Set music volume
 * Mix_PauseMusic::           Pause music
@@ -2051,10 +2069,16 @@ Music is therefore manipulated separately, except in post-processing hooks.
 * Mix_SetMusicPosition::     Set position of playback in stream
 * Mix_SetMusicCMD::          Use external program for music playback
 @c Mix_SetSynchroValue::      seems useless! (return -1;)
+
+@b{MIDI settings}
+* Mix_SetMidiDevice::        Set a MIDI sequencer to play MIDI music
+* Mix_SetLockMIDIArgs::      Enable ignoring of MIDI arguments and locking of current MIDI setup
+
 @b{Stopping}
 * Mix_HaltMusic::            Stop music playback
 * Mix_FadeOutMusic::         Stop music, with fade out
 * Mix_HookMusicFinished::    Set a callback for when music stops
+
 @b{Info}
 * Mix_GetMusicType::         Get the music encoding type
 * Mix_PlayingMusic::         Test whether music is playing
@@ -2062,6 +2086,7 @@ Music is therefore manipulated separately, except in post-processing hooks.
 * Mix_FadingMusic::          Get status of current music fade activity
 * Mix_GetMusicHookData::     Retrieve the Mix_HookMusic @var{arg}
 @c Mix_GetSynchroValue::      seems useless! (return -1;)
+
 @b{Meta-Tags}
 * Mix_GetMusicTitle::        Retrieve the title meta-tag of currently playing @var{music}
 * Mix_GetMusicTitleTag::     Retrieve the title meta-tag of currently playing @var{music}
@@ -2737,6 +2762,66 @@ if(Mix_SetMusicCMD("mpg123 -q")==-1) @{
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
+@node Mix_SetMidiDevice
+@subsection Mix_SetMidiDevice
+@findex Mix_SetMidiDevice
+
+@noindent
+@code{int @b{Mix_SetMidiDevice}(int @var{device})}
+
+@table @var
+@item device
+A @b{MIDI_*} enum value which identifies MIDI sequencer you want to use
+@end table
+
+@noindent
+Allows to choose a MIDI sequencer to play MIDI files.
+@b{NOTE}: new choosen MIDI device begins to work on  MIDI music file reopen
+
+@noindent
+@b{Returns}: 0 on success, or -1 on any errors, such as MIDI sequencer is unknown or does not built with this library assembly.
+@cartouche
+@example
+//Set libOPNMIDI as MIDI playing sequencer
+Mix_SetMidiDevice(MIDI_OPNMIDI);
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_SetLockMIDIArgs}
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_SetLockMIDIArgs
+@subsection Mix_SetLockMIDIArgs
+@findex Mix_SetLockMIDIArgs
+
+@noindent
+@code{void @b{Mix_SetLockMIDIArgs}(int @var{lock_midiargs})}
+
+@table @var
+@item lock_midiargs
+0 to disable locking or 1 to enable locking of MIDI arguments passed through @code{Mix_LoadMUS(filename)} function
+@end table
+
+@noindent
+Allows to don't reset MIDI arguments to default when is no arguments passed through @code{Mix_LoadMUS(filename)} function, or different arguments was passed.
+
+@cartouche
+@example
+//Turn on ignoring of MIDI arguments
+Mix_SetLockMIDIArgs(1);
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_SetMidiDevice}
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
 @node Mix_HaltMusic
 @subsection Mix_HaltMusic
 @findex Mix_HaltMusic
@@ -3192,6 +3277,7 @@ mixed stream which contains all the channels including music.
 * Mix_UnregisterEffect::           Unhook a processor from a channel
 * Mix_UnregisterAllEffects::       Unhook all processors from a channel
 * Mix_SetPostMix::                 Hook in a postmix processor
+
 @b{Built-in Processors}
 * Mix_SetPanning::                 Stereo panning
 * Mix_SetDistance::                Distance attenuation (volume)
@@ -3800,7 +3886,7 @@ or free some memory.  It should free memory at least, because the processor coul
 @chapter Defines
 
 @table @b
-@cindex MIx_MAJOR_VERSION
+@cindex MIX_MAJOR_VERSION
 @cindex SDL_MIXER_MAJOR_VERSION
 @item SDL_MIXER_MAJOR_VERSION
 @code{1}@*
@@ -3870,6 +3956,16 @@ Also known as @dfn{Big-Endian}.  Which means the most significant byte comes fir
 (SDL defines this as @b{SDL_BYTEORDER==SDL_LIL_ENDIAN})
 @end cartouche
 
+@c -----------------------------------------------------------------------------
+@page
+@c =============================================================================
+@contents
+
+@c -----------------------------------------------------------------------------
+@page
+@c =============================================================================
+@shortcontents
+
 @c =============================================================================
 @page
 @node Index
@@ -3878,3 +3974,4 @@ Also known as @dfn{Big-Endian}.  Which means the most significant byte comes fir
 @printindex cp
 
 @bye
+

@@ -41,20 +41,10 @@ ul.toc {list-style: none}
 
 <body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
 
-<p>This is an unofficial document for the SDL_mixer library API
-and official for SDL Mixer X.
-</p>
-<p>Copyright &copy; 2009 Jonathan Atkins (original documentation)
-Copyright &copy; 2017 Vitaliy Novichkov (SDL Mixer X specific updates)
-</p>
-<p>Permission is granted to distribute freely, or in a distribution of any kind.
-All distributions of this file must be in an unaltered state, except for corrections.
-</p>
-<p>The latest copy of original document can be found at <a href="http://www.jonatkins.org/SDL_mixer">http://www.jonatkins.org/SDL_mixer</a>
-</p><a name="Top"></a>
+<a name="Top"></a>
 <table cellpadding="1" cellspacing="1" border="0">
 <tr><td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -80,6 +70,7 @@ All distributions of this file must be in an unaltered state, except for correct
 </td></tr>
 </table>
 
+
 <hr size="1">
 <a name="Overview"></a>
 <table cellpadding="1" cellspacing="1" border="0">
@@ -94,7 +85,7 @@ All distributions of this file must be in an unaltered state, except for correct
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -118,7 +109,7 @@ All distributions of this file must be in an unaltered state, except for correct
 <p>SDL Mixer X
 </p>
 <p>The latest version of this library is available from:<br>
-<a href="http://www.libsdl.org/projects/SDL_mixer/">SDL_mixer Homepage</a>
+<a href="https://github.com/WohlSoft/SDL-Mixer-X">SDL Mixer X GitHub repository</a>
 </p>
 <p>Due to popular demand, here is a simple multi-channel audio mixer.
 It supports 8 channels of 16 bit stereo audio, plus a single channel
@@ -162,7 +153,7 @@ see the file &quot;COPYING&quot; for details.
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -220,7 +211,7 @@ make
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -231,7 +222,7 @@ make
 SDL_mixer_ext.h include file:
 </p>
 <table class="cartouche" border="1"><tr><td>
-<p><code>  #include &lt;SDL_mixer_ext.h&gt;</code>
+<p><code>  #include &quot;SDL_mixer_ext.h&quot;</code>
 </p></td></tr></table>
 
 
@@ -249,7 +240,7 @@ SDL_mixer_ext.h include file:
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -288,7 +279,7 @@ compilation options.  After that, compiling with SDL Mixer X is quite easy.<br>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -355,7 +346,7 @@ Callbacks include Effects functions and other SDL_mixer audio hooks.
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -394,7 +385,7 @@ Callbacks include Effects functions and other SDL_mixer audio hooks.
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -406,23 +397,26 @@ Callbacks include Effects functions and other SDL_mixer audio hooks.
 <table class="menu" border="0" cellspacing="0">
 <tr><th colspan="3" align="left" valign="top"><pre class="menu-comment"><b>Info</b>
 </pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fLinked_005fVersion">4.1.1 Mix_Linked_Version</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">    Get version number
-<b>Activation</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fInit">4.1.2 Mix_Init</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                    Initialize SDL_mixer
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
+<b>Activation</b>
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fInit">4.1.2 Mix_Init</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                    Initialize SDL_mixer
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fQuit">4.1.3 Mix_Quit</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                    Cleanup SDL_mixer
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fOpenAudio">4.1.4 Mix_OpenAudio</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">               Open sound mixer
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fCloseAudio">4.1.5 Mix_CloseAudio</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">              Close sound mixer
-<b>Errors</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fSetError">4.1.6 Mix_SetError</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                Set the current error string
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
+<b>Errors</b>
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fSetError">4.1.6 Mix_SetError</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                Set the current error string
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fGetError">4.1.7 Mix_GetError</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                Get the current error string
-<b>Settings</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fQuerySpec">4.1.8 Mix_QuerySpec</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">               Get output format
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
+<b>Settings</b>
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fQuerySpec">4.1.8 Mix_QuerySpec</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">               Get output format
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fTimidity_005faddToPathList">4.1.9 Mix_Timidity_addToPathList</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">  Append extra patches search path. Must be ran before initialization!
 </td></tr>
@@ -443,7 +437,7 @@ Callbacks include Effects functions and other SDL_mixer audio hooks.
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -492,7 +486,7 @@ printf(&quot;running with SDL_mixer version: %d.%d.%d\n&quot;,
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -548,7 +542,7 @@ if(initted&amp;flags != flags) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -593,7 +587,7 @@ while(Mix_Init(0))
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -703,7 +697,7 @@ if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024)==-1) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -747,7 +741,7 @@ needs to be called before the device is actually closed.
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -786,7 +780,7 @@ This functions acts like printf, except that it is limited to <b>SDL_ERRBUFIZE</
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -825,7 +819,7 @@ from an SDL_mixer function call.
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -894,7 +888,7 @@ else {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -934,7 +928,7 @@ Mix_Timidity_addToPathList(mypath);
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -957,12 +951,14 @@ Mix_Timidity_addToPathList(mypath);
 <tr><td align="left" valign="top"><a href="#Mix_005fQuickLoad_005fWAV">4.2.5 Mix_QuickLoad_WAV</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        From memory, in output format already
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fQuickLoad_005fRAW">4.2.6 Mix_QuickLoad_RAW</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        From memory, in output format already
+</td></tr>
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
 <b>Settings</b>
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fVolumeChunk">4.2.7 Mix_VolumeChunk</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">          Set mix volume
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fVolumeChunk">4.2.7 Mix_VolumeChunk</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">          Set mix volume
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
 <b>Freeing</b>
-</td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fFreeChunk">4.2.8 Mix_FreeChunk</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Free sample
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fFreeChunk">4.2.8 Mix_FreeChunk</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Free sample
 </td></tr>
 </table>
 
@@ -981,7 +977,7 @@ Mix_Timidity_addToPathList(mypath);
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -1021,7 +1017,7 @@ printf(&quot;There are %d sample chunk deocoders available\n&quot;, Mix_GetNumCh
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -1071,7 +1067,7 @@ for(i=0; i&lt;max; ++i)
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -1123,7 +1119,7 @@ if(!sample) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -1179,7 +1175,7 @@ if(!sample) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -1232,7 +1228,7 @@ if(!(wave_chunk=Mix_QuickLoad_WAV(wave))) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -1285,7 +1281,7 @@ if(!(raw_chunk=Mix_QuickLoad_RAW(raw))) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -1338,7 +1334,7 @@ printf(&quot;previous_volume: %d\n&quot;, previous_volume);
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -1386,7 +1382,7 @@ sample=NULL; // to be safe...
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -1400,32 +1396,36 @@ sample=NULL; // to be safe...
 </pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fAllocateChannels">4.3.1 Mix_AllocateChannels</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">   Set the number of channels to mix
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fVolume">4.3.2 Mix_Volume</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">             Set the mix volume of a channel
-<b>Playing</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fPlayChannel">4.3.3 Mix_PlayChannel</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Play loop
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
+<b>Playing</b>
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fPlayChannel">4.3.3 Mix_PlayChannel</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Play loop
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fPlayChannelTimed">4.3.4 Mix_PlayChannelTimed</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">   Play loop and limit by time
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fFadeInChannel">4.3.5 Mix_FadeInChannel</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">      Play loop with fade in
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fFadeInChannelTimed">4.3.6 Mix_FadeInChannelTimed</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top"> Play loop with fade in and limit by time
-<b>Pausing</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fPause">4.3.7 Mix_Pause</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">              Pause a channel
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
+<b>Pausing</b>
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fPause">4.3.7 Mix_Pause</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">              Pause a channel
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fResume">4.3.8 Mix_Resume</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">             Resume a paused channel
-<b>Stopping</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fHaltChannel">4.3.9 Mix_HaltChannel</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Stop playing on a channel
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
+<b>Stopping</b>
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fHaltChannel">4.3.9 Mix_HaltChannel</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Stop playing on a channel
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fExpireChannel">4.3.10 Mix_ExpireChannel</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">      Change the timed stoppage of a channel
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fFadeOutChannel">4.3.11 Mix_FadeOutChannel</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">     Stop playing channel after timed fade out
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fChannelFinished">4.3.12 Mix_ChannelFinished</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">    Set callback for when channel finishes playing
-<b>Info</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fPlaying">4.3.13 Mix_Playing</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Get the active playing status of a channel
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
+<b>Info</b>
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fPlaying">4.3.13 Mix_Playing</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Get the active playing status of a channel
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fPaused">4.3.14 Mix_Paused</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">             Get the pause status of a channel
 </td></tr>
@@ -1450,7 +1450,7 @@ sample=NULL; // to be safe...
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -1497,7 +1497,7 @@ Mix_AllocateChannels(16);
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -1551,7 +1551,7 @@ printf(&quot;Average volume is %d\n&quot;,Mix_Volume(-1,-1));
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -1614,7 +1614,7 @@ if(Mix_PlayChannel(-1, sample, 0)==-1) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -1681,7 +1681,7 @@ if(Mix_PlayChannelTimed(-1, sample, -1 , 500)==-1) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -1750,7 +1750,7 @@ if(Mix_FadeInChannel(-1, sample, 2, 1000)==-1) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -1823,7 +1823,7 @@ if(Mix_PlayChannelTimed(-1, sample, -1 , 500)==-1) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -1868,7 +1868,7 @@ Mix_Pause(-1);
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -1911,7 +1911,7 @@ Mix_Resume(-1);
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -1958,7 +1958,7 @@ Mix_HaltChannel(-1);
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -2008,7 +2008,7 @@ Mix_ExpireChannel(-1, 2000);
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -2060,7 +2060,7 @@ printf(&quot;starting fade out of %d channels\n&quot;, Mix_FadeOutChannel(-1, 30
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -2118,7 +2118,7 @@ Mix_ChannelFinished(channelDone);
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -2167,7 +2167,7 @@ printf(&quot;%d channels are playing\n&quot;, Mix_Playing(-1));
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -2215,7 +2215,7 @@ printf(&quot;%d channels are paused\n&quot;, Mix_Paused(-1));
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -2275,7 +2275,7 @@ switch(Mix_FadingChannel(0)) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -2322,7 +2322,7 @@ printf(&quot;Mix_Chunk* last in use on channel 0 was: %08p\n&quot;, Mix_GetChunk
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -2336,23 +2336,26 @@ printf(&quot;Mix_Chunk* last in use on channel 0 was: %08p\n&quot;, Mix_GetChunk
 <table class="menu" border="0" cellspacing="0">
 <tr><th colspan="3" align="left" valign="top"><pre class="menu-comment"><b>Setup</b>
 </pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fReserveChannels">4.4.1 Mix_ReserveChannels</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">   Prevent channels from being used in default group
-<b>TODO</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fGroupChannel">4.4.2 Mix_GroupChannel</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">      Add/remove channel to/from group
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
+<b>TODO</b>
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fGroupChannel">4.4.2 Mix_GroupChannel</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">      Add/remove channel to/from group
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fGroupChannels">4.4.3 Mix_GroupChannels</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">     Add/remove segment of channels to/from group
-<b>Info</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fGroupCount">4.4.4 Mix_GroupCount</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Get number of channels in group
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
+<b>Info</b>
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fGroupCount">4.4.4 Mix_GroupCount</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Get number of channels in group
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fGroupAvailable">4.4.5 Mix_GroupAvailable</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">    Get first inactive channel in group
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fGroupOldest">4.4.6 Mix_GroupOldest</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">       Get oldest busy channel in group
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fGroupNewer">4.4.7 Mix_GroupNewer</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Get youngest busy channel in group
-<b>Stopping</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fFadeOutGroup">4.4.8 Mix_FadeOutGroup</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">      Fade out a group over time
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
+<b>Stopping</b>
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fFadeOutGroup">4.4.8 Mix_FadeOutGroup</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">      Fade out a group over time
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fHaltGroup">4.4.9 Mix_HaltGroup</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">         Stop a group
 </td></tr>
@@ -2373,7 +2376,7 @@ printf(&quot;Mix_Chunk* last in use on channel 0 was: %08p\n&quot;, Mix_GetChunk
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -2437,7 +2440,7 @@ if(reserved_count!=8) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -2489,7 +2492,7 @@ if(!Mix_GroupChannel(0,1)) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -2544,7 +2547,7 @@ if(Mix_GroupChannels(0,7,1)!=8) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -2590,7 +2593,7 @@ printf(&quot;There are %d channels in group 1\n&quot;, Mix_GroupCount(1));
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -2643,7 +2646,7 @@ if (channel==-1) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -2696,7 +2699,7 @@ if (channel==-1) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -2749,7 +2752,7 @@ if (channel==-1) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -2802,7 +2805,7 @@ printf(&quot;starting fade out of %d channels\n&quot;, Mix_FadeOutGroup(1, 3000)
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -2850,7 +2853,7 @@ Mix_HaltGroup(1);
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -2873,21 +2876,24 @@ Music is therefore manipulated separately, except in post-processing hooks.
 <tr><td align="left" valign="top"><a href="#Mix_005fLoadMUS_005fRW_005fARG">4.5.5 Mix_LoadMUS_RW_ARG</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">       Load music through SDL RWops with passing of extra arguments string
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fLoadMUS_005fRW_005fGME">4.5.6 Mix_LoadMUS_RW_GME</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">       Load music through SDL RWops with passing of GME track number
+</td></tr>
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
 <b>Free</b>
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fFreeMusic">4.5.7 Mix_FreeMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Free a Mix_Music
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fFreeMusic">4.5.7 Mix_FreeMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Free a Mix_Music
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
 <b>Playing</b>
-</td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fPlayMusic">4.5.8 Mix_PlayMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Play music, with looping
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fPlayMusic">4.5.8 Mix_PlayMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Play music, with looping
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fFadeInMusic">4.5.9 Mix_FadeInMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">          Play music, with looping, and fade in
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fFadeInMusicPos">4.5.10 Mix_FadeInMusicPos</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">       Play music from a start point, with looping, and fade in
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fHookMusic">4.5.11 Mix_HookMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Hook for a custom music player
-<b>Settings</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fVolumeMusic">4.5.12 Mix_VolumeMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">          Set music volume
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
+<b>Settings</b>
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fVolumeMusic">4.5.12 Mix_VolumeMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">          Set music volume
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fPauseMusic">4.5.13 Mix_PauseMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">           Pause music
 </td></tr>
@@ -2898,35 +2904,44 @@ Music is therefore manipulated separately, except in post-processing hooks.
 <tr><td align="left" valign="top"><a href="#Mix_005fSetMusicPosition">4.5.16 Mix_SetMusicPosition</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">     Set position of playback in stream
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fSetMusicCMD">4.5.17 Mix_SetMusicCMD</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">          Use external program for music playback
+</td></tr>
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
+<b>MIDI settings</b>
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fSetMidiDevice">4.5.18 Mix_SetMidiDevice</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Set a MIDI sequencer to play MIDI music
+</td></tr>
+<tr><td align="left" valign="top"><a href="#Mix_005fSetLockMIDIArgs">4.5.19 Mix_SetLockMIDIArgs</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">      Enable ignoring of MIDI arguments and locking of current MIDI setup
+</td></tr>
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
 <b>Stopping</b>
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fHaltMusic">4.5.20 Mix_HaltMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Stop music playback
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fHaltMusic">4.5.18 Mix_HaltMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Stop music playback
+<tr><td align="left" valign="top"><a href="#Mix_005fFadeOutMusic">4.5.21 Mix_FadeOutMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">         Stop music, with fade out
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fFadeOutMusic">4.5.19 Mix_FadeOutMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">         Stop music, with fade out
+<tr><td align="left" valign="top"><a href="#Mix_005fHookMusicFinished">4.5.22 Mix_HookMusicFinished</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">    Set a callback for when music stops
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fHookMusicFinished">4.5.20 Mix_HookMusicFinished</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">    Set a callback for when music stops
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
 <b>Info</b>
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fGetMusicType">4.5.23 Mix_GetMusicType</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">         Get the music encoding type
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicType">4.5.21 Mix_GetMusicType</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">         Get the music encoding type
+<tr><td align="left" valign="top"><a href="#Mix_005fPlayingMusic">4.5.24 Mix_PlayingMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">         Test whether music is playing
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fPlayingMusic">4.5.22 Mix_PlayingMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">         Test whether music is playing
+<tr><td align="left" valign="top"><a href="#Mix_005fPausedMusic">4.5.25 Mix_PausedMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">          Test whether music is paused
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fPausedMusic">4.5.23 Mix_PausedMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">          Test whether music is paused
+<tr><td align="left" valign="top"><a href="#Mix_005fFadingMusic">4.5.26 Mix_FadingMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">          Get status of current music fade activity
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fFadingMusic">4.5.24 Mix_FadingMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">          Get status of current music fade activity
+<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicHookData">4.5.27 Mix_GetMusicHookData</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">     Retrieve the Mix_HookMusic <var>arg</var>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicHookData">4.5.25 Mix_GetMusicHookData</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">     Retrieve the Mix_HookMusic <var>arg</var>
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
 <b>Meta-Tags</b>
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fGetMusicTitle">4.5.28 Mix_GetMusicTitle</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Retrieve the title meta-tag of currently playing <var>music</var>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicTitle">4.5.26 Mix_GetMusicTitle</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Retrieve the title meta-tag of currently playing <var>music</var>
+<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicTitleTag">4.5.29 Mix_GetMusicTitleTag</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">     Retrieve the title meta-tag of currently playing <var>music</var>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicTitleTag">4.5.27 Mix_GetMusicTitleTag</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">     Retrieve the title meta-tag of currently playing <var>music</var>
+<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicArtistTag">4.5.30 Mix_GetMusicArtistTag</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">    Retrieve the artist meta-tag of currently playing <var>music</var>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicArtistTag">4.5.28 Mix_GetMusicArtistTag</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">    Retrieve the artist meta-tag of currently playing <var>music</var>
+<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicAlbumTag">4.5.31 Mix_GetMusicAlbumTag</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">     Retrieve the album meta-tag of currently playing <var>music</var>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicAlbumTag">4.5.29 Mix_GetMusicAlbumTag</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">     Retrieve the album meta-tag of currently playing <var>music</var>
-</td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicCopyrightTag">4.5.30 Mix_GetMusicCopyrightTag</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top"> Retrieve the copyright meta-tag of currently playing <var>music</var>
+<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicCopyrightTag">4.5.32 Mix_GetMusicCopyrightTag</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top"> Retrieve the copyright meta-tag of currently playing <var>music</var>
 </td></tr>
 <tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
 </pre></th></tr></table>
@@ -2946,7 +2961,7 @@ Music is therefore manipulated separately, except in post-processing hooks.
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -2986,7 +3001,7 @@ printf(&quot;There are %d music deocoders available\n&quot;, Mix_GetNumMusicDeco
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -3036,7 +3051,7 @@ for(i=0; i&lt;max; ++i)
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -3090,7 +3105,7 @@ if(!music) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -3149,7 +3164,7 @@ if(!music) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -3211,7 +3226,7 @@ if(!music) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -3273,7 +3288,7 @@ if(!music) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -3317,7 +3332,7 @@ music=NULL; // so we know we freed it...
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -3370,7 +3385,7 @@ if(Mix_PlayMusic(music, -1)==-1) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -3430,7 +3445,7 @@ if(Mix_FadeInMusic(music, -1, 2000)==-1) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -3494,7 +3509,7 @@ if(Mix_FadeInMusicPos(music, -1, 2000)==-1) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -3560,7 +3575,7 @@ Mix_HookMusic(myMusicPlayer, &amp;music_pos);
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -3609,7 +3624,7 @@ printf(&quot;volume is now : %d\n&quot;, Mix_VolumeMusic(-1));
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -3648,7 +3663,7 @@ Mix_PauseMusic();
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -3685,7 +3700,7 @@ Mix_ResumeMusic();
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -3723,7 +3738,7 @@ Mix_RewindMusic();
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -3776,7 +3791,7 @@ if(Mix_SetMusicPosition(60.0)==-1) {
 <a name="Mix_005fSetMusicCMD"></a>
 <table cellpadding="1" cellspacing="1" border="0">
 <tr><td valign="middle" align="left">[<a href="#Mix_005fSetMusicPosition" title="Previous section in reading order"> &lt; </a>]</td>
-<td valign="middle" align="left">[<a href="#Mix_005fHaltMusic" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Mix_005fSetMidiDevice" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Functions" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#Music" title="Up section"> Up </a>]</td>
@@ -3786,7 +3801,7 @@ if(Mix_SetMusicPosition(60.0)==-1) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -3833,9 +3848,96 @@ if(Mix_SetMusicCMD(&quot;mpg123 -q&quot;)==-1) {
 </p>
 
 <hr size="6">
-<a name="Mix_005fHaltMusic"></a>
+<a name="Mix_005fSetMidiDevice"></a>
 <table cellpadding="1" cellspacing="1" border="0">
 <tr><td valign="middle" align="left">[<a href="#Mix_005fSetMusicCMD" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Mix_005fSetLockMIDIArgs" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#Functions" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Music" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="#Types" title="Next chapter"> &gt;&gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<a name="Mix_005fSetMidiDevice-1"></a>
+<h3 class="subsection">4.5.18 Mix_SetMidiDevice</h3>
+<a name="index-Mix_005fSetMidiDevice"></a>
+
+<p><code>int <b>Mix_SetMidiDevice</b>(int <var>device</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>device</var></dt>
+<dd><p>A <b>MIDI_*</b> enum value which identifies MIDI sequencer you want to use
+</p></dd>
+</dl>
+
+<p>Allows to choose a MIDI sequencer to play MIDI files.
+<b>NOTE</b>: new choosen MIDI device begins to work on  MIDI music file reopen
+</p>
+<p><b>Returns</b>: 0 on success, or -1 on any errors, such as MIDI sequencer is unknown or does not built with this library assembly.
+</p><table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">//Set libOPNMIDI as MIDI playing sequencer
+Mix_SetMidiDevice(MIDI_OPNMIDI);
+</pre></td></tr></table>
+</td></tr></table>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fSetLockMIDIArgs">Mix_SetLockMIDIArgs</a>
+</p>
+
+<hr size="6">
+<a name="Mix_005fSetLockMIDIArgs"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#Mix_005fSetMidiDevice" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Mix_005fHaltMusic" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#Functions" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Music" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="#Types" title="Next chapter"> &gt;&gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<a name="Mix_005fSetLockMIDIArgs-1"></a>
+<h3 class="subsection">4.5.19 Mix_SetLockMIDIArgs</h3>
+<a name="index-Mix_005fSetLockMIDIArgs"></a>
+
+<p><code>void <b>Mix_SetLockMIDIArgs</b>(int <var>lock_midiargs</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>lock_midiargs</var></dt>
+<dd><p>0 to disable locking or 1 to enable locking of MIDI arguments passed through <code>Mix_LoadMUS(filename)</code> function
+</p></dd>
+</dl>
+
+<p>Allows to don&rsquo;t reset MIDI arguments to default when is no arguments passed through <code>Mix_LoadMUS(filename)</code> function, or different arguments was passed.
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">//Turn on ignoring of MIDI arguments
+Mix_SetLockMIDIArgs(1);
+</pre></td></tr></table>
+</td></tr></table>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fSetMidiDevice">Mix_SetMidiDevice</a>
+</p>
+
+
+<hr size="6">
+<a name="Mix_005fHaltMusic"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#Mix_005fSetLockMIDIArgs" title="Previous section in reading order"> &lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#Mix_005fFadeOutMusic" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Functions" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
@@ -3846,12 +3948,12 @@ if(Mix_SetMusicCMD(&quot;mpg123 -q&quot;)==-1) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fHaltMusic-1"></a>
-<h3 class="subsection">4.5.18 Mix_HaltMusic</h3>
+<h3 class="subsection">4.5.20 Mix_HaltMusic</h3>
 <a name="index-Mix_005fHaltMusic"></a>
 
 <p><code>int <b>Mix_HaltMusic</b>()</code>
@@ -3886,12 +3988,12 @@ Mix_HaltMusic();
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fFadeOutMusic-1"></a>
-<h3 class="subsection">4.5.19 Mix_FadeOutMusic</h3>
+<h3 class="subsection">4.5.21 Mix_FadeOutMusic</h3>
 <a name="index-Mix_005fFadeOutMusic"></a>
 
 <p><code>int <b>Mix_FadeOutMusic</b>(int <var>ms</var>)</code>
@@ -3938,12 +4040,12 @@ while(!Mix_FadeOutMusic(3000) &amp;&amp; Mix_PlayingMusic()) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fHookMusicFinished-1"></a>
-<h3 class="subsection">4.5.20 Mix_HookMusicFinished</h3>
+<h3 class="subsection">4.5.22 Mix_HookMusicFinished</h3>
 <a name="index-Mix_005fHookMusicFinished"></a>
 
 <p><code>void <b>Mix_HookMusicFinished</b>(void (*<var>music_finished</var>)())</code>
@@ -3989,12 +4091,12 @@ Mix_HookMusicFinished(musicFinished);
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fGetMusicType-1"></a>
-<h3 class="subsection">4.5.21 Mix_GetMusicType</h3>
+<h3 class="subsection">4.5.23 Mix_GetMusicType</h3>
 <a name="index-Mix_005fGetMusicType"></a>
 
 <p><code>Mix_MusicType <b>Mix_GetMusicType</b>(const Mix_Music *<var>music</var>)</code>
@@ -4062,12 +4164,12 @@ switch(Mix_GetMusicType(NULL))
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fPlayingMusic-1"></a>
-<h3 class="subsection">4.5.22 Mix_PlayingMusic</h3>
+<h3 class="subsection">4.5.24 Mix_PlayingMusic</h3>
 <a name="index-Mix_005fPlayingMusic"></a>
 
 <p><code>int <b>Mix_PlayingMusic</b>()</code>
@@ -4103,12 +4205,12 @@ printf(&quot;music is%s playing.\n&quot;, Mix_PlayingMusic()?&quot;&quot;:&quot;
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fPausedMusic-1"></a>
-<h3 class="subsection">4.5.23 Mix_PausedMusic</h3>
+<h3 class="subsection">4.5.25 Mix_PausedMusic</h3>
 <a name="index-Mix_005fPausedMusic"></a>
 
 <p><code>int <b>Mix_PausedMusic</b>()</code>
@@ -4144,12 +4246,12 @@ printf(&quot;music is%s paused\n&quot;, Mix_PausedMusic()?&quot;&quot;:&quot; no
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fFadingMusic-1"></a>
-<h3 class="subsection">4.5.24 Mix_FadingMusic</h3>
+<h3 class="subsection">4.5.26 Mix_FadingMusic</h3>
 <a name="index-Mix_005fFadingMusic"></a>
 
 <p><code>Mix_Fading <b>Mix_FadingMusic</b>()</code>
@@ -4196,12 +4298,12 @@ switch(Mix_FadingMusic()) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fGetMusicHookData-1"></a>
-<h3 class="subsection">4.5.25 Mix_GetMusicHookData</h3>
+<h3 class="subsection">4.5.27 Mix_GetMusicHookData</h3>
 <a name="index-Mix_005fGetMusicHookData"></a>
 
 <p><code>void *<b>Mix_GetMusicHookData</b>()</code>
@@ -4235,12 +4337,12 @@ data=Mix_GetMusicHookData();
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fGetMusicTitle-1"></a>
-<h3 class="subsection">4.5.26 Mix_GetMusicTitle</h3>
+<h3 class="subsection">4.5.28 Mix_GetMusicTitle</h3>
 <a name="index-Mix_005fGetMusicTitle"></a>
 
 <p><code>const char *<b>Mix_GetMusicTitle</b>(const Mix_Music *music)</code>
@@ -4277,12 +4379,12 @@ title=Mix_GetMusicTitle(myMusic);
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fGetMusicTitleTag-1"></a>
-<h3 class="subsection">4.5.27 Mix_GetMusicTitleTag</h3>
+<h3 class="subsection">4.5.29 Mix_GetMusicTitleTag</h3>
 <a name="index-Mix_005fGetMusicTitleTag"></a>
 
 <p><code>const char *<b>Mix_GetMusicTitleTag</b>(const Mix_Music *music)</code>
@@ -4319,12 +4421,12 @@ title=Mix_GetMusicTitleTag(myMusic);
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fGetMusicArtistTag-1"></a>
-<h3 class="subsection">4.5.28 Mix_GetMusicArtistTag</h3>
+<h3 class="subsection">4.5.30 Mix_GetMusicArtistTag</h3>
 <a name="index-Mix_005fGetMusicArtistTag"></a>
 
 <p><code>const char *<b>Mix_GetMusicArtistTag</b>(const Mix_Music *music)</code>
@@ -4361,12 +4463,12 @@ title=Mix_GetMusicArtistTag(myMusic);
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fGetMusicAlbumTag-1"></a>
-<h3 class="subsection">4.5.29 Mix_GetMusicAlbumTag</h3>
+<h3 class="subsection">4.5.31 Mix_GetMusicAlbumTag</h3>
 <a name="index-Mix_005fGetMusicAlbumTag"></a>
 
 <p><code>const char *<b>Mix_GetMusicAlbumTag</b>(const Mix_Music *music)</code>
@@ -4403,12 +4505,12 @@ title=Mix_GetMusicAlbumTag(myMusic);
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fGetMusicCopyrightTag-1"></a>
-<h3 class="subsection">4.5.30 Mix_GetMusicCopyrightTag</h3>
+<h3 class="subsection">4.5.32 Mix_GetMusicCopyrightTag</h3>
 <a name="index-Mix_005fGetMusicCopyrightTag"></a>
 
 <p><code>const char *<b>Mix_GetMusicCopyrightTag</b>(const Mix_Music *music)</code>
@@ -4445,7 +4547,7 @@ title=Mix_GetMusicCopyrightTag(myMusic);
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -4467,9 +4569,10 @@ mixed stream which contains all the channels including music.
 <tr><td align="left" valign="top"><a href="#Mix_005fUnregisterAllEffects">4.6.3 Mix_UnregisterAllEffects</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">       Unhook all processors from a channel
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fSetPostMix">4.6.4 Mix_SetPostMix</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                 Hook in a postmix processor
-<b>Built-in Processors</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fSetPanning">4.6.5 Mix_SetPanning</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                 Stereo panning
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
+<b>Built-in Processors</b>
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fSetPanning">4.6.5 Mix_SetPanning</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                 Stereo panning
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fSetDistance">4.6.6 Mix_SetDistance</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                Distance attenuation (volume)
 </td></tr>
@@ -4499,7 +4602,7 @@ If the environment variable is defined these processors may use more memory or r
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -4567,7 +4670,7 @@ if(!Mix_RegisterEffect(MIX_CHANNEL_POST, noEffect, NULL, NULL)) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -4620,7 +4723,7 @@ while(Mix_UnregisterEffect(MIX_CHANNEL_POST, noEffect));
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -4669,7 +4772,7 @@ if(!Mix_UnregisterAllEffects(0)) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -4727,7 +4830,7 @@ Mix_SetPostMix(noEffect, NULL);
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -4791,7 +4894,7 @@ if(!Mix_SetPanning(1, 255, 127)) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -4844,7 +4947,7 @@ if(!Mix_SetDistance(1, 255)) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -4908,7 +5011,7 @@ if(!Mix_SetPosition(2, 135, 100)) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -4961,7 +5064,7 @@ if(!Mix_SetReverseStereo(MIX_CHANNEL_POST, 1)) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -5002,7 +5105,7 @@ if(!Mix_SetReverseStereo(MIX_CHANNEL_POST, 1)) {
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -5064,7 +5167,7 @@ when mixing the sample.
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -5101,7 +5204,7 @@ Who knows why it isn&rsquo;t a pointer in this typedef...
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -5155,7 +5258,7 @@ Otherwise they are self explanatory.
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -5193,7 +5296,7 @@ Otherwise they are self explanatory.
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -5233,7 +5336,7 @@ Otherwise they are self explanatory.
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -5289,7 +5392,7 @@ It may also be advantageous to keep the effect state in the <var>udata</var>, wi
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -5338,7 +5441,7 @@ or free some memory.  It should free memory at least, because the processor coul
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -5346,7 +5449,7 @@ or free some memory.  It should free memory at least, because the processor coul
 <h1 class="chapter">6. Defines</h1>
 
 <dl compact="compact">
-<dd><a name="index-MIx_005fMAJOR_005fVERSION"></a>
+<dd><a name="index-MIX_005fMAJOR_005fVERSION"></a>
 <a name="index-SDL_005fMIXER_005fMAJOR_005fVERSION"></a>
 </dd>
 <dt> <b>SDL_MIXER_MAJOR_VERSION</b></dt>
@@ -5422,7 +5525,7 @@ is called for the setting to take effect.
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -5444,6 +5547,10 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 </p></td></tr></table>
 
 
+
+
+
+
 <hr size="6">
 <a name="Index"></a>
 <table cellpadding="1" cellspacing="1" border="0">
@@ -5458,7 +5565,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
@@ -5510,23 +5617,23 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <tr><td></td><td valign="top"><a href="#index-Mix_005fFadeInMusicPos"><code>Mix_FadeInMusicPos</code></a></td><td valign="top"><a href="#Mix_005fFadeInMusicPos">4.5.10 Mix_FadeInMusicPos</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fFadeOutChannel"><code>Mix_FadeOutChannel</code></a></td><td valign="top"><a href="#Mix_005fFadeOutChannel">4.3.11 Mix_FadeOutChannel</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fFadeOutGroup"><code>Mix_FadeOutGroup</code></a></td><td valign="top"><a href="#Mix_005fFadeOutGroup">4.4.8 Mix_FadeOutGroup</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fFadeOutMusic"><code>Mix_FadeOutMusic</code></a></td><td valign="top"><a href="#Mix_005fFadeOutMusic">4.5.19 Mix_FadeOutMusic</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fFadeOutMusic"><code>Mix_FadeOutMusic</code></a></td><td valign="top"><a href="#Mix_005fFadeOutMusic">4.5.21 Mix_FadeOutMusic</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fFading"><code>Mix_Fading</code></a></td><td valign="top"><a href="#Mix_005fFading">5.5 Mix_Fading</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fFadingChannel"><code>Mix_FadingChannel</code></a></td><td valign="top"><a href="#Mix_005fFadingChannel">4.3.15 Mix_FadingChannel</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fFadingMusic"><code>Mix_FadingMusic</code></a></td><td valign="top"><a href="#Mix_005fFadingMusic">4.5.24 Mix_FadingMusic</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fFadingMusic"><code>Mix_FadingMusic</code></a></td><td valign="top"><a href="#Mix_005fFadingMusic">4.5.26 Mix_FadingMusic</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fFreeChunk"><code>Mix_FreeChunk</code></a></td><td valign="top"><a href="#Mix_005fFreeChunk">4.2.8 Mix_FreeChunk</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fFreeMusic"><code>Mix_FreeMusic</code></a></td><td valign="top"><a href="#Mix_005fFreeMusic">4.5.7 Mix_FreeMusic</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fGetChunk"><code>Mix_GetChunk</code></a></td><td valign="top"><a href="#Mix_005fGetChunk">4.3.16 Mix_GetChunk</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fGetChunkDecoder"><code>Mix_GetChunkDecoder</code></a></td><td valign="top"><a href="#Mix_005fGetChunkDecoder">4.2.2 Mix_GetChunkDecoder</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fGetError"><code>Mix_GetError</code></a></td><td valign="top"><a href="#Mix_005fGetError">4.1.7 Mix_GetError</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicAlbumTag"><code>Mix_GetMusicAlbumTag</code></a></td><td valign="top"><a href="#Mix_005fGetMusicAlbumTag">4.5.29 Mix_GetMusicAlbumTag</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicArtistTag"><code>Mix_GetMusicArtistTag</code></a></td><td valign="top"><a href="#Mix_005fGetMusicArtistTag">4.5.28 Mix_GetMusicArtistTag</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicCopyrightTag"><code>Mix_GetMusicCopyrightTag</code></a></td><td valign="top"><a href="#Mix_005fGetMusicCopyrightTag">4.5.30 Mix_GetMusicCopyrightTag</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicAlbumTag"><code>Mix_GetMusicAlbumTag</code></a></td><td valign="top"><a href="#Mix_005fGetMusicAlbumTag">4.5.31 Mix_GetMusicAlbumTag</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicArtistTag"><code>Mix_GetMusicArtistTag</code></a></td><td valign="top"><a href="#Mix_005fGetMusicArtistTag">4.5.30 Mix_GetMusicArtistTag</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicCopyrightTag"><code>Mix_GetMusicCopyrightTag</code></a></td><td valign="top"><a href="#Mix_005fGetMusicCopyrightTag">4.5.32 Mix_GetMusicCopyrightTag</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicDecoder"><code>Mix_GetMusicDecoder</code></a></td><td valign="top"><a href="#Mix_005fGetMusicDecoder">4.5.2 Mix_GetMusicDecoder</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicHookData"><code>Mix_GetMusicHookData</code></a></td><td valign="top"><a href="#Mix_005fGetMusicHookData">4.5.25 Mix_GetMusicHookData</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicTitle"><code>Mix_GetMusicTitle</code></a></td><td valign="top"><a href="#Mix_005fGetMusicTitle">4.5.26 Mix_GetMusicTitle</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicTitleTag"><code>Mix_GetMusicTitleTag</code></a></td><td valign="top"><a href="#Mix_005fGetMusicTitleTag">4.5.27 Mix_GetMusicTitleTag</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicType"><code>Mix_GetMusicType</code></a></td><td valign="top"><a href="#Mix_005fGetMusicType">4.5.21 Mix_GetMusicType</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicHookData"><code>Mix_GetMusicHookData</code></a></td><td valign="top"><a href="#Mix_005fGetMusicHookData">4.5.27 Mix_GetMusicHookData</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicTitle"><code>Mix_GetMusicTitle</code></a></td><td valign="top"><a href="#Mix_005fGetMusicTitle">4.5.28 Mix_GetMusicTitle</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicTitleTag"><code>Mix_GetMusicTitleTag</code></a></td><td valign="top"><a href="#Mix_005fGetMusicTitleTag">4.5.29 Mix_GetMusicTitleTag</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicType"><code>Mix_GetMusicType</code></a></td><td valign="top"><a href="#Mix_005fGetMusicType">4.5.23 Mix_GetMusicType</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fGetNumChunkDecoders"><code>Mix_GetNumChunkDecoders</code></a></td><td valign="top"><a href="#Mix_005fGetNumChunkDecoders">4.2.1 Mix_GetNumChunkDecoders</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fGetNumMusicDecoders"><code>Mix_GetNumMusicDecoders</code></a></td><td valign="top"><a href="#Mix_005fGetNumMusicDecoders">4.5.1 Mix_GetNumMusicDecoders</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fGroupAvailable"><code>Mix_GroupAvailable</code></a></td><td valign="top"><a href="#Mix_005fGroupAvailable">4.4.5 Mix_GroupAvailable</a></td></tr>
@@ -5537,9 +5644,9 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <tr><td></td><td valign="top"><a href="#index-Mix_005fGroupOldest"><code>Mix_GroupOldest</code></a></td><td valign="top"><a href="#Mix_005fGroupOldest">4.4.6 Mix_GroupOldest</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fHaltChannel"><code>Mix_HaltChannel</code></a></td><td valign="top"><a href="#Mix_005fHaltChannel">4.3.9 Mix_HaltChannel</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fHaltGroup"><code>Mix_HaltGroup</code></a></td><td valign="top"><a href="#Mix_005fHaltGroup">4.4.9 Mix_HaltGroup</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fHaltMusic"><code>Mix_HaltMusic</code></a></td><td valign="top"><a href="#Mix_005fHaltMusic">4.5.18 Mix_HaltMusic</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fHaltMusic"><code>Mix_HaltMusic</code></a></td><td valign="top"><a href="#Mix_005fHaltMusic">4.5.20 Mix_HaltMusic</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fHookMusic"><code>Mix_HookMusic</code></a></td><td valign="top"><a href="#Mix_005fHookMusic">4.5.11 Mix_HookMusic</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fHookMusicFinished"><code>Mix_HookMusicFinished</code></a></td><td valign="top"><a href="#Mix_005fHookMusicFinished">4.5.20 Mix_HookMusicFinished</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fHookMusicFinished"><code>Mix_HookMusicFinished</code></a></td><td valign="top"><a href="#Mix_005fHookMusicFinished">4.5.22 Mix_HookMusicFinished</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fInit"><code>Mix_Init</code></a></td><td valign="top"><a href="#Mix_005fInit">4.1.2 Mix_Init</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fLinked_005fVersion"><code>Mix_Linked_Version</code></a></td><td valign="top"><a href="#Mix_005fLinked_005fVersion">4.1.1 Mix_Linked_Version</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fLoadMUS"><code>Mix_LoadMUS</code></a></td><td valign="top"><a href="#Mix_005fLoadMUS">4.5.3 Mix_LoadMUS</a></td></tr>
@@ -5548,7 +5655,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <tr><td></td><td valign="top"><a href="#index-Mix_005fLoadMUS_005fRW_005fGME"><code>Mix_LoadMUS_RW_GME</code></a></td><td valign="top"><a href="#Mix_005fLoadMUS_005fRW_005fGME">4.5.6 Mix_LoadMUS_RW_GME</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fLoadWAV"><code>Mix_LoadWAV</code></a></td><td valign="top"><a href="#Mix_005fLoadWAV">4.2.3 Mix_LoadWAV</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fLoadWAV_005fRW"><code>Mix_LoadWAV_RW</code></a></td><td valign="top"><a href="#Mix_005fLoadWAV_005fRW">4.2.4 Mix_LoadWAV_RW</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-MIx_005fMAJOR_005fVERSION">MIx_MAJOR_VERSION</a></td><td valign="top"><a href="#Defines">6. Defines</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-MIX_005fMAJOR_005fVERSION">MIX_MAJOR_VERSION</a></td><td valign="top"><a href="#Defines">6. Defines</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-MIX_005fMAX_005fVOLUME">MIX_MAX_VOLUME</a></td><td valign="top"><a href="#Defines">6. Defines</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fMIDI_005fDevice"><code>Mix_MIDI_Device</code></a></td><td valign="top"><a href="#Mix_005fMIDI_005fDevice">5.4 Mix_MIDI_Device</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-MIX_005fMINOR_005fVERSION">MIX_MINOR_VERSION</a></td><td valign="top"><a href="#Defines">6. Defines</a></td></tr>
@@ -5558,14 +5665,14 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <tr><td></td><td valign="top"><a href="#index-MIX_005fPATCHLEVEL">MIX_PATCHLEVEL</a></td><td valign="top"><a href="#Defines">6. Defines</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fPause"><code>Mix_Pause</code></a></td><td valign="top"><a href="#Mix_005fPause">4.3.7 Mix_Pause</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fPaused"><code>Mix_Paused</code></a></td><td valign="top"><a href="#Mix_005fPaused">4.3.14 Mix_Paused</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fPausedMusic"><code>Mix_PausedMusic</code></a></td><td valign="top"><a href="#Mix_005fPausedMusic">4.5.23 Mix_PausedMusic</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fPausedMusic"><code>Mix_PausedMusic</code></a></td><td valign="top"><a href="#Mix_005fPausedMusic">4.5.25 Mix_PausedMusic</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fPauseMusic"><code>Mix_PauseMusic</code></a></td><td valign="top"><a href="#Mix_005fPauseMusic">4.5.13 Mix_PauseMusic</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fPlayChannel"><code>Mix_PlayChannel</code></a></td><td valign="top"><a href="#Mix_005fPlayChannel">4.3.3 Mix_PlayChannel</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fPlayChannel-1"><code>Mix_PlayChannel</code></a></td><td valign="top"><a href="#Mix_005fReserveChannels">4.4.1 Mix_ReserveChannels</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fPlayChannelTimed"><code>Mix_PlayChannelTimed</code></a></td><td valign="top"><a href="#Mix_005fPlayChannelTimed">4.3.4 Mix_PlayChannelTimed</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fPlayChannelTimed-1"><code>Mix_PlayChannelTimed</code></a></td><td valign="top"><a href="#Mix_005fReserveChannels">4.4.1 Mix_ReserveChannels</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fPlaying"><code>Mix_Playing</code></a></td><td valign="top"><a href="#Mix_005fPlaying">4.3.13 Mix_Playing</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fPlayingMusic"><code>Mix_PlayingMusic</code></a></td><td valign="top"><a href="#Mix_005fPlayingMusic">4.5.22 Mix_PlayingMusic</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fPlayingMusic"><code>Mix_PlayingMusic</code></a></td><td valign="top"><a href="#Mix_005fPlayingMusic">4.5.24 Mix_PlayingMusic</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fPlayMusic"><code>Mix_PlayMusic</code></a></td><td valign="top"><a href="#Mix_005fPlayMusic">4.5.8 Mix_PlayMusic</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fQuerySpec"><code>Mix_QuerySpec</code></a></td><td valign="top"><a href="#Mix_005fQuerySpec">4.1.8 Mix_QuerySpec</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fQuickLoad_005fRAW"><code>Mix_QuickLoad_RAW</code></a></td><td valign="top"><a href="#Mix_005fQuickLoad_005fRAW">4.2.6 Mix_QuickLoad_RAW</a></td></tr>
@@ -5578,6 +5685,8 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <tr><td></td><td valign="top"><a href="#index-Mix_005fRewindMusic"><code>Mix_RewindMusic</code></a></td><td valign="top"><a href="#Mix_005fRewindMusic">4.5.15 Mix_RewindMusic</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fSetDistance"><code>Mix_SetDistance</code></a></td><td valign="top"><a href="#Mix_005fSetDistance">4.6.6 Mix_SetDistance</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fSetError"><code>Mix_SetError</code></a></td><td valign="top"><a href="#Mix_005fSetError">4.1.6 Mix_SetError</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fSetLockMIDIArgs"><code>Mix_SetLockMIDIArgs</code></a></td><td valign="top"><a href="#Mix_005fSetLockMIDIArgs">4.5.19 Mix_SetLockMIDIArgs</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fSetMidiDevice"><code>Mix_SetMidiDevice</code></a></td><td valign="top"><a href="#Mix_005fSetMidiDevice">4.5.18 Mix_SetMidiDevice</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fSetMusicCMD"><code>Mix_SetMusicCMD</code></a></td><td valign="top"><a href="#Mix_005fSetMusicCMD">4.5.17 Mix_SetMusicCMD</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fSetMusicPosition"><code>Mix_SetMusicPosition</code></a></td><td valign="top"><a href="#Mix_005fSetMusicPosition">4.5.16 Mix_SetMusicPosition</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fSetPanning"><code>Mix_SetPanning</code></a></td><td valign="top"><a href="#Mix_005fSetPanning">4.6.5 Mix_SetPanning</a></td></tr>
@@ -5623,10 +5732,169 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 </td></tr></table>
 
 <hr size="6">
+<a name="SEC_Contents"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h1>Table of Contents</h1>
+<div class="contents">
+
+<ul class="toc">
+  <li><a name="toc-Overview-1" href="#Overview">1. Overview</a></li>
+  <li><a name="toc-Getting-Started-1" href="#Getting-Started">2. Getting Started</a>
+  <ul class="toc">
+    <li><a name="toc-Includes-1" href="#Includes">2.1 Includes</a></li>
+    <li><a name="toc-Compiling-1" href="#Compiling">2.2 Compiling</a></li>
+  </ul></li>
+  <li><a name="toc-Conflicts-1" href="#Conflicts">3. Conflicts</a></li>
+  <li><a name="toc-Functions-1" href="#Functions">4. Functions</a>
+  <ul class="toc">
+    <li><a name="toc-General-1" href="#General">4.1 General</a>
+    <ul class="toc">
+      <li><a name="toc-Mix_005fLinked_005fVersion-1" href="#Mix_005fLinked_005fVersion">4.1.1 Mix_Linked_Version</a></li>
+      <li><a name="toc-Mix_005fInit-1" href="#Mix_005fInit">4.1.2 Mix_Init</a></li>
+      <li><a name="toc-Mix_005fQuit-1" href="#Mix_005fQuit">4.1.3 Mix_Quit</a></li>
+      <li><a name="toc-Mix_005fOpenAudio-1" href="#Mix_005fOpenAudio">4.1.4 Mix_OpenAudio</a></li>
+      <li><a name="toc-Mix_005fCloseAudio-1" href="#Mix_005fCloseAudio">4.1.5 Mix_CloseAudio</a></li>
+      <li><a name="toc-Mix_005fSetError-1" href="#Mix_005fSetError">4.1.6 Mix_SetError</a></li>
+      <li><a name="toc-Mix_005fGetError-1" href="#Mix_005fGetError">4.1.7 Mix_GetError</a></li>
+      <li><a name="toc-Mix_005fQuerySpec-1" href="#Mix_005fQuerySpec">4.1.8 Mix_QuerySpec</a></li>
+      <li><a name="toc-Mix_005fTimidity_005faddToPathList-1" href="#Mix_005fTimidity_005faddToPathList">4.1.9 Mix_Timidity_addToPathList</a></li>
+    </ul></li>
+    <li><a name="toc-Samples-1" href="#Samples">4.2 Samples</a>
+    <ul class="toc">
+      <li><a name="toc-Mix_005fGetNumChunkDecoders-1" href="#Mix_005fGetNumChunkDecoders">4.2.1 Mix_GetNumChunkDecoders</a></li>
+      <li><a name="toc-Mix_005fGetChunkDecoder-1" href="#Mix_005fGetChunkDecoder">4.2.2 Mix_GetChunkDecoder</a></li>
+      <li><a name="toc-Mix_005fLoadWAV-1" href="#Mix_005fLoadWAV">4.2.3 Mix_LoadWAV</a></li>
+      <li><a name="toc-Mix_005fLoadWAV_005fRW-1" href="#Mix_005fLoadWAV_005fRW">4.2.4 Mix_LoadWAV_RW</a></li>
+      <li><a name="toc-Mix_005fQuickLoad_005fWAV-1" href="#Mix_005fQuickLoad_005fWAV">4.2.5 Mix_QuickLoad_WAV</a></li>
+      <li><a name="toc-Mix_005fQuickLoad_005fRAW-1" href="#Mix_005fQuickLoad_005fRAW">4.2.6 Mix_QuickLoad_RAW</a></li>
+      <li><a name="toc-Mix_005fVolumeChunk-1" href="#Mix_005fVolumeChunk">4.2.7 Mix_VolumeChunk</a></li>
+      <li><a name="toc-Mix_005fFreeChunk-1" href="#Mix_005fFreeChunk">4.2.8 Mix_FreeChunk</a></li>
+    </ul></li>
+    <li><a name="toc-Channels-1" href="#Channels">4.3 Channels</a>
+    <ul class="toc">
+      <li><a name="toc-Mix_005fAllocateChannels-1" href="#Mix_005fAllocateChannels">4.3.1 Mix_AllocateChannels</a></li>
+      <li><a name="toc-Mix_005fVolume-1" href="#Mix_005fVolume">4.3.2 Mix_Volume</a></li>
+      <li><a name="toc-Mix_005fPlayChannel-1" href="#Mix_005fPlayChannel">4.3.3 Mix_PlayChannel</a></li>
+      <li><a name="toc-Mix_005fPlayChannelTimed-1" href="#Mix_005fPlayChannelTimed">4.3.4 Mix_PlayChannelTimed</a></li>
+      <li><a name="toc-Mix_005fFadeInChannel-1" href="#Mix_005fFadeInChannel">4.3.5 Mix_FadeInChannel</a></li>
+      <li><a name="toc-Mix_005fFadeInChannelTimed-1" href="#Mix_005fFadeInChannelTimed">4.3.6 Mix_FadeInChannelTimed</a></li>
+      <li><a name="toc-Mix_005fPause-1" href="#Mix_005fPause">4.3.7 Mix_Pause</a></li>
+      <li><a name="toc-Mix_005fResume-1" href="#Mix_005fResume">4.3.8 Mix_Resume</a></li>
+      <li><a name="toc-Mix_005fHaltChannel-1" href="#Mix_005fHaltChannel">4.3.9 Mix_HaltChannel</a></li>
+      <li><a name="toc-Mix_005fExpireChannel-1" href="#Mix_005fExpireChannel">4.3.10 Mix_ExpireChannel</a></li>
+      <li><a name="toc-Mix_005fFadeOutChannel-1" href="#Mix_005fFadeOutChannel">4.3.11 Mix_FadeOutChannel</a></li>
+      <li><a name="toc-Mix_005fChannelFinished-1" href="#Mix_005fChannelFinished">4.3.12 Mix_ChannelFinished</a></li>
+      <li><a name="toc-Mix_005fPlaying-1" href="#Mix_005fPlaying">4.3.13 Mix_Playing</a></li>
+      <li><a name="toc-Mix_005fPaused-1" href="#Mix_005fPaused">4.3.14 Mix_Paused</a></li>
+      <li><a name="toc-Mix_005fFadingChannel-1" href="#Mix_005fFadingChannel">4.3.15 Mix_FadingChannel</a></li>
+      <li><a name="toc-Mix_005fGetChunk-1" href="#Mix_005fGetChunk">4.3.16 Mix_GetChunk</a></li>
+    </ul></li>
+    <li><a name="toc-Groups-1" href="#Groups">4.4 Groups</a>
+    <ul class="toc">
+      <li><a name="toc-Mix_005fReserveChannels-1" href="#Mix_005fReserveChannels">4.4.1 Mix_ReserveChannels</a></li>
+      <li><a name="toc-Mix_005fGroupChannel-1" href="#Mix_005fGroupChannel">4.4.2 Mix_GroupChannel</a></li>
+      <li><a name="toc-Mix_005fGroupChannels-1" href="#Mix_005fGroupChannels">4.4.3 Mix_GroupChannels</a></li>
+      <li><a name="toc-Mix_005fGroupCount-1" href="#Mix_005fGroupCount">4.4.4 Mix_GroupCount</a></li>
+      <li><a name="toc-Mix_005fGroupAvailable-1" href="#Mix_005fGroupAvailable">4.4.5 Mix_GroupAvailable</a></li>
+      <li><a name="toc-Mix_005fGroupOldest-1" href="#Mix_005fGroupOldest">4.4.6 Mix_GroupOldest</a></li>
+      <li><a name="toc-Mix_005fGroupNewer-1" href="#Mix_005fGroupNewer">4.4.7 Mix_GroupNewer</a></li>
+      <li><a name="toc-Mix_005fFadeOutGroup-1" href="#Mix_005fFadeOutGroup">4.4.8 Mix_FadeOutGroup</a></li>
+      <li><a name="toc-Mix_005fHaltGroup-1" href="#Mix_005fHaltGroup">4.4.9 Mix_HaltGroup</a></li>
+    </ul></li>
+    <li><a name="toc-Music-1" href="#Music">4.5 Music</a>
+    <ul class="toc">
+      <li><a name="toc-Mix_005fGetNumMusicDecoders-1" href="#Mix_005fGetNumMusicDecoders">4.5.1 Mix_GetNumMusicDecoders</a></li>
+      <li><a name="toc-Mix_005fGetMusicDecoder-1" href="#Mix_005fGetMusicDecoder">4.5.2 Mix_GetMusicDecoder</a></li>
+      <li><a name="toc-Mix_005fLoadMUS-1" href="#Mix_005fLoadMUS">4.5.3 Mix_LoadMUS</a></li>
+      <li><a name="toc-Mix_005fLoadMUS_005fRW-1" href="#Mix_005fLoadMUS_005fRW">4.5.4 Mix_LoadMUS_RW</a></li>
+      <li><a name="toc-Mix_005fLoadMUS_005fRW_005fARG-1" href="#Mix_005fLoadMUS_005fRW_005fARG">4.5.5 Mix_LoadMUS_RW_ARG</a></li>
+      <li><a name="toc-Mix_005fLoadMUS_005fRW_005fGME-1" href="#Mix_005fLoadMUS_005fRW_005fGME">4.5.6 Mix_LoadMUS_RW_GME</a></li>
+      <li><a name="toc-Mix_005fFreeMusic-1" href="#Mix_005fFreeMusic">4.5.7 Mix_FreeMusic</a></li>
+      <li><a name="toc-Mix_005fPlayMusic-1" href="#Mix_005fPlayMusic">4.5.8 Mix_PlayMusic</a></li>
+      <li><a name="toc-Mix_005fFadeInMusic-1" href="#Mix_005fFadeInMusic">4.5.9 Mix_FadeInMusic</a></li>
+      <li><a name="toc-Mix_005fFadeInMusicPos-1" href="#Mix_005fFadeInMusicPos">4.5.10 Mix_FadeInMusicPos</a></li>
+      <li><a name="toc-Mix_005fHookMusic-1" href="#Mix_005fHookMusic">4.5.11 Mix_HookMusic</a></li>
+      <li><a name="toc-Mix_005fVolumeMusic-1" href="#Mix_005fVolumeMusic">4.5.12 Mix_VolumeMusic</a></li>
+      <li><a name="toc-Mix_005fPauseMusic-1" href="#Mix_005fPauseMusic">4.5.13 Mix_PauseMusic</a></li>
+      <li><a name="toc-Mix_005fResumeMusic-1" href="#Mix_005fResumeMusic">4.5.14 Mix_ResumeMusic</a></li>
+      <li><a name="toc-Mix_005fRewindMusic-1" href="#Mix_005fRewindMusic">4.5.15 Mix_RewindMusic</a></li>
+      <li><a name="toc-Mix_005fSetMusicPosition-1" href="#Mix_005fSetMusicPosition">4.5.16 Mix_SetMusicPosition</a></li>
+      <li><a name="toc-Mix_005fSetMusicCMD-1" href="#Mix_005fSetMusicCMD">4.5.17 Mix_SetMusicCMD</a></li>
+      <li><a name="toc-Mix_005fSetMidiDevice-1" href="#Mix_005fSetMidiDevice">4.5.18 Mix_SetMidiDevice</a></li>
+      <li><a name="toc-Mix_005fSetLockMIDIArgs-1" href="#Mix_005fSetLockMIDIArgs">4.5.19 Mix_SetLockMIDIArgs</a></li>
+      <li><a name="toc-Mix_005fHaltMusic-1" href="#Mix_005fHaltMusic">4.5.20 Mix_HaltMusic</a></li>
+      <li><a name="toc-Mix_005fFadeOutMusic-1" href="#Mix_005fFadeOutMusic">4.5.21 Mix_FadeOutMusic</a></li>
+      <li><a name="toc-Mix_005fHookMusicFinished-1" href="#Mix_005fHookMusicFinished">4.5.22 Mix_HookMusicFinished</a></li>
+      <li><a name="toc-Mix_005fGetMusicType-1" href="#Mix_005fGetMusicType">4.5.23 Mix_GetMusicType</a></li>
+      <li><a name="toc-Mix_005fPlayingMusic-1" href="#Mix_005fPlayingMusic">4.5.24 Mix_PlayingMusic</a></li>
+      <li><a name="toc-Mix_005fPausedMusic-1" href="#Mix_005fPausedMusic">4.5.25 Mix_PausedMusic</a></li>
+      <li><a name="toc-Mix_005fFadingMusic-1" href="#Mix_005fFadingMusic">4.5.26 Mix_FadingMusic</a></li>
+      <li><a name="toc-Mix_005fGetMusicHookData-1" href="#Mix_005fGetMusicHookData">4.5.27 Mix_GetMusicHookData</a></li>
+      <li><a name="toc-Mix_005fGetMusicTitle-1" href="#Mix_005fGetMusicTitle">4.5.28 Mix_GetMusicTitle</a></li>
+      <li><a name="toc-Mix_005fGetMusicTitleTag-1" href="#Mix_005fGetMusicTitleTag">4.5.29 Mix_GetMusicTitleTag</a></li>
+      <li><a name="toc-Mix_005fGetMusicArtistTag-1" href="#Mix_005fGetMusicArtistTag">4.5.30 Mix_GetMusicArtistTag</a></li>
+      <li><a name="toc-Mix_005fGetMusicAlbumTag-1" href="#Mix_005fGetMusicAlbumTag">4.5.31 Mix_GetMusicAlbumTag</a></li>
+      <li><a name="toc-Mix_005fGetMusicCopyrightTag-1" href="#Mix_005fGetMusicCopyrightTag">4.5.32 Mix_GetMusicCopyrightTag</a></li>
+    </ul></li>
+    <li><a name="toc-Effects-1" href="#Effects">4.6 Effects</a>
+    <ul class="toc">
+      <li><a name="toc-Mix_005fRegisterEffect-1" href="#Mix_005fRegisterEffect">4.6.1 Mix_RegisterEffect</a></li>
+      <li><a name="toc-Mix_005fUnregisterEffect-1" href="#Mix_005fUnregisterEffect">4.6.2 Mix_UnregisterEffect</a></li>
+      <li><a name="toc-Mix_005fUnregisterAllEffects-1" href="#Mix_005fUnregisterAllEffects">4.6.3 Mix_UnregisterAllEffects</a></li>
+      <li><a name="toc-Mix_005fSetPostMix-1" href="#Mix_005fSetPostMix">4.6.4 Mix_SetPostMix</a></li>
+      <li><a name="toc-Mix_005fSetPanning-1" href="#Mix_005fSetPanning">4.6.5 Mix_SetPanning</a></li>
+      <li><a name="toc-Mix_005fSetDistance-1" href="#Mix_005fSetDistance">4.6.6 Mix_SetDistance</a></li>
+      <li><a name="toc-Mix_005fSetPosition-1" href="#Mix_005fSetPosition">4.6.7 Mix_SetPosition</a></li>
+      <li><a name="toc-Mix_005fSetReverseStereo-1" href="#Mix_005fSetReverseStereo">4.6.8 Mix_SetReverseStereo</a></li>
+    </ul>
+</li>
+  </ul></li>
+  <li><a name="toc-Types-1" href="#Types">5. Types</a>
+  <ul class="toc">
+    <li><a name="toc-Mix_005fChunk-1" href="#Mix_005fChunk">5.1 Mix_Chunk</a></li>
+    <li><a name="toc-Mix_005fMusic-1" href="#Mix_005fMusic">5.2 Mix_Music</a></li>
+    <li><a name="toc-Mix_005fMusicType-1" href="#Mix_005fMusicType">5.3 Mix_MusicType</a></li>
+    <li><a name="toc-Mix_005fMIDI_005fDevice-1" href="#Mix_005fMIDI_005fDevice">5.4 Mix_MIDI_Device</a></li>
+    <li><a name="toc-Mix_005fFading-1" href="#Mix_005fFading">5.5 Mix_Fading</a></li>
+    <li><a name="toc-Mix_005fEffectFunc_005ft-1" href="#Mix_005fEffectFunc_005ft">5.6 Mix_EffectFunc_t</a></li>
+    <li><a name="toc-Mix_005fEffectDone_005ft-1" href="#Mix_005fEffectDone_005ft">5.7 Mix_EffectDone_t</a></li>
+  </ul></li>
+  <li><a name="toc-Defines-1" href="#Defines">6. Defines</a></li>
+  <li><a name="toc-Glossary-1" href="#Glossary">7. Glossary</a></li>
+  <li><a name="toc-Index-1" href="#Index">Index</a></li>
+</ul>
+</div>
+<hr size="1">
+<a name="SEC_Overview"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h1>Short Table of Contents</h1>
+<div class="shortcontents">
+<ul class="toc">
+<li><a name="stoc-Overview-1" href="#Overview">1. Overview</a></li>
+<li><a name="stoc-Getting-Started-1" href="#Getting-Started">2. Getting Started</a></li>
+<li><a name="stoc-Conflicts-1" href="#Conflicts">3. Conflicts</a></li>
+<li><a name="stoc-Functions-1" href="#Functions">4. Functions</a></li>
+<li><a name="stoc-Types-1" href="#Types">5. Types</a></li>
+<li><a name="stoc-Defines-1" href="#Defines">6. Defines</a></li>
+<li><a name="stoc-Glossary-1" href="#Glossary">7. Glossary</a></li>
+<li><a name="stoc-Index-1" href="#Index">Index</a></li>
+</ul>
+</div>
+<hr size="1">
 <a name="SEC_About"></a>
 <table cellpadding="1" cellspacing="1" border="0">
 <tr><td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[Contents]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>

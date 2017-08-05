@@ -131,7 +131,7 @@ typedef enum
    Attempt to toggle unsupported MIDI device takes no effect
    (for case when library built without linking of required library)
 */
-int MIX_SetMidiDevice(int device);
+int Mix_SetMidiDevice(int device);
 
 /*
     Returns current ADLMIDI bank number
