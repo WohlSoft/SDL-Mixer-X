@@ -189,12 +189,12 @@ SDL Mixer X supports playing music and sound samples from the following formats:
 - WAVE/RIFF (.wav)@*
 - AIFF (.aiff)@*
 - VOC (.voc)@*
-- MOD (.mod .xm .s3m .669 .it .med and more) requiring libmikmod or libmodplug built in package@*
-- MIDI (.mid) using timidity, ADLMIDI, OPNMIDI or native midi hardware@*
+- MOD (.mod .xm .s3m .669 .it .med and more) requiring libmikmod or libmodplug @b{[Mixer 2.0]} built in package@*
+- MIDI (.mid) using timidity, FluidSynth @b{[Mixer 2.0]}, ADLMIDI @b{[Mixer X]}, OPNMIDI @b{[Mixer X]} or native midi hardware@*
 - OggVorbis (.ogg) requiring ogg/vorbis libraries built in package@*
 - MP3 (.mp3) requiring MAD or SMPEG libraries built in package@*
 - FLAC (.flac) requiring the FLAC library built in package@*
-- GME (.spc .nsf .hes .vgm and more) emulated chiptunes from various console games@*
+- GME (.spc .nsf .hes .vgm and more) emulated chiptunes from various console games @b{[Mixer X]} @*
 - also any command-line player, which is not mixed by SDL Mixer X...@*
 
 @noindent
@@ -264,11 +264,9 @@ Use @code{Mix_CloseAudio} instead.
 Use @code{Mix_Pause(-1)} and @code{Mix_PauseMusic} instead, to pause.@*
 Use @code{Mix_Resume(-1)} and @code{Mix_ResumeMusic} instead, to unpause.
 @item SDL_LockAudio
-This is just not needed since SDL_mixer handles this for you.@*
-Using it may cause problems as well.
+Use @code{Mix_LockAudio} instead.
 @item SDL_UnlockAudio
-This is just not needed since SDL_mixer handles this for you.@*
-Using it may cause problems as well.
+Use @code{Mix_UnlockAudio} instead.
 @end table
 
 You may call the following functions freely:
@@ -793,7 +791,7 @@ File name to load sample from.
 @end table
 
 @noindent
-Load @var{file} for use as a sample.  This is actually @code{Mix_LoadWAV_RW(SDL_RWFromFile(@var{file}, "rb"), 1)}.  This can load WAVE, AIFF, RIFF, OGG, and VOC files.@*
+Load @var{file} for use as a sample.  This is actually @code{Mix_LoadWAV_RW(SDL_RWFromFile(@var{file}, "rb"), 1)}.  This can load WAVE, AIFF, RIFF, OGG, FLAC, MP3, and VOC files.@*
 @b{Note:} You must call SDL_OpenAudio before this. It must know the output characteristics so it can convert the sample for playback, it does this conversion at load time.
 
 @noindent
@@ -834,7 +832,7 @@ A non-zero value mean is will automatically close/free the @var{src} for you.
 @end table
 
 @noindent
-Load @var{src} for use as a sample.  This can load WAVE, AIFF, RIFF, OGG, and VOC formats.
+Load @var{src} for use as a sample.  This can load WAVE, AIFF, RIFF, OGG, FLAC, MP3, and VOC formats.
 Using @code{SDL_RWops} is not covered here, but they enable you to load from almost any source.
 @b{Note:} You must call SDL_OpenAudio before this. It must know the output characteristics so it can convert the sample for playback, it does this conversion at load time.
 
@@ -2377,8 +2375,10 @@ Music is therefore manipulated separately, except in post-processing hooks.
 @c Mix_SetSynchroValue::          seems useless! (return -1;)
 
 @b{MIDI settings}
-* Mix_SetMidiDevice::        Set a MIDI sequencer to play MIDI music
-* Mix_SetLockMIDIArgs::      Enable ignoring of MIDI arguments and locking of current MIDI setup
+* Mix_GetMidiDevice::        Get type of MIDI device currently in use @b{[Mixer X]}
+* Mix_GetNextMidiDevice::    Get type of MIDI device prepared for next opening of MIDI file @b{[Mixer X]}
+* Mix_SetMidiDevice::        Set a MIDI sequencer to play MIDI music @b{[Mixer X]}
+* Mix_SetLockMIDIArgs::      Enable ignoring of MIDI arguments and locking of current MIDI setup @b{[Mixer X]}
 
 @b{Stopping}
 * Mix_HaltMusic::            Stop music playback
@@ -3017,8 +3017,11 @@ Posistion to play from.
 Set the position of the currently playing music.  The @var{position} takes different meanings for different music sources.  It only works on the music sources listed below.
 
 @table @b
+@item WAV
+Jumps to @var{position} seconds from the beginning of the song.
 @item MOD
-The double is cast to Uint16 and used for a pattern number in the module.@*
+ModPlug: Jumps to @var{position} seconds from the beginning of the song.
+Mikmod: The double is cast to Uint16 and used for a pattern number in the module.@*
 Passing zero is similar to rewinding the song.
 @item OGG
 Jumps to @var{position} seconds from the beginning of the song.
@@ -3225,6 +3228,100 @@ if(Mix_SetMusicCMD("mpg123 -q")==-1) @{
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
+@node Mix_GetMidiDevice
+@subsection Mix_GetMidiDevice
+@findex Mix_GetMidiDevice
+
+@noindent
+@code{int @b{Mix_GetMidiDevice}()}
+
+@noindent
+Tells currently using MIDI sequencer to play MIDI files.
+
+@noindent
+@b{Returns}: The type of currently using MIDI device.
+
+@cartouche
+@example
+// print the type of music currently playing
+switch(Mix_GetMidiDevice())
+@{
+    MIDI_ADLMIDI:
+        printf("ADLMIDI is active.\n");
+        break;
+    MIDI_Native:
+        printf("Operating system native MIDI is active.\n");
+        break;
+    MIDI_Timidity:
+        printf("Timidity is active.\n");
+        break;
+    MIDI_OPNMIDI:
+        printf("OPNMIDI is active.\n");
+        break;
+    MIDI_Fluidsynth:
+        printf("FluidSynth is active.\n");
+        break;
+    default:
+        printf("Unknown MIDI device is using.\n");
+        break;
+@}
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_SetMidiDevice}
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_GetNextMidiDevice
+@subsection Mix_GetNextMidiDevice
+@findex Mix_GetNextMidiDevice
+
+@noindent
+@code{int @b{Mix_GetNextMidiDevice}()}
+
+@noindent
+Tells MIDI sequencer recently choosen by @ref{Mix_SetMidiDevice} which will be use in next open of MIDI file.
+
+@noindent
+@b{Returns}: The type of currently using MIDI device.
+
+@cartouche
+@example
+// print the type of music currently playing
+switch(Mix_GetNextMidiDevice())
+@{
+    MIDI_ADLMIDI:
+        printf("ADLMIDI is next.\n");
+        break;
+    MIDI_Native:
+        printf("Operating system native MIDI is next.\n");
+        break;
+    MIDI_Timidity:
+        printf("Timidity is next.\n");
+        break;
+    MIDI_OPNMIDI:
+        printf("OPNMIDI is next.\n");
+        break;
+    MIDI_Fluidsynth:
+        printf("FluidSynth is next.\n");
+        break;
+    default:
+        printf("Unknown MIDI device is next.\n");
+        break;
+@}
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_GetMidiDevice},
+@ref{Mix_SetMidiDevice}
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
 @node Mix_SetMidiDevice
 @subsection Mix_SetMidiDevice
 @findex Mix_SetMidiDevice
@@ -3424,7 +3521,10 @@ switch(Mix_GetMusicType(NULL))
         printf("WAVE/RIFF music is playing.\n");
         break;
     MUS_MOD:
-        printf("MOD music is playing.\n");
+        printf("MOD (MikMod) music is playing.\n");
+        break;
+    MUS_MODPLUG: // [Mixer 2.0]
+        printf("MOD (ModPlug) music is playing.\n");
         break;
     MUS_MID:
         printf("MIDI music is playing.\n");
@@ -3433,7 +3533,13 @@ switch(Mix_GetMusicType(NULL))
         printf("OGG music is playing.\n");
         break;
     MUS_MP3:
-        printf("MP3 music is playing.\n");
+        printf("MP3 (SMPEG) music is playing.\n");
+        break;
+    MUS_MP3_MAD: // [Mixer 2.0]
+        printf("MP3 (libMAD) music is playing.\n");
+        break;
+    MUS_GME: // [Mixer X]
+        printf("Game Music Emulators music is playing.\n");
         break;
     default:
         printf("Unknown music is playing.\n");
