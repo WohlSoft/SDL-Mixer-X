@@ -330,7 +330,7 @@ extern DECLSPEC void SDLCALL Mix_ChannelFinished(void (*channel_finished)(int ch
  *  to be mixed with the rest of the channels and music for the final output
  *  stream.
  *
- * DO NOT EVER call Mix_LockAudio() from your callback function!
+ * DO NOT EVER call SDL_LockAudio() from your callback function!
  */
 typedef void (*Mix_EffectFunc_t)(int chan, void *stream, int len, void *udata);
 
@@ -341,7 +341,7 @@ typedef void (*Mix_EffectFunc_t)(int chan, void *stream, int len, void *udata);
  *  a channel via Mix_AllocateChannels(), or unregister a callback while
  *  it's still playing.
  *
- * DO NOT EVER call Mix_LockAudio() from your callback function!
+ * DO NOT EVER call SDL_LockAudio() from your callback function!
  */
 typedef void (*Mix_EffectDone_t)(int chan, void *udata);
 
@@ -387,7 +387,7 @@ typedef void (*Mix_EffectDone_t)(int chan, void *udata);
  *  through Mix_SetPostMix() runs, and then the stream goes to the audio
  *  device.
  *
- * DO NOT EVER call Mix_LockAudio() from your callback function!
+ * DO NOT EVER call SDL_LockAudio() from your callback function!
  *
  * returns zero if error (no such channel), nonzero if added.
  *  Error messages can be retrieved from Mix_GetError().

@@ -110,7 +110,7 @@ static int lock_midi_args = 0;
 struct _Mix_Music
 {
     AudioCodec          codec;
-    AudioCodecStream*   music;
+    AudioCodecStream   *music;
     Mix_MusicType       type;
     Mix_Fading fading;
     int fade_step;
@@ -323,31 +323,31 @@ int open_music(SDL_AudioSpec *mixer)
     #endif
 
     #ifdef MID_MUSIC
-        #ifdef USE_ADL_MIDI
-        if(ADLMIDI_init2(&available_MIDI[MIDI_ADLMIDI], mixer) == 0)
-            add_music_decoder("ADLMIDI");
-        #endif
+    #ifdef USE_ADL_MIDI
+    if(ADLMIDI_init2(&available_MIDI[MIDI_ADLMIDI], mixer) == 0)
+        add_music_decoder("ADLMIDI");
+    #endif
 
-        #ifdef USE_OPN2_MIDI
-        if(OPNMIDI_init2(&available_MIDI[MIDI_OPNMIDI], mixer) == 0)
-            add_music_decoder("OPNMIDI");
-        #endif
+    #ifdef USE_OPN2_MIDI
+    if(OPNMIDI_init2(&available_MIDI[MIDI_OPNMIDI], mixer) == 0)
+        add_music_decoder("OPNMIDI");
+    #endif
 
-        #ifdef USE_TIMIDITY_MIDI
-        if(Timidity_init2(&available_MIDI[MIDI_Timidity], mixer) == 0)
-            add_music_decoder("TIMIDITY");
-        #endif
+    #ifdef USE_TIMIDITY_MIDI
+    if(Timidity_init2(&available_MIDI[MIDI_Timidity], mixer) == 0)
+        add_music_decoder("TIMIDITY");
+    #endif
 
-        #ifdef USE_FLUIDSYNTH_MIDI
-        if(fluidsynth_init2(&available_MIDI[MIDI_Fluidsynth], mixer) == 0)
-            add_music_decoder("FLUIDSYNTH");
-        #endif
+    #ifdef USE_FLUIDSYNTH_MIDI
+    if(fluidsynth_init2(&available_MIDI[MIDI_Fluidsynth], mixer) == 0)
+        add_music_decoder("FLUIDSYNTH");
+    #endif
 
-        #ifdef USE_NATIVE_MIDI
-        NativeMIDI_init2(&available_MIDI[MIDI_Native]);
-        if(available_MIDI[MIDI_Native].isValid)
-            add_music_decoder("NATIVEMIDI");
-        #endif
+    #ifdef USE_NATIVE_MIDI
+    NativeMIDI_init2(&available_MIDI[MIDI_Native]);
+    if(available_MIDI[MIDI_Native].isValid)
+        add_music_decoder("NATIVEMIDI");
+    #endif
     #endif
 
     music_playing = NULL;
@@ -536,8 +536,8 @@ static Mix_MusicType detect_music_type(SDL_RWops *src)
 
     /* WAVE files have the magic four bytes "RIFF"
        AIFF files have the magic 12 bytes "FORM" XXXX "AIFF" */
-    if( ((strncmp((char *)magic, "RIFF", 4) == 0) && (strncmp((char *)(moremagic + 4), "WAVE", 4) == 0))
-        || ((strncmp((char *)magic, "FORM", 4) == 0) && (strncmp((const char *)(moremagic + 4), "XDIR", 4) != 0)) ) /*Don't parse XMIDI as AIFF file*/
+    if(((strncmp((char *)magic, "RIFF", 4) == 0) && (strncmp((char *)(moremagic + 4), "WAVE", 4) == 0))
+       || ((strncmp((char *)magic, "FORM", 4) == 0) && (strncmp((const char *)(moremagic + 4), "XDIR", 4) != 0)))  /*Don't parse XMIDI as AIFF file*/
         return MUS_WAV;
 
     /* Ogg Vorbis files have the magic four bytes "OggS" */
@@ -555,8 +555,8 @@ static Mix_MusicType detect_music_type(SDL_RWops *src)
     #ifdef USE_ADL_MIDI
     if(strncmp((char *)magic, "MUS\x1A", 4) == 0)
         return compatible_midi_player();
-    if( (memcmp(extramagic, "FORM", 4) == 0) &&
-        (memcmp(extramagic + 8, "XDIR", 4) == 0) )
+    if((memcmp(extramagic, "FORM", 4) == 0) &&
+       (memcmp(extramagic + 8, "XDIR", 4) == 0))
         return compatible_midi_player();
     if(strncmp((char *)magic, "GMF\x1", 4) == 0)
         return MUS_ADLMIDI;
@@ -760,7 +760,7 @@ void parse_adlmidi_args(char *args)
     }
 }
 
-AudioCodec chooseMidiCodec(char* extraSettings, int force_codec)
+AudioCodec chooseMidiCodec(char *extraSettings, int force_codec)
 {
     if((need_reset_midi == 1) || (lock_midi_args == 0))
     {
@@ -988,7 +988,7 @@ Mix_Music *SDLCALLCC Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int 
 
     switch(type)
     {
-    #ifdef WAV_MUSIC
+        #ifdef WAV_MUSIC
     case MUS_WAV:
         music->type = MUS_WAV;
         music->codec = available_codecs[MUS_WAV];
@@ -996,9 +996,9 @@ Mix_Music *SDLCALLCC Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int 
         if(music->music != NULL)
             music->error = 0;
         break;
-    #endif
+        #endif
 
-    #ifdef OGG_MUSIC
+        #ifdef OGG_MUSIC
     case MUS_OGG:
         music->type = MUS_OGG;
         music->codec = available_codecs[MUS_OGG];
@@ -1006,9 +1006,9 @@ Mix_Music *SDLCALLCC Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int 
         if(music->music != NULL)
             music->error = 0;
         break;
-    #endif
+        #endif
 
-    #ifdef FLAC_MUSIC
+        #ifdef FLAC_MUSIC
     case MUS_FLAC:
         music->type = MUS_FLAC;
         music->codec = available_codecs[MUS_FLAC];
@@ -1018,9 +1018,9 @@ Mix_Music *SDLCALLCC Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int 
         else
             Mix_SetError("Could not initialize FLAC stream.");
         break;
-    #endif
+        #endif
 
-    #if defined(MP3_MUSIC)
+        #if defined(MP3_MUSIC)
     case MUS_MP3:
         if(Mix_Init(MIX_INIT_MP3))
         {
@@ -1035,7 +1035,7 @@ Mix_Music *SDLCALLCC Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int 
         }
         break;
 
-    #elif defined(MP3_MAD_MUSIC)
+        #elif defined(MP3_MAD_MUSIC)
     case MUS_MP3:
     case MUS_MP3_MAD:
         music->type = MUS_MP3_MAD;
@@ -1046,9 +1046,9 @@ Mix_Music *SDLCALLCC Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int 
         else
             Mix_SetError("Could not initialize MPEG stream.");
         break;
-    #endif
+        #endif
 
-    #ifdef MID_MUSIC
+        #ifdef MID_MUSIC
 
         #ifdef USE_ADL_MIDI
     case MUS_ADLMIDI:
@@ -1068,48 +1068,48 @@ Mix_Music *SDLCALLCC Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int 
             switch(mididevice_current)
             {
             case MIDI_ADLMIDI:
-            #ifdef USE_ADL_MIDI
+                #ifdef USE_ADL_MIDI
                 Mix_SetError("ADLMIDI is not ok");
-            #else
+                #else
                 Mix_SetError("ADLMIDI support is disabled in this build");
-            #endif
-            break;
+                #endif
+                break;
 
             case MIDI_OPNMIDI:
-            #ifdef USE_OPN2_MIDI
+                #ifdef USE_OPN2_MIDI
                 Mix_SetError("OPNMIDI is not ok");
-            #else
+                #else
                 Mix_SetError("OPNMIDI support is disabled in this build");
-            #endif
-            break;
+                #endif
+                break;
 
             case MIDI_Native:
-            #ifdef USE_NATIVE_MIDI
+                #ifdef USE_NATIVE_MIDI
                 Mix_SetError("Native MIDI is not ok: %s", native_midi_error());
-            #else
+                #else
                 Mix_SetError("Native MIDI support is disabled in this build");
-            #endif
-            break;
+                #endif
+                break;
 
             case MIDI_Fluidsynth:
-            #ifdef USE_FLUIDSYNTH_MIDI
+                #ifdef USE_FLUIDSYNTH_MIDI
                 Mix_SetError("FluidSynth is not ok");
-            #else
+                #else
                 Mix_SetError("FluidSynth support is disabled in this build");
-            #endif
-            break;
+                #endif
+                break;
 
             case MIDI_Timidity:
-            #ifdef USE_TIMIDITY_MIDI
+                #ifdef USE_TIMIDITY_MIDI
                 Mix_SetError("Timidty is not ok: %s", Timidity_Error());
-            #else
+                #else
                 Mix_SetError("Timidty support is disabled in this build");
-            #endif
-            break;
+                #endif
+                break;
 
             default:
                 Mix_SetError("Unknown/Unsupported MIDI device (Index %d)", mididevice_current);
-            break;
+                break;
             }
         }
         break;
@@ -1300,12 +1300,14 @@ static int music_internal_play(Mix_Music *music, double position)
         music->codec.play(music->music);
         if((music->codec.capabilities() & ACODEC_NEED_VOLUME_INIT_POST) != 0)
             music_internal_initialize_volume();
-    } else {
+    }
+    else
+    {
         Mix_SetError("Can't play unknown music type");
         retval = -1;
     }
 
-/*skip:*/
+    /*skip:*/
 
     /* Set the playback position, note any errors if an offset is used */
     if(retval == 0)
@@ -1391,7 +1393,9 @@ int music_internal_position(double position)
     if(music_playing->codec.isValid && music_playing->music)
     {
         music_playing->codec.jumpToTime(music_playing->music, position);
-    } else {
+    }
+    else
+    {
         /* TODO: Implement this for other music backends */
         retval = -1;
     }
@@ -1425,7 +1429,9 @@ double music_internal_position_get(Mix_Music *music)
     if(music->codec.isValid && music->music)
     {
         retval = music->codec.getCurrentTime(music->music);
-    } else {
+    }
+    else
+    {
         retval = -1.0;
     }
 
@@ -1457,7 +1463,9 @@ double music_internal_position_total(Mix_Music *music)
     if(music->codec.isValid && music->music)
     {
         retval = music->codec.getTimeLength(music->music);
-    } else {
+    }
+    else
+    {
         retval = -1.0;
     }
 
@@ -1488,7 +1496,9 @@ double music_internal_loop_start(Mix_Music *music)
     if(music->codec.isValid && music->music)
     {
         retval = music->codec.getLoopStartTime(music->music);
-    } else {
+    }
+    else
+    {
         retval = -1.0;
     }
 
@@ -1519,7 +1529,9 @@ double music_internal_loop_end(Mix_Music *music)
     if(music->codec.isValid && music->music)
     {
         retval = music->codec.getLoopEndTime(music->music);
-    } else {
+    }
+    else
+    {
         retval = -1.0;
     }
 
@@ -1550,7 +1562,9 @@ double music_internal_loop_length(Mix_Music *music)
     if(music->codec.isValid && music->music)
     {
         retval = music->codec.getLoopLengthTime(music->music);
-    } else {
+    }
+    else
+    {
         retval = -1.0;
     }
 
@@ -1737,7 +1751,9 @@ static int music_internal_playing()
     {
         if(!music_playing->codec.isPlaying(music_playing->music))
             playing = 0;
-    } else {
+    }
+    else
+    {
         playing = 0;
     }
 
@@ -1802,9 +1818,9 @@ void close_music(void)
     #endif
 
     #ifdef MID_MUSIC
-        # ifdef USE_TIMIDITY_MIDI
-        Timidity_Close();
-        # endif
+    # ifdef USE_TIMIDITY_MIDI
+    Timidity_Close();
+    # endif
     #endif
 
     if(music_file)
@@ -1853,9 +1869,38 @@ const char *SDLCALLCC Mix_GetSoundFonts(void)
         return soundfont_paths;
 }
 
-#if !defined(__MINGW32__) && !defined(__MINGW64__) && !defined(_WIN32)
-extern char *strtok_r(char *, const char *, char **);
-#endif
+//#if !defined(__MINGW32__) && !defined(__MINGW64__) && !defined(_WIN32)
+//extern char *strtok_r(char *, const char *, char **);
+//#endif
+
+/*
+ * public domain strtok_r() by Charlie Gordon
+ *
+ *   from comp.lang.c  9/14/2007
+ *
+ *      http://groups.google.com/group/comp.lang.c/msg/2ab1ecbb86646684
+ *
+ *     (Declaration that it's public domain):
+ *      http://groups.google.com/group/comp.lang.c/msg/7c7b39328fefab9c
+ */
+static char *strtok_safe(char *str, const char *delim, char **nextp)
+{
+    char *ret;
+    if(str == NULL)
+        str = *nextp;
+
+    str += strspn(str, delim);
+    if(*str == '\0')
+        return NULL;
+    ret = str;
+
+    str += strcspn(str, delim);
+    if(*str)
+        *str++ = '\0';
+
+    *nextp = str;
+    return ret;
+}
 
 int SDLCALLCC Mix_EachSoundFont(int (*function)(const char *, void *), void *data)
 {
@@ -1874,16 +1919,18 @@ int SDLCALLCC Mix_EachSoundFont(int (*function)(const char *, void *), void *dat
         return 0;
     }
 
-    #if defined(__MINGW32__) || defined(__MINGW64__)
+    /* #if defined(__MINGW32__) || defined(__MINGW64__)
     for(path = strtok(paths, ";"); path; path = strtok(NULL, ";"))
     {
     #elif defined(_WIN32)
     for(path = strtok_s(paths, ";", &context); path; path = strtok_s(NULL, ";", &context))
     {
-    #else
-    for(path = strtok_r(paths, ":;", &context); path; path = strtok_r(NULL, ":;", &context))
+    #else*/
+    for(path = strtok_safe(paths, ":;", &context);
+        path;
+        path = strtok_safe(NULL, ":;", &context))
     {
-    #endif
+        /*#endif*/
         if(!function(path, data))
         {
             SDL_free(paths);
@@ -2063,7 +2110,7 @@ int SDLCALLCC Mix_SetMidiDevice(int device)
 {
     switch(device)
     {
-    #ifdef MID_MUSIC
+        #ifdef MID_MUSIC
         #ifdef USE_ADL_MIDI
     case MIDI_ADLMIDI:
         #endif
@@ -2082,7 +2129,7 @@ int SDLCALLCC Mix_SetMidiDevice(int device)
         mididevice_next = device;
         need_reset_midi = 0;
         return 0;
-    #endif
+        #endif
 
     default:
         Mix_SetError("Unknown MIDI Device");
