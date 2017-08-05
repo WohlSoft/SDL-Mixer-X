@@ -2104,6 +2104,16 @@ void SDLCALLCC Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path)
 }
 
 
+int SDLCALLCC Mix_GetMidiDevice()
+{
+    return mididevice_current;
+}
+
+int SDLCALLCC Mix_GetNextMidiDevice()
+{
+    return mididevice_next;
+}
+
 int SDLCALLCC Mix_SetMidiDevice(int device)
 {
     switch(device)

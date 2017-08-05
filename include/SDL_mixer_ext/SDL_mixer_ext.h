@@ -777,7 +777,13 @@ extern DECLSPEC void SDLCALL Mix_ADLMIDI_setSetDefaults();
 /* Sets WOPN bank file for OPNMIDI playing device, affects on MIDI file reopen */
 extern DECLSPEC void SDLCALL Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path);
 
-/* Change MIDI playing device (ADLMIDI, Timidity, Native MIDI (if available) and FluidSynth) */
+/* Get type of MIDI device currently in use */
+extern DECLSPEC int  SDLCALL Mix_GetMidiDevice();
+
+/* Get type of MIDI device prepared for next opening of MIDI file */
+extern DECLSPEC int  SDLCALL Mix_GetNextMidiDevice();
+
+/* Set the MIDI playing device (ADLMIDI, Timidity, Native MIDI (if available) and FluidSynth) */
 extern DECLSPEC int  SDLCALL Mix_SetMidiDevice(int device);
 
 /* Disables support of MIDI file arguments */
