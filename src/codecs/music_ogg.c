@@ -263,11 +263,11 @@ static void *OGG_new_RW(SDL_RWops *src, int freesrc)
         for(i = 0; i < ptr->comments; i++)
         {
             int   paramLen = ptr->comment_lengths[i] + 1;
-            char *param = (char *)SDL_malloc(paramLen);
+            char *param = (char *)SDL_malloc((size_t)paramLen);
             char *argument  = param;
             char *value     = param;
-            memset(param, 0, paramLen);
-            memcpy(param, ptr->user_comments[i], ptr->comment_lengths[i]);
+            memset(param, 0, (size_t)paramLen);
+            memcpy(param, ptr->user_comments[i], (size_t)ptr->comment_lengths[i]);
             value = strchr(param, '=');
             if(value == NULL)
             {
@@ -429,19 +429,19 @@ static void OGG_getsome(OGG_music *music)
     ogg_int64_t pcmpos;
     SDL_zero(data);
 
-    len = sizeof(data);
+    len = (long)sizeof(data);
     /* Align length to the channels position */
-    len -= len % (music->channels * sizeof(Uint16));
+    len -= len % (long)(music->channels * (long)sizeof(Uint16));
 
     #ifdef OGG_USE_TREMOR
     len = vorbis.ov_read(&music->vf, data, sizeof(data), &section);
     #else
-    len = vorbis.ov_read(&music->vf, (char *)data, len, 0, 2, 1, &section);
+    len = vorbis.ov_read(&music->vf, (char *)data, (int)len, 0, 2, 1, &section);
     #endif
     pcmpos = ov_pcm_tell(&music->vf);
     if((music->loop == 1) && (pcmpos >= music->loop_end))
     {
-        len -= ((pcmpos - music->loop_end) * music->loop_len_ch) * sizeof(Uint16);
+        len -= ((pcmpos - music->loop_end) * music->loop_len_ch) * (long)sizeof(Uint16);
         ov_pcm_seek(&music->vf, music->loop_start);
         if(music->loops_count > 0)
         {
