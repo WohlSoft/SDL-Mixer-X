@@ -450,7 +450,7 @@ while(Mix_Init(0))
 @table @var
 @item frequency
 Output sampling frequency in samples per second (Hz).@*
-you might use @b{MIX_DEFAULT_FREQUENCY}(22050) since that is a good value for most games.
+you might use @b{MIX_DEFAULT_FREQUENCY}(44100) since that is a good value for most games.
 @item format
 Output sample format.@*
 @item channels
@@ -4946,7 +4946,7 @@ The default mixer has this many simultaneous mixing channels after the first
 call to @code{Mix_OpenAudio}.
 @item MIX_DEFAULT_FREQUENCY
 @cindex MIX_DEFAULT_FREQUENCY
-@code{22050}@*
+@code{44100}@*
 Good default sample rate in Hz (samples per second) for PC sound cards.
 @item MIX_DEFAULT_FORMAT
 @cindex MIX_DEFAULT_FORMAT
