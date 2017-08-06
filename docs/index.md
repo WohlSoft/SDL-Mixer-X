@@ -37,7 +37,7 @@ and providing support for more supported audio formats.
 * QMake and CMake building systems in use
 
 ## Requirements
-* Fresh [SDL2 library](https://hg.libsdl.org)
+* Fresh [SDL2 library](https://hg.libsdl.org/SDL/)
 * Complete set of audio codecs from [this repository](https://github.com/WohlSoft/AudioCodecs)
 * Building system on your taste:
   * QMake from Qt 5.x
