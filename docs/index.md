@@ -24,7 +24,7 @@ and providing support for more supported audio formats.
 * Better MIDI support:
   * Added ability to choose any of available MIDI backends in runtime
   * Added ability to append custom config path for Timidity synthesizer, then no more limit to default patches set
-  * Forked version now has [https://github.com/Wohlstand/libADLMIDI ADLMIDI] midi sequences together with Native MIDI, Timidity and Fluidsynth. ADLMIDI is [[FM Synthesis|OPL-Synth]] Emulation based MIDI player.
+  * Forked version now has [ADLMIDI](https://github.com/Wohlstand/libADLMIDI) midi sequences together with Native MIDI, Timidity and Fluidsynth. ADLMIDI is [[FM Synthesis|OPL-Synth]] Emulation based MIDI player.
   * Also the experimental [OPNMIDI](https://github.com/Wohlstand/libOPNMIDI) was added which an MIDI player through emulator of YM2612 chip which was widely used on Sega Megadrive/Genesis game console.
 * Added new API functions
   * Ability to redefine Timidity patches path. So, patches folders are can be stored in any place!
