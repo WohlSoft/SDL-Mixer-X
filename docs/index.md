@@ -17,7 +17,7 @@ long Chunks is ineffectively), etc. The goal of this fork is resolving those
 issues, providing more extended functionality than was originally, 
 and providing support for more supported audio formats.
 
-# New features of SDL Mixer X in comparison to original SDL_mixer
+## New features of SDL Mixer X in comparison to original SDL_mixer
 * Added much more music formats (Such a game music emulators, XMI, MUS, and IMF playing via [ADLMIDI](https://github.com/Wohlstand/libADLMIDI) library)
 * Added support of the loop points in the OGG files (via <u>LOOPSTART</u> and <u>LOOPEND</u> (or <u>LOOPLENGHT</u>) meta-tags)
 * In the Modplug module enabled internal loops (tracker musics with internal loops are will be looped rightly)
@@ -36,13 +36,13 @@ and providing support for more supported audio formats.
 * Added ability to build shared library in the <u>stdcall</u> mode with static linking of libSDL on Windows to use it as independent audio library with other languages like VB6 or .NET.
 * QMake and CMake building systems in use
 
-# Documentation
-* [Full documentation](SDL_mixer_ext.html)
-* [PGE-Wiki description page](http://wohlsoft.ru/pgewiki/SDL_Mixer_X)
-
-# Requirements
+## Requirements
 * Fresh [SDL2 library](https://hg.libsdl.org)
 * Complete set of audio codecs from [this repository](https://github.com/WohlSoft/AudioCodecs)
 * Building system on your taste:
   * QMake from Qt 5.x
   * CMake >= 2.8
+
+# Documentation
+* [Full documentation](SDL_mixer_ext.html)
+* [PGE-Wiki description page](http://wohlsoft.ru/pgewiki/SDL_Mixer_X)
