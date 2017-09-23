@@ -40,6 +40,7 @@ endif()
 
 option(USE_WAV             "Build with WAV codec" ON)
 if(USE_WAV)
+    add_definitions(-DWAV_MUSIC)
     list(APPEND SDLMixerX_SOURCES
         ${SDLMixerX_SOURCE_DIR}/src/codecs/load_aiff.c
         ${SDLMixerX_SOURCE_DIR}/src/codecs/load_voc.c
@@ -86,6 +87,17 @@ if(USE_MP3_MAD)
         ${SDLMixerX_SOURCE_DIR}/src/codecs/dynamic_mp3.c
         ${SDLMixerX_SOURCE_DIR}/src/codecs/load_mp3.c
         ${SDLMixerX_SOURCE_DIR}/src/codecs/music_mad.c)
+endif()
+
+option(USE_MP3_SMPEG       "Build with SMPEG MP3 codec" OFF)
+if(USE_MP3_SMPEG)
+    add_definitions(-DMP3_MUSIC)
+    list(APPEND SDLMixerX_LINK_LIBS smpeg id3tag)
+    include_directories(${AUDIO_CODECS_PATH}/smpeg/include)
+    include_directories(${AUDIO_CODECS_PATH}/libid3tag/include)
+    list(APPEND SDLMixerX_SOURCES
+        ${SDLMixerX_SOURCE_DIR}/src/codecs/dynamic_mp3.c
+        ${SDLMixerX_SOURCE_DIR}/src/codecs/load_mp3.c)
 endif()
 
 option(USE_MODPLUG         "Build with ModPlug library" ON)

@@ -34,3 +34,8 @@ Makefile.*
 /build/*
 /OBJ/*
 
+# Built examples
+examples/*SDL_mixer_ext*
+examples/playmus*
+examples/playwave*
+

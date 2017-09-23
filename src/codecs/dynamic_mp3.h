@@ -22,7 +22,7 @@
 #ifdef MP3_MUSIC
 #include <smpeg/smpeg.h>
 
-#include "audio_codec.h"
+#include "../audio_codec.h"
 
 typedef struct {
     int loaded;
