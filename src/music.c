@@ -127,6 +127,7 @@ static int num_decoders = 0;
 
 /* Semicolon-separated SoundFont paths */
 #ifdef MID_MUSIC
+extern char *soundfont_paths;//CLang Warning fix
 char *soundfont_paths = NULL;
 #endif
 
@@ -144,11 +145,9 @@ const char *SDLCALLCC Mix_GetMusicDecoder(int index)
 
 static void add_music_decoder(const char *decoder)
 {
-    void *ptr = SDL_realloc((void *)music_decoders, (num_decoders + 1) * sizeof(const char *));
+    void *ptr = SDL_realloc((void *)music_decoders, (size_t)(num_decoders + 1) * sizeof(const char *));
     if(ptr == NULL)
-    {
         return;  /* oh well, go on without it. */
-    }
     music_decoders = (const char **) ptr;
     music_decoders[num_decoders++] = decoder;
 }
@@ -1157,7 +1156,6 @@ Mix_Music *SDLCALLCC Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int 
 
         break;
         #endif
-
     default:
         Mix_SetError("Unrecognized music format");
         break;
