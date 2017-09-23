@@ -1150,6 +1150,361 @@ static void _Eff_position_s16msb_c6(int chan, void *stream, int len, void *udata
     }
 }
 
+static void _Eff_position_s32lsb(int chan, void *stream, int len, void *udata)
+{
+    /* 32 signed bits (lsb) * 2 channels. */
+    volatile position_args *args = (volatile position_args *) udata;
+    Sint32 *ptr = (Sint32 *) stream;
+    int i;
+
+#if 0
+    if (len % (sizeof(Sint32) * 2)) {
+        fprintf(stderr,"Not an even number of frames! len=%d\n", len);
+        return;
+    }
+#endif
+
+    for (i = 0; i < len; i += sizeof (Sint32) * 2) {
+        Sint32 swapl = (Sint32) ((((float) (Sint32) SDL_SwapLE32(*(ptr+0))) *
+                                    args->left_f) * args->distance_f);
+        Sint32 swapr = (Sint32) ((((float) (Sint32) SDL_SwapLE32(*(ptr+1))) *
+                                    args->right_f) * args->distance_f);
+    if (args->room_angle == 180) {
+            *(ptr++) = (Sint32) SDL_SwapLE32(swapr);
+            *(ptr++) = (Sint32) SDL_SwapLE32(swapl);
+    }
+    else {
+            *(ptr++) = (Sint32) SDL_SwapLE32(swapl);
+            *(ptr++) = (Sint32) SDL_SwapLE32(swapr);
+    }
+    }
+}
+static void _Eff_position_s32lsb_c4(int chan, void *stream, int len, void *udata)
+{
+    /* 32 signed bits (lsb) * 4 channels. */
+    volatile position_args *args = (volatile position_args *) udata;
+    Sint32 *ptr = (Sint32 *) stream;
+    int i;
+
+    for (i = 0; i < len; i += sizeof (Sint32) * 4) {
+        Sint32 swapl = (Sint32) ((((float) (Sint32) SDL_SwapLE32(*(ptr+0))) *
+                                    args->left_f) * args->distance_f);
+        Sint32 swapr = (Sint32) ((((float) (Sint32) SDL_SwapLE32(*(ptr+1))) *
+                                    args->right_f) * args->distance_f);
+        Sint32 swaplr = (Sint32) ((((float) (Sint32) SDL_SwapLE32(*(ptr+1))) *
+                                    args->left_rear_f) * args->distance_f);
+        Sint32 swaprr = (Sint32) ((((float) (Sint32) SDL_SwapLE32(*(ptr+2))) *
+                                    args->right_rear_f) * args->distance_f);
+    switch (args->room_angle) {
+        case 0:
+                *(ptr++) = (Sint32) SDL_SwapLE32(swapl);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swapr);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swaplr);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swaprr);
+            break;
+        case 90:
+                *(ptr++) = (Sint32) SDL_SwapLE32(swapr);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swaprr);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swapl);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swaplr);
+            break;
+        case 180:
+                *(ptr++) = (Sint32) SDL_SwapLE32(swaprr);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swaplr);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swapr);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swapl);
+            break;
+        case 270:
+                *(ptr++) = (Sint32) SDL_SwapLE32(swaplr);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swapl);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swaprr);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swapr);
+            break;
+    }
+    }
+}
+
+static void _Eff_position_s32lsb_c6(int chan, void *stream, int len, void *udata)
+{
+    /* 32 signed bits (lsb) * 6 channels. */
+    volatile position_args *args = (volatile position_args *) udata;
+    Sint32 *ptr = (Sint32 *) stream;
+    int i;
+
+    for (i = 0; i < len; i += sizeof (Sint32) * 6) {
+        Sint32 swapl = (Sint32) ((((float) (Sint32) SDL_SwapLE32(*(ptr+0))) *
+                                    args->left_f) * args->distance_f);
+        Sint32 swapr = (Sint32) ((((float) (Sint32) SDL_SwapLE32(*(ptr+1))) *
+                                    args->right_f) * args->distance_f);
+        Sint32 swaplr = (Sint32) ((((float) (Sint32) SDL_SwapLE32(*(ptr+2))) *
+                                    args->left_rear_f) * args->distance_f);
+        Sint32 swaprr = (Sint32) ((((float) (Sint32) SDL_SwapLE32(*(ptr+3))) *
+                                    args->right_rear_f) * args->distance_f);
+        Sint32 swapce = (Sint32) ((((float) (Sint32) SDL_SwapLE32(*(ptr+4))) *
+                                    args->center_f) * args->distance_f);
+        Sint32 swapwf = (Sint32) ((((float) (Sint32) SDL_SwapLE32(*(ptr+5))) *
+                                    args->lfe_f) * args->distance_f);
+    switch (args->room_angle) {
+        case 0:
+                *(ptr++) = (Sint32) SDL_SwapLE32(swapl);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swapr);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swaplr);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swaprr);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swapce);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swapwf);
+            break;
+        case 90:
+                *(ptr++) = (Sint32) SDL_SwapLE32(swapr);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swaprr);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swapl);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swaplr);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swapr)/2 + (Sint32) SDL_SwapLE32(swaprr)/2;
+                *(ptr++) = (Sint32) SDL_SwapLE32(swapwf);
+            break;
+        case 180:
+                *(ptr++) = (Sint32) SDL_SwapLE32(swaprr);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swaplr);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swapr);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swapl);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swaprr)/2 + (Sint32) SDL_SwapLE32(swaplr)/2;
+                *(ptr++) = (Sint32) SDL_SwapLE32(swapwf);
+            break;
+        case 270:
+                *(ptr++) = (Sint32) SDL_SwapLE32(swaplr);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swapl);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swaprr);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swapr);
+                *(ptr++) = (Sint32) SDL_SwapLE32(swapl)/2 + (Sint32) SDL_SwapLE32(swaplr)/2;
+                *(ptr++) = (Sint32) SDL_SwapLE32(swapwf);
+            break;
+    }
+    }
+}
+
+static void _Eff_position_s32msb(int chan, void *stream, int len, void *udata)
+{
+    /* 32 signed bits (lsb) * 2 channels. */
+    volatile position_args *args = (volatile position_args *) udata;
+    Sint32 *ptr = (Sint32 *) stream;
+    int i;
+
+    for (i = 0; i < len; i += sizeof (Sint32) * 2) {
+        Sint32 swapl = (Sint32) ((((float) (Sint32) SDL_SwapBE32(*(ptr+0))) *
+                                    args->left_f) * args->distance_f);
+        Sint32 swapr = (Sint32) ((((float) (Sint32) SDL_SwapBE32(*(ptr+1))) *
+                                    args->right_f) * args->distance_f);
+        *(ptr++) = (Sint32) SDL_SwapBE32(swapl);
+        *(ptr++) = (Sint32) SDL_SwapBE32(swapr);
+    }
+}
+static void _Eff_position_s32msb_c4(int chan, void *stream, int len, void *udata)
+{
+    /* 32 signed bits (lsb) * 4 channels. */
+    volatile position_args *args = (volatile position_args *) udata;
+    Sint32 *ptr = (Sint32 *) stream;
+    int i;
+
+    for (i = 0; i < len; i += sizeof (Sint32) * 4) {
+        Sint32 swapl = (Sint32) ((((float) (Sint32) SDL_SwapBE32(*(ptr+0))) *
+                                    args->left_f) * args->distance_f);
+        Sint32 swapr = (Sint32) ((((float) (Sint32) SDL_SwapBE32(*(ptr+1))) *
+                                    args->right_f) * args->distance_f);
+        Sint32 swaplr = (Sint32) ((((float) (Sint32) SDL_SwapBE32(*(ptr+2))) *
+                                    args->left_rear_f) * args->distance_f);
+        Sint32 swaprr = (Sint32) ((((float) (Sint32) SDL_SwapBE32(*(ptr+3))) *
+                                    args->right_rear_f) * args->distance_f);
+    switch (args->room_angle) {
+        case 0:
+                *(ptr++) = (Sint32) SDL_SwapBE32(swapl);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swapr);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swaplr);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swaprr);
+            break;
+        case 90:
+                *(ptr++) = (Sint32) SDL_SwapBE32(swapr);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swaprr);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swapl);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swaplr);
+            break;
+        case 180:
+                *(ptr++) = (Sint32) SDL_SwapBE32(swaprr);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swaplr);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swapr);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swapl);
+            break;
+        case 270:
+                *(ptr++) = (Sint32) SDL_SwapBE32(swaplr);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swapl);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swaprr);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swapr);
+            break;
+    }
+    }
+}
+static void _Eff_position_s32msb_c6(int chan, void *stream, int len, void *udata)
+{
+    /* 32 signed bits (lsb) * 6 channels. */
+    volatile position_args *args = (volatile position_args *) udata;
+    Sint32 *ptr = (Sint32 *) stream;
+    int i;
+
+    for (i = 0; i < len; i += sizeof (Sint32) * 6) {
+        Sint32 swapl = (Sint32) ((((float) (Sint32) SDL_SwapBE32(*(ptr+0))) *
+                                    args->left_f) * args->distance_f);
+        Sint32 swapr = (Sint32) ((((float) (Sint32) SDL_SwapBE32(*(ptr+1))) *
+                                    args->right_f) * args->distance_f);
+        Sint32 swaplr = (Sint32) ((((float) (Sint32) SDL_SwapBE32(*(ptr+2))) *
+                                    args->left_rear_f) * args->distance_f);
+        Sint32 swaprr = (Sint32) ((((float) (Sint32) SDL_SwapBE32(*(ptr+3))) *
+                                    args->right_rear_f) * args->distance_f);
+        Sint32 swapce = (Sint32) ((((float) (Sint32) SDL_SwapBE32(*(ptr+4))) *
+                                    args->center_f) * args->distance_f);
+        Sint32 swapwf = (Sint32) ((((float) (Sint32) SDL_SwapBE32(*(ptr+5))) *
+                                    args->lfe_f) * args->distance_f);
+
+    switch (args->room_angle) {
+        case 0:
+                *(ptr++) = (Sint32) SDL_SwapBE32(swapl);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swapr);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swaplr);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swaprr);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swapce);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swapwf);
+            break;
+        case 90:
+                *(ptr++) = (Sint32) SDL_SwapBE32(swapr);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swaprr);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swapl);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swaplr);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swapr)/2 + (Sint32) SDL_SwapBE32(swaprr)/2;
+                *(ptr++) = (Sint32) SDL_SwapBE32(swapwf);
+            break;
+        case 180:
+                *(ptr++) = (Sint32) SDL_SwapBE32(swaprr);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swaplr);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swapr);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swapl);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swaprr)/2 + (Sint32) SDL_SwapBE32(swaplr)/2;
+                *(ptr++) = (Sint32) SDL_SwapBE32(swapwf);
+            break;
+        case 270:
+                *(ptr++) = (Sint32) SDL_SwapBE32(swaplr);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swapl);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swaprr);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swapr);
+                *(ptr++) = (Sint32) SDL_SwapBE32(swapl)/2 + (Sint32) SDL_SwapBE32(swaplr)/2;
+                *(ptr++) = (Sint32) SDL_SwapBE32(swapwf);
+            break;
+    }
+    }
+}
+
+static void _Eff_position_f32sys(int chan, void *stream, int len, void *udata)
+{
+    /* float * 2 channels. */
+    volatile position_args *args = (volatile position_args *) udata;
+    float *ptr = (float *) stream;
+    int i;
+
+    for (i = 0; i < len; i += sizeof (float) * 2) {
+        float swapl = ((*(ptr+0) * args->left_f) * args->distance_f);
+        float swapr = ((*(ptr+1) * args->right_f) * args->distance_f);
+        *(ptr++) = swapl;
+        *(ptr++) = swapr;
+    }
+}
+static void _Eff_position_f32sys_c4(int chan, void *stream, int len, void *udata)
+{
+    /* float * 4 channels. */
+    volatile position_args *args = (volatile position_args *) udata;
+    float *ptr = (float *) stream;
+    int i;
+
+    for (i = 0; i < len; i += sizeof (float) * 4) {
+        float swapl = ((*(ptr+0) * args->left_f) * args->distance_f);
+        float swapr = ((*(ptr+1) * args->right_f) * args->distance_f);
+        float swaplr = ((*(ptr+2) * args->left_rear_f) * args->distance_f);
+        float swaprr = ((*(ptr+3) * args->right_rear_f) * args->distance_f);
+		switch (args->room_angle) {
+        case 0:
+                *(ptr++) = swapl;
+                *(ptr++) = swapr;
+                *(ptr++) = swaplr;
+                *(ptr++) = swaprr;
+            break;
+        case 90:
+                *(ptr++) = swapr;
+                *(ptr++) = swaprr;
+                *(ptr++) = swapl;
+                *(ptr++) = swaplr;
+            break;
+        case 180:
+                *(ptr++) = swaprr;
+                *(ptr++) = swaplr;
+                *(ptr++) = swapr;
+                *(ptr++) = swapl;
+            break;
+        case 270:
+                *(ptr++) = swaplr;
+                *(ptr++) = swapl;
+                *(ptr++) = swaprr;
+                *(ptr++) = swapr;
+            break;
+		}
+    }
+}
+static void _Eff_position_f32sys_c6(int chan, void *stream, int len, void *udata)
+{
+    /* float * 6 channels. */
+    volatile position_args *args = (volatile position_args *) udata;
+    float *ptr = (float *) stream;
+    int i;
+
+    for (i = 0; i < len; i += sizeof (float) * 6) {
+        float swapl = ((*(ptr+0) * args->left_f) * args->distance_f);
+        float swapr = ((*(ptr+1) * args->right_f) * args->distance_f);
+        float swaplr = ((*(ptr+2) * args->left_rear_f) * args->distance_f);
+        float swaprr = ((*(ptr+3) * args->right_rear_f) * args->distance_f);
+        float swapce = ((*(ptr+4) * args->center_f) * args->distance_f);
+        float swapwf = ((*(ptr+5) * args->lfe_f) * args->distance_f);
+
+    switch (args->room_angle) {
+        case 0:
+                *(ptr++) = swapl;
+                *(ptr++) = swapr;
+                *(ptr++) = swaplr;
+                *(ptr++) = swaprr;
+                *(ptr++) = swapce;
+                *(ptr++) = swapwf;
+            break;
+        case 90:
+                *(ptr++) = swapr;
+                *(ptr++) = swaprr;
+                *(ptr++) = swapl;
+                *(ptr++) = swaplr;
+                *(ptr++) = swapr/2.0f + swaprr/2.0f;
+                *(ptr++) = swapwf;
+            break;
+        case 180:
+                *(ptr++) = swaprr;
+                *(ptr++) = swaplr;
+                *(ptr++) = swapr;
+                *(ptr++) = swapl;
+                *(ptr++) = swaprr/2.0f + swaplr/2.0f;
+                *(ptr++) = swapwf;
+            break;
+        case 270:
+                *(ptr++) = swaplr;
+                *(ptr++) = swapl;
+                *(ptr++) = swaprr;
+                *(ptr++) = swapr;
+                *(ptr++) = swapl/2.0f + swaplr/2.0f;
+                *(ptr++) = swapwf;
+            break;
+    }
+    }
+}
+
 static void init_position_args(position_args *args)
 {
     SDL_memset(args, '\0', sizeof (position_args));
@@ -1216,96 +1571,169 @@ static Mix_EffectFunc_t get_position_effect_func(Uint16 format, int channels)
         switch (channels) {
             case 1:
             case 2:
-                    f = (_Eff_build_volume_table_u8()) ? _Eff_position_table_u8 :
+                f = (_Eff_build_volume_table_u8()) ? _Eff_position_table_u8 :
                                                         _Eff_position_u8;
                 break;
-                case 4:
-                        f = _Eff_position_u8_c4;
+            case 4:
+                f = _Eff_position_u8_c4;
                 break;
-                case 6:
-                        f = _Eff_position_u8_c6;
+            case 6:
+                f = _Eff_position_u8_c6;
+                break;
+            default:
+                Mix_SetError("Unsupported audio channels");
                 break;
         }
-            break;
+        break;
 
         case AUDIO_S8:
         switch (channels) {
             case 1:
             case 2:
-                    f = (_Eff_build_volume_table_s8()) ? _Eff_position_table_s8 :
+                f = (_Eff_build_volume_table_s8()) ? _Eff_position_table_s8 :
                                                         _Eff_position_s8;
                 break;
-                case 4:
-                        f = _Eff_position_s8_c4;
+            case 4:
+                f = _Eff_position_s8_c4;
                 break;
-                case 6:
-                        f = _Eff_position_s8_c6;
+            case 6:
+                f = _Eff_position_s8_c6;
+                break;
+            default:
+                Mix_SetError("Unsupported audio channels");
                 break;
         }
-            break;
+        break;
 
         case AUDIO_U16LSB:
         switch (channels) {
             case 1:
             case 2:
-                    f = _Eff_position_u16lsb;
+                f = _Eff_position_u16lsb;
                 break;
-                case 4:
-                    f = _Eff_position_u16lsb_c4;
+            case 4:
+                f = _Eff_position_u16lsb_c4;
                 break;
-                case 6:
-                    f = _Eff_position_u16lsb_c6;
+            case 6:
+                f = _Eff_position_u16lsb_c6;
+                break;
+            default:
+                Mix_SetError("Unsupported audio channels");
                 break;
         }
-            break;
+        break;
 
         case AUDIO_S16LSB:
         switch (channels) {
             case 1:
             case 2:
-                    f = _Eff_position_s16lsb;
+                f = _Eff_position_s16lsb;
                 break;
-                case 4:
-                    f = _Eff_position_s16lsb_c4;
+            case 4:
+                f = _Eff_position_s16lsb_c4;
                 break;
-                case 6:
-                    f = _Eff_position_s16lsb_c6;
+            case 6:
+                f = _Eff_position_s16lsb_c6;
+                break;
+            default:
+                Mix_SetError("Unsupported audio channels");
                 break;
         }
-            break;
+        break;
 
         case AUDIO_U16MSB:
         switch (channels) {
             case 1:
             case 2:
-                    f = _Eff_position_u16msb;
+                f = _Eff_position_u16msb;
                 break;
-                case 4:
-                    f = _Eff_position_u16msb_c4;
+            case 4:
+                f = _Eff_position_u16msb_c4;
                 break;
-                case 6:
-                    f = _Eff_position_u16msb_c6;
+            case 6:
+                f = _Eff_position_u16msb_c6;
+                break;
+            default:
+                Mix_SetError("Unsupported audio channels");
                 break;
         }
-            break;
+        break;
 
         case AUDIO_S16MSB:
         switch (channels) {
             case 1:
             case 2:
-                    f = _Eff_position_s16msb;
+                f = _Eff_position_s16msb;
                 break;
-                case 4:
-                    f = _Eff_position_s16msb_c4;
+            case 4:
+                f = _Eff_position_s16msb_c4;
                 break;
-                case 6:
-                    f = _Eff_position_s16msb_c6;
+            case 6:
+                f = _Eff_position_s16msb_c6;
+                break;
+            default:
+                Mix_SetError("Unsupported audio channels");
                 break;
         }
-            break;
+        break;
+
+        case AUDIO_S32MSB:
+        switch (channels) {
+            case 1:
+            case 2:
+                f = _Eff_position_s32msb;
+                break;
+            case 4:
+                f = _Eff_position_s32msb_c4;
+                break;
+            case 6:
+                f = _Eff_position_s32msb_c6;
+                break;
+            default:
+                Mix_SetError("Unsupported audio channels");
+                break;
+        }
+        break;
+
+        case AUDIO_S32LSB:
+        switch (channels) {
+            case 1:
+            case 2:
+                f = _Eff_position_s32lsb;
+                break;
+            case 4:
+                f = _Eff_position_s32lsb_c4;
+                break;
+            case 6:
+                f = _Eff_position_s32lsb_c6;
+                break;
+            default:
+                Mix_SetError("Unsupported audio channels");
+                break;
+        }
+        break;
+
+        case AUDIO_F32SYS:
+        switch (channels) {
+            case 1:
+            case 2:
+                f = _Eff_position_f32sys;
+                break;
+            case 4:
+                f = _Eff_position_f32sys_c4;
+                break;
+            case 6:
+                f = _Eff_position_f32sys_c6;
+                break;
+            default:
+                Mix_SetError("Unsupported audio channels");
+                break;
+        }
+        break;
 
         default:
             Mix_SetError("Unsupported audio format");
+            break;
     }
 
     return(f);
@@ -1402,26 +1830,11 @@ static void set_amplitudes(int channels, int angle, int room_angle)
         }
     }
 
-    if (left < 0)
-        left = 0;
-    if (left > 255)
-        left = 255;
-    if (right < 0)
-        right = 0;
-    if (right > 255)
-        right = 255;
-    if (left_rear < 0)
-        left_rear = 0;
-    if (left_rear > 255)
-        left_rear = 255;
-    if (right_rear < 0)
-        right_rear = 0;
-    if (right_rear > 255)
-        right_rear = 255;
-    if (center < 0)
-        center = 0;
-    if (center > 255)
-        center = 255;
+    if (left < 0) left = 0; if (left > 255) left = 255;
+    if (right < 0) right = 0; if (right > 255) right = 255;
+    if (left_rear < 0) left_rear = 0; if (left_rear > 255) left_rear = 255;
+    if (right_rear < 0) right_rear = 0; if (right_rear > 255) right_rear = 255;
+    if (center < 0) center = 0; if (center > 255) center = 255;
 
     if (room_angle == 90) {
         speaker_amplitude[0] = (Uint8)left_rear;
