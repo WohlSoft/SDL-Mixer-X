@@ -3,7 +3,7 @@ A fork of [SDL_mixer](http://www.libsdl.org/projects/SDL_mixer/) library
 
 # Description
 SDL_Mixer is a sample multi-channel audio mixer library.
-It supports any number of simultaneously playing channels of 16 bit stereo audio, 
+It supports any number of simultaneously playing channels of 16 bit stereo audio,
 plus a single channel of music, mixed by the popular FLAC, MikMod MOD, ModPlug,
 Timidity MIDI, FluidSynth, Ogg Vorbis, libMAD, and SMPEG MP3 libraries.
 
@@ -14,7 +14,7 @@ playback of WAV files, inability to choose MIDI backend in runtime,
 inability to customize Timidty patches path, No support for cross-fade
 and parallel streams playing (has only one musical stream. Using of very
 long Chunks is ineffectively), etc. The goal of this fork is resolving those
-issues, providing more extended functionality than was originally, 
+issues, providing more extended functionality than was originally,
 and providing support for more supported audio formats.
 
 ## New features of SDL Mixer X in comparison to original SDL_mixer
@@ -43,6 +43,40 @@ and providing support for more supported audio formats.
   * QMake from Qt 5.x
   * CMake >= 2.8
 
+# How to build
+
+## With CMake
+With this way all dependencies will be automatically downloaded and compiled
+```bash
+mkdir build
+cd build
+cmake -DCMAKE_INSTALL_PREFIX=/usr/local/ -DDOWNLOAD_AUDIO_CODECS_DEPENDENCY=ON -DDOWNLOAD_SDL2_DEPENDENCY=ON ..
+make -j 4 #where 4 - set number of CPU cores you have
+make install
+```
+
+# How to use library
+
+## Include
+The API is fully compatible with original SDL Mixer with exception of new added functions and different header name
+```cpp
+#include <SDL2/SDL_mixer_ext.h>
+```
+
+## Linking (Linux)
+
+### Dynamically
+```bash
+gcc playmus.c -o playmus -I/usr/local/include -L/usr/local/lib -lSDL2_mixer_ext -lSDL2 -lstdc++
+```
+
+### Statically
+To get it linked you must also link dependencies of SDL Mixer X library itself and also dependencies of SDL2 too
+```
+gcc playmus.c -o playmus -I/usr/local/include -L/usr/local/lib -Wl,-Bstatic -lSDL2_mixer_ext -lFLAC -lvorbisfile -lvorbis -logg -lmad -lid3tag -lmodplug -lADLMIDI -lOPNMIDI -ltimidity -lgme -lzlib -lSDL2 -Wl,-Bdynamic -lpthread -lm -ldl -static-libgcc -lstdc++
+```
+
 # Documentation
 * [Full documentation](SDL_mixer_ext.html)
 * [PGE-Wiki description page](http://wohlsoft.ru/pgewiki/SDL_Mixer_X)
+
