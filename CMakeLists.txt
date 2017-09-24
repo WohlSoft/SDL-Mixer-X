@@ -13,7 +13,42 @@ option(SSE                 "Use SSE assembly routines" ${OPT_DEF_ASM})
 option(SSE2                "Use SSE2 assembly routines" ${OPT_DEF_SSEMATH})
 option(SSE3                "Use SSE3 assembly routines" ${OPT_DEF_SSEMATH})
 
-set(AUDIO_CODECS_PATH ${SDLMixerX_SOURCE_DIR}/../AudioCodecs)
+# Settings
+option(SDL_MIXER_X_STATIC   "Build static library of SDL Mixer X" ON)
+option(SDL_MIXER_X_SHARED   "Build shared library of SDL Mixer X" ON)
+
+option(DOWNLOAD_AUDIO_CODECS_DEPENDENCY "Downloads and compiles AudioCodecs dependencies pack directly" OFF)
+set(AUDIO_CODECS_REPO_PATH "" CACHE PATH "Path to the AudioCodecs dependencies pack")
+
+option(DOWNLOAD_SDL2_DEPENDENCY "Downloads and compiles SDL2 from official Mercurial directly" OFF)
+set(SDL2_REPO_PATH "" CACHE PATH "Path to the SDL2")
+
+if(NOT AUDIO_CODECS_REPO_PATH)
+    # Try to resolve sqlite dependency
+    if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
+        # Download and configure AudioCodecs dependency
+        include(cmake/DownloadAudioCodecs.cmake)
+        set(AUDIO_CODECS_REPO_PATH ${AUDIO_CODECS_INSTALL_DIR})
+    endif()
+endif()
+
+if(NOT SDL2_REPO_PATH)
+    # Try to resolve sqlite dependency
+    if(DOWNLOAD_SDL2_DEPENDENCY)
+        # Download and configure SDL2 dependency
+        include(cmake/DownloadSdlHg.cmake)
+        set(SDL2_REPO_PATH ${SDL2_INSTALL_DIR})
+    endif()
+endif()
+
+if(AUDIO_CODECS_REPO_PATH)
+    set(AUDIO_CODECS_PATH ${AUDIO_CODECS_REPO_PATH})
+    link_directories(${AUDIO_CODECS_INSTALL_DIR}/lib)
+    include_directories(${AUDIO_CODECS_INSTALL_DIR}/include)
+else()
+    set(AUDIO_CODECS_PATH ${SDLMixerX_SOURCE_DIR}/../AudioCodecs)
+    link_directories(${AUDIO_CODECS_PATH}/build/lib)
+endif()
 
 add_definitions(-DHAVE_INTTYPES_H -DHAVE_SETENV -DHAVE_SINF)
 add_definitions(-Dmain=SDL_main -DPIC -D_REENTRANT -D_USE_MATH_DEFINES)
@@ -21,20 +56,21 @@ add_definitions(-Dmain=SDL_main -DPIC -D_REENTRANT -D_USE_MATH_DEFINES)
 set(SDLMixerX_SOURCES)
 set(SDLMixerX_LINK_LIBS)
 
-link_directories(${AUDIO_CODECS_PATH}/build/lib)
-
 # libSDL2
-if(EXISTS "${AUDIO_CODECS_PATH}/libSDL2/include/")
-    # TODO: Implement automatical downloading and unpacking of hg.libsdl.org/SDL
-    # or using of separated repository for libSDL's backup
-    message("SDL2 found in ${AUDIO_CODECS_PATH}/libSDL2/include folder")
-    include_directories(${AUDIO_CODECS_PATH}/libSDL2/include)
+if(SDL2_REPO_PATH)
     list(APPEND SDLMixerX_LINK_LIBS SDL2)
+    link_directories(${SDL2_INSTALL_DIR}/lib)
+    include_directories(${SDL2_INSTALL_DIR}/include)
 else()
-    find_library(SDL2_LIBRARY SDL2)
-    message("Found ${SDL2_LIBRARY}")
+    if(EXISTS "${AUDIO_CODECS_PATH}/libSDL2/include/")
+        message("SDL2 found in ${AUDIO_CODECS_PATH}/libSDL2/include folder")
+        include_directories(${AUDIO_CODECS_PATH}/libSDL2/include)
+        list(APPEND SDLMixerX_LINK_LIBS SDL2)
+    else()
+        find_library(SDL2_LIBRARY SDL2)
+        message("Found ${SDL2_LIBRARY}")
+    endif()
 endif()
-
 
 
 
@@ -229,11 +265,44 @@ list(APPEND SDLMixerX_SOURCES
         ${SDLMixerX_SOURCE_DIR}/src/music.c
     )
 
-link_directories(${AUDIO_CODECS_PATH}/build/lib)
-
 file(GLOB SDLMixerX_SOURCES ${SDLMixerX_SOURCES})
 
-add_library(SDL_mixer_ext SHARED ${SDLMixerX_SOURCES})
-target_link_libraries(SDL_mixer_ext ${SDLMixerX_LINK_LIBS})
+set(SDLMixerX_INSTALLS)
 
-target_include_directories(SDL_mixer_ext PUBLIC ${SDLMixerX_SOURCE_DIR}/include)
+if(SDL_MIXER_X_SHARED)
+    add_library(SDL_mixer_ext SHARED ${SDLMixerX_SOURCES})
+    target_link_libraries(SDL_mixer_ext ${SDLMixerX_LINK_LIBS})
+    target_include_directories(SDL_mixer_ext PUBLIC ${SDLMixerX_SOURCE_DIR}/include)
+    if(AUDIO_CODECS_REPO_PATH)
+        add_dependencies(SDL_mixer_ext AudioCodecs)
+    endif()
+    if(SDL2_REPO_PATH)
+        add_dependencies(SDL_mixer_ext SDL2HG)
+    endif()
+    list(APPEND SDLMixerX_INSTALLS SDL_mixer_ext)
+endif()
+
+if(SDL_MIXER_X_STATIC)
+    add_library(SDL_mixer_ext_Static STATIC ${SDLMixerX_SOURCES})
+    set_target_properties(SDL_mixer_ext_Static PROPERTIES OUTPUT_NAME SDL_mixer_ext)
+    target_include_directories(SDL_mixer_ext_Static PUBLIC ${SDLMixerX_SOURCE_DIR}/include)
+    if(AUDIO_CODECS_REPO_PATH)
+        add_dependencies(SDL_mixer_ext_Static AudioCodecs)
+    endif()
+    if(SDL2_REPO_PATH)
+        add_dependencies(SDL_mixer_ext_Static SDL2HG)
+    endif()
+    list(APPEND SDLMixerX_INSTALLS SDL_mixer_ext_Static)
+endif()
+
+install(TARGETS ${SDLMixerX_INSTALLS}
+        LIBRARY DESTINATION "lib"
+        ARCHIVE DESTINATION "lib"
+        INCLUDES DESTINATION "include")
+
+install(FILES
+        include/SDL_mixer_ext/begin_code.h
+        include/SDL_mixer_ext/close_code.h
+        include/SDL_mixer_ext/SDL_mixer_ext.h
+        DESTINATION include/SDL2)
+
