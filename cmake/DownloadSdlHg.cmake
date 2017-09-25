@@ -1,11 +1,11 @@
 
-# This file downloads, configures and build AudioCodecs dependencies package.
+# This file downloads, configures and build SDL2 from official HG dependencies package.
 #
 # Output Variables:
-# AUDIO_CODECS_INSTALL_DIR      The install directory
-# AUDIO_CODECS_REPOSITORY_PATH  The reposotory directory
+# SDL2_INSTALL_DIR			    The install directory
+# SDL2_REPOSITORY_PATH  		The reposotory directory
 
-# Require ExternalProject and GIT!
+# Require ExternalProject!
 include(ExternalProject)
 
 # Posttible Input Vars:
@@ -22,4 +22,3 @@ ExternalProject_Add(
     URL https://hg.libsdl.org/SDL/archive/default.tar.bz2
     CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${SDL2_INSTALL_DIR}" -DSNDIO=OFF
 )
-
