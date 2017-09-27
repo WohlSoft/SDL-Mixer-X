@@ -6,6 +6,10 @@ project(SDLMixerX C)
 #include(CheckFunctionExists)
 #include(CheckLibraryExists)
 
+if(NOT CMAKE_VERSION VERSION_LESS 2.8.12)
+    set(CMAKE_MACOSX_RPATH 0)
+endif()
+
 option(SSEMATH             "Allow GCC to use SSE floating point math" ${OPT_DEF_SSEMATH})
 option(MMX                 "Use MMX assembly routines" ${OPT_DEF_ASM})
 option(3DNOW               "Use 3Dnow! MMX assembly routines" ${OPT_DEF_ASM})
@@ -20,24 +24,45 @@ option(SDL_MIXER_X_SHARED   "Build shared library of SDL Mixer X" ON)
 option(DOWNLOAD_AUDIO_CODECS_DEPENDENCY "Downloads and compiles AudioCodecs dependencies pack directly" OFF)
 set(AUDIO_CODECS_REPO_PATH "" CACHE PATH "Path to the AudioCodecs dependencies pack")
 
-option(DOWNLOAD_SDL2_DEPENDENCY "Downloads and compiles SDL2 from official Mercurial directly" OFF)
-set(SDL2_REPO_PATH "" CACHE PATH "Path to the SDL2")
+#option(DOWNLOAD_SDL2_DEPENDENCY "Downloads and compiles SDL2 from official Mercurial directly" OFF)
+#set(SDL2_REPO_PATH "" CACHE PATH "Path to the SDL2")
+
+#if(NOT SDL2_REPO_PATH)
+#    # Try to resolve sqlite dependency
+#    if(DOWNLOAD_SDL2_DEPENDENCY)
+        # Download and configure SDL2 dependency
+        #include(cmake/DownloadSdlHg.cmake)
+#        set(SDL2_INSTALL_DIR ${CMAKE_INSTALL_PREFIX})
+#        set(SDL2_REPOSITORY_PATH ${SDL2_INSTALL_DIR})
+#        set(SDL2_REPO_PATH ${SDL2_INSTALL_DIR})
+#    endif()
+#endif()
+
+# libSDL2
+#if(SDL2_REPO_PATH)
+#    list(APPEND SDLMixerX_LINK_LIBS SDL2)
+#    link_directories(${SDL2_INSTALL_DIR}/lib)
+#    include_directories(${SDL2_INSTALL_DIR}/include)
+#else()
+#    if(EXISTS "${AUDIO_CODECS_PATH}/libSDL2/include/")
+#        set(SDL2_REPO_PATH ${AUDIO_CODECS_PATH}/libSDL2)
+#        message("SDL2 found in ${AUDIO_CODECS_PATH}/libSDL2/include folder")
+#        include_directories(${AUDIO_CODECS_PATH}/libSDL2/include)
+#        list(APPEND SDLMixerX_LINK_LIBS SDL2)
+#    else()
+#        find_library(SDL2_LIBRARY SDL2)
+#        message("Found ${SDL2_LIBRARY}")
+#        set(SDL2_REPO_PATH ${SDL2_LIBRARY})
+#    endif()
+#endif()
 
 if(NOT AUDIO_CODECS_REPO_PATH)
     # Try to resolve sqlite dependency
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
         # Download and configure AudioCodecs dependency
+        set(SDL2_REPO_PATH ${CMAKE_INSTALL_PREFIX})
         include(cmake/DownloadAudioCodecs.cmake)
         set(AUDIO_CODECS_REPO_PATH ${AUDIO_CODECS_INSTALL_DIR})
-    endif()
-endif()
-
-if(NOT SDL2_REPO_PATH)
-    # Try to resolve sqlite dependency
-    if(DOWNLOAD_SDL2_DEPENDENCY)
-        # Download and configure SDL2 dependency
-        include(cmake/DownloadSdlHg.cmake)
-        set(SDL2_REPO_PATH ${SDL2_INSTALL_DIR})
     endif()
 endif()
 
@@ -55,24 +80,6 @@ add_definitions(-Dmain=SDL_main -DPIC -D_REENTRANT -D_USE_MATH_DEFINES)
 
 set(SDLMixerX_SOURCES)
 set(SDLMixerX_LINK_LIBS)
-
-# libSDL2
-if(SDL2_REPO_PATH)
-    list(APPEND SDLMixerX_LINK_LIBS SDL2)
-    link_directories(${SDL2_INSTALL_DIR}/lib)
-    include_directories(${SDL2_INSTALL_DIR}/include)
-else()
-    if(EXISTS "${AUDIO_CODECS_PATH}/libSDL2/include/")
-        message("SDL2 found in ${AUDIO_CODECS_PATH}/libSDL2/include folder")
-        include_directories(${AUDIO_CODECS_PATH}/libSDL2/include)
-        list(APPEND SDLMixerX_LINK_LIBS SDL2)
-    else()
-        find_library(SDL2_LIBRARY SDL2)
-        message("Found ${SDL2_LIBRARY}")
-    endif()
-endif()
-
-
 
 option(USE_WAV             "Build with WAV codec" ON)
 if(USE_WAV)
@@ -255,6 +262,33 @@ if(WIN32)
     endif()
 endif()
 
+list(APPEND SDLMixerX_LINK_LIBS SDL2)
+
+if(APPLE)
+    find_library(APPLE_CORE_AUDIO CoreAudio)
+    find_library(APPLE_IOKIT IOKit)
+    find_library(APPLE_COCOA Cocoa)
+    find_library(APPLE_AUDIOTOOLBOX AudioToolbox)
+    find_library(APPLE_CORE_VIDEO CoreVideo)
+    find_library(APPLE_CORE_FOUNDATION CoreFoundation)
+    find_library(APPLE_CARBON Carbon)
+    find_library(APPLE_FORCE_FEEDBACK ForceFeedback)
+    find_library(ICONV_LIB iconv)
+    list(APPEND SDLMixerX_LINK_LIBS 
+            ${APPLE_CORE_AUDIO} 
+            ${APPLE_COCOA}
+            ${APPLE_CORE_VIDEO}
+            ${APPLE_CORE_FOUNDATION}
+            ${APPLE_FORCE_FEEDBACK}
+            ${APPLE_IOKIT}
+            ${APPLE_CARBON}
+            ${APPLE_AUDIOTOOLBOX}
+            ${ICONV_LIB})
+    list(APPEND SDLMixerX_LINK_LIBS objc)
+endif()
+
+list(APPEND SDLMixerX_LINK_LIBS stdc++)
+
 list(APPEND SDLMixerX_SOURCES
         ${SDLMixerX_SOURCE_DIR}/src/resample/my_resample.c
         ${SDLMixerX_SOURCE_DIR}/src/audio_codec.c
@@ -273,12 +307,12 @@ if(SDL_MIXER_X_SHARED)
     add_library(SDL2_mixer_ext SHARED ${SDLMixerX_SOURCES})
     target_link_libraries(SDL2_mixer_ext ${SDLMixerX_LINK_LIBS})
     target_include_directories(SDL2_mixer_ext PUBLIC ${SDLMixerX_SOURCE_DIR}/include)
-    if(AUDIO_CODECS_REPO_PATH)
+    if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY AND AUDIO_CODECS_REPO_PATH)
         add_dependencies(SDL2_mixer_ext AudioCodecs)
     endif()
-    if(SDL2_REPO_PATH)
-        add_dependencies(SDL2_mixer_ext SDL2HG)
-    endif()
+    #if(DOWNLOAD_SDL2_DEPENDENCY AND SDL2_REPO_PATH)
+    #    add_dependencies(SDL2_mixer_ext SDL2HG)
+    #endif()
     list(APPEND SDLMixerX_INSTALLS SDL2_mixer_ext)
 endif()
 
@@ -286,12 +320,12 @@ if(SDL_MIXER_X_STATIC)
     add_library(SDL2_mixer_ext_Static STATIC ${SDLMixerX_SOURCES})
     set_target_properties(SDL2_mixer_ext_Static PROPERTIES OUTPUT_NAME SDL2_mixer_ext)
     target_include_directories(SDL2_mixer_ext_Static PUBLIC ${SDLMixerX_SOURCE_DIR}/include)
-    if(AUDIO_CODECS_REPO_PATH)
+    if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY AND AUDIO_CODECS_REPO_PATH)
         add_dependencies(SDL2_mixer_ext_Static AudioCodecs)
     endif()
-    if(SDL2_REPO_PATH)
-        add_dependencies(SDL2_mixer_ext_Static SDL2HG)
-    endif()
+    #if(DOWNLOAD_SDL2_DEPENDENCY AND SDL2_REPO_PATH)
+    #    add_dependencies(SDL2_mixer_ext_Static SDL2HG)
+    #endif()
     list(APPEND SDLMixerX_INSTALLS SDL2_mixer_ext_Static)
 endif()
 
