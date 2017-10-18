@@ -220,10 +220,9 @@ static void *OGG_new_RW(SDL_RWops *src, int freesrc)
     if(music)
     {
         vorbis_info *vi;
-        vorbis_comment *ptr;
-        int isLength = 0;
-        int i;
-        ogg_int64_t total;
+        vorbis_comment *vc;
+        int isLoopLength = 0, i;
+        ogg_int64_t fullLength;
 
         /* Initialize the music structure */
         SDL_memset(music, 0, (sizeof * music));
@@ -258,17 +257,17 @@ static void *OGG_new_RW(SDL_RWops *src, int freesrc)
         music->samplerate = vi->rate;
 
         /* Parse comments and extract title and loop points */
-        ptr = ov_comment(&music->vf, -1);
+        vc = ov_comment(&music->vf, -1);
 
-        for(i = 0; i < ptr->comments; i++)
+        for(i = 0; i < vc->comments; i++)
         {
-            int   paramLen = ptr->comment_lengths[i] + 1;
+            int   paramLen = vc->comment_lengths[i] + 1;
             char *param = (char *)SDL_malloc((size_t)paramLen);
             char *argument  = param;
             char *value     = param;
-            memset(param, 0, (size_t)paramLen);
-            memcpy(param, ptr->user_comments[i], (size_t)ptr->comment_lengths[i]);
-            value = strchr(param, '=');
+            SDL_memset(param, 0, (size_t)paramLen);
+            SDL_memcpy(param, vc->user_comments[i], (size_t)vc->comment_lengths[i]);
+            value = SDL_strchr(param, '=');
             if(value == NULL)
             {
                 value = param + paramLen - 1; /* set null */
@@ -282,37 +281,41 @@ static void *OGG_new_RW(SDL_RWops *src, int freesrc)
 #define A_TO_OGG64(x) (ogg_int64_t)atol(x)
             #endif
 
-            if(strcasecmp(argument, "LOOPSTART") == 0)
+            if(SDL_strcasecmp(argument, "LOOPSTART") == 0)
                 music->loop_start = A_TO_OGG64(value);
-            else if(strcasecmp(argument, "LOOPLENGTH") == 0)
+            else if(SDL_strcasecmp(argument, "LOOPLENGTH") == 0)
             {
                 music->loop_len = A_TO_OGG64(value);
-                isLength = 1;
+                isLoopLength = 1;
             }
-            else if(strcasecmp(argument, "LOOPEND") == 0)
+            else if(SDL_strcasecmp(argument, "LOOPEND") == 0)
             {
-                isLength = 0;
+                isLoopLength = 0;
                 music->loop_end = A_TO_OGG64(value);
             }
-            else if(strcasecmp(argument, "TITLE") == 0)
+            else if(SDL_strcasecmp(argument, "TITLE") == 0)
             {
-                music->mus_title = (char *)SDL_malloc(sizeof(char) * strlen(value) + 1);
-                strcpy(music->mus_title, value);
+                size_t len = SDL_strlen(value);
+                music->mus_title = (char *)SDL_malloc(sizeof(char) * len + 1);
+                SDL_strlcpy(music->mus_title, value, len);
             }
-            else if(strcasecmp(argument, "ARTIST") == 0)
+            else if(SDL_strcasecmp(argument, "ARTIST") == 0)
             {
-                music->mus_artist = (char *)SDL_malloc(sizeof(char) * strlen(value) + 1);
-                strcpy(music->mus_artist, value);
+                size_t len = SDL_strlen(value);
+                music->mus_artist = (char *)SDL_malloc(sizeof(char) * len + 1);
+                SDL_strlcpy(music->mus_artist, value, len);
             }
-            else if(strcasecmp(argument, "ALBUM") == 0)
+            else if(SDL_strcasecmp(argument, "ALBUM") == 0)
             {
-                music->mus_album = (char *)SDL_malloc(sizeof(char) * strlen(value) + 1);
-                strcpy(music->mus_album, value);
+                size_t len = SDL_strlen(value);
+                music->mus_album = (char *)SDL_malloc(sizeof(char) * len + 1);
+                SDL_strlcpy(music->mus_album, value, len);
             }
-            else if(strcasecmp(argument, "COPYRIGHT") == 0)
+            else if(SDL_strcasecmp(argument, "COPYRIGHT") == 0)
             {
-                music->mus_copyright = (char *)SDL_malloc(sizeof(char) * strlen(value) + 1);
-                strcpy(music->mus_copyright, value);
+                size_t len = SDL_strlen(value);
+                music->mus_copyright = (char *)SDL_malloc(sizeof(char) * len + 1);
+                SDL_strlcpy(music->mus_copyright, value, len);
             }
 
             SDL_free(param);
@@ -320,21 +323,21 @@ static void *OGG_new_RW(SDL_RWops *src, int freesrc)
 
 #undef A_TO_OGG64
 
-        if(isLength == 1)
+        if(isLoopLength == 1)
             music->loop_end = music->loop_start + music->loop_len;
         else
             music->loop_len = music->loop_end - music->loop_start;
 
-        total = ov_pcm_total(&music->vf, -1);
+        fullLength = ov_pcm_total(&music->vf, -1);
         if(((music->loop_start >= 0) || (music->loop_end > 0)) &&
            ((music->loop_start < music->loop_end) || (music->loop_end == 0)) &&
-           (music->loop_start < total) &&
-           (music->loop_end <= total))
+           (music->loop_start < fullLength) &&
+           (music->loop_end <= fullLength))
         {
             if(music->loop_start < 0)
                 music->loop_start = 0;
             if(music->loop_end == 0)
-                music->loop_end = total;
+                music->loop_end = fullLength;
             music->loop = 1;
             music->loop_len_ch = music->channels;
         }
@@ -426,7 +429,7 @@ static void OGG_getsome(OGG_music *music)
     Uint8 data[4096];
     SDL_AudioCVT *cvt;
     struct MyResampler *res;
-    ogg_int64_t pcmpos;
+    ogg_int64_t pcmPos;
     SDL_zero(data);
 
     len = (long)sizeof(data);
@@ -438,10 +441,10 @@ static void OGG_getsome(OGG_music *music)
     #else
     len = vorbis.ov_read(&music->vf, (char *)data, (int)len, 0, 2, 1, &section);
     #endif
-    pcmpos = ov_pcm_tell(&music->vf);
-    if((music->loop == 1) && (pcmpos >= music->loop_end))
+    pcmPos = ov_pcm_tell(&music->vf);
+    if((music->loop == 1) && (pcmPos >= music->loop_end))
     {
-        len -= ((pcmpos - music->loop_end) * music->loop_len_ch) * (long)sizeof(Uint16);
+        len -= ((pcmPos - music->loop_end) * music->loop_len_ch) * (long)sizeof(Uint16);
         ov_pcm_seek(&music->vf, music->loop_start);
         if(music->loops_count > 0)
         {
