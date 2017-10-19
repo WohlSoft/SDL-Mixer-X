@@ -64,7 +64,7 @@ extern "C" {
 */
 #define SDL_MIXER_MAJOR_VERSION 2
 #define SDL_MIXER_MINOR_VERSION 0
-#define SDL_MIXER_PATCHLEVEL    1
+#define SDL_MIXER_PATCHLEVEL    2
 
 /* This macro can be used to fill a version structure with the compile-time
  * version of the SDL_mixer library.
@@ -150,6 +150,7 @@ typedef enum
     MUS_OGG,
     MUS_MP3,
     MUS_MP3_MAD,
+    MUS_MP3_MPG,
     MUS_FLAC,
     MUS_MODPLUG,
     MUS_SPC, /* Deprecated, use MUS_GME instead */
@@ -677,8 +678,8 @@ extern DECLSPEC int SDLCALL Mix_PausedMusic(void);
 /* Set the current position in the music stream.
    This returns 0 if successful, or -1 if it failed or isn't implemented.
    This function is only implemented for MOD music formats (set pattern
-   order number) and for WAV, OGG, FLAC, MP3_MAD, and MODPLUG music (set
-   position in seconds), at the moment.
+   order number) and for WAV, OGG, FLAC, MP3_MAD, MP3_MPG, and MODPLUG music
+   (set position in seconds), at the moment.
 */
 extern DECLSPEC int SDLCALL Mix_SetMusicPosition(double position);
 /*

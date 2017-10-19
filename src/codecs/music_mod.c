@@ -216,20 +216,26 @@ static void MOD_setvolume(void *music_p, int volume)
 typedef struct
 {
     MREADER mr;
+    /* struct MREADER in libmikmod <= 3.2.0-beta2
+     * doesn't have iobase members. adding them here
+     * so that if we compile against 3.2.0-beta2, we
+     * can still run OK against 3.2.0b3 and newer. */
+    long iobase, prev_iobase;
     Sint64 offset;
     Sint64 eof;
     SDL_RWops *src;
 } LMM_MREADER;
 
-BOOL LMM_Seek(struct MREADER *mr, long to, int dir)
+int LMM_Seek(struct MREADER *mr, long to, int dir)
 {
     Sint64 offset = to;
-    LMM_MREADER *lmmmr = (LMM_MREADER *)mr;
-    if(dir == SEEK_SET)
-    {
+    LMM_MREADER* lmmmr = (LMM_MREADER*)mr;
+    if ( dir == SEEK_SET ) {
         offset += lmmmr->offset;
+        if (offset < lmmmr->offset)
+            return -1;
     }
-    return (SDL_RWseek(lmmmr->src, offset, dir) < lmmmr->offset);
+    return (int)(SDL_RWseek(lmmmr->src, offset, dir));
 }
 long LMM_Tell(struct MREADER *mr)
 {

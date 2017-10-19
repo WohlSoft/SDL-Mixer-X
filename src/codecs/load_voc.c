@@ -142,7 +142,7 @@ static int voc_get_block(SDL_RWops *src, vs_t *v, SDL_AudioSpec *spec)
             return 1;  /* assume that's the end of the file. */
 
         /* Size is an 24-bit value. Ugh. */
-        sblen = ( (bits24[0]) | (bits24[1] << 8) | (bits24[2] << 16) );
+        sblen = (Uint32)( (bits24[0]) | (bits24[1] << 8) | (bits24[2] << 16) );
 
         switch(block)
         {
@@ -200,7 +200,7 @@ static int voc_get_block(SDL_RWops *src, vs_t *v, SDL_AudioSpec *spec)
                     return 0;
                 }
                 v->rate = new_rate_long;
-                spec->freq = new_rate_long;
+                spec->freq = (int)new_rate_long;
 
                 if (SDL_RWread(src, &uc, sizeof (uc), 1) != 1)
                     return 0;
@@ -329,7 +329,7 @@ static int voc_get_block(SDL_RWops *src, vs_t *v, SDL_AudioSpec *spec)
 
 static int voc_read(SDL_RWops *src, vs_t *v, Uint8 *buf, SDL_AudioSpec *spec)
 {
-    int done = 0;
+    Uint32 done = 0;
     Uint8 silence = 0x80;
 
     if (v->rest == 0)
@@ -354,7 +354,7 @@ static int voc_read(SDL_RWops *src, vs_t *v, Uint8 *buf, SDL_AudioSpec *spec)
 
     else
     {
-        done = SDL_RWread(src, buf, 1, v->rest);
+        done = (Uint32)SDL_RWread(src, buf, 1, v->rest);
         v->rest -= done;
         if (v->size == ST_SIZE_WORD)
         {
@@ -370,7 +370,7 @@ static int voc_read(SDL_RWops *src, vs_t *v, Uint8 *buf, SDL_AudioSpec *spec)
         }
     }
 
-    return done;
+    return (int)done;
 } /* voc_read */
 
 
@@ -390,7 +390,7 @@ SDL_AudioSpec *Mix_LoadVOC_RW (SDL_RWops *src, int freesrc,
     if ( !voc_check_header(src) )
         goto done;
 
-    v.rate = -1;
+    v.rate = (Uint32)-1;
     v.rest = 0;
     v.has_extended = 0;
     *audio_buf = NULL;
@@ -442,7 +442,7 @@ SDL_AudioSpec *Mix_LoadVOC_RW (SDL_RWops *src, int freesrc,
 
     /* Don't return a buffer that isn't a multiple of samplesize */
     samplesize = ((spec->format & 0xFF)/8)*spec->channels;
-    *audio_len &= ~(samplesize-1);
+    *audio_len &= (Uint32)~(samplesize - 1);
 
 done:
     if (freesrc && src) {

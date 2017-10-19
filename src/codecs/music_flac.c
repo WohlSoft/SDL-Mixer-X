@@ -204,7 +204,7 @@ static FLAC__StreamDecoderSeekStatus flac_seek_music_cb(
     FLAC_music *data = (FLAC_music *)client_data;
     (void)decoder;
 
-    if(SDL_RWseek(data->src, absolute_byte_offset, RW_SEEK_SET) < 0)
+    if(SDL_RWseek(data->src, (Sint32)absolute_byte_offset, RW_SEEK_SET) < 0)
         return FLAC__STREAM_DECODER_SEEK_STATUS_ERROR;
     else
         return FLAC__STREAM_DECODER_SEEK_STATUS_OK;
@@ -318,7 +318,7 @@ static FLAC__StreamDecoderWriteStatus flac_write_music_cb(
 
                 /*  create it */
                 data->flac_data.data =
-                    (char *)SDL_malloc(data->flac_data.data_len);
+                    (char *)SDL_malloc((size_t)data->flac_data.data_len);
 
                 if(!data->flac_data.data)
                     return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
@@ -355,12 +355,12 @@ static FLAC__StreamDecoderWriteStatus flac_write_music_cb(
             if(!data->flac_data.overflow)
             {
                 data->flac_data.overflow_len =
-                    4 * (frame->header.blocksize - i);
+                    4 * (int)(frame->header.blocksize - i);
                 data->flac_data.overflow_read = 0;
 
                 /*  make it big enough for the rest of the block */
                 data->flac_data.overflow =
-                    (char *)SDL_malloc(data->flac_data.overflow_len);
+                    (char *)SDL_malloc((size_t)data->flac_data.overflow_len);
 
                 if(!data->flac_data.overflow)
                     return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
@@ -406,18 +406,18 @@ static void flac_metadata_music_cb(
     }
     else if(metadata->type == FLAC__METADATA_TYPE_VORBIS_COMMENT)
     {
-        int i, num = metadata->data.vorbis_comment.num_comments;
+        int i, num = (int)metadata->data.vorbis_comment.num_comments;
         for(i = 0; i < num; i++)
         {
             FLAC__uint32 len = metadata->data.vorbis_comment.comments[i].length;
             FLAC__byte *ent = metadata->data.vorbis_comment.comments[i].entry;
 
-            int   paramLen = len + 1;
-            char *param = (char *)SDL_malloc(paramLen);
+            int   paramLen = (int)len + 1;
+            char *param = (char *)SDL_malloc((size_t)paramLen);
             char *argument  = param;
             char *value     = param;
-            memset(param, 0, paramLen);
-            memcpy(param, ent, len);
+            SDL_memset(param, 0, (size_t)paramLen);
+            SDL_memcpy(param, ent, len);
             value = strchr(param, '=');
             if(value == NULL)
             {
@@ -625,7 +625,7 @@ static void FLAC_getsome(FLAC_music *music)
     music->flac_data.data_len = music->flac_data.max_to_read;
     music->flac_data.data_read = 0;
     if(!music->flac_data.data)
-        music->flac_data.data = (char *)SDL_malloc(music->flac_data.data_len);
+        music->flac_data.data = (char *)SDL_malloc((size_t)music->flac_data.data_len);
 
     /*  we have data to read */
     while(music->flac_data.max_to_read > 0)
@@ -633,33 +633,32 @@ static void FLAC_getsome(FLAC_music *music)
         /*  first check if there is data in the overflow from before */
         if(music->flac_data.overflow)
         {
-            size_t overflow_len = music->flac_data.overflow_read;
+            size_t overflow_len = (size_t)music->flac_data.overflow_read;
 
             if(overflow_len > (size_t)music->flac_data.max_to_read)
             {
-                size_t overflow_extra_len = overflow_len -
-                                            music->flac_data.max_to_read;
+                size_t overflow_extra_len = overflow_len - (size_t)music->flac_data.max_to_read;
 
                 SDL_memcpy(music->flac_data.data + music->flac_data.data_read,
-                           music->flac_data.overflow, music->flac_data.max_to_read);
+                           music->flac_data.overflow, (size_t)music->flac_data.max_to_read);
                 music->flac_data.data_read += music->flac_data.max_to_read;
                 SDL_memcpy(music->flac_data.overflow,
                            music->flac_data.overflow + music->flac_data.max_to_read,
                            overflow_extra_len);
-                music->flac_data.overflow_len = overflow_extra_len;
-                music->flac_data.overflow_read = overflow_extra_len;
+                music->flac_data.overflow_len = (int)overflow_extra_len;
+                music->flac_data.overflow_read = (int)overflow_extra_len;
                 music->flac_data.max_to_read = 0;
             }
             else
             {
                 SDL_memcpy(music->flac_data.data + music->flac_data.data_read,
                            music->flac_data.overflow, overflow_len);
-                music->flac_data.data_read += overflow_len;
+                music->flac_data.data_read += (int)overflow_len;
                 SDL_free(music->flac_data.overflow);
                 music->flac_data.overflow = NULL;
                 music->flac_data.overflow_len = 0;
                 music->flac_data.overflow_read = 0;
-                music->flac_data.max_to_read -= overflow_len;
+                music->flac_data.max_to_read -= (int)overflow_len;
             }
         }
         else
@@ -704,7 +703,7 @@ static void FLAC_getsome(FLAC_music *music)
 
         if(cvt->buf)
             SDL_free(cvt->buf);
-        cvt->buf = (Uint8 *)SDL_malloc(music->flac_data.data_len * cvt->len_mult * music->resample.ratio);
+        cvt->buf = (Uint8 *)SDL_malloc((size_t)((double)(music->flac_data.data_len * cvt->len_mult) * music->resample.ratio));
         music->section = 0;
     }
 
@@ -714,7 +713,7 @@ static void FLAC_getsome(FLAC_music *music)
         {
             MyResample_addSource(&music->resample, (Uint8*)music->flac_data.data, music->flac_data.data_read);
             MyResample_Process(&music->resample);
-            SDL_memcpy(cvt->buf, music->resample.buf, music->resample.buf_len);
+            SDL_memcpy(cvt->buf, music->resample.buf, (size_t)music->resample.buf_len);
             cvt->len = music->resample.buf_len;
             cvt->len_cvt = music->resample.buf_len;
         }
@@ -722,7 +721,7 @@ static void FLAC_getsome(FLAC_music *music)
         {
             cvt->len = music->flac_data.data_read;
             cvt->len_cvt = music->flac_data.data_read;
-            SDL_memcpy(cvt->buf, music->flac_data.data, music->flac_data.data_read);
+            SDL_memcpy(cvt->buf, music->flac_data.data, (size_t)music->flac_data.data_read);
         }
         if(cvt->needed)
             SDL_ConvertAudio(cvt);
@@ -750,9 +749,9 @@ static int FLAC_playAudio(void *music_p, Uint8 *snd, int len)
         if(mixable > music->len_available)
             mixable = music->len_available;
         if(music->volume == MIX_MAX_VOLUME)
-            SDL_memcpy(snd, music->snd_available, mixable);
+            SDL_memcpy(snd, music->snd_available, (size_t)mixable);
         else
-            SDL_MixAudioFormat(snd, music->snd_available, mixer.format, mixable, music->volume);
+            SDL_MixAudioFormat(snd, music->snd_available, mixer.format, (Uint32)mixable, music->volume);
         music->len_available -= mixable;
         music->snd_available += mixable;
         len -= mixable;

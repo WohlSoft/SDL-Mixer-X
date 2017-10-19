@@ -80,7 +80,7 @@ static FLAC__StreamDecoderSeekStatus flac_seek_load_cb(
     FLAC_SDL_Data *data = (FLAC_SDL_Data *)client_data;
     (void)decoder;
 
-    if (SDL_RWseek (data->sdl_src, absolute_byte_offset, RW_SEEK_SET) < 0) {
+    if (SDL_RWseek (data->sdl_src, (int)absolute_byte_offset, RW_SEEK_SET) < 0) {
         return FLAC__STREAM_DECODER_SEEK_STATUS_ERROR;
     } else {
         return FLAC__STREAM_DECODER_SEEK_STATUS_OK;
@@ -190,14 +190,14 @@ static FLAC__StreamDecoderWriteStatus flac_write_load_cb(
         i16 = (FLAC__int16)buffer[0][i];
         ui16 = (FLAC__uint16)i16;
 
-        *(buf + (data->sdl_audio_read++)) = (char)(ui16);
-        *(buf + (data->sdl_audio_read++)) = (char)(ui16 >> 8);
+        *(buf + (data->sdl_audio_read++)) = (Uint8)(char)(ui16);
+        *(buf + (data->sdl_audio_read++)) = (Uint8)(char)(ui16 >> 8);
 
         i16 = (FLAC__int16)buffer[1][i];
         ui16 = (FLAC__uint16)i16;
 
-        *(buf + (data->sdl_audio_read++)) = (char)(ui16);
-        *(buf + (data->sdl_audio_read++)) = (char)(ui16 >> 8);
+        *(buf + (data->sdl_audio_read++)) = (Uint8)(char)(ui16);
+        *(buf + (data->sdl_audio_read++)) = (Uint8)(char)(ui16 >> 8);
     }
 
     return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;

@@ -143,6 +143,29 @@ if(USE_MP3_SMPEG)
         ${SDLMixerX_SOURCE_DIR}/src/codecs/load_mp3.c)
 endif()
 
+option(USE_MP3_MPG123     "[WIP, DON'T USE IT] Build with MPG123 MP3 codec" OFF)
+if(USE_MP3_MPG123)
+    add_definitions(-DMP3_MPG_MUSIC)
+
+    message(WARNING "MPG123 SUPPORT IS WIP, DON'T USE IT!!!")
+    # ======= Until AudioCodecs will receive buildable mpg123, detect it externally =======
+    include(cmake/FindMpg123.cmake)
+
+    if(NOT MPG123_FOUND)
+        message(FATAL_ERROR "MPG123 is not found!")
+    else()
+        message("MPG123 found in ${MPG123_INCLUDE_DIR} folder")
+    endif()
+
+    include_directories(${MPG123_INCLUDE_DIRS})
+    set(LIBS ${LIBS} ${MPG123_LIBRARIES})
+    list(APPEND SDLMixerX_LINK_LIBS mpg123)
+    list(APPEND SDLMixerX_SOURCES
+        ${SDLMixerX_SOURCE_DIR}/src/codecs/music_mpg.c
+        ${SDLMixerX_SOURCE_DIR}/src/codecs/dynamic_mp3.c
+        ${SDLMixerX_SOURCE_DIR}/src/codecs/load_mp3.c)
+endif()
+
 option(USE_MODPLUG         "Build with ModPlug library" ON)
 if(USE_MODPLUG)
     add_definitions(-DMODPLUG_MUSIC -DMODPLUG_STATIC)

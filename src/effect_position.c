@@ -128,7 +128,7 @@ static void _Eff_position_u8(int chan, void *stream, int len, void *udata)
          *  a len divisible by 2 here), then left_f and right_f are always
          *  1.0, and are therefore throwaways.
          */
-    if (len % sizeof (Uint16) != 0) {
+    if ((size_t)len % sizeof (Uint16) != 0) {
         *ptr = (Uint8) (((float) *ptr) * args->distance_f);
         ptr++;
         len--;
@@ -166,7 +166,7 @@ static void _Eff_position_u8_c4(int chan, void *stream, int len, void *udata)
          *  a len divisible by 2 here), then left_f and right_f are always
          *  1.0, and are therefore throwaways.
          */
-    if (len % sizeof (Uint16) != 0) {
+    if ((size_t)len % sizeof (Uint16) != 0) {
         *ptr = (Uint8) (((float) *ptr) * args->distance_f);
         ptr++;
         len--;
@@ -251,7 +251,7 @@ static void _Eff_position_u8_c6(int chan, void *stream, int len, void *udata)
          *  a len divisible by 2 here), then left_f and right_f are always
          *  1.0, and are therefore throwaways.
          */
-    if (len % sizeof (Uint16) != 0) {
+    if ((size_t)len % sizeof (Uint16) != 0) {
         *ptr = (Uint8) (((float) *ptr) * args->distance_f);
         ptr++;
         len--;
@@ -383,7 +383,7 @@ static void _Eff_position_table_u8(int chan, void *stream, int len, void *udata)
          *  volume 255, and are therefore throwaways. Still, we have to
          *  be sure not to overrun the audio buffer...
          */
-    while (len % sizeof (Uint32) != 0) {
+    while ((size_t)len % sizeof (Uint32) != 0) {
         *ptr = d[l[*ptr]];
         ptr++;
         if (args->channels > 1) {
@@ -397,15 +397,15 @@ static void _Eff_position_table_u8(int chan, void *stream, int len, void *udata)
 
     for (i = 0; i < len; i += sizeof (Uint32)) {
 #if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
-        *p = (d[l[(*p & 0xFF000000) >> 24]] << 24) |
-             (d[r[(*p & 0x00FF0000) >> 16]] << 16) |
-             (d[l[(*p & 0x0000FF00) >>  8]] <<  8) |
-             (d[r[(*p & 0x000000FF)      ]]      ) ;
+        *p = (Uint32)((d[l[(*p & 0xFF000000) >> 24]] << 24) |
+                      (d[r[(*p & 0x00FF0000) >> 16]] << 16) |
+                      (d[l[(*p & 0x0000FF00) >>  8]] <<  8) |
+                      (d[r[(*p & 0x000000FF)      ]]      ));
 #else
-        *p = (d[r[(*p & 0xFF000000) >> 24]] << 24) |
-             (d[l[(*p & 0x00FF0000) >> 16]] << 16) |
-             (d[r[(*p & 0x0000FF00) >>  8]] <<  8) |
-             (d[l[(*p & 0x000000FF)      ]]      ) ;
+        *p = (Uint32)((d[r[(*p & 0xFF000000) >> 24]] << 24) |
+                      (d[l[(*p & 0x00FF0000) >> 16]] << 16) |
+                      (d[r[(*p & 0x0000FF00) >>  8]] <<  8) |
+                      (d[l[(*p & 0x000000FF)      ]]      ));
 #endif
         ++p;
     }
@@ -424,7 +424,7 @@ static void _Eff_position_s8(int chan, void *stream, int len, void *udata)
          *  a len divisible by 2 here), then left_f and right_f are always
          *  1.0, and are therefore throwaways.
          */
-    if (len % sizeof (Sint16) != 0) {
+    if ((size_t)len % sizeof (Sint16) != 0) {
         *ptr = (Sint8) (((float) *ptr) * args->distance_f);
         ptr++;
         len--;
@@ -456,7 +456,7 @@ static void _Eff_position_s8_c4(int chan, void *stream, int len, void *udata)
          *  a len divisible by 2 here), then left_f and right_f are always
          *  1.0, and are therefore throwaways.
          */
-    if (len % sizeof (Sint16) != 0) {
+    if ((size_t)len % sizeof (Sint16) != 0) {
         *ptr = (Sint8) (((float) *ptr) * args->distance_f);
         ptr++;
         len--;
@@ -503,7 +503,7 @@ static void _Eff_position_s8_c6(int chan, void *stream, int len, void *udata)
          *  a len divisible by 2 here), then left_f and right_f are always
          *  1.0, and are therefore throwaways.
          */
-    if (len % sizeof (Sint16) != 0) {
+    if ((size_t)len % sizeof (Sint16) != 0) {
         *ptr = (Sint8) (((float) *ptr) * args->distance_f);
         ptr++;
         len--;
@@ -577,7 +577,7 @@ static void _Eff_position_table_s8(int chan, void *stream, int len, void *udata)
     }
 
 
-    while (len % sizeof (Uint32) != 0) {
+    while ((size_t)len % sizeof (Uint32) != 0) {
         *ptr = d[l[*ptr]];
         ptr++;
         if (args->channels > 1) {
@@ -591,15 +591,15 @@ static void _Eff_position_table_s8(int chan, void *stream, int len, void *udata)
 
     for (i = 0; i < len; i += sizeof (Uint32)) {
 #if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
-        *p = (d[l[((Sint16)(Sint8)((*p & 0xFF000000) >> 24))+128]] << 24) |
-             (d[r[((Sint16)(Sint8)((*p & 0x00FF0000) >> 16))+128]] << 16) |
-             (d[l[((Sint16)(Sint8)((*p & 0x0000FF00) >>  8))+128]] <<  8) |
-             (d[r[((Sint16)(Sint8)((*p & 0x000000FF)      ))+128]]      ) ;
+        *p = (Uint32)((d[l[((Sint16)(Sint8)((*p & 0xFF000000) >> 24))+128]] << 24) |
+                      (d[r[((Sint16)(Sint8)((*p & 0x00FF0000) >> 16))+128]] << 16) |
+                      (d[l[((Sint16)(Sint8)((*p & 0x0000FF00) >>  8))+128]] <<  8) |
+                      (d[r[((Sint16)(Sint8)((*p & 0x000000FF)      ))+128]]      ));
 #else
-        *p = (d[r[((Sint16)(Sint8)((*p & 0xFF000000) >> 24))+128]] << 24) |
-             (d[l[((Sint16)(Sint8)((*p & 0x00FF0000) >> 16))+128]] << 16) |
-             (d[r[((Sint16)(Sint8)((*p & 0x0000FF00) >>  8))+128]] <<  8) |
-             (d[l[((Sint16)(Sint8)((*p & 0x000000FF)      ))+128]]      ) ;
+        *p = (Uint32)((d[r[((Sint16)(Sint8)((*p & 0xFF000000) >> 24))+128]] << 24) |
+                      (d[l[((Sint16)(Sint8)((*p & 0x00FF0000) >> 16))+128]] << 16) |
+                      (d[r[((Sint16)(Sint8)((*p & 0x0000FF00) >>  8))+128]] <<  8) |
+                      (d[l[((Sint16)(Sint8)((*p & 0x000000FF)      ))+128]]      ));
 #endif
         ++p;
     }

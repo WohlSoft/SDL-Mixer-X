@@ -303,7 +303,7 @@ static void *Mix_DoEffects(int chan, void *snd, int len)
 
 
 /* Mixing function */
-static void mix_channels(void *udata, Uint8 *stream, int len)
+static void SDLCALL mix_channels(void *udata, Uint8 *stream, int len)
 {
     Uint8 *mix_input;
     int i, mixable, volume = SDL_MIX_MAXVOLUME;
@@ -520,8 +520,9 @@ int SDLCALLCC Mix_OpenAudioDevice(int frequency, Uint16 format, int nchannels, i
 /* Open the mixer with a certain desired audio format */
 int SDLCALLCC Mix_OpenAudio(int frequency, Uint16 format, int nchannels, int chunksize)
 {
-    return Mix_OpenAudioDevice(frequency, format, nchannels, chunksize,
-			       NULL, SDL_AUDIO_ALLOW_ANY_CHANGE);
+    return Mix_OpenAudioDevice(frequency, format, nchannels, chunksize, NULL,
+                                SDL_AUDIO_ALLOW_FREQUENCY_CHANGE |
+                                SDL_AUDIO_ALLOW_CHANNELS_CHANGE);
 }
 
 /* Dynamically change the number of channels managed by the mixer.
@@ -667,13 +668,13 @@ Mix_Chunk * SDLCALLCC Mix_LoadWAV_RW(SDL_RWops *src, int freesrc)
             SDL_RWseek(src, -24, RW_SEEK_CUR);
 
             if(SDLMixerX_detect_mp3(extramagic, src, start))
-			{
-				/* note: send a copy of the mixer spec */
-				wavespec = mixer;
-				loaded = Mix_LoadMP3_RW(src, freesrc, &wavespec,
-						(Uint8 **)&chunk->abuf, &chunk->alen);
-				break;
-			}
+            {
+                /* note: send a copy of the mixer spec */
+                wavespec = mixer;
+                loaded = Mix_LoadMP3_RW(src, freesrc, &wavespec,
+                        (Uint8 **)&chunk->abuf, &chunk->alen);
+                break;
+            }
         }
 #endif
             SDL_SetError("Unrecognized sound file type");

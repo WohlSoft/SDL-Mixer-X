@@ -234,24 +234,24 @@ static void MusicCMD_Start(void *music_p)
 
             /* Unblock signals in case we're called from a thread */
             {
-            sigset_t mask;
-            sigemptyset(&mask);
-            sigprocmask(SIG_SETMASK, &mask, NULL);
+                sigset_t mask;
+                sigemptyset(&mask);
+                sigprocmask(SIG_SETMASK, &mask, NULL);
             }
 
             /* Execute the command */
             command = SDL_strdup(music->cmd);
             argv = parse_args(command, music->file);
             if ( argv != NULL ) {
-            execvp(argv[0], argv);
+                execvp(argv[0], argv);
+
+                /* exec() failed */
+                perror(argv[0]);
             }
             SDL_free(command);
-
-            /* exec() failed */
-            perror(argv[0]);
             _exit(-1);
         }
-        break;
+        /*break;*/     /* Break will never executed */
 
         /* Parent process - executes here */
         default:

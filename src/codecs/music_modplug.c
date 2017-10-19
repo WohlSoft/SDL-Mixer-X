@@ -205,7 +205,7 @@ static void *modplug_new_RW(SDL_RWops *src, int freesrc)
                 music->playing = 0;
                 music->sample_counter = 0;
                 music->mus_title = NULL;
-                music->file = modplug.ModPlug_Load(buf, sz);
+                music->file = modplug.ModPlug_Load(buf, (int)sz);
                 if(!music->file)
                 {
                     SDL_free(music);
