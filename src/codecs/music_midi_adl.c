@@ -123,7 +123,7 @@ int ADLMIDI_getBanksCount()
     return adl_getBanksCount();
 }
 
-const char * const*ADLMIDI_getBankNames()
+const char *const *ADLMIDI_getBankNames()
 {
     return adl_getBankNames();
 }
@@ -206,7 +206,7 @@ void ADLMIDI_setInfiniteLoop(struct MUSIC_MIDIADL *music, int loop)
         adl_setLoopEnabled(music->adlmidi, loop);
 }
 
-static void ADLMIDI_setLoops(void*music_p, int loops)
+static void ADLMIDI_setLoops(void *music_p, int loops)
 {
     struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
     ADLMIDI_setInfiniteLoop(music, loops < 0 ? 1 : 0);
@@ -271,28 +271,26 @@ int ADLMIDI_init2(AudioCodec *codec, SDL_AudioSpec *mixerfmt)
 /* Set the volume for a ADLMIDI stream */
 void ADLMIDI_setvolume(void *music_p, int volume)
 {
-    struct MUSIC_MIDIADL* music = (struct MUSIC_MIDIADL*)music_p;
+    struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
     if(music)
-    {
-        music->volume = (int)round(128.0*sqrt(((double)volume)*(1.0/128.0) ));
-    }
+        music->volume = (int)round(128.0 * sqrt(((double)volume) * (1.0 / 128.0)));
 }
 
 struct MUSIC_MIDIADL *ADLMIDI_LoadSongRW(SDL_RWops *src)
 {
     if(src != NULL)
     {
-        void *bytes=0;
+        void *bytes = 0;
         long filesize = 0;
         int err = 0;
-        Sint64 length=0;
+        Sint64 length = 0;
         size_t bytes_l;
         unsigned char byte[1];
-        struct ADL_MIDIPlayer* adl_midiplayer = NULL;
+        struct ADL_MIDIPlayer *adl_midiplayer = NULL;
         struct MUSIC_MIDIADL *adlMidi = NULL;
 
         length = SDL_RWseek(src, 0, RW_SEEK_END);
-        if (length < 0)
+        if(length < 0)
         {
             Mix_SetError("ADL-MIDI: wrong file\n");
             return NULL;
@@ -302,39 +300,39 @@ struct MUSIC_MIDIADL *ADLMIDI_LoadSongRW(SDL_RWops *src)
         bytes = SDL_malloc((size_t)length);
 
         filesize = 0;
-        while( (bytes_l = SDL_RWread(src, &byte, sizeof(Uint8), 1)) != 0)
+        while((bytes_l = SDL_RWread(src, &byte, sizeof(Uint8), 1)) != 0)
         {
-            ((unsigned char*)bytes)[filesize] = byte[0];
+            ((unsigned char *)bytes)[filesize] = byte[0];
             filesize++;
         }
 
-        if (filesize == 0)
+        if(filesize == 0)
         {
             Mix_SetError("ADL-MIDI: wrong file\n");
             SDL_free(bytes);
             return NULL;
         }
 
-        adl_midiplayer = adl_init( mixer.freq );
+        adl_midiplayer = adl_init(mixer.freq);
 
-        adl_setHVibrato( adl_midiplayer, adlmidi_vibrato );
-        adl_setHTremolo( adl_midiplayer, adlmidi_tremolo );
-        if( adl_setBank( adl_midiplayer, adlmidi_bank ) < 0 )
+        adl_setHVibrato(adl_midiplayer, adlmidi_vibrato);
+        adl_setHTremolo(adl_midiplayer, adlmidi_tremolo);
+        if(adl_setBank(adl_midiplayer, adlmidi_bank) < 0)
         {
             Mix_SetError("ADL-MIDI: %s", adl_errorString());
-            adl_close( adl_midiplayer );
+            adl_close(adl_midiplayer);
             SDL_free(bytes);
             return NULL;
         }
 
-        adl_setScaleModulators( adl_midiplayer, adlmidi_scalemod );
-        adl_setPercMode( adl_midiplayer, adlmidi_adlibdrums );
-        adl_setNumFourOpsChn( adl_midiplayer, tableOf_num4opChans[adlmidi_bank] );
-        adl_setLogarithmicVolumes( adl_midiplayer, adlmidi_logVolumes );
-        adl_setVolumeRangeModel( adl_midiplayer, adlmidi_volumeModel );
-        adl_setNumCards( adl_midiplayer, 4 );
+        adl_setScaleModulators(adl_midiplayer, adlmidi_scalemod);
+        adl_setPercMode(adl_midiplayer, adlmidi_adlibdrums);
+        adl_setNumFourOpsChn(adl_midiplayer, tableOf_num4opChans[adlmidi_bank]);
+        adl_setLogarithmicVolumes(adl_midiplayer, adlmidi_logVolumes);
+        adl_setVolumeRangeModel(adl_midiplayer, adlmidi_volumeModel);
+        adl_setNumCards(adl_midiplayer, 4);
 
-        err = adl_openData( adl_midiplayer, bytes, filesize );
+        err = adl_openData(adl_midiplayer, bytes, filesize);
         SDL_free(bytes);
 
         if(err != 0)
@@ -343,7 +341,7 @@ struct MUSIC_MIDIADL *ADLMIDI_LoadSongRW(SDL_RWops *src)
             return NULL;
         }
 
-        adlMidi = (struct MUSIC_MIDIADL*)SDL_malloc(sizeof(struct MUSIC_MIDIADL));
+        adlMidi = (struct MUSIC_MIDIADL *)SDL_malloc(sizeof(struct MUSIC_MIDIADL));
         adlMidi->adlmidi                = adl_midiplayer;
         adlMidi->playing                = 0;
         adlMidi->gme_t_sample_rate      = mixer.freq;
@@ -362,12 +360,12 @@ void *ADLMIDI_new_RW(struct SDL_RWops *src, int freesrc)
     struct MUSIC_MIDIADL *adlmidiMusic;
 
     adlmidiMusic = ADLMIDI_LoadSongRW(src);
-    if (!adlmidiMusic)
+    if(!adlmidiMusic)
     {
         Mix_SetError("ADL-MIDI: Can't load file: %s", adl_errorString());
         return NULL;
     }
-    if( freesrc )
+    if(freesrc)
         SDL_RWclose(src);
 
     return adlmidiMusic;
@@ -376,7 +374,7 @@ void *ADLMIDI_new_RW(struct SDL_RWops *src, int freesrc)
 /* Start playback of a given Game Music Emulators stream */
 void ADLMIDI_play(void *music_p)
 {
-    struct MUSIC_MIDIADL* music = (struct MUSIC_MIDIADL*)music_p;
+    struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
     if(music)
         music->playing = 1;
 }
@@ -384,7 +382,7 @@ void ADLMIDI_play(void *music_p)
 /* Return non-zero if a stream is currently playing */
 int ADLMIDI_playing(void *music_p)
 {
-    struct MUSIC_MIDIADL* music = (struct MUSIC_MIDIADL*)music_p;
+    struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
     if(music)
         return music->playing;
     else
@@ -394,26 +392,26 @@ int ADLMIDI_playing(void *music_p)
 /* Play some of a stream previously started with ADLMIDI_play() */
 int ADLMIDI_playAudio(void *music_p, Uint8 *stream, int len)
 {
-    struct MUSIC_MIDIADL* music = (struct MUSIC_MIDIADL*)music_p;
+    struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
 
     int srgArraySize, srcLen, gottenLen, dest_len;
-    short* buf = NULL;
+    short *buf = NULL;
 
-    if( music == NULL )
+    if(music == NULL)
         return 0;
-    if( music->adlmidi == NULL )
+    if(music->adlmidi == NULL)
         return 0;
-    if( music->playing <= 0 )
+    if(music->playing <= 0)
         return 0;
-    if( len < 0 )
+    if(len < 0)
         return 0;
 
     srgArraySize = len * music->cvt.len_mult;
-    buf = (short*)SDL_malloc((size_t)srgArraySize);
-    srcLen = (int)((double)(len/2.0)/music->cvt.len_ratio);
+    buf = (short *)SDL_malloc((size_t)srgArraySize);
+    srcLen = (int)((double)(len / 2.0) / music->cvt.len_ratio);
 
-    gottenLen = adl_play( music->adlmidi, srcLen, buf );
-    if( gottenLen <= 0 )
+    gottenLen = adl_play(music->adlmidi, srcLen, buf);
+    if(gottenLen <= 0)
     {
         SDL_free(buf);
         music->playing = 0;
@@ -422,20 +420,18 @@ int ADLMIDI_playAudio(void *music_p, Uint8 *stream, int len)
 
     dest_len = gottenLen * 2;
 
-    if( music->cvt.needed )
+    if(music->cvt.needed)
     {
         music->cvt.len = dest_len;
-        music->cvt.buf = (Uint8*)buf;
+        music->cvt.buf = (Uint8 *)buf;
         SDL_ConvertAudio(&music->cvt);
         dest_len = music->cvt.len_cvt;
     }
 
-    if( music->volume == MIX_MAX_VOLUME )
-    {
-        SDL_memcpy( stream, (Uint8*)buf, (size_t)dest_len );
-    } else {
-        SDL_MixAudioFormat( stream, (Uint8*)buf, mixer.format, (Uint32)dest_len, music->volume );
-    }
+    if(music->volume == MIX_MAX_VOLUME)
+        SDL_memcpy(stream, (Uint8 *)buf, (size_t)dest_len);
+    else
+        SDL_MixAudioFormat(stream, (Uint8 *)buf, mixer.format, (Uint32)dest_len, music->volume);
 
     SDL_free(buf);
     return len - dest_len;
@@ -444,7 +440,7 @@ int ADLMIDI_playAudio(void *music_p, Uint8 *stream, int len)
 /* Stop playback of a stream previously started with ADLMIDI_play() */
 void ADLMIDI_stop(void *music_p)
 {
-    struct MUSIC_MIDIADL* music = (struct MUSIC_MIDIADL*)music_p;
+    struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
     if(music)
     {
         music->playing = 0;
@@ -455,27 +451,25 @@ void ADLMIDI_stop(void *music_p)
 /* Close the given Game Music Emulators stream */
 void ADLMIDI_delete(void *music_p)
 {
-    struct MUSIC_MIDIADL* music = (struct MUSIC_MIDIADL*)music_p;
+    struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
     if(music)
     {
-        if( music->mus_title )
-        {
+        if(music->mus_title)
             SDL_free(music->mus_title);
-        }
         music->playing = 0;
         if(music->adlmidi)
-            adl_close( music->adlmidi );
+            adl_close(music->adlmidi);
         music->adlmidi = NULL;
-        SDL_free( music );
+        SDL_free(music);
     }
 }
 
 /* Jump (seek) to a given position (time is in seconds) */
 void ADLMIDI_jump_to_time(void *music_p, double time)
 {
-    struct MUSIC_MIDIADL* music = (struct MUSIC_MIDIADL*)music_p;
+    struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
     (void)time;
-    if( music )
+    if(music)
     {
         /* gme_seek(adl_midiplayer, (int)round(time*1000)); */
     }
