@@ -115,8 +115,12 @@ int OPNMIDI_init2(AudioCodec *codec, SDL_AudioSpec *mixerfmt)
     codec->setVolume        = OPNMIDI_setvolume;
 
     codec->jumpToTime       = OPNMIDI_jump_to_time;
-    codec->getCurrentTime   = audioCodec_dummy_cb_tell;
-    codec->getTimeLength    = audioCodec_dummy_cb_tell;
+    codec->getCurrentTime   = OPNMIDI_currentPosition;
+    codec->getTimeLength    = OPNMIDI_songLength;
+
+    codec->getLoopStartTime = OPNMIDI_loopStart;
+    codec->getLoopEndTime   = OPNMIDI_loopEnd;
+    codec->getLoopLengthTime= OPNMIDI_loopLength;
 
     codec->metaTitle        = audioCodec_dummy_meta_tag;
     codec->metaArtist       = audioCodec_dummy_meta_tag;
@@ -204,7 +208,7 @@ struct MUSIC_MIDIOPN *OPNMIDI_LoadSongRW(SDL_RWops *src)
             err = opn2_openBankData( opn_midiplayer, g_gm_opn2_bank, sizeof(g_gm_opn2_bank) );
         if( err < 0 )
         {
-            Mix_SetError("OPN2-MIDI: %s", opn2_errorString());
+            Mix_SetError("OPN2-MIDI: %s", opn2_errorInfo(opn_midiplayer));
             opn2_close( opn_midiplayer );
             SDL_free(bytes);
             return NULL;
@@ -214,12 +218,14 @@ struct MUSIC_MIDIOPN *OPNMIDI_LoadSongRW(SDL_RWops *src)
         opn2_setVolumeRangeModel( opn_midiplayer, opnmidi_volumeModel );
         opn2_setNumCards( opn_midiplayer, 4 );
 
-        err = opn2_openData( opn_midiplayer, bytes, filesize );
+        err = opn2_openData( opn_midiplayer, bytes, filesize);
         SDL_free(bytes);
 
         if(err != 0)
         {
-            Mix_SetError("OPN2-MIDI: %s", opn2_errorString());
+            Mix_SetError("OPN2-MIDI: %s", opn2_errorInfo(opn_midiplayer));
+            opn2_close( opn_midiplayer );
+            SDL_free(bytes);
             return NULL;
         }
 
@@ -245,10 +251,7 @@ void *OPNMIDI_new_RW(struct SDL_RWops *src, int freesrc)
 
     adlmidiMusic = OPNMIDI_LoadSongRW(src);
     if (!adlmidiMusic)
-    {
-        Mix_SetError("OPN2-MIDI: Can't load file: %s", opn2_errorString());
         return NULL;
-    }
     if( freesrc )
         SDL_RWclose(src);
 
@@ -358,9 +361,53 @@ void OPNMIDI_jump_to_time(void *music_p, double time)
     struct MUSIC_MIDIOPN *music = (struct MUSIC_MIDIOPN*)music_p;
     (void)time;
     if( music )
+        opn2_positionSeek(music->opnmidi, time);
+}
+
+double OPNMIDI_currentPosition(AudioCodecStream* music_p)
+{
+    struct MUSIC_MIDIOPN *music = (struct MUSIC_MIDIOPN *)music_p;
+    if(music)
+        return opn2_positionTell(music->opnmidi);
+    return -1;
+}
+
+
+double OPNMIDI_songLength(AudioCodecStream* music_p)
+{
+    struct MUSIC_MIDIOPN *music = (struct MUSIC_MIDIOPN *)music_p;
+    if(music)
+        return opn2_totalTimeLength(music->opnmidi);
+    return -1;
+}
+
+double OPNMIDI_loopStart(AudioCodecStream* music_p)
+{
+    struct MUSIC_MIDIOPN *music = (struct MUSIC_MIDIOPN *)music_p;
+    if(music)
+        return opn2_loopStartTime(music->opnmidi);
+    return -1;
+}
+
+double OPNMIDI_loopEnd(AudioCodecStream* music_p)
+{
+    struct MUSIC_MIDIOPN *music = (struct MUSIC_MIDIOPN *)music_p;
+    if(music)
+        return opn2_loopEndTime(music->opnmidi);
+    return -1;
+}
+
+double OPNMIDI_loopLength(AudioCodecStream* music_p)
+{
+    struct MUSIC_MIDIOPN *music = (struct MUSIC_MIDIOPN *)music_p;
+    if(music)
     {
-        /* gme_seek(adl_midiplayer, (int)round(time*1000)); */
+        double start = opn2_loopStartTime(music->opnmidi);
+        double end = opn2_loopEndTime(music->opnmidi);
+        if(start >= 0 && end >= 0)
+            return (end - start);
     }
+    return -1;
 }
 
 #endif /*USE_OPN2_MIDI*/

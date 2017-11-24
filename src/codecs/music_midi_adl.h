@@ -89,6 +89,21 @@ extern void ADLMIDI_delete(void *music_p);
 /* Jump (seek) to a given position (time is in seconds) */
 extern void ADLMIDI_jump_to_time(void *music_p, double time);
 
+/* Tell a current position */
+extern double ADLMIDI_currentPosition(AudioCodecStream* music);
+
+/* Total length of a song */
+extern double ADLMIDI_songLength(AudioCodecStream* music);
+
+/* Loop start position */
+extern double ADLMIDI_loopStart(AudioCodecStream* music);
+
+/* Loop end position */
+extern double ADLMIDI_loopEnd(AudioCodecStream* music);
+
+/* Loop length time*/
+extern double ADLMIDI_loopLength(AudioCodecStream* music);
+
 #endif /* USE_ADL_MIDI */
 
 #endif /* MUSIC_MIDI_ADL_H */

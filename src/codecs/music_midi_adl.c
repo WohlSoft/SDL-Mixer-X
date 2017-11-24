@@ -30,85 +30,6 @@
 
 #include <stdio.h>
 
-/* Count of four-operator channnels per bank */
-static const int tableOf_num4opChans[] =
-{
-    0,/* 0 */
-    0,/* 1 */
-    0,/* 2 */
-    0,/* 3 */
-    0,/* 4 */
-    0,/* 5 */
-    0,/* 6 */
-    0,/* 7 */
-    0,/* 8 */
-    0,/* 9 */
-    0,/* 10 */
-    0,/* 11 */
-    0,/* 12 */
-    0,/* 13 */
-    0,/* 14 */
-    0,/* 15 */
-    0,/* 16 */
-    0,/* 17 */
-    0,/* 18 */
-    0,/* 19 */
-    24,/* 20 */
-    0,/* 21 */
-    0,/* 22 */
-    0,/* 23 */
-    0,/* 24 */
-    0,/* 25 */
-    0,/* 26 */
-    0,/* 27 */
-    0,/* 28 */
-    0,/* 29 */
-    0,/* 30 */
-    24,/* 31 */
-    0,/* 32 */
-    0,/* 33 */
-    0,/* 34 */
-    0,/* 35 */
-    24,/* 36 */
-    0,/* 37 */
-    24,/* 38 */
-    24,/* 39 */
-    0,/* 40 */
-    0,/* 41 */
-    0,/* 42 */
-    0,/* 43 */
-    18,/* 44 */
-    18,/* 45 */
-    0,/* 46 */
-    18,/* 47 */
-    18,/* 48 */
-    0,/* 49 */
-    0,/* 50 */
-    0,/* 51 */
-    0,/* 52 */
-    24,/* 53 */
-    24,/* 54 */
-    0,/* 55 */
-    0,/* 56 */
-    0,/* 57 */
-    0,/* 58 */
-    24,/* 59 */
-    0,/* 60 */
-    0,/* 61 */
-    0,/* 62 */
-    0,/* 63 */
-    0,/* 64 */
-    0,/* 65 */
-    0,/* 66 */
-    0,/* 67 */
-    18,/* 68 */
-    0,/* 69 */
-    0,/* 70 */
-    0,/* 71 */
-    0,/* 72 */
-};
-
-
 /* Global ADLMIDI flags which are applying on initializing of MIDI player with a file */
 static int adlmidi_bank         = 58;
 static int adlmidi_tremolo      = 1;
@@ -255,8 +176,12 @@ int ADLMIDI_init2(AudioCodec *codec, SDL_AudioSpec *mixerfmt)
     codec->setVolume        = ADLMIDI_setvolume;
 
     codec->jumpToTime       = ADLMIDI_jump_to_time;
-    codec->getCurrentTime   = audioCodec_dummy_cb_tell;
-    codec->getTimeLength    = audioCodec_dummy_cb_tell;
+    codec->getCurrentTime   = ADLMIDI_currentPosition;
+    codec->getTimeLength    = ADLMIDI_songLength;
+
+    codec->getLoopStartTime = ADLMIDI_loopStart;
+    codec->getLoopEndTime   = ADLMIDI_loopEnd;
+    codec->getLoopLengthTime= ADLMIDI_loopLength;
 
     codec->metaTitle        = audioCodec_dummy_meta_tag;
     codec->metaArtist       = audioCodec_dummy_meta_tag;
@@ -319,7 +244,7 @@ struct MUSIC_MIDIADL *ADLMIDI_LoadSongRW(SDL_RWops *src)
         adl_setHTremolo(adl_midiplayer, adlmidi_tremolo);
         if(adl_setBank(adl_midiplayer, adlmidi_bank) < 0)
         {
-            Mix_SetError("ADL-MIDI: %s", adl_errorString());
+            Mix_SetError("ADL-MIDI: %s", adl_errorInfo(adl_midiplayer));
             adl_close(adl_midiplayer);
             SDL_free(bytes);
             return NULL;
@@ -327,7 +252,6 @@ struct MUSIC_MIDIADL *ADLMIDI_LoadSongRW(SDL_RWops *src)
 
         adl_setScaleModulators(adl_midiplayer, adlmidi_scalemod);
         adl_setPercMode(adl_midiplayer, adlmidi_adlibdrums);
-        adl_setNumFourOpsChn(adl_midiplayer, tableOf_num4opChans[adlmidi_bank]);
         adl_setLogarithmicVolumes(adl_midiplayer, adlmidi_logVolumes);
         adl_setVolumeRangeModel(adl_midiplayer, adlmidi_volumeModel);
         adl_setNumCards(adl_midiplayer, 4);
@@ -337,7 +261,9 @@ struct MUSIC_MIDIADL *ADLMIDI_LoadSongRW(SDL_RWops *src)
 
         if(err != 0)
         {
-            Mix_SetError("ADL-MIDI: %s", adl_errorString());
+            Mix_SetError("ADL-MIDI: %s", adl_errorInfo(adl_midiplayer));
+            adl_close(adl_midiplayer);
+            SDL_free(bytes);
             return NULL;
         }
 
@@ -361,10 +287,7 @@ void *ADLMIDI_new_RW(struct SDL_RWops *src, int freesrc)
 
     adlmidiMusic = ADLMIDI_LoadSongRW(src);
     if(!adlmidiMusic)
-    {
-        Mix_SetError("ADL-MIDI: Can't load file: %s", adl_errorString());
         return NULL;
-    }
     if(freesrc)
         SDL_RWclose(src);
 
@@ -468,12 +391,55 @@ void ADLMIDI_delete(void *music_p)
 void ADLMIDI_jump_to_time(void *music_p, double time)
 {
     struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
-    (void)time;
+    if(music)
+        adl_positionSeek(music->adlmidi, time);
+}
+
+double ADLMIDI_currentPosition(AudioCodecStream* music_p)
+{
+    struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
+    if(music)
+        return adl_positionTell(music->adlmidi);
+    return -1;
+}
+
+double ADLMIDI_songLength(AudioCodecStream* music_p)
+{
+    struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
+    if(music)
+        return adl_totalTimeLength(music->adlmidi);
+    return -1;
+}
+
+double ADLMIDI_loopStart(AudioCodecStream* music_p)
+{
+    struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
+    if(music)
+        return adl_loopStartTime(music->adlmidi);
+    return -1;
+}
+
+double ADLMIDI_loopEnd(AudioCodecStream* music_p)
+{
+    struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
+    if(music)
+        return adl_loopEndTime(music->adlmidi);
+    return -1;
+}
+
+double ADLMIDI_loopLength(AudioCodecStream* music_p)
+{
+    struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
     if(music)
     {
-        /* gme_seek(adl_midiplayer, (int)round(time*1000)); */
+        double start = adl_loopStartTime(music->adlmidi);
+        double end = adl_loopEndTime(music->adlmidi);
+        if(start >= 0 && end >= 0)
+            return (end - start);
     }
+    return -1;
 }
+
 #endif
 
 

@@ -87,6 +87,21 @@ extern void OPNMIDI_delete(void *music_p);
 /* Jump (seek) to a given position (time is in seconds) */
 extern void OPNMIDI_jump_to_time(void *music_p, double time);
 
+/* Tell a current position */
+extern double OPNMIDI_currentPosition(AudioCodecStream* music);
+
+/* Total length of a song */
+extern double OPNMIDI_songLength(AudioCodecStream* music);
+
+/* Loop start position */
+extern double OPNMIDI_loopStart(AudioCodecStream* music);
+
+/* Loop end position */
+extern double OPNMIDI_loopEnd(AudioCodecStream* music);
+
+/* Loop length time*/
+extern double OPNMIDI_loopLength(AudioCodecStream* music);
+
 #endif /* USE_OPN2_MIDI */
 
 #endif /* MUSIC_MIDI_OPN_H */
