@@ -218,7 +218,7 @@ struct MUSIC_MIDIOPN *OPNMIDI_LoadSongRW(SDL_RWops *src)
         opn2_setVolumeRangeModel( opn_midiplayer, opnmidi_volumeModel );
         opn2_setNumCards( opn_midiplayer, 4 );
 
-        err = opn2_openData( opn_midiplayer, bytes, filesize);
+        err = opn2_openData( opn_midiplayer, bytes, (unsigned long)filesize);
         SDL_free(bytes);
 
         if(err != 0)

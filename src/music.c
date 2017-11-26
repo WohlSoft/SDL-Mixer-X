@@ -2093,6 +2093,13 @@ void SDLCALLCC Mix_ADLMIDI_setVolumeModel(int vm)
     #endif
 }
 
+void SDLCALLCC Mix_ADLMIDI_setCustomBankFile(const char *bank_wonl_path)
+{
+    #ifdef USE_ADL_MIDI
+    ADLMIDI_setCustomBankFile(bank_wonl_path);
+    #endif
+}
+
 
 void SDLCALLCC Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path)
 {

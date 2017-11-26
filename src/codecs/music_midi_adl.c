@@ -38,6 +38,7 @@ static int adlmidi_scalemod     = 0;
 static int adlmidi_adlibdrums   = 0;
 static int adlmidi_logVolumes   = 0;
 static int adlmidi_volumeModel  = 0;
+static char adlmidi_customBankPath[2048] = "";
 
 int ADLMIDI_getBanksCount()
 {
@@ -201,6 +202,14 @@ void ADLMIDI_setvolume(void *music_p, int volume)
         music->volume = (int)round(128.0 * sqrt(((double)volume) * (1.0 / 128.0)));
 }
 
+void ADLMIDI_setCustomBankFile(const char *bank_wonl_path)
+{
+    if(bank_wonl_path)
+        strcpy(adlmidi_customBankPath, bank_wonl_path);
+    else
+        adlmidi_customBankPath[0] = '\0';
+}
+
 struct MUSIC_MIDIADL *ADLMIDI_LoadSongRW(SDL_RWops *src)
 {
     if(src != NULL)
@@ -242,7 +251,11 @@ struct MUSIC_MIDIADL *ADLMIDI_LoadSongRW(SDL_RWops *src)
 
         adl_setHVibrato(adl_midiplayer, adlmidi_vibrato);
         adl_setHTremolo(adl_midiplayer, adlmidi_tremolo);
-        if(adl_setBank(adl_midiplayer, adlmidi_bank) < 0)
+        if(adlmidi_customBankPath[0] != '\0')
+            err = adl_openBankFile(adl_midiplayer, (char*)adlmidi_customBankPath);
+        else
+            err = adl_setBank(adl_midiplayer, adlmidi_bank);
+        if(err < 0)
         {
             Mix_SetError("ADL-MIDI: %s", adl_errorInfo(adl_midiplayer));
             adl_close(adl_midiplayer);
@@ -256,7 +269,7 @@ struct MUSIC_MIDIADL *ADLMIDI_LoadSongRW(SDL_RWops *src)
         adl_setVolumeRangeModel(adl_midiplayer, adlmidi_volumeModel);
         adl_setNumCards(adl_midiplayer, 4);
 
-        err = adl_openData(adl_midiplayer, bytes, filesize);
+        err = adl_openData(adl_midiplayer, bytes, (unsigned long)filesize);
         SDL_free(bytes);
 
         if(err != 0)

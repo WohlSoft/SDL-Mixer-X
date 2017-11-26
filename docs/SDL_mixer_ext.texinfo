@@ -2423,6 +2423,7 @@ Music is therefore manipulated separately, except in post-processing hooks.
 * Mix_ADLMIDI_getVolumeModel::              Get ID of current volumes model @b{[Mixer X]}
 * Mix_ADLMIDI_setVolumeModel::              Change current volume model. Applying on MIDI file reopen. @b{[Mixer X]}
 * Mix_ADLMIDI_setSetDefaults::              Reset ADLMIDI settings to default state. Applying on MIDI file reopen. @b{[Mixer X]}
+* Mix_ADLMIDI_setCustomBankFile::           Path to custom WOPL bank file. Applying on MIDI file reopen. @b{[Mixer X]}
 
 @b{libOPNMIDI Extra Settings}
 * Mix_OPNMIDI_setCustomBankFile::           Path to custom WOPN bank file. Applying on MIDI file reopen. @b{[Mixer X]}
@@ -4245,6 +4246,31 @@ Change current volume model.
 @noindent
 Resets all settings of ADLMIDI into default state.
 @b{NOTE}: Applies on MIDI file reopen
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_ADLMIDI_setCustomBankFile
+@subsection Mix_ADLMIDI_setCustomBankFile
+@findex Mix_ADLMIDI_setCustomBankFile
+
+@noindent
+@code{void @b{Mix_ADLMIDI_setCustomBankFile}(const char *@var{bank_wonl_path})}
+
+@table @var
+@item bank_wonl_path
+Path to custom WOPL bank or NULL to use embedded banks.
+@end table
+
+@noindent
+Sets path to custom WOPL bank file.
+@b{NOTE}: Applies on MIDI file reopen
+
+@cartouche
+@example
+//Set custom ADLMIDI bank
+Mix_ADLMIDI_setCustomBankFile("./music/my-gm-bank.wonl");
+@end example
+@end cartouche
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

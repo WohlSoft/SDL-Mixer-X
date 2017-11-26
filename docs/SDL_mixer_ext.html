@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html401/loose.dtd">
 <html>
-<!-- Created on August 6, 2017 by texi2html 1.82
+<!-- Created on November 26, 2017 by texi2html 1.82
 texi2html was written by: 
             Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -3389,9 +3389,11 @@ Music is therefore manipulated separately, except in post-processing hooks.
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetSetDefaults">5.5.59 Mix_ADLMIDI_setSetDefaults</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">              Reset ADLMIDI settings to default state. Applying on MIDI file reopen. <b>[Mixer X]</b>
 </td></tr>
+<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetCustomBankFile">5.5.60 Mix_ADLMIDI_setCustomBankFile</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">           Path to custom WOPL bank file. Applying on MIDI file reopen. <b>[Mixer X]</b>
+</td></tr>
 <tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
 <b>libOPNMIDI Extra Settings</b>
-</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fOPNMIDI_005fsetCustomBankFile">5.5.60 Mix_OPNMIDI_setCustomBankFile</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">           Path to custom WOPN bank file. Applying on MIDI file reopen. <b>[Mixer X]</b>
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fOPNMIDI_005fsetCustomBankFile">5.5.61 Mix_OPNMIDI_setCustomBankFile</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">           Path to custom WOPN bank file. Applying on MIDI file reopen. <b>[Mixer X]</b>
 </td></tr>
 <tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
 </pre></th></tr></table>
@@ -6001,7 +6003,7 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) {
 <a name="Mix_005fADLMIDI_005fsetSetDefaults"></a>
 <table cellpadding="1" cellspacing="1" border="0">
 <tr><td valign="middle" align="left">[<a href="#Mix_005fADLMIDI_005fsetVolumeModel" title="Previous section in reading order"> &lt; </a>]</td>
-<td valign="middle" align="left">[<a href="#Mix_005fOPNMIDI_005fsetCustomBankFile" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Mix_005fADLMIDI_005fsetCustomBankFile" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Functions" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#Music" title="Up section"> Up </a>]</td>
@@ -6025,11 +6027,51 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) {
 <b>NOTE</b>: Applies on MIDI file reopen
 </p>
 
+<hr size="6">
+<a name="Mix_005fADLMIDI_005fsetCustomBankFile"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#Mix_005fADLMIDI_005fsetSetDefaults" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Mix_005fOPNMIDI_005fsetCustomBankFile" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#Functions" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Music" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="#Types" title="Next chapter"> &gt;&gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<a name="Mix_005fADLMIDI_005fsetCustomBankFile-1"></a>
+<h3 class="subsection">5.5.60 Mix_ADLMIDI_setCustomBankFile</h3>
+<a name="index-Mix_005fADLMIDI_005fsetCustomBankFile"></a>
+
+<p><code>void <b>Mix_ADLMIDI_setCustomBankFile</b>(const char *<var>bank_wonl_path</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>bank_wonl_path</var></dt>
+<dd><p>Path to custom WOPL bank or NULL to use embedded banks.
+</p></dd>
+</dl>
+
+<p>Sets path to custom WOPL bank file.
+<b>NOTE</b>: Applies on MIDI file reopen
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">//Set custom ADLMIDI bank
+Mix_ADLMIDI_setCustomBankFile(&quot;./music/my-gm-bank.wonl&quot;);
+</pre></td></tr></table>
+</td></tr></table>
+
+
 
 <hr size="6">
 <a name="Mix_005fOPNMIDI_005fsetCustomBankFile"></a>
 <table cellpadding="1" cellspacing="1" border="0">
-<tr><td valign="middle" align="left">[<a href="#Mix_005fADLMIDI_005fsetSetDefaults" title="Previous section in reading order"> &lt; </a>]</td>
+<tr><td valign="middle" align="left">[<a href="#Mix_005fADLMIDI_005fsetCustomBankFile" title="Previous section in reading order"> &lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#Effects" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Functions" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
@@ -6045,7 +6087,7 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fOPNMIDI_005fsetCustomBankFile-1"></a>
-<h3 class="subsection">5.5.60 Mix_OPNMIDI_setCustomBankFile</h3>
+<h3 class="subsection">5.5.61 Mix_OPNMIDI_setCustomBankFile</h3>
 <a name="index-Mix_005fOPNMIDI_005fsetCustomBankFile"></a>
 
 <p><code>void <b>Mix_OPNMIDI_setCustomBankFile</b>(const char *<var>bank_wonp_path</var>)</code>
@@ -7181,6 +7223,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fgetVolumeModel"><code>Mix_ADLMIDI_getVolumeModel</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fgetVolumeModel">5.5.57 Mix_ADLMIDI_getVolumeModel</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fsetAdLibMode"><code>Mix_ADLMIDI_setAdLibMode</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fsetAdLibMode">5.5.54 Mix_ADLMIDI_setAdLibMode</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fsetBankID"><code>Mix_ADLMIDI_setBankID</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fsetBankID">5.5.46 Mix_ADLMIDI_setBankID</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fsetCustomBankFile"><code>Mix_ADLMIDI_setCustomBankFile</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fsetCustomBankFile">5.5.60 Mix_ADLMIDI_setCustomBankFile</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fsetLogarithmicVolumes"><code>Mix_ADLMIDI_setLogarithmicVolumes</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fsetLogarithmicVolumes">5.5.56 Mix_ADLMIDI_setLogarithmicVolumes</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fsetScaleMod"><code>Mix_ADLMIDI_setScaleMod</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fsetScaleMod">5.5.52 Mix_ADLMIDI_setScaleMod</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fsetSetDefaults"><code>Mix_ADLMIDI_setSetDefaults</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fsetSetDefaults">5.5.59 Mix_ADLMIDI_setSetDefaults</a></td></tr>
@@ -7266,7 +7309,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <tr><td></td><td valign="top"><a href="#index-Mix_005fMusic"><code>Mix_Music</code></a></td><td valign="top"><a href="#Mix_005fMusic">6.2 Mix_Music</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fMusicType"><code>Mix_MusicType</code></a></td><td valign="top"><a href="#Mix_005fMusicType">6.3 Mix_MusicType</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fOpenAudio"><code>Mix_OpenAudio</code></a></td><td valign="top"><a href="#Mix_005fOpenAudio">5.1.4 Mix_OpenAudio</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fOPNMIDI_005fsetCustomBankFile"><code>Mix_OPNMIDI_setCustomBankFile</code></a></td><td valign="top"><a href="#Mix_005fOPNMIDI_005fsetCustomBankFile">5.5.60 Mix_OPNMIDI_setCustomBankFile</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fOPNMIDI_005fsetCustomBankFile"><code>Mix_OPNMIDI_setCustomBankFile</code></a></td><td valign="top"><a href="#Mix_005fOPNMIDI_005fsetCustomBankFile">5.5.61 Mix_OPNMIDI_setCustomBankFile</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-MIX_005fPATCHLEVEL">MIX_PATCHLEVEL</a></td><td valign="top"><a href="#Defines">7. Defines</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fPause"><code>Mix_Pause</code></a></td><td valign="top"><a href="#Mix_005fPause">5.3.11 Mix_Pause</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fPaused"><code>Mix_Paused</code></a></td><td valign="top"><a href="#Mix_005fPaused">5.3.18 Mix_Paused</a></td></tr>
@@ -7480,7 +7523,8 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
       <li><a name="toc-Mix_005fADLMIDI_005fgetVolumeModel-1" href="#Mix_005fADLMIDI_005fgetVolumeModel">5.5.57 Mix_ADLMIDI_getVolumeModel</a></li>
       <li><a name="toc-Mix_005fADLMIDI_005fsetVolumeModel-1" href="#Mix_005fADLMIDI_005fsetVolumeModel">5.5.58 Mix_ADLMIDI_setVolumeModel</a></li>
       <li><a name="toc-Mix_005fADLMIDI_005fsetSetDefaults-1" href="#Mix_005fADLMIDI_005fsetSetDefaults">5.5.59 Mix_ADLMIDI_setSetDefaults</a></li>
-      <li><a name="toc-Mix_005fOPNMIDI_005fsetCustomBankFile-1" href="#Mix_005fOPNMIDI_005fsetCustomBankFile">5.5.60 Mix_OPNMIDI_setCustomBankFile</a></li>
+      <li><a name="toc-Mix_005fADLMIDI_005fsetCustomBankFile-1" href="#Mix_005fADLMIDI_005fsetCustomBankFile">5.5.60 Mix_ADLMIDI_setCustomBankFile</a></li>
+      <li><a name="toc-Mix_005fOPNMIDI_005fsetCustomBankFile-1" href="#Mix_005fOPNMIDI_005fsetCustomBankFile">5.5.61 Mix_OPNMIDI_setCustomBankFile</a></li>
     </ul></li>
     <li><a name="toc-Effects-1" href="#Effects">5.6 Effects</a>
     <ul class="toc">
@@ -7543,7 +7587,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 </tr></table>
 <h1>About This Document</h1>
 <p>
-  This document was generated by <em>Vitaly</em> on <em>August 6, 2017</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
+  This document was generated by <em>Vitaly</em> on <em>November 26, 2017</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
 </p>
 <p>
   The buttons in the navigation panels have the following meaning:
@@ -7645,7 +7689,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <hr size="1">
 <p>
  <font size="-1">
-  This document was generated by <em>Vitaly</em> on <em>August 6, 2017</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
+  This document was generated by <em>Vitaly</em> on <em>November 26, 2017</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
  </font>
  <br>
 

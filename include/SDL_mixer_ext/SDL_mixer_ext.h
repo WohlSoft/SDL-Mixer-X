@@ -775,6 +775,9 @@ extern DECLSPEC void SDLCALL Mix_ADLMIDI_setVolumeModel(int vm);
 /* Reset all ADLMIDI properties to default state */
 extern DECLSPEC void SDLCALL Mix_ADLMIDI_setSetDefaults();
 
+/* Sets WOPL bank file for ADLMIDI playing device, affects on MIDI file reopen */
+extern DECLSPEC void SDLCALL Mix_ADLMIDI_setCustomBankFile(const char *bank_wonl_path);
+
 /* Sets WOPN bank file for OPNMIDI playing device, affects on MIDI file reopen */
 extern DECLSPEC void SDLCALL Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path);
 

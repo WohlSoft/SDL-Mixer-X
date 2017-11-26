@@ -48,6 +48,7 @@ extern int  ADLMIDI_getBanksCount();
 extern const char *const *ADLMIDI_getBankNames();
 extern int  ADLMIDI_getBankID();
 extern void ADLMIDI_setBankID(int bnk);
+extern void ADLMIDI_setCustomBankFile(const char *bank_wonl_path);
 extern int  ADLMIDI_getTremolo();
 extern void ADLMIDI_setTremolo(int tr);
 extern int  ADLMIDI_getVibrato();
