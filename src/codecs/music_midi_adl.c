@@ -276,7 +276,6 @@ struct MUSIC_MIDIADL *ADLMIDI_LoadSongRW(SDL_RWops *src)
         {
             Mix_SetError("ADL-MIDI: %s", adl_errorInfo(adl_midiplayer));
             adl_close(adl_midiplayer);
-            SDL_free(bytes);
             return NULL;
         }
 

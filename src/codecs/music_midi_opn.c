@@ -225,7 +225,6 @@ struct MUSIC_MIDIOPN *OPNMIDI_LoadSongRW(SDL_RWops *src)
         {
             Mix_SetError("OPN2-MIDI: %s", opn2_errorInfo(opn_midiplayer));
             opn2_close( opn_midiplayer );
-            SDL_free(bytes);
             return NULL;
         }
 
