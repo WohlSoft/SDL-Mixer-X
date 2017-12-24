@@ -121,7 +121,7 @@ extern DECLSPEC void SDLCALL Mix_Quit(void);
 #define MIX_DEFAULT_FORMAT  AUDIO_S16MSB
 #endif
 #define MIX_DEFAULT_CHANNELS    2
-#define MIX_MAX_VOLUME          128 /* Volume of a chunk */
+#define MIX_MAX_VOLUME          SDL_MIX_MAXVOLUME /* Volume of a chunk */
 
 /* The internal format for an audio chunk */
 typedef struct Mix_Chunk
@@ -825,6 +825,7 @@ DEPRECATED(extern DECLSPEC void SDLCALL MIX_SetLockMIDIArgs(int lock_midiargs));
 /* We'll use SDL for reporting errors */
 #define Mix_SetError    SDL_SetError
 #define Mix_GetError    SDL_GetError
+#define Mix_ClearError  SDL_ClearError
 
 /* Ends C function definitions when using C++ */
 #ifdef __cplusplus
@@ -833,3 +834,5 @@ DEPRECATED(extern DECLSPEC void SDLCALL MIX_SetLockMIDIArgs(int lock_midiargs));
 #include "close_code.h"
 
 #endif /* SDL_MIXER_H_ */
+
+/* vi: set ts=4 sw=4 expandtab: */
