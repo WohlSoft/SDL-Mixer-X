@@ -23,6 +23,6 @@
 
 #include "../audio_codec.h"
 
-int modplug_init2(AudioCodec* codec, SDL_AudioSpec *mixer);
+int modplug_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixer);
 
 #endif /* MODPLUG_MUSIC */

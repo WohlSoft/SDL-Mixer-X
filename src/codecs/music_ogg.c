@@ -126,11 +126,11 @@ int OGG_init(SDL_AudioSpec *mixerfmt)
 /* Initialize the Ogg Vorbis player, with the given mixer settings
    This function returns 0, or -1 if there was an error.
  */
-int OGG_init2(AudioCodec* codec, SDL_AudioSpec *mixerfmt)
+int OGG_init2(Mix_MusicInterface* codec, SDL_AudioSpec *mixerfmt)
 {
     mixer = *mixerfmt;
 
-    initAudioCodec(codec);
+    initMusicInterface(codec);
 
     codec->isValid = 1;
 

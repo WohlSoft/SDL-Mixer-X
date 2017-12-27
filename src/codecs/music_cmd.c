@@ -37,11 +37,15 @@
 #include "music_cmd.h"
 
 #include <sys/types.h>
+#ifndef _WIN32
+# include <unistd.h>
+#endif
 #include <limits.h>
 #include <stdio.h>
 #if defined(__linux__) && defined(__arm__)
 # include <linux/limits.h>
 #endif
+
 typedef struct {
     char *file;
     char *cmd;
@@ -71,7 +75,7 @@ static Uint32 MusicCMD_Codec_capabilities()
     return ACODEC_ASYNC;
 }
 
-int MusicCMD_init2(AudioCodec* codec, SDL_AudioSpec *mixerfmt)
+int MusicCMD_init2(Mix_MusicInterface* codec, SDL_AudioSpec *mixerfmt)
 {
     (void)mixerfmt;//Unused!
 

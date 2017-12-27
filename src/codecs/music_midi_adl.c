@@ -151,11 +151,11 @@ void ADLMIDI_setDefaults()
 /* This is the format of the audio mixer data */
 static SDL_AudioSpec mixer;
 
-int ADLMIDI_init2(AudioCodec *codec, SDL_AudioSpec *mixerfmt)
+int ADLMIDI_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixerfmt)
 {
     mixer = *mixerfmt;
 
-    initAudioCodec(codec);
+    initMusicInterface(codec);
 
     codec->isValid = 1;
 
@@ -407,7 +407,7 @@ void ADLMIDI_jump_to_time(void *music_p, double time)
         adl_positionSeek(music->adlmidi, time);
 }
 
-double ADLMIDI_currentPosition(AudioCodecStream* music_p)
+double ADLMIDI_currentPosition(Mix_MusicInterfaceStream* music_p)
 {
     struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
     if(music)
@@ -415,7 +415,7 @@ double ADLMIDI_currentPosition(AudioCodecStream* music_p)
     return -1;
 }
 
-double ADLMIDI_songLength(AudioCodecStream* music_p)
+double ADLMIDI_songLength(Mix_MusicInterfaceStream* music_p)
 {
     struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
     if(music)
@@ -423,7 +423,7 @@ double ADLMIDI_songLength(AudioCodecStream* music_p)
     return -1;
 }
 
-double ADLMIDI_loopStart(AudioCodecStream* music_p)
+double ADLMIDI_loopStart(Mix_MusicInterfaceStream* music_p)
 {
     struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
     if(music)
@@ -431,7 +431,7 @@ double ADLMIDI_loopStart(AudioCodecStream* music_p)
     return -1;
 }
 
-double ADLMIDI_loopEnd(AudioCodecStream* music_p)
+double ADLMIDI_loopEnd(Mix_MusicInterfaceStream* music_p)
 {
     struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
     if(music)
@@ -439,7 +439,7 @@ double ADLMIDI_loopEnd(AudioCodecStream* music_p)
     return -1;
 }
 
-double ADLMIDI_loopLength(AudioCodecStream* music_p)
+double ADLMIDI_loopLength(Mix_MusicInterfaceStream* music_p)
 {
     struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
     if(music)

@@ -29,7 +29,7 @@
 #include <SDL2/SDL_rwops.h>
 #include <SDL2/SDL_audio.h>
 
-typedef void AudioCodecStream;
+typedef void Mix_MusicInterfaceStream;
 
 typedef enum
 {
@@ -58,58 +58,58 @@ typedef enum
 Uint32      audioCodec_default_capabilities();
 void       *audioCodec_dummy_cb_open(SDL_RWops* src, int freesrc);
 void       *audioCodec_dummy_cb_openEx(SDL_RWops* src, int freesrc, const char *extraSettings);
-void        audioCodec_dummy_cb_void_1arg(AudioCodecStream* music);
-int         audioCodec_dummy_cb_int_1arg(AudioCodecStream* music);
-const char *audioCodec_dummy_meta_tag(AudioCodecStream* music);
-void        audioCodec_dummy_cb_regulator(AudioCodecStream* music, int value);
-void        audioCodec_dummy_cb_seek(AudioCodecStream* music, double position);
-double      audioCodec_dummy_cb_tell(AudioCodecStream* music);
-int         audioCodec_dummy_playAudio(AudioCodecStream* music, Uint8* data, int length);
+void        audioCodec_dummy_cb_void_1arg(Mix_MusicInterfaceStream* music);
+int         audioCodec_dummy_cb_int_1arg(Mix_MusicInterfaceStream* music);
+const char *audioCodec_dummy_meta_tag(Mix_MusicInterfaceStream* music);
+void        audioCodec_dummy_cb_regulator(Mix_MusicInterfaceStream* music, int value);
+void        audioCodec_dummy_cb_seek(Mix_MusicInterfaceStream* music, double position);
+double      audioCodec_dummy_cb_tell(Mix_MusicInterfaceStream* music);
+int         audioCodec_dummy_playAudio(Mix_MusicInterfaceStream* music, Uint8* data, int length);
 
 /* A generic audio playing codec interface interface */
-typedef struct _AudioCodec
+typedef struct
 {
     int     isValid;
 
     /* Capabilities of the codec */
     Uint32 (*capabilities)(void);
 
-    AudioCodecStream* (*open)(SDL_RWops* src, int freesrc);
-    AudioCodecStream* (*openEx)(SDL_RWops* src, int freesrc, const char *extraSettings);
-    void  (*close)(AudioCodecStream* music);
+    Mix_MusicInterfaceStream* (*open)(SDL_RWops* src, int freesrc);
+    Mix_MusicInterfaceStream* (*openEx)(SDL_RWops* src, int freesrc, const char *extraSettings);
+    void  (*close)(Mix_MusicInterfaceStream* music);
 
-    void  (*play)(AudioCodecStream* music);
-    void  (*pause)(AudioCodecStream* music);
-    void  (*resume)(AudioCodecStream* music);
-    void  (*stop)(AudioCodecStream* music);
+    void  (*play)(Mix_MusicInterfaceStream* music);
+    void  (*pause)(Mix_MusicInterfaceStream* music);
+    void  (*resume)(Mix_MusicInterfaceStream* music);
+    void  (*stop)(Mix_MusicInterfaceStream* music);
 
-    int   (*isPlaying)(AudioCodecStream* music);
-    int   (*isPaused)(AudioCodecStream* music);
+    int   (*isPlaying)(Mix_MusicInterfaceStream* music);
+    int   (*isPaused)(Mix_MusicInterfaceStream* music);
 
-    void  (*setLoops)(AudioCodecStream* music, int loopsCount);
-    void  (*setVolume)(AudioCodecStream* music, int volume);
+    void  (*setLoops)(Mix_MusicInterfaceStream* music, int loopsCount);
+    void  (*setVolume)(Mix_MusicInterfaceStream* music, int volume);
 
-    double (*getCurrentTime)(AudioCodecStream* music);
-    void  (*jumpToTime)(AudioCodecStream* music, double position);
-    double (*getTimeLength)(AudioCodecStream* music);
+    double (*getCurrentTime)(Mix_MusicInterfaceStream* music);
+    void  (*jumpToTime)(Mix_MusicInterfaceStream* music, double position);
+    double (*getTimeLength)(Mix_MusicInterfaceStream* music);
 
-    double (*getLoopStartTime)(AudioCodecStream* music);
-    double (*getLoopEndTime)(AudioCodecStream* music);
-    double (*getLoopLengthTime)(AudioCodecStream* music);
+    double (*getLoopStartTime)(Mix_MusicInterfaceStream* music);
+    double (*getLoopEndTime)(Mix_MusicInterfaceStream* music);
+    double (*getLoopLengthTime)(Mix_MusicInterfaceStream* music);
 
-    const char* (*metaTitle)(AudioCodecStream* music);
-    const char* (*metaArtist)(AudioCodecStream* music);
-    const char* (*metaAlbum)(AudioCodecStream* music);
-    const char* (*metaCopyright)(AudioCodecStream* music);
+    const char* (*metaTitle)(Mix_MusicInterfaceStream* music);
+    const char* (*metaArtist)(Mix_MusicInterfaceStream* music);
+    const char* (*metaAlbum)(Mix_MusicInterfaceStream* music);
+    const char* (*metaCopyright)(Mix_MusicInterfaceStream* music);
 
-    int   (*playAudio)(AudioCodecStream* music, Uint8* data, int length);
+    int   (*playAudio)(Mix_MusicInterfaceStream* music, Uint8* data, int length);
 
-} AudioCodec;
+} Mix_MusicInterface;
 
 /*
     Set all function pointers to dummy calls
  */
-void initAudioCodec(AudioCodec *codec);
+void initMusicInterface(Mix_MusicInterface *interface);
 
 #endif /* AUDIO_CODEC_H*/
 

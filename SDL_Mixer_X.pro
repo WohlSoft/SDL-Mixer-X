@@ -93,7 +93,7 @@ exists($$PWD/../../_common/build_props.pri):{
 INCLUDEPATH += $$PWD/include/
 
 linux-g++||unix:!macx:!android:{
-    DEFINES += HAVE_INTTYPES_H HAVE_SETENV HAVE_SINF
+    DEFINES += HAVE_INTTYPES_H HAVE_SETENV HAVE_SINF HAVE_FORK
     CONFIG -= dll
     CONFIG -= static
     CONFIG += static_and_shared

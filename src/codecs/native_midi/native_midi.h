@@ -28,7 +28,7 @@
 
 typedef struct _NativeMidiSong NativeMidiSong;
 
-int NativeMIDI_init2(AudioCodec *codec);
+int NativeMIDI_init2(Mix_MusicInterface *codec);
 
 int native_midi_detect();
 

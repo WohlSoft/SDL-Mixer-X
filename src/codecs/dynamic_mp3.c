@@ -271,7 +271,7 @@ static int SMPEG_getSamples(void *mp3_p, Uint8 *stream, int len)
 }
 
 
-int SMPEG_init2(AudioCodec *codec, SDL_AudioSpec *mixerfmt)
+int SMPEG_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixerfmt)
 {
     global_mixer = *mixerfmt;
 

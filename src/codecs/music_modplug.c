@@ -77,7 +77,7 @@ static Uint32      modpug_Codec_capabilities()
     return ACODEC_NEED_VOLUME_INIT;
 }
 
-int modplug_init2(AudioCodec *codec, SDL_AudioSpec *spec)
+int modplug_init2(Mix_MusicInterface *codec, SDL_AudioSpec *spec)
 {
     if(!Mix_Init(MIX_INIT_MODPLUG))
         return -1;
@@ -136,7 +136,7 @@ int modplug_init2(AudioCodec *codec, SDL_AudioSpec *spec)
     settings.mLoopCount = -1;
     modplug.ModPlug_SetSettings(&settings);
 
-    initAudioCodec(codec);
+    initMusicInterface(codec);
 
     codec->isValid = 1;
 

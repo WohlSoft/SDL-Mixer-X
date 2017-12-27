@@ -39,7 +39,7 @@ typedef struct {
     fluid_player_t* player;
 } FluidSynthMidiSong;
 
-extern int fluidsynth_init2(AudioCodec *codec, SDL_AudioSpec *mixer);
+extern int fluidsynth_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixer);
 
 void    *fluidsynth_loadsong_RW(SDL_RWops *rw, int freerw);
 void    fluidsynth_freesong(void *song_p);

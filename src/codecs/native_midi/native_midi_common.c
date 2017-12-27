@@ -47,9 +47,9 @@ static Uint32 native_midi_caps()
     return ACODEC_ASYNC|ACODEC_SINGLETON|ACODEC_HAS_PAUSE;
 }
 
-int NativeMIDI_init2(AudioCodec *codec)
+int NativeMIDI_init2(Mix_MusicInterface *codec)
 {
-    initAudioCodec(codec);
+    initMusicInterface(codec);
 
     codec->isValid          = native_midi_detect();
 

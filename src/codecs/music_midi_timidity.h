@@ -24,7 +24,7 @@
 
 #include "../audio_codec.h"
 
-extern int Timidity_init2(AudioCodec *codec, SDL_AudioSpec *mixer);
+extern int Timidity_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixer);
 
 extern void         Timidity_addToPathList(const char* path);
 extern const char   *Timidity_Error(void);

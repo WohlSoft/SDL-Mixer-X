@@ -46,11 +46,11 @@ static const char *MAD_metaCopyright(void *music_p);
 /* Initialize the MAD player, with the given mixer settings
    This function returns 0, or -1 if there was an error.
  */
-int MAD_init2(AudioCodec* codec, SDL_AudioSpec *mixerfmt)
+int MAD_init2(Mix_MusicInterface* codec, SDL_AudioSpec *mixerfmt)
 {
     global_mixer = *mixerfmt;
 
-    initAudioCodec(codec);
+    initMusicInterface(codec);
 
     codec->isValid = 1;
 

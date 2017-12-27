@@ -41,7 +41,7 @@ struct MUSIC_MIDIADL
     SDL_AudioCVT cvt;
 };
 
-extern int ADLMIDI_init2(AudioCodec *codec, SDL_AudioSpec *mixer);
+extern int ADLMIDI_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixer);
 
 /*Setup editing functions (changes applying on file reopening)*/
 extern int  ADLMIDI_getBanksCount();
@@ -91,19 +91,19 @@ extern void ADLMIDI_delete(void *music_p);
 extern void ADLMIDI_jump_to_time(void *music_p, double time);
 
 /* Tell a current position */
-extern double ADLMIDI_currentPosition(AudioCodecStream* music);
+extern double ADLMIDI_currentPosition(Mix_MusicInterfaceStream* music);
 
 /* Total length of a song */
-extern double ADLMIDI_songLength(AudioCodecStream* music);
+extern double ADLMIDI_songLength(Mix_MusicInterfaceStream* music);
 
 /* Loop start position */
-extern double ADLMIDI_loopStart(AudioCodecStream* music);
+extern double ADLMIDI_loopStart(Mix_MusicInterfaceStream* music);
 
 /* Loop end position */
-extern double ADLMIDI_loopEnd(AudioCodecStream* music);
+extern double ADLMIDI_loopEnd(Mix_MusicInterfaceStream* music);
 
 /* Loop length time*/
-extern double ADLMIDI_loopLength(AudioCodecStream* music);
+extern double ADLMIDI_loopLength(Mix_MusicInterfaceStream* music);
 
 #endif /* USE_ADL_MIDI */
 

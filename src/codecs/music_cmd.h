@@ -25,7 +25,7 @@
 
 #include "../audio_codec.h"
 
-int MusicCMD_init2(AudioCodec* codec, SDL_AudioSpec *mixerfmt);
+int MusicCMD_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixerfmt);
 
 /*  Load a music stream from the given file
     to free song, please use codec->close(music) function

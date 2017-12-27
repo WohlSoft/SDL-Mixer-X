@@ -83,6 +83,15 @@ typedef _off_t off_t;
 #include "codecs/music_gme.h"
 #endif
 
+/* Check to make sure we are building with a new enough SDL */
+#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 7)
+#error You need SDL 2.0.7 or newer from http://www.libsdl.org
+#endif
+
+/* Set this hint to true if you want verbose logging of music interfaces */
+#define SDL_MIXER_HINT_DEBUG_MUSIC_INTERFACES \
+    "SDL_MIXER_DEBUG_MUSIC_INTERFACES"
+
 extern int volatile music_active;//Avoid Clang's "no previous extern declaration" warning
 int volatile music_active = 1;
 
@@ -98,8 +107,8 @@ static int music_volume = MIX_MAX_VOLUME;
 static int mididevice_next    = MIDI_ADLMIDI;
 static int mididevice_current = MIDI_ADLMIDI;
 
-static AudioCodec   available_codecs[MUS_KnownCodecs];
-static AudioCodec   available_MIDI[MIDI_KnuwnDevices];
+static Mix_MusicInterface   s_music_interfaces[MUS_KnownCodecs];
+static Mix_MusicInterface   s_music_MIDI_devices[MIDI_KnuwnDevices];
 
 /* Reset MIDI settings every file reopening (to allow right argument passing) */
 static int need_reset_midi = 1;
@@ -109,8 +118,8 @@ static int lock_midi_args = 0;
 
 struct _Mix_Music
 {
-    AudioCodec          codec;
-    AudioCodecStream   *music;
+    Mix_MusicInterface  interface;
+    Mix_MusicInterfaceStream   *music;
     Mix_MusicType       type;
     Mix_Fading fading;
     int fade_step;
@@ -182,7 +191,7 @@ static int music_halt_or_loop(void)
     {
         #ifdef USE_NATIVE_MIDI
         /* Native MIDI handles looping internally */
-        if(mididevice_current == MIDI_Native && music_playing->type == MUS_MID && music_playing->codec.isValid)
+        if(mididevice_current == MIDI_Native && music_playing->type == MUS_MID && music_playing->interface.isValid)
             music_loops = 0;
         #endif
 
@@ -249,11 +258,11 @@ void music_mixer(void *udata, Uint8 *stream, int len)
         if(!music_internal_playing())
             return;
 
-        if(music_playing->codec.isValid && music_playing->music)
+        if(music_playing->interface.isValid && music_playing->music)
         {
-            if((music_playing->codec.capabilities() & ACODEC_ASYNC) != 0)
+            if((music_playing->interface.capabilities() & ACODEC_ASYNC) != 0)
                 goto skip;/*Asyncronious player plays audio through separately opened audio output*/
-            left = music_playing->codec.playAudio(music_playing->music, stream, len);
+            left = music_playing->interface.playAudio(music_playing->music, stream, len);
         }
     }
 
@@ -270,46 +279,46 @@ skip:
 /* Initialize the music players with a certain desired audio format */
 int open_music(SDL_AudioSpec *mixer)
 {
-    SDL_memset(available_codecs, 0, sizeof(available_codecs));
-    SDL_memset(available_MIDI,   0, sizeof(available_MIDI));
+    SDL_memset(s_music_interfaces, 0, sizeof(s_music_interfaces));
+    SDL_memset(s_music_MIDI_devices,   0, sizeof(s_music_MIDI_devices));
 
     /* available_codecs */
     #ifdef WAV_MUSIC
-    WAVStream_Init2(&available_codecs[MUS_WAV], mixer);
+    WAVStream_Init2(&s_music_interfaces[MUS_WAV], mixer);
     add_music_decoder("WAVE");
     #endif
 
     #ifdef MODPLUG_MUSIC
-    if(modplug_init2(&available_codecs[MUS_MODPLUG], mixer) == 0)
+    if(modplug_init2(&s_music_interfaces[MUS_MODPLUG], mixer) == 0)
         add_music_decoder("MODPLUG");
     #endif
 
     #ifdef MOD_MUSIC
-    if(MOD_init2(&available_codecs[MUS_MOD], mixer) == 0)
+    if(MOD_init2(&s_music_interfaces[MUS_MOD], mixer) == 0)
         add_music_decoder("MIKMOD");
     #endif
 
     #ifdef GME_MUSIC
-    GME_init2(&available_codecs[MUS_GME], mixer);
+    GME_init2(&s_music_interfaces[MUS_GME], mixer);
     add_music_decoder("GAMEEMU");
     #endif
 
     #ifdef OGG_MUSIC
-    OGG_init2(&available_codecs[MUS_OGG], mixer);
+    OGG_init2(&s_music_interfaces[MUS_OGG], mixer);
     add_music_decoder("OGG");
     #endif
 
     #ifdef FLAC_MUSIC
-    FLAC_init2(&available_codecs[MUS_FLAC], mixer);
+    FLAC_init2(&s_music_interfaces[MUS_FLAC], mixer);
     add_music_decoder("FLAC");
     #endif
 
     #ifdef MP3_MAD_MUSIC
-    MAD_init2(&available_codecs[MUS_MP3_MAD], mixer);
+    MAD_init2(&s_music_interfaces[MUS_MP3_MAD], mixer);
     #endif
 
     #ifdef MP3_MUSIC
-    SMPEG_init2(&available_codecs[MUS_MP3], mixer);
+    SMPEG_init2(&s_music_interfaces[MUS_MP3], mixer);
     #endif
 
     #if defined(MP3_MUSIC) || defined(MP3_MAD_MUSIC)
@@ -317,34 +326,34 @@ int open_music(SDL_AudioSpec *mixer)
     #endif
 
     #ifdef CMD_MUSIC
-    MusicCMD_init2(&available_codecs[MUS_CMD], mixer);
+    MusicCMD_init2(&s_music_interfaces[MUS_CMD], mixer);
     add_music_decoder("CMD");
     #endif
 
     #ifdef MID_MUSIC
     #ifdef USE_ADL_MIDI
-    if(ADLMIDI_init2(&available_MIDI[MIDI_ADLMIDI], mixer) == 0)
+    if(ADLMIDI_init2(&s_music_MIDI_devices[MIDI_ADLMIDI], mixer) == 0)
         add_music_decoder("ADLMIDI");
     #endif
 
     #ifdef USE_OPN2_MIDI
-    if(OPNMIDI_init2(&available_MIDI[MIDI_OPNMIDI], mixer) == 0)
+    if(OPNMIDI_init2(&s_music_MIDI_devices[MIDI_OPNMIDI], mixer) == 0)
         add_music_decoder("OPNMIDI");
     #endif
 
     #ifdef USE_TIMIDITY_MIDI
-    if(Timidity_init2(&available_MIDI[MIDI_Timidity], mixer) == 0)
+    if(Timidity_init2(&s_music_MIDI_devices[MIDI_Timidity], mixer) == 0)
         add_music_decoder("TIMIDITY");
     #endif
 
     #ifdef USE_FLUIDSYNTH_MIDI
-    if(fluidsynth_init2(&available_MIDI[MIDI_Fluidsynth], mixer) == 0)
+    if(fluidsynth_init2(&s_music_MIDI_devices[MIDI_Fluidsynth], mixer) == 0)
         add_music_decoder("FLUIDSYNTH");
     #endif
 
     #ifdef USE_NATIVE_MIDI
-    NativeMIDI_init2(&available_MIDI[MIDI_Native]);
-    if(available_MIDI[MIDI_Native].isValid)
+    NativeMIDI_init2(&s_music_MIDI_devices[MIDI_Native]);
+    if(s_music_MIDI_devices[MIDI_Native].isValid)
         add_music_decoder("NATIVEMIDI");
     #endif
     #endif
@@ -759,7 +768,7 @@ void parse_adlmidi_args(char *args)
     }
 }
 
-AudioCodec chooseMidiCodec(char *extraSettings, int force_codec)
+Mix_MusicInterface chooseMidiCodec(char *extraSettings, int force_codec)
 {
     if((need_reset_midi == 1) || (lock_midi_args == 0))
     {
@@ -786,7 +795,7 @@ AudioCodec chooseMidiCodec(char *extraSettings, int force_codec)
     }
 
     /* FIXME: parse extra settings and find synthesizer type */
-    return available_MIDI[mididevice_current];
+    return s_music_MIDI_devices[mididevice_current];
 }
 
 /* Load a music file */
@@ -846,7 +855,7 @@ Mix_Music *SDLCALLCC Mix_LoadMUS(const char *file)
         }
         music->error = 0;
         music->type = MUS_CMD;
-        music->codec = available_codecs[MUS_CMD];
+        music->interface = s_music_interfaces[MUS_CMD];
         music->music = MusicCMD_LoadSong(music_cmd, music_file);
         if(music->music == NULL)
         {
@@ -990,8 +999,8 @@ Mix_Music *SDLCALLCC Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int 
         #ifdef WAV_MUSIC
     case MUS_WAV:
         music->type = MUS_WAV;
-        music->codec = available_codecs[MUS_WAV];
-        music->music = music->codec.open(src, freesrc);
+        music->interface = s_music_interfaces[MUS_WAV];
+        music->music = music->interface.open(src, freesrc);
         if(music->music != NULL)
             music->error = 0;
         break;
@@ -1000,8 +1009,8 @@ Mix_Music *SDLCALLCC Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int 
         #ifdef OGG_MUSIC
     case MUS_OGG:
         music->type = MUS_OGG;
-        music->codec = available_codecs[MUS_OGG];
-        music->music = music->codec.open(src, freesrc);
+        music->interface = s_music_interfaces[MUS_OGG];
+        music->music = music->interface.open(src, freesrc);
         if(music->music != NULL)
             music->error = 0;
         break;
@@ -1010,8 +1019,8 @@ Mix_Music *SDLCALLCC Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int 
         #ifdef FLAC_MUSIC
     case MUS_FLAC:
         music->type = MUS_FLAC;
-        music->codec = available_codecs[MUS_FLAC];
-        music->music = music->codec.open(src, freesrc);
+        music->interface = s_music_interfaces[MUS_FLAC];
+        music->music = music->interface.open(src, freesrc);
         if(music->music)
             music->error = 0;
         else
@@ -1024,7 +1033,7 @@ Mix_Music *SDLCALLCC Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int 
         if(Mix_Init(MIX_INIT_MP3))
         {
             music->type = MUS_MP3;
-            music->codec = available_codecs[MUS_MP3];
+            music->interface = s_music_interfaces[MUS_MP3];
             music->music = music->codec.open(src, freesrc);
             if(music->music)
                 music->error = 0;
@@ -1038,8 +1047,8 @@ Mix_Music *SDLCALLCC Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int 
     case MUS_MP3:
     case MUS_MP3_MAD:
         music->type = MUS_MP3_MAD;
-        music->codec = available_codecs[MUS_MP3_MAD];
-        music->music = music->codec.open(src, freesrc);
+        music->interface = s_music_interfaces[MUS_MP3_MAD];
+        music->music = music->interface.open(src, freesrc);
         if(music->music)
             music->error = 0;
         else
@@ -1055,10 +1064,10 @@ Mix_Music *SDLCALLCC Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int 
     case MUS_MID:
 
         music->type = MUS_MID;
-        music->codec = chooseMidiCodec(music_args, (type == MUS_ADLMIDI) ? MIDI_ADLMIDI : -1);
-        if(music->codec.isValid)
+        music->interface = chooseMidiCodec(music_args, (type == MUS_ADLMIDI) ? MIDI_ADLMIDI : -1);
+        if(music->interface.isValid)
         {
-            music->music = music->codec.open(src, freesrc);
+            music->music = music->interface.open(src, freesrc);
             if(music->music)
                 music->error = 0;
         }
@@ -1120,8 +1129,8 @@ Mix_Music *SDLCALLCC Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int 
         {
             SDL_RWseek(src, start, RW_SEEK_SET);
             music->type = MUS_GME;
-            music->codec = available_codecs[MUS_GME];
-            music->music = music->codec.openEx(src, freesrc, music_args);
+            music->interface = s_music_interfaces[MUS_GME];
+            music->music = music->interface.openEx(src, freesrc, music_args);
             if(music->music)
                 music->error = 0;
         }
@@ -1135,8 +1144,8 @@ Mix_Music *SDLCALLCC Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int 
         {
             SDL_RWseek(src, start, RW_SEEK_SET);
             music->type = MUS_MODPLUG;
-            music->codec = available_codecs[MUS_MODPLUG];
-            music->music = music->codec.open(src, freesrc);
+            music->interface = s_music_interfaces[MUS_MODPLUG];
+            music->music = music->interface.open(src, freesrc);
             if(music->music)
                 music->error = 0;
         }
@@ -1147,8 +1156,8 @@ Mix_Music *SDLCALLCC Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int 
         {
             SDL_RWseek(src, start, RW_SEEK_SET);
             music->type = MUS_MOD;
-            music->codec = available_codecs[MUS_MOD];
-            music->music = music->codec.open(src, freesrc);
+            music->interface = s_music_interfaces[MUS_MOD];
+            music->music = music->interface.open(src, freesrc);
             if(music->music)
                 music->error = 0;
         }
@@ -1194,9 +1203,9 @@ void SDLCALLCC Mix_FreeMusic(Mix_Music *music)
         }
         Mix_UnlockAudio();
 
-        if(music->codec.isValid && music->music)
+        if(music->interface.isValid && music->music)
         {
-            music->codec.close(music->music);
+            music->interface.close(music->music);
             music->music = 0;
         }
 
@@ -1236,29 +1245,29 @@ const char *SDLCALLCC Mix_GetMusicTitle(const Mix_Music *music)
 
 const char *SDLCALLCC Mix_GetMusicTitleTag(const Mix_Music *music)
 {
-    if(music && music->codec.isValid && music->music)
-        return music->codec.metaTitle(music->music);
+    if(music && music->interface.isValid && music->music)
+        return music->interface.metaTitle(music->music);
     return "";
 }
 
 const char *SDLCALLCC Mix_GetMusicArtistTag(const Mix_Music *music)
 {
-    if(music && music->codec.isValid && music->music)
-        return music->codec.metaArtist(music->music);
+    if(music && music->interface.isValid && music->music)
+        return music->interface.metaArtist(music->music);
     return "";
 }
 
 const char *SDLCALLCC Mix_GetMusicAlbumTag(const Mix_Music *music)
 {
-    if(music && music->codec.isValid && music->music)
-        return music->codec.metaAlbum(music->music);
+    if(music && music->interface.isValid && music->music)
+        return music->interface.metaAlbum(music->music);
     return "";
 }
 
 const char *SDLCALLCC Mix_GetMusicCopyrightTag(const Mix_Music *music)
 {
-    if(music && music->codec.isValid && music->music)
-        return music->codec.metaCopyright(music->music);
+    if(music && music->interface.isValid && music->music)
+        return music->interface.metaCopyright(music->music);
     return "";
 }
 
@@ -1290,13 +1299,13 @@ static int music_internal_play(Mix_Music *music, double position)
     if(music->type != MUS_MOD)
         music_internal_initialize_volume();
 
-    if(music->codec.isValid && music->music)
+    if(music->interface.isValid && music->music)
     {
-        if((music->codec.capabilities() & ACODEC_NEED_VOLUME_INIT) != 0)
+        if((music->interface.capabilities() & ACODEC_NEED_VOLUME_INIT) != 0)
             music_internal_initialize_volume();
-        music->codec.setLoops(music->music, music_loops);
-        music->codec.play(music->music);
-        if((music->codec.capabilities() & ACODEC_NEED_VOLUME_INIT_POST) != 0)
+        music->interface.setLoops(music->music, music_loops);
+        music->interface.play(music->music);
+        if((music->interface.capabilities() & ACODEC_NEED_VOLUME_INIT_POST) != 0)
             music_internal_initialize_volume();
     }
     else
@@ -1388,9 +1397,9 @@ int SDLCALLCC Mix_PlayMusic(Mix_Music *music, int loops)
 int music_internal_position(double position)
 {
     int retval = 0;
-    if(music_playing->codec.isValid && music_playing->music)
+    if(music_playing->interface.isValid && music_playing->music)
     {
-        music_playing->codec.jumpToTime(music_playing->music, position);
+        music_playing->interface.jumpToTime(music_playing->music, position);
     }
     else
     {
@@ -1424,9 +1433,9 @@ int SDLCALLCC Mix_SetMusicPosition(double position)
 double music_internal_position_get(Mix_Music *music)
 {
     double retval = 0;
-    if(music->codec.isValid && music->music)
+    if(music->interface.isValid && music->music)
     {
-        retval = music->codec.getCurrentTime(music->music);
+        retval = music->interface.getCurrentTime(music->music);
     }
     else
     {
@@ -1458,9 +1467,9 @@ double SDLCALLCC Mix_GetMusicPosition(Mix_Music *music)
 double music_internal_position_total(Mix_Music *music)
 {
     double retval = 0;
-    if(music->codec.isValid && music->music)
+    if(music->interface.isValid && music->music)
     {
-        retval = music->codec.getTimeLength(music->music);
+        retval = music->interface.getTimeLength(music->music);
     }
     else
     {
@@ -1491,9 +1500,9 @@ double SDLCALLCC Mix_GetMusicTotalTime(Mix_Music *music)
 double music_internal_loop_start(Mix_Music *music)
 {
     double retval = 0;
-    if(music->codec.isValid && music->music)
+    if(music->interface.isValid && music->music)
     {
-        retval = music->codec.getLoopStartTime(music->music);
+        retval = music->interface.getLoopStartTime(music->music);
     }
     else
     {
@@ -1524,9 +1533,9 @@ double SDLCALLCC Mix_GetMusicLoopStartTime(Mix_Music *music)
 double music_internal_loop_end(Mix_Music *music)
 {
     double retval = 0;
-    if(music->codec.isValid && music->music)
+    if(music->interface.isValid && music->music)
     {
-        retval = music->codec.getLoopEndTime(music->music);
+        retval = music->interface.getLoopEndTime(music->music);
     }
     else
     {
@@ -1557,9 +1566,9 @@ double SDLCALLCC Mix_GetMusicLoopEndTime(Mix_Music *music)
 double music_internal_loop_length(Mix_Music *music)
 {
     double retval = 0;
-    if(music->codec.isValid && music->music)
+    if(music->interface.isValid && music->music)
     {
-        retval = music->codec.getLoopLengthTime(music->music);
+        retval = music->interface.getLoopLengthTime(music->music);
     }
     else
     {
@@ -1600,9 +1609,9 @@ static void music_internal_volume(int volume)
 {
     if(!music_playing)
         return;
-    if(music_playing->codec.isValid && music_playing->music)
+    if(music_playing->interface.isValid && music_playing->music)
     {
-        music_playing->codec.setVolume(music_playing->music, volume);
+        music_playing->interface.setVolume(music_playing->music, volume);
     }
 }
 
@@ -1629,9 +1638,9 @@ static void music_internal_halt(void)
     if(!music_playing)
         return;
 
-    if(music_playing->codec.isValid && music_playing->music)
+    if(music_playing->interface.isValid && music_playing->music)
     {
-        music_playing->codec.stop(music_playing->music);
+        music_playing->interface.stop(music_playing->music);
     }
 
     music_playing->fading = MIX_NO_FADING;
@@ -1714,15 +1723,15 @@ Mix_Fading SDLCALLCC Mix_FadingMusic(void)
 void SDLCALLCC Mix_PauseMusic(void)
 {
     music_active = 0;
-    if(music_playing && music_playing->codec.isValid && music_playing->music)
-        music_playing->codec.pause(music_playing->music);
+    if(music_playing && music_playing->interface.isValid && music_playing->music)
+        music_playing->interface.pause(music_playing->music);
 }
 
 void SDLCALLCC Mix_ResumeMusic(void)
 {
     music_active = 1;
-    if(music_playing && music_playing->codec.isValid && music_playing->music)
-        music_playing->codec.resume(music_playing->music);
+    if(music_playing && music_playing->interface.isValid && music_playing->music)
+        music_playing->interface.resume(music_playing->music);
 }
 
 void SDLCALLCC Mix_RewindMusic(void)
@@ -1732,10 +1741,10 @@ void SDLCALLCC Mix_RewindMusic(void)
 
 int SDLCALLCC Mix_PausedMusic(void)
 {
-    if(music_playing && music_playing->codec.isValid && music_playing->music)
+    if(music_playing && music_playing->interface.isValid && music_playing->music)
     {
-        if((music_playing->codec.capabilities() & ACODEC_HAS_PAUSE) != 0)
-            return music_playing->codec.isPaused(music_playing->music);
+        if((music_playing->interface.capabilities() & ACODEC_HAS_PAUSE) != 0)
+            return music_playing->interface.isPaused(music_playing->music);
     }
     return (music_active == 0);
 }
@@ -1745,9 +1754,9 @@ static int music_internal_playing()
 {
     int playing = 1;
 
-    if(music_playing && music_playing->codec.isValid && music_playing->music)
+    if(music_playing && music_playing->interface.isValid && music_playing->music)
     {
-        if(!music_playing->codec.isPlaying(music_playing->music))
+        if(!music_playing->interface.isPlaying(music_playing->music))
             playing = 0;
     }
     else

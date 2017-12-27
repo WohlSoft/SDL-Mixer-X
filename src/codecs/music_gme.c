@@ -85,11 +85,11 @@ static int GME_playAudio(void *music_p, Uint8 *stream, int len);
  * Initialize the Game Music Emulators player, with the given mixer settings
  * This function returns 0, or -1 if there was an error.
  */
-int GME_init2(AudioCodec *codec, SDL_AudioSpec *mixerfmt)
+int GME_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixerfmt)
 {
     mixer = *mixerfmt;
 
-    initAudioCodec(codec);
+    initMusicInterface(codec);
 
     codec->isValid = 1;
 

@@ -43,11 +43,11 @@ static void Timidity_delete(void *music_p)
     Timidity_FreeSong(music);
 }
 
-int Timidity_init2(AudioCodec *codec, SDL_AudioSpec *mixer)
+int Timidity_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixer)
 {
     samplesize = (int)mixer->size / mixer->samples;
 
-    initAudioCodec(codec);
+    initMusicInterface(codec);
 
     codec->isValid = (Timidity_Init(mixer->freq,
                                     mixer->format,

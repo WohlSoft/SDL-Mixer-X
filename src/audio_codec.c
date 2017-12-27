@@ -41,42 +41,42 @@ void *audioCodec_dummy_cb_openEx(SDL_RWops *src, int freesrc, const char *extraS
     return NULL;
 }
 
-void audioCodec_dummy_cb_void_1arg(AudioCodecStream* music)
+void audioCodec_dummy_cb_void_1arg(Mix_MusicInterfaceStream* music)
 {
     (void)music;
 }
 
-int  audioCodec_dummy_cb_int_1arg(AudioCodecStream* music)
+int  audioCodec_dummy_cb_int_1arg(Mix_MusicInterfaceStream* music)
 {
     (void)music;
     return 0;
 }
 
-const char *audioCodec_dummy_meta_tag(AudioCodecStream* music)
+const char *audioCodec_dummy_meta_tag(Mix_MusicInterfaceStream* music)
 {
     (void)music;
     return "";
 }
 
-void audioCodec_dummy_cb_seek(AudioCodecStream* music, double position)
+void audioCodec_dummy_cb_seek(Mix_MusicInterfaceStream* music, double position)
 {
     (void)music;
     (void)position;
 }
 
-double audioCodec_dummy_cb_tell(AudioCodecStream* music)
+double audioCodec_dummy_cb_tell(Mix_MusicInterfaceStream* music)
 {
     (void)music;
     return -1.0;
 }
 
-void audioCodec_dummy_cb_regulator(AudioCodecStream *music, int value)
+void audioCodec_dummy_cb_regulator(Mix_MusicInterfaceStream *music, int value)
 {
     (void)music;
     (void)value;
 }
 
-int audioCodec_dummy_playAudio(AudioCodecStream *music, Uint8 *data, int length)
+int audioCodec_dummy_playAudio(Mix_MusicInterfaceStream *music, Uint8 *data, int length)
 {
     (void)music;
     (void)data;
@@ -85,42 +85,42 @@ int audioCodec_dummy_playAudio(AudioCodecStream *music, Uint8 *data, int length)
 }
 
 
-void initAudioCodec(AudioCodec *codec)
+void initMusicInterface(Mix_MusicInterface *interface)
 {
-    if(!codec)
+    if(!interface)
         return;
 
-    codec->isValid = 0;
+    interface->isValid = 0;
 
-    codec->capabilities     = audioCodec_default_capabilities;
+    interface->capabilities     = audioCodec_default_capabilities;
 
-    codec->open             = audioCodec_dummy_cb_open;
-    codec->openEx           = audioCodec_dummy_cb_openEx;
-    codec->close            = audioCodec_dummy_cb_void_1arg;
+    interface->open             = audioCodec_dummy_cb_open;
+    interface->openEx           = audioCodec_dummy_cb_openEx;
+    interface->close            = audioCodec_dummy_cb_void_1arg;
 
-    codec->play             = audioCodec_dummy_cb_void_1arg;
-    codec->pause            = audioCodec_dummy_cb_void_1arg;
-    codec->resume           = audioCodec_dummy_cb_void_1arg;
-    codec->stop             = audioCodec_dummy_cb_void_1arg;
+    interface->play             = audioCodec_dummy_cb_void_1arg;
+    interface->pause            = audioCodec_dummy_cb_void_1arg;
+    interface->resume           = audioCodec_dummy_cb_void_1arg;
+    interface->stop             = audioCodec_dummy_cb_void_1arg;
 
-    codec->isPlaying        = audioCodec_dummy_cb_int_1arg;
-    codec->isPaused         = audioCodec_dummy_cb_int_1arg;
+    interface->isPlaying        = audioCodec_dummy_cb_int_1arg;
+    interface->isPaused         = audioCodec_dummy_cb_int_1arg;
 
-    codec->setLoops         = audioCodec_dummy_cb_regulator;
-    codec->setVolume        = audioCodec_dummy_cb_regulator;
+    interface->setLoops         = audioCodec_dummy_cb_regulator;
+    interface->setVolume        = audioCodec_dummy_cb_regulator;
 
-    codec->jumpToTime       = audioCodec_dummy_cb_seek;
-    codec->getCurrentTime   = audioCodec_dummy_cb_tell;
-    codec->getTimeLength    = audioCodec_dummy_cb_tell;
+    interface->jumpToTime       = audioCodec_dummy_cb_seek;
+    interface->getCurrentTime   = audioCodec_dummy_cb_tell;
+    interface->getTimeLength    = audioCodec_dummy_cb_tell;
 
-    codec->getLoopStartTime = audioCodec_dummy_cb_tell;
-    codec->getLoopEndTime   = audioCodec_dummy_cb_tell;
-    codec->getLoopLengthTime= audioCodec_dummy_cb_tell;
+    interface->getLoopStartTime = audioCodec_dummy_cb_tell;
+    interface->getLoopEndTime   = audioCodec_dummy_cb_tell;
+    interface->getLoopLengthTime= audioCodec_dummy_cb_tell;
 
-    codec->metaTitle        = audioCodec_dummy_meta_tag;
-    codec->metaArtist       = audioCodec_dummy_meta_tag;
-    codec->metaAlbum        = audioCodec_dummy_meta_tag;
-    codec->metaCopyright    = audioCodec_dummy_meta_tag;
+    interface->metaTitle        = audioCodec_dummy_meta_tag;
+    interface->metaArtist       = audioCodec_dummy_meta_tag;
+    interface->metaAlbum        = audioCodec_dummy_meta_tag;
+    interface->metaCopyright    = audioCodec_dummy_meta_tag;
 
-    codec->playAudio        = audioCodec_dummy_playAudio;
+    interface->playAudio        = audioCodec_dummy_playAudio;
 }

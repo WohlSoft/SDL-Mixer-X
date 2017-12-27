@@ -31,7 +31,7 @@
 /* Initialize the Game Music Emulators player, with the given mixer settings
    This function returns 0, or -1 if there was an error.
  */
-extern int GME_init2(AudioCodec *codec, SDL_AudioSpec *mixer);
+extern int GME_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixer);
 
 #endif /* GME_MUSIC */
 

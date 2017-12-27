@@ -28,6 +28,6 @@
 /* Initialize the Ogg Vorbis player, with the given mixer settings
    This function returns 0, or -1 if there was an error.
  */
-extern int OGG_init2(AudioCodec *codec, SDL_AudioSpec *mixer);
+extern int OGG_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixer);
 
 #endif /* OGG_MUSIC */

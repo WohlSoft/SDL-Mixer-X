@@ -77,7 +77,7 @@ static Uint32      MOD_Codec_capabilities()
 /* Initialize the MOD player, with the given mixer settings
    This function returns 0, or -1 if there was an error.
  */
-int MOD_init2(AudioCodec *codec, SDL_AudioSpec *mixerfmt)
+int MOD_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixerfmt)
 {
     CHAR *list;
 

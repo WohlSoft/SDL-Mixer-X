@@ -54,7 +54,7 @@ int fluidsynth_load_soundfont(const char *path, void *data)
     return 1;
 }
 
-int fluidsynth_init2(AudioCodec *codec, SDL_AudioSpec *mixer)
+int fluidsynth_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixer)
 {
     codec->isValid = 0;
 

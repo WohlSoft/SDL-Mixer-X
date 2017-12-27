@@ -30,7 +30,7 @@
 /* Initialize the MikMod player, with the given mixer settings
    This function returns 0, or -1 if there was an error.
  */
-extern int MOD_init2(AudioCodec* codec, SDL_AudioSpec *mixer);
+extern int MOD_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixer);
 
 /* Uninitialize the music players */
 extern void MOD_exit(void);

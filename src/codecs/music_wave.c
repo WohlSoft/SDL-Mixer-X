@@ -178,11 +178,11 @@ static SDL_bool LoadAIFFStream(WAVStream *wave);
 /* Initialize the WAVStream player, with the given mixer settings
    This function returns 0, or -1 if there was an error.
  */
-int WAVStream_Init2(AudioCodec *codec, SDL_AudioSpec *mixerfmt)
+int WAVStream_Init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixerfmt)
 {
     mixer = *mixerfmt;
 
-    initAudioCodec(codec);
+    initMusicInterface(codec);
 
     codec->isValid = 1;
 

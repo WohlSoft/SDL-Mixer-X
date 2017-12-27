@@ -41,7 +41,7 @@ struct MUSIC_MIDIOPN
     SDL_AudioCVT cvt;
 };
 
-extern int OPNMIDI_init2(AudioCodec *codec, SDL_AudioSpec *mixer);
+extern int OPNMIDI_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixer);
 
 /*Setup editing functions (changes applying on file reopening)*/
 extern int  OPNMIDI_getScaleMod();
@@ -88,19 +88,19 @@ extern void OPNMIDI_delete(void *music_p);
 extern void OPNMIDI_jump_to_time(void *music_p, double time);
 
 /* Tell a current position */
-extern double OPNMIDI_currentPosition(AudioCodecStream* music);
+extern double OPNMIDI_currentPosition(Mix_MusicInterfaceStream* music);
 
 /* Total length of a song */
-extern double OPNMIDI_songLength(AudioCodecStream* music);
+extern double OPNMIDI_songLength(Mix_MusicInterfaceStream* music);
 
 /* Loop start position */
-extern double OPNMIDI_loopStart(AudioCodecStream* music);
+extern double OPNMIDI_loopStart(Mix_MusicInterfaceStream* music);
 
 /* Loop end position */
-extern double OPNMIDI_loopEnd(AudioCodecStream* music);
+extern double OPNMIDI_loopEnd(Mix_MusicInterfaceStream* music);
 
 /* Loop length time*/
-extern double OPNMIDI_loopLength(AudioCodecStream* music);
+extern double OPNMIDI_loopLength(Mix_MusicInterfaceStream* music);
 
 #endif /* USE_OPN2_MIDI */
 

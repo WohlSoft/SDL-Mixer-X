@@ -118,11 +118,11 @@ static int      FLAC_playAudio(void *music_p, Uint8 *snd, int len);
 /* Initialize the FLAC player, with the given mixer settings
    This function returns 0, or -1 if there was an error.
  */
-int FLAC_init2(AudioCodec *codec, SDL_AudioSpec *mixerfmt)
+int FLAC_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixerfmt)
 {
     mixer = *mixerfmt;
 
-    initAudioCodec(codec);
+    initMusicInterface(codec);
 
     codec->isValid = 1;
 

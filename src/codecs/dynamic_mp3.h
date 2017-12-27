@@ -50,7 +50,7 @@ typedef struct {
 
 extern smpeg_loader smpeg;
 
-extern int SMPEG_init2(AudioCodec* codec, SDL_AudioSpec *mixerfmt);
+extern int SMPEG_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixerfmt);
 
 #endif /* MUSIC_MP3 */
 
