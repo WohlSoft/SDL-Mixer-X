@@ -186,21 +186,21 @@ int WAVStream_Init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixerfmt)
 
     codec->isValid = 1;
 
-    codec->capabilities     = audioCodec_default_capabilities;
+    codec->capabilities     = music_interface_default_capabilities;
 
     codec->open             = WAVStream_LoadSong_RW;
-    codec->openEx           = audioCodec_dummy_cb_openEx;
+    codec->openEx           = music_interface_dummy_cb_openEx;
     codec->close            = WAVStream_FreeSong;
 
     codec->play             = WAVStream_Start;
-    codec->pause            = audioCodec_dummy_cb_void_1arg;
-    codec->resume           = audioCodec_dummy_cb_void_1arg;
+    codec->pause            = music_interface_dummy_cb_void_1arg;
+    codec->resume           = music_interface_dummy_cb_void_1arg;
     codec->stop             = WAVStream_Stop;
 
     codec->isPlaying        = WAVStream_Active;
-    codec->isPaused         = audioCodec_dummy_cb_int_1arg;
+    codec->isPaused         = music_interface_dummy_cb_int_1arg;
 
-    codec->setLoops         = audioCodec_dummy_cb_regulator;
+    codec->setLoops         = music_interface_dummy_cb_regulator;
     codec->setVolume        = WAVStream_SetVolume;
 
     codec->jumpToTime       = WAVStream_seek;

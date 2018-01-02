@@ -57,28 +57,28 @@ int Timidity_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixer)
     codec->capabilities     = Timidity_capabilities;
 
     codec->open             = Timidity_LoadSong_RW;
-    codec->openEx           = audioCodec_dummy_cb_openEx;
+    codec->openEx           = music_interface_dummy_cb_openEx;
     codec->close            = Timidity_delete;
 
     codec->play             = Timidity_Start;
-    codec->pause            = audioCodec_dummy_cb_void_1arg;
-    codec->resume           = audioCodec_dummy_cb_void_1arg;
+    codec->pause            = music_interface_dummy_cb_void_1arg;
+    codec->resume           = music_interface_dummy_cb_void_1arg;
     codec->stop             = Timidity_Stop;
 
     codec->isPlaying        = Timidity_Active;
-    codec->isPaused         = audioCodec_dummy_cb_int_1arg;
+    codec->isPaused         = music_interface_dummy_cb_int_1arg;
 
-    codec->setLoops         = audioCodec_dummy_cb_regulator;
+    codec->setLoops         = music_interface_dummy_cb_regulator;
     codec->setVolume        = Timidity_SetVolume;
 
-    codec->jumpToTime       = audioCodec_dummy_cb_seek;
-    codec->getCurrentTime   = audioCodec_dummy_cb_tell;
-    codec->getTimeLength    = audioCodec_dummy_cb_tell;
+    codec->jumpToTime       = music_interface_dummy_cb_seek;
+    codec->getCurrentTime   = music_interface_dummy_cb_tell;
+    codec->getTimeLength    = music_interface_dummy_cb_tell;
 
-    codec->metaTitle        = audioCodec_dummy_meta_tag;
-    codec->metaArtist       = audioCodec_dummy_meta_tag;
-    codec->metaAlbum        = audioCodec_dummy_meta_tag;
-    codec->metaCopyright    = audioCodec_dummy_meta_tag;
+    codec->metaTitle        = music_interface_dummy_meta_tag;
+    codec->metaArtist       = music_interface_dummy_meta_tag;
+    codec->metaAlbum        = music_interface_dummy_meta_tag;
+    codec->metaCopyright    = music_interface_dummy_meta_tag;
 
     codec->playAudio        = Timidity_playAudio;
 

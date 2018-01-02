@@ -24,59 +24,59 @@
 
 #include "audio_codec.h"
 
-Uint32 audioCodec_default_capabilities()
+Uint32 music_interface_default_capabilities()
 {
     return ACODEC_NOCAPS;
 }
 
-void *audioCodec_dummy_cb_open(SDL_RWops *src, int freesrc)
+void *music_interface_dummy_cb_open(SDL_RWops *src, int freesrc)
 {
     (void)src; (void)freesrc;
     return NULL;
 }
 
-void *audioCodec_dummy_cb_openEx(SDL_RWops *src, int freesrc, const char *extraSettings)
+void *music_interface_dummy_cb_openEx(SDL_RWops *src, int freesrc, const char *extraSettings)
 {
     (void)src; (void)freesrc; (void)extraSettings;
     return NULL;
 }
 
-void audioCodec_dummy_cb_void_1arg(Mix_MusicInterfaceStream* music)
+void music_interface_dummy_cb_void_1arg(Mix_MusicInterfaceStream* music)
 {
     (void)music;
 }
 
-int  audioCodec_dummy_cb_int_1arg(Mix_MusicInterfaceStream* music)
+int  music_interface_dummy_cb_int_1arg(Mix_MusicInterfaceStream* music)
 {
     (void)music;
     return 0;
 }
 
-const char *audioCodec_dummy_meta_tag(Mix_MusicInterfaceStream* music)
+const char *music_interface_dummy_meta_tag(Mix_MusicInterfaceStream* music)
 {
     (void)music;
     return "";
 }
 
-void audioCodec_dummy_cb_seek(Mix_MusicInterfaceStream* music, double position)
+void music_interface_dummy_cb_seek(Mix_MusicInterfaceStream* music, double position)
 {
     (void)music;
     (void)position;
 }
 
-double audioCodec_dummy_cb_tell(Mix_MusicInterfaceStream* music)
+double music_interface_dummy_cb_tell(Mix_MusicInterfaceStream* music)
 {
     (void)music;
     return -1.0;
 }
 
-void audioCodec_dummy_cb_regulator(Mix_MusicInterfaceStream *music, int value)
+void music_interface_dummy_cb_regulator(Mix_MusicInterfaceStream *music, int value)
 {
     (void)music;
     (void)value;
 }
 
-int audioCodec_dummy_playAudio(Mix_MusicInterfaceStream *music, Uint8 *data, int length)
+int music_interface_dummy_playAudio(Mix_MusicInterfaceStream *music, Uint8 *data, int length)
 {
     (void)music;
     (void)data;
@@ -92,35 +92,35 @@ void initMusicInterface(Mix_MusicInterface *interface)
 
     interface->isValid = 0;
 
-    interface->capabilities     = audioCodec_default_capabilities;
+    interface->capabilities     = music_interface_default_capabilities;
 
-    interface->open             = audioCodec_dummy_cb_open;
-    interface->openEx           = audioCodec_dummy_cb_openEx;
-    interface->close            = audioCodec_dummy_cb_void_1arg;
+    interface->open             = music_interface_dummy_cb_open;
+    interface->openEx           = music_interface_dummy_cb_openEx;
+    interface->close            = music_interface_dummy_cb_void_1arg;
 
-    interface->play             = audioCodec_dummy_cb_void_1arg;
-    interface->pause            = audioCodec_dummy_cb_void_1arg;
-    interface->resume           = audioCodec_dummy_cb_void_1arg;
-    interface->stop             = audioCodec_dummy_cb_void_1arg;
+    interface->play             = music_interface_dummy_cb_void_1arg;
+    interface->pause            = music_interface_dummy_cb_void_1arg;
+    interface->resume           = music_interface_dummy_cb_void_1arg;
+    interface->stop             = music_interface_dummy_cb_void_1arg;
 
-    interface->isPlaying        = audioCodec_dummy_cb_int_1arg;
-    interface->isPaused         = audioCodec_dummy_cb_int_1arg;
+    interface->isPlaying        = music_interface_dummy_cb_int_1arg;
+    interface->isPaused         = music_interface_dummy_cb_int_1arg;
 
-    interface->setLoops         = audioCodec_dummy_cb_regulator;
-    interface->setVolume        = audioCodec_dummy_cb_regulator;
+    interface->setLoops         = music_interface_dummy_cb_regulator;
+    interface->setVolume        = music_interface_dummy_cb_regulator;
 
-    interface->jumpToTime       = audioCodec_dummy_cb_seek;
-    interface->getCurrentTime   = audioCodec_dummy_cb_tell;
-    interface->getTimeLength    = audioCodec_dummy_cb_tell;
+    interface->jumpToTime       = music_interface_dummy_cb_seek;
+    interface->getCurrentTime   = music_interface_dummy_cb_tell;
+    interface->getTimeLength    = music_interface_dummy_cb_tell;
 
-    interface->getLoopStartTime = audioCodec_dummy_cb_tell;
-    interface->getLoopEndTime   = audioCodec_dummy_cb_tell;
-    interface->getLoopLengthTime= audioCodec_dummy_cb_tell;
+    interface->getLoopStartTime = music_interface_dummy_cb_tell;
+    interface->getLoopEndTime   = music_interface_dummy_cb_tell;
+    interface->getLoopLengthTime= music_interface_dummy_cb_tell;
 
-    interface->metaTitle        = audioCodec_dummy_meta_tag;
-    interface->metaArtist       = audioCodec_dummy_meta_tag;
-    interface->metaAlbum        = audioCodec_dummy_meta_tag;
-    interface->metaCopyright    = audioCodec_dummy_meta_tag;
+    interface->metaTitle        = music_interface_dummy_meta_tag;
+    interface->metaArtist       = music_interface_dummy_meta_tag;
+    interface->metaAlbum        = music_interface_dummy_meta_tag;
+    interface->metaCopyright    = music_interface_dummy_meta_tag;
 
-    interface->playAudio        = audioCodec_dummy_playAudio;
+    interface->playAudio        = music_interface_dummy_playAudio;
 }

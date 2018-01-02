@@ -277,30 +277,30 @@ int SMPEG_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixerfmt)
 
     codec->isValid = 1;
 
-    codec->capabilities     = audioCodec_default_capabilities;
+    codec->capabilities     = music_interface_default_capabilities;
 
     codec->open             = SMPEG_openFileRW;
-    codec->openEx           = audioCodec_dummy_cb_openEx;
+    codec->openEx           = music_interface_dummy_cb_openEx;
     codec->close            = SMPEG_closeFile;
 
     codec->play             = SMPEG_start;
-    codec->pause            = audioCodec_dummy_cb_void_1arg;
-    codec->resume           = audioCodec_dummy_cb_void_1arg;
+    codec->pause            = music_interface_dummy_cb_void_1arg;
+    codec->resume           = music_interface_dummy_cb_void_1arg;
     codec->stop             = SMPEG_stopMix;
 
     codec->isPlaying        = SMPEG_isPlaying;
-    codec->isPaused         = audioCodec_dummy_cb_int_1arg;
+    codec->isPaused         = music_interface_dummy_cb_int_1arg;
 
-    codec->setLoops         = audioCodec_dummy_cb_regulator;
+    codec->setLoops         = music_interface_dummy_cb_regulator;
     codec->setVolume        = SMPEG_setVolume;
 
     codec->jumpToTime       = SMPEG_seekMix;
-    codec->getCurrentTime   = audioCodec_dummy_cb_tell;
+    codec->getCurrentTime   = music_interface_dummy_cb_tell;
 
-    codec->metaTitle        = audioCodec_dummy_meta_tag;
-    codec->metaArtist       = audioCodec_dummy_meta_tag;
-    codec->metaAlbum        = audioCodec_dummy_meta_tag;
-    codec->metaCopyright    = audioCodec_dummy_meta_tag;
+    codec->metaTitle        = music_interface_dummy_meta_tag;
+    codec->metaArtist       = music_interface_dummy_meta_tag;
+    codec->metaAlbum        = music_interface_dummy_meta_tag;
+    codec->metaCopyright    = music_interface_dummy_meta_tag;
 
     codec->playAudio        = SMPEG_getSamples;
 

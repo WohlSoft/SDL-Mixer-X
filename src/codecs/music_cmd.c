@@ -83,8 +83,8 @@ int MusicCMD_init2(Mix_MusicInterface* codec, SDL_AudioSpec *mixerfmt)
 
     codec->capabilities     = MusicCMD_Codec_capabilities;
 
-    codec->open             = audioCodec_dummy_cb_open;
-    codec->openEx           = audioCodec_dummy_cb_openEx;
+    codec->open             = music_interface_dummy_cb_open;
+    codec->openEx           = music_interface_dummy_cb_openEx;
     codec->close            = MusicCMD_FreeSong;
 
     codec->play             = MusicCMD_Start;
@@ -93,20 +93,20 @@ int MusicCMD_init2(Mix_MusicInterface* codec, SDL_AudioSpec *mixerfmt)
     codec->stop             = MusicCMD_Stop;
 
     codec->isPlaying        = MusicCMD_Active;
-    codec->isPaused         = audioCodec_dummy_cb_int_1arg;
+    codec->isPaused         = music_interface_dummy_cb_int_1arg;
 
-    codec->setLoops         = audioCodec_dummy_cb_regulator;
+    codec->setLoops         = music_interface_dummy_cb_regulator;
     codec->setVolume        = MusicCMD_SetVolume;
 
-    codec->jumpToTime       = audioCodec_dummy_cb_seek;
-    codec->getCurrentTime   = audioCodec_dummy_cb_tell;
+    codec->jumpToTime       = music_interface_dummy_cb_seek;
+    codec->getCurrentTime   = music_interface_dummy_cb_tell;
 
-    codec->metaTitle        = audioCodec_dummy_meta_tag;
-    codec->metaArtist       = audioCodec_dummy_meta_tag;
-    codec->metaAlbum        = audioCodec_dummy_meta_tag;
-    codec->metaCopyright    = audioCodec_dummy_meta_tag;
+    codec->metaTitle        = music_interface_dummy_meta_tag;
+    codec->metaArtist       = music_interface_dummy_meta_tag;
+    codec->metaAlbum        = music_interface_dummy_meta_tag;
+    codec->metaCopyright    = music_interface_dummy_meta_tag;
 
-    codec->playAudio        = audioCodec_dummy_playAudio;
+    codec->playAudio        = music_interface_dummy_playAudio;
 
     return(0);
 }

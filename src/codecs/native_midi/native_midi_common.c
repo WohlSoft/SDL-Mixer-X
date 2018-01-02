@@ -56,7 +56,7 @@ int NativeMIDI_init2(Mix_MusicInterface *codec)
     codec->capabilities     = native_midi_caps;
 
     codec->open             = native_midi_loadsong_RW;
-    codec->openEx           = audioCodec_dummy_cb_openEx;
+    codec->openEx           = music_interface_dummy_cb_openEx;
     codec->close            = native_midi_freesong;
 
     codec->play             = native_midi_start;
@@ -70,16 +70,16 @@ int NativeMIDI_init2(Mix_MusicInterface *codec)
     codec->setLoops         = native_midi_setloops;
     codec->setVolume        = native_midi_setvolume;
 
-    codec->jumpToTime       = audioCodec_dummy_cb_seek;
-    codec->getCurrentTime   = audioCodec_dummy_cb_tell;
-    codec->getTimeLength    = audioCodec_dummy_cb_tell;
+    codec->jumpToTime       = music_interface_dummy_cb_seek;
+    codec->getCurrentTime   = music_interface_dummy_cb_tell;
+    codec->getTimeLength    = music_interface_dummy_cb_tell;
 
-    codec->metaTitle        = audioCodec_dummy_meta_tag;
-    codec->metaArtist       = audioCodec_dummy_meta_tag;
-    codec->metaAlbum        = audioCodec_dummy_meta_tag;
-    codec->metaCopyright    = audioCodec_dummy_meta_tag;
+    codec->metaTitle        = music_interface_dummy_meta_tag;
+    codec->metaArtist       = music_interface_dummy_meta_tag;
+    codec->metaAlbum        = music_interface_dummy_meta_tag;
+    codec->metaCopyright    = music_interface_dummy_meta_tag;
 
-    codec->playAudio        = audioCodec_dummy_playAudio;
+    codec->playAudio        = music_interface_dummy_playAudio;
 
     return(codec->isValid ? 0 : -1);
 }

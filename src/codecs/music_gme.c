@@ -93,26 +93,26 @@ int GME_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixerfmt)
 
     codec->isValid = 1;
 
-    codec->capabilities     = audioCodec_default_capabilities;
+    codec->capabilities     = music_interface_default_capabilities;
 
     codec->open             = GME_new_RW;
     codec->openEx           = GME_new_RWEx;
     codec->close            = GME_delete;
 
     codec->play             = GME_play;
-    codec->pause            = audioCodec_dummy_cb_void_1arg;
-    codec->resume           = audioCodec_dummy_cb_void_1arg;
+    codec->pause            = music_interface_dummy_cb_void_1arg;
+    codec->resume           = music_interface_dummy_cb_void_1arg;
     codec->stop             = GME_stop;
 
     codec->isPlaying        = GME_playing;
-    codec->isPaused         = audioCodec_dummy_cb_int_1arg;
+    codec->isPaused         = music_interface_dummy_cb_int_1arg;
 
-    codec->setLoops         = audioCodec_dummy_cb_regulator;
+    codec->setLoops         = music_interface_dummy_cb_regulator;
     codec->setVolume        = GME_setvolume;
 
     codec->jumpToTime       = GME_jump_to_time;
     codec->getCurrentTime   = GME_get_cur_time;
-    codec->getTimeLength    = audioCodec_dummy_cb_tell;
+    codec->getTimeLength    = music_interface_dummy_cb_tell;
 
     codec->metaTitle        = GME_metaTitle;
     codec->metaArtist       = GME_metaArtist;

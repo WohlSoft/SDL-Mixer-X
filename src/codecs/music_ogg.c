@@ -51,126 +51,30 @@ typedef struct {
     SDL_RWops *src;
     int freesrc;
     int playing;
-    int paused;
-    int volume;
+    int paused;/* TO DELETE */
+    int volume;/* TO DELETE */
     OggVorbis_File vf;
     int section;
     SDL_AudioCVT cvt;
     struct MyResampler resample;
     int len_available;
     Uint8 *snd_available;
-    int channels;
-    /* Loop points stuff [by Wohlstand] */
     int loop;
-    int loops_count;
+    int loops_count; /* CUSTOM */
     ogg_int64_t loop_start;
     ogg_int64_t loop_end;
     ogg_int64_t loop_len;
-    ogg_int64_t loop_len_ch;
-    long samplerate;
+    ogg_int64_t channels;
+    long samplerate; /* CUSTOM */
     /* Loop points stuff [by Wohlstand] */
-    char *mus_title;
-    char *mus_artist;
-    char *mus_album;
-    char *mus_copyright;
+    char *mus_title; /* CUSTOM */
+    char *mus_artist; /* CUSTOM */
+    char *mus_album; /* CUSTOM */
+    char *mus_copyright; /* CUSTOM */
 } OGG_music;
-
 
 /* This is the format of the audio mixer data */
 static SDL_AudioSpec mixer;
-
-/* Load an OGG stream from an SDL_RWops object */
-static void     *OGG_new_RW(SDL_RWops *src, int freesrc);
-/* Close the given OGG stream */
-static void     OGG_delete(void *music_p);
-
-/* Set the volume for an OGG stream */
-static void     OGG_setloops(void *music_p, int loops);
-static void     OGG_setvolume(void *music_p, int volume);
-
-/* Start playback of a given OGG stream */
-static void     OGG_play(void *music_p);
-static void     OGG_pause(void *music_p);
-static void     OGG_resume(void *music_p);
-/* Stop playback of a stream previously started with OGG_play() */
-static void     OGG_stop(void *music_p);
-
-/* Return non-zero if a stream is currently playing */
-static int      OGG_playing(void *music_p);
-static int      OGG_paused(void *music_p);
-
-static const char *OGG_metaTitle(void *music_p);
-static const char *OGG_metaArtist(void *music_p);
-static const char *OGG_metaAlbum(void *music_p);
-static const char *OGG_metaCopyright(void *music_p);
-
-/* Jump (seek) to a given position (time is in seconds) */
-static void     OGG_jump_to_time(void *music_p, double time);
-static double   OGG_get_time(void *music_p);
-static double   OGG_get_length(void *music_p);
-
-static double   OGG_get_loop_start(void *music_p);
-static double   OGG_get_loop_end(void *music_p);
-static double   OGG_get_loop_length(void *music_p);
-
-static int      OGG_playAudio(void *music_p, Uint8 *snd, int len);
-
-/* DEPRECATED */
-/*
-int OGG_init(SDL_AudioSpec *mixerfmt)
-{
-    mixer = *mixerfmt;
-    return(0);
-}*/
-
-/* Initialize the Ogg Vorbis player, with the given mixer settings
-   This function returns 0, or -1 if there was an error.
- */
-int OGG_init2(Mix_MusicInterface* codec, SDL_AudioSpec *mixerfmt)
-{
-    mixer = *mixerfmt;
-
-    initMusicInterface(codec);
-
-    codec->isValid = 1;
-
-    codec->capabilities     = audioCodec_default_capabilities;
-
-    codec->open             = OGG_new_RW;
-    codec->openEx           = audioCodec_dummy_cb_openEx;
-    codec->close            = OGG_delete;
-
-    codec->play             = OGG_play;
-    codec->pause            = OGG_pause;
-    codec->resume           = OGG_resume;
-    codec->stop             = OGG_stop;
-
-    codec->isPlaying        = OGG_playing;
-    codec->isPaused         = OGG_paused;
-
-    codec->setLoops         = OGG_setloops;
-    codec->setVolume        = OGG_setvolume;
-
-    codec->jumpToTime       = OGG_jump_to_time;
-    codec->getCurrentTime   = OGG_get_time;
-    codec->getTimeLength    = OGG_get_length;
-
-    codec->getLoopStartTime = OGG_get_loop_start;
-    codec->getLoopEndTime   = OGG_get_loop_end;
-    codec->getLoopLengthTime= OGG_get_loop_length;
-
-    codec->metaTitle        = OGG_metaTitle;
-    codec->metaArtist       = OGG_metaArtist;
-    codec->metaAlbum        = OGG_metaAlbum;
-    codec->metaCopyright    = OGG_metaCopyright;
-
-    codec->playAudio        = OGG_playAudio;
-
-    return(0);
-}
-
-
-
 
 static void OGG_setloops(void *music_p, int loops)
 {
@@ -201,6 +105,8 @@ static long sdl_tell_func(void *datasource)
 {
     return (long)SDL_RWtell((SDL_RWops *)datasource);
 }
+
+static void OGG_stop(void *music_p);
 
 /* Load an OGG stream from an SDL_RWops object */
 static void *OGG_new_RW(SDL_RWops *src, int freesrc)
@@ -339,7 +245,7 @@ static void *OGG_new_RW(SDL_RWops *src, int freesrc)
             if(music->loop_end == 0)
                 music->loop_end = fullLength;
             music->loop = 1;
-            music->loop_len_ch = music->channels;
+            music->channels = music->channels;
         }
     }
     else
@@ -444,7 +350,7 @@ static void OGG_getsome(OGG_music *music)
     pcmPos = ov_pcm_tell(&music->vf);
     if((music->loop == 1) && (pcmPos >= music->loop_end))
     {
-        len -= ((pcmPos - music->loop_end) * music->loop_len_ch) * (long)sizeof(Uint16);
+        len -= ((pcmPos - music->loop_end) * music->channels) * (long)sizeof(Uint16);
         ov_pcm_seek(&music->vf, music->loop_start);
         if(music->loops_count > 0)
         {
@@ -632,6 +538,53 @@ static double   OGG_get_loop_length(void *music_p)
         return (double)music->loop_len / (double)music->samplerate;
     }
     return -1.0;
+}
+
+
+/* Initialize the Ogg Vorbis player, with the given mixer settings
+   This function returns 0, or -1 if there was an error.
+ */
+int OGG_init2(Mix_MusicInterface* codec, SDL_AudioSpec *mixerfmt)
+{
+    mixer = *mixerfmt;
+
+    initMusicInterface(codec);
+
+    codec->isValid = 1;
+
+    codec->capabilities     = music_interface_default_capabilities;
+
+    codec->open             = OGG_new_RW;
+    codec->openEx           = music_interface_dummy_cb_openEx;
+    codec->close            = OGG_delete;
+
+    codec->play             = OGG_play;
+    codec->pause            = OGG_pause;
+    codec->resume           = OGG_resume;
+    codec->stop             = OGG_stop;
+
+    codec->isPlaying        = OGG_playing;
+    codec->isPaused         = OGG_paused;
+
+    codec->setLoops         = OGG_setloops;
+    codec->setVolume        = OGG_setvolume;
+
+    codec->jumpToTime       = OGG_jump_to_time;
+    codec->getCurrentTime   = OGG_get_time;
+    codec->getTimeLength    = OGG_get_length;
+
+    codec->getLoopStartTime = OGG_get_loop_start;
+    codec->getLoopEndTime   = OGG_get_loop_end;
+    codec->getLoopLengthTime= OGG_get_loop_length;
+
+    codec->metaTitle        = OGG_metaTitle;
+    codec->metaArtist       = OGG_metaArtist;
+    codec->metaAlbum        = OGG_metaAlbum;
+    codec->metaCopyright    = OGG_metaCopyright;
+
+    codec->playAudio        = OGG_playAudio;
+
+    return(0);
 }
 
 #endif /* OGG_MUSIC */

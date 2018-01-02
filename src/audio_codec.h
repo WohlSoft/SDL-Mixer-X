@@ -55,16 +55,16 @@ typedef enum
 /*
     Dummy callbacks. Use them if codec doesn't supports some features
 */
-Uint32      audioCodec_default_capabilities();
-void       *audioCodec_dummy_cb_open(SDL_RWops* src, int freesrc);
-void       *audioCodec_dummy_cb_openEx(SDL_RWops* src, int freesrc, const char *extraSettings);
-void        audioCodec_dummy_cb_void_1arg(Mix_MusicInterfaceStream* music);
-int         audioCodec_dummy_cb_int_1arg(Mix_MusicInterfaceStream* music);
-const char *audioCodec_dummy_meta_tag(Mix_MusicInterfaceStream* music);
-void        audioCodec_dummy_cb_regulator(Mix_MusicInterfaceStream* music, int value);
-void        audioCodec_dummy_cb_seek(Mix_MusicInterfaceStream* music, double position);
-double      audioCodec_dummy_cb_tell(Mix_MusicInterfaceStream* music);
-int         audioCodec_dummy_playAudio(Mix_MusicInterfaceStream* music, Uint8* data, int length);
+Uint32      music_interface_default_capabilities();
+void       *music_interface_dummy_cb_open(SDL_RWops* src, int freesrc);
+void       *music_interface_dummy_cb_openEx(SDL_RWops* src, int freesrc, const char *extraSettings);
+void        music_interface_dummy_cb_void_1arg(Mix_MusicInterfaceStream* music);
+int         music_interface_dummy_cb_int_1arg(Mix_MusicInterfaceStream* music);
+const char *music_interface_dummy_meta_tag(Mix_MusicInterfaceStream* music);
+void        music_interface_dummy_cb_regulator(Mix_MusicInterfaceStream* music, int value);
+void        music_interface_dummy_cb_seek(Mix_MusicInterfaceStream* music, double position);
+double      music_interface_dummy_cb_tell(Mix_MusicInterfaceStream* music);
+int         music_interface_dummy_playAudio(Mix_MusicInterfaceStream* music, Uint8* data, int length);
 
 /* A generic audio playing codec interface interface */
 typedef struct
@@ -74,27 +74,51 @@ typedef struct
     /* Capabilities of the codec */
     Uint32 (*capabilities)(void);
 
+    /* Create a music object from an SDL_RWops stream
+     * If the function returns NULL, 'src' will be freed if needed by the caller.
+     */
     Mix_MusicInterfaceStream* (*open)(SDL_RWops* src, int freesrc);
     Mix_MusicInterfaceStream* (*openEx)(SDL_RWops* src, int freesrc, const char *extraSettings);
+
+    /* Create a music object from a file, if SDL_RWops are not supported */
+    /* Mix_MusicInterfaceStream* (*CreateFromFile)(const char *file); */
+
+    /* Close the library and clean up */
     void  (*close)(Mix_MusicInterfaceStream* music);
 
+    /* Start playing music from the beginning with an optional loop count */
     void  (*play)(Mix_MusicInterfaceStream* music);
+
     void  (*pause)(Mix_MusicInterfaceStream* music);
     void  (*resume)(Mix_MusicInterfaceStream* music);
     void  (*stop)(Mix_MusicInterfaceStream* music);
 
+    /* Returns SDL_TRUE if music is still playing */
     int   (*isPlaying)(Mix_MusicInterfaceStream* music);
     int   (*isPaused)(Mix_MusicInterfaceStream* music);
 
+    /* Set the count of loops */
     void  (*setLoops)(Mix_MusicInterfaceStream* music, int loopsCount);
+
+    /* Set the volume */
     void  (*setVolume)(Mix_MusicInterfaceStream* music, int volume);
 
+    /* Tell a play position (in seconds) */
     double (*getCurrentTime)(Mix_MusicInterfaceStream* music);
+
+    /* Seek to a play position (in seconds) */
     void  (*jumpToTime)(Mix_MusicInterfaceStream* music, double position);
+
+    /* Tell a total track length (in seconds) */
     double (*getTimeLength)(Mix_MusicInterfaceStream* music);
 
+    /* Tell a loop start position (in seconds) */
     double (*getLoopStartTime)(Mix_MusicInterfaceStream* music);
+
+    /* Tell a loop end position (in seconds) */
     double (*getLoopEndTime)(Mix_MusicInterfaceStream* music);
+
+    /* Tell a loop length (in seconds) */
     double (*getLoopLengthTime)(Mix_MusicInterfaceStream* music);
 
     const char* (*metaTitle)(Mix_MusicInterfaceStream* music);
@@ -102,6 +126,7 @@ typedef struct
     const char* (*metaAlbum)(Mix_MusicInterfaceStream* music);
     const char* (*metaCopyright)(Mix_MusicInterfaceStream* music);
 
+    /* Get music data, returns the number of bytes left */
     int   (*playAudio)(Mix_MusicInterfaceStream* music, Uint8* data, int length);
 
 } Mix_MusicInterface;

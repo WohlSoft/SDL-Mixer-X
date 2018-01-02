@@ -159,19 +159,19 @@ int ADLMIDI_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixerfmt)
 
     codec->isValid = 1;
 
-    codec->capabilities     = audioCodec_default_capabilities;
+    codec->capabilities     = music_interface_default_capabilities;
 
     codec->open             = ADLMIDI_new_RW;
-    codec->openEx           = audioCodec_dummy_cb_openEx;
+    codec->openEx           = music_interface_dummy_cb_openEx;
     codec->close            = ADLMIDI_delete;
 
     codec->play             = ADLMIDI_play;
-    codec->pause            = audioCodec_dummy_cb_void_1arg;
-    codec->resume           = audioCodec_dummy_cb_void_1arg;
+    codec->pause            = music_interface_dummy_cb_void_1arg;
+    codec->resume           = music_interface_dummy_cb_void_1arg;
     codec->stop             = ADLMIDI_stop;
 
     codec->isPlaying        = ADLMIDI_playing;
-    codec->isPaused         = audioCodec_dummy_cb_int_1arg;
+    codec->isPaused         = music_interface_dummy_cb_int_1arg;
 
     codec->setLoops         = ADLMIDI_setLoops;
     codec->setVolume        = ADLMIDI_setvolume;
@@ -184,10 +184,10 @@ int ADLMIDI_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixerfmt)
     codec->getLoopEndTime   = ADLMIDI_loopEnd;
     codec->getLoopLengthTime= ADLMIDI_loopLength;
 
-    codec->metaTitle        = audioCodec_dummy_meta_tag;
-    codec->metaArtist       = audioCodec_dummy_meta_tag;
-    codec->metaAlbum        = audioCodec_dummy_meta_tag;
-    codec->metaCopyright    = audioCodec_dummy_meta_tag;
+    codec->metaTitle        = music_interface_dummy_meta_tag;
+    codec->metaArtist       = music_interface_dummy_meta_tag;
+    codec->metaAlbum        = music_interface_dummy_meta_tag;
+    codec->metaCopyright    = music_interface_dummy_meta_tag;
 
     codec->playAudio        = ADLMIDI_playAudio;
 
