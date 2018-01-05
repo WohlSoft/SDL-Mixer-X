@@ -333,9 +333,19 @@ if(SDL_MIXER_X_SHARED)
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY AND AUDIO_CODECS_REPO_PATH)
         add_dependencies(SDL2_mixer_ext AudioCodecs)
     endif()
-    #if(DOWNLOAD_SDL2_DEPENDENCY AND SDL2_REPO_PATH)
-    #    add_dependencies(SDL2_mixer_ext SDL2HG)
-    #endif()
+    set_target_properties(SDL2_mixer_ext
+        PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    )
+    if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
+        add_custom_command(
+            TARGET SDL2_mixer_ext_Static POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+                    ${CMAKE_SOURCE_DIR}/include/SDL_mixer_ext/SDL_mixer_ext.h
+                    ${AUDIO_CODECS_INSTALL_DIR}/include/SDL2)
+    endif()
     list(APPEND SDLMixerX_INSTALLS SDL2_mixer_ext)
 endif()
 
@@ -346,9 +356,19 @@ if(SDL_MIXER_X_STATIC)
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY AND AUDIO_CODECS_REPO_PATH)
         add_dependencies(SDL2_mixer_ext_Static AudioCodecs)
     endif()
-    #if(DOWNLOAD_SDL2_DEPENDENCY AND SDL2_REPO_PATH)
-    #    add_dependencies(SDL2_mixer_ext_Static SDL2HG)
-    #endif()
+    set_target_properties(SDL2_mixer_ext_Static
+        PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    )
+    if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
+        add_custom_command(
+            TARGET SDL2_mixer_ext_Static POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+                    ${CMAKE_SOURCE_DIR}/include/SDL_mixer_ext/SDL_mixer_ext.h
+                    ${AUDIO_CODECS_INSTALL_DIR}/include/SDL2)
+    endif()
     list(APPEND SDLMixerX_INSTALLS SDL2_mixer_ext_Static)
 endif()
 
