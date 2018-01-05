@@ -297,8 +297,8 @@ if(APPLE)
     find_library(APPLE_CARBON Carbon)
     find_library(APPLE_FORCE_FEEDBACK ForceFeedback)
     find_library(ICONV_LIB iconv)
-    list(APPEND SDLMixerX_LINK_LIBS 
-            ${APPLE_CORE_AUDIO} 
+    list(APPEND SDLMixerX_LINK_LIBS
+            ${APPLE_CORE_AUDIO}
             ${APPLE_COCOA}
             ${APPLE_CORE_VIDEO}
             ${APPLE_CORE_FOUNDATION}
@@ -356,6 +356,13 @@ install(TARGETS ${SDLMixerX_INSTALLS}
         LIBRARY DESTINATION "lib"
         ARCHIVE DESTINATION "lib"
         INCLUDES DESTINATION "include")
+
+if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
+    install(DIRECTORY ${AUDIO_CODECS_INSTALL_DIR}/lib
+            DESTINATION .)
+    install(DIRECTORY ${AUDIO_CODECS_INSTALL_DIR}/include
+            DESTINATION .)
+endif()
 
 install(FILES
         include/SDL_mixer_ext/begin_code.h
