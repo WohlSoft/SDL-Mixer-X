@@ -29,10 +29,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <SDL2/SDL.h>
-#include <SDL_mixer_ext/SDL_mixer_ext.h>
+#include "SDL.h"
+#include "SDL_mixer.h"
 
-#define MIX_INTERNAL_EFFECT__
+#define __MIX_INTERNAL_EFFECT__
 #include "effects_internal.h"
 
 /* profile code:
@@ -55,9 +55,8 @@
  * Stereo reversal effect...this one's pretty straightforward...
  */
 
-static void _Eff_reversestereo32(int chan, void *stream, int len, void *udata)
+static void SDLCALL _Eff_reversestereo32(int chan, void *stream, int len, void *udata)
 {
-    (void)chan;(void)udata;
     /* 16 bits * 2 channels. */
     Uint32 *ptr = (Uint32 *) stream;
     Uint32 tmp;
@@ -71,12 +70,11 @@ static void _Eff_reversestereo32(int chan, void *stream, int len, void *udata)
 }
 
 
-static void _Eff_reversestereo16(int chan, void *stream, int len, void *udata)
+static void SDLCALL _Eff_reversestereo16(int chan, void *stream, int len, void *udata)
 {
     /* 16 bits * 2 channels. */
     Uint32 *ptr = (Uint32 *) stream;
     int i;
-    (void)chan;(void)udata;
 
     for (i = 0; i < len; i += sizeof (Uint32), ptr++) {
         *ptr = (((*ptr) & 0xFFFF0000) >> 16) | (((*ptr) & 0x0000FFFF) << 16);
@@ -84,12 +82,11 @@ static void _Eff_reversestereo16(int chan, void *stream, int len, void *udata)
 }
 
 
-static void _Eff_reversestereo8(int chan, void *stream, int len, void *udata)
+static void SDLCALL _Eff_reversestereo8(int chan, void *stream, int len, void *udata)
 {
     /* 8 bits * 2 channels. */
     Uint32 *ptr = (Uint32 *) stream;
     int i;
-    (void)chan;(void)udata;
 
     /* get the last two bytes if len is not divisible by four... */
     if (len % sizeof (Uint32) != 0) {
@@ -105,7 +102,7 @@ static void _Eff_reversestereo8(int chan, void *stream, int len, void *udata)
 }
 
 
-int SDLCALLCC Mix_SetReverseStereo(int channel, int flip)
+int Mix_SetReverseStereo(int channel, int flip)
 {
     Mix_EffectFunc_t f = NULL;
     int channels;
@@ -114,7 +111,7 @@ int SDLCALLCC Mix_SetReverseStereo(int channel, int flip)
     Mix_QuerySpec(NULL, &format, &channels);
 
     if (channels == 2) {
-        Uint16 bits = (format & 0xFF);
+        int bits = (format & 0xFF);
         switch (bits) {
         case 8:
             f = _Eff_reversestereo8;
@@ -140,10 +137,10 @@ int SDLCALLCC Mix_SetReverseStereo(int channel, int flip)
         return(0);
     }
 
-    /* Clang Code Model warns: "Return will never executed"! */
-    /*return (1);*/
+    return(1);
 }
 
 
 /* end of effect_stereoreverse.c ... */
 
+/* vi: set ts=4 sw=4 expandtab: */

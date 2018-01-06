@@ -22,18 +22,18 @@
 /* This is Mac OS X only, using Core MIDI.
    Mac OS 9 support via QuickTime is in native_midi_mac.c */
 
-#include <SDL2/SDL_config.h>
+#include "SDL_config.h"
 
-#if __MACOSX__ && USE_NATIVE_MIDI
+#if __MACOSX__
 
 #include <CoreServices/CoreServices.h>      /* ComponentDescription */
 #include <AudioUnit/AudioUnit.h>
 #include <AudioToolbox/AudioToolbox.h>
 #include <AvailabilityMacros.h>
 
-#include <SDL_mixer_ext/SDL_mixer_ext.h>
-#include <SDL2/SDL_endian.h>
-#include "../../mixer.h"
+#include "SDL_endian.h"
+#include "../SDL_mixer.h"
+#include "../mixer.h"
 #include "native_midi.h"
 
 /* Native Midi song */
@@ -52,10 +52,8 @@ static int latched_volume = MIX_MAX_VOLUME;
 static OSStatus
 GetSequenceLength(MusicSequence sequence, MusicTimeStamp *_sequenceLength)
 {
-    /*
-    http://lists.apple.com/archives/Coreaudio-api/2003/Jul/msg00370.html
-    figure out sequence length
-    */
+    // http://lists.apple.com/archives/Coreaudio-api/2003/Jul/msg00370.html
+    // figure out sequence length
     UInt32 ntracks, i;
     MusicTimeStamp sequenceLength = 0;
     OSStatus err;
@@ -152,12 +150,12 @@ GetSequenceAudioUnit(MusicSequence sequence, AudioUnit *aunit)
 }
 
 
-int native_midi_detect()
+int native_midi_detect(void)
 {
     return 1;  /* always available. */
 }
 
-void *native_midi_loadsong_RW(SDL_RWops *src, int freesrc)
+NativeMidiSong *native_midi_loadsong_RW(SDL_RWops *src, int freesrc)
 {
     NativeMidiSong *retval = NULL;
     void *buf = NULL;
@@ -247,9 +245,8 @@ fail:
     return NULL;
 }
 
-void native_midi_freesong(void *song_p)
+void native_midi_freesong(NativeMidiSong *song)
 {
-    NativeMidiSong *song = (NativeMidiSong *)song_p;
     if (song != NULL) {
         if (currentsong == song)
             currentsong = NULL;
@@ -260,15 +257,8 @@ void native_midi_freesong(void *song_p)
     }
 }
 
-void native_midi_setloops(void *song_p, int loops)
+void native_midi_start(NativeMidiSong *song, int loops)
 {
-    NativeMidiSong *song = (NativeMidiSong*)song_p;
-    song->loops = loops;
-}
-
-void native_midi_start(void *song_p)
-{
-    NativeMidiSong *song = (NativeMidiSong*)song_p;
     int vol;
 
     if (song == NULL)
@@ -281,6 +271,7 @@ void native_midi_start(void *song_p)
         MusicPlayerStop(currentsong->player);
 
     currentsong = song;
+    currentsong->loops = loops;
 
     MusicPlayerPreroll(song->player);
     MusicPlayerSetTime(song->player, 0);
@@ -290,34 +281,22 @@ void native_midi_start(void *song_p)
 
     vol = latched_volume;
     latched_volume++;  /* just make this not match. */
-    native_midi_setvolume(song, vol);
+    native_midi_setvolume(vol);
 
     Mix_LockAudio();
     SDL_PauseAudio(0);
 }
 
-void native_midi_pause(void *song_p)
+void native_midi_pause(void)
 {
-    NativeMidiSong *song = (NativeMidiSong*)song_p;
-    /*FIXME: Implement this!*/
 }
 
-void native_midi_resume(void *song_p)
+void native_midi_resume(void)
 {
-    NativeMidiSong *song = (NativeMidiSong*)song_p;
-    /*FIXME: Implement this!*/
 }
 
-int native_midi_paused(void *song_p)
+void native_midi_stop(void)
 {
-    NativeMidiSong *song = (NativeMidiSong*)song_p;
-    /*FIXME: Implement this!*/
-    return 0;
-}
-
-void native_midi_stop(void *midi)
-{
-    (void)midi;
     if (currentsong) {
         SDL_PauseAudio(1);
         Mix_UnlockAudio();
@@ -328,9 +307,8 @@ void native_midi_stop(void *midi)
     }
 }
 
-int native_midi_active(void *midi)
+int native_midi_active(void)
 {
-    (void)midi;
     MusicTimeStamp currentTime = 0;
     if (currentsong == NULL)
         return 0;
@@ -347,9 +325,8 @@ int native_midi_active(void *midi)
     return 0;
 }
 
-void native_midi_setvolume(void *midi_p, int volume)
+void native_midi_setvolume(int volume)
 {
-    (void)midi_p;
     if (latched_volume == volume)
         return;
 
@@ -367,3 +344,4 @@ const char *native_midi_error(void)
 }
 
 #endif /* Mac OS X native MIDI support */
+

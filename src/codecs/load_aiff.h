@@ -23,11 +23,11 @@
     externally-callable function is Mix_LoadAIFF_RW(), which is meant to
     act as identically to SDL_LoadWAV_RW() as possible.
 
-    This file by TorbjÃ¶rn Andersson (torbjorn.andersson@eurotime.se)
+    This file by Torbjörn Andersson (torbjorn.andersson@eurotime.se)
 */
-
-/* $Id$ */
 
 /* Don't call this directly; use Mix_LoadWAV_RW() for now. */
 SDL_AudioSpec *Mix_LoadAIFF_RW (SDL_RWops *src, int freesrc,
     SDL_AudioSpec *spec, Uint8 **audio_buf, Uint32 *audio_len);
+
+/* vi: set ts=4 sw=4 expandtab: */

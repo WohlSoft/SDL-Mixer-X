@@ -32,9 +32,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <SDL_mixer_ext/SDL_mixer_ext.h>
+#include "SDL_mixer.h"
 
-#define MIX_INTERNAL_EFFECT__
+#define __MIX_INTERNAL_EFFECT__
 #include "effects_internal.h"
 
 /* Should we favor speed over memory usage and/or quality of output? */
@@ -122,3 +122,4 @@ void *_Eff_build_volume_table_s8(void)
 
 /* end of effects.c ... */
 
+/* vi: set ts=4 sw=4 expandtab: */

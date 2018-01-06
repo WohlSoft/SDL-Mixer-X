@@ -98,8 +98,6 @@ if(USE_OGG_VORBIS)
     list(APPEND SDLMixerX_LINK_LIBS vorbisfile vorbis)
     set(LIBOGG_NEEDED ON)
     list(APPEND SDLMixerX_SOURCES
-        ${SDLMixerX_SOURCE_DIR}/src/codecs/dynamic_ogg.c
-        ${SDLMixerX_SOURCE_DIR}/src/codecs/load_ogg.c
         ${SDLMixerX_SOURCE_DIR}/src/codecs/music_ogg.c)
 endif()
 
@@ -111,8 +109,6 @@ if(USE_FLAC)
     set(LIBOGG_NEEDED ON)
     list(APPEND SDLMixerX_LINK_LIBS FLAC)
     list(APPEND SDLMixerX_SOURCES
-        ${SDLMixerX_SOURCE_DIR}/src/codecs/dynamic_flac.c
-        ${SDLMixerX_SOURCE_DIR}/src/codecs/load_flac.c
         ${SDLMixerX_SOURCE_DIR}/src/codecs/music_flac.c)
 endif()
 
@@ -127,8 +123,6 @@ if(USE_MP3_MAD)
     include_directories(${AUDIO_CODECS_PATH}/libmad/include)
     include_directories(${AUDIO_CODECS_PATH}/libid3tag/include)
     list(APPEND SDLMixerX_SOURCES
-        ${SDLMixerX_SOURCE_DIR}/src/codecs/dynamic_mp3.c
-        ${SDLMixerX_SOURCE_DIR}/src/codecs/load_mp3.c
         ${SDLMixerX_SOURCE_DIR}/src/codecs/music_mad.c)
 endif()
 
@@ -139,8 +133,7 @@ if(USE_MP3_SMPEG)
     include_directories(${AUDIO_CODECS_PATH}/smpeg/include)
     include_directories(${AUDIO_CODECS_PATH}/libid3tag/include)
     list(APPEND SDLMixerX_SOURCES
-        ${SDLMixerX_SOURCE_DIR}/src/codecs/dynamic_mp3.c
-        ${SDLMixerX_SOURCE_DIR}/src/codecs/load_mp3.c)
+        ${SDLMixerX_SOURCE_DIR}/src/codecs/music_smpeg.c)
 endif()
 
 option(USE_MP3_MPG123     "[WIP, DON'T USE IT] Build with MPG123 MP3 codec" OFF)
@@ -161,9 +154,7 @@ if(USE_MP3_MPG123)
     set(LIBS ${LIBS} ${MPG123_LIBRARIES})
     list(APPEND SDLMixerX_LINK_LIBS mpg123)
     list(APPEND SDLMixerX_SOURCES
-        ${SDLMixerX_SOURCE_DIR}/src/codecs/music_mpg.c
-        ${SDLMixerX_SOURCE_DIR}/src/codecs/dynamic_mp3.c
-        ${SDLMixerX_SOURCE_DIR}/src/codecs/load_mp3.c)
+        ${SDLMixerX_SOURCE_DIR}/src/codecs/music_mpg123.c)
 endif()
 
 option(USE_MODPLUG         "Build with ModPlug library" ON)
@@ -172,7 +163,6 @@ if(USE_MODPLUG)
     include_directories(${AUDIO_CODECS_PATH}/libmodplug/include)
     list(APPEND SDLMixerX_LINK_LIBS modplug)
     list(APPEND SDLMixerX_SOURCES
-        ${SDLMixerX_SOURCE_DIR}/src/codecs/dynamic_modplug.c
         ${SDLMixerX_SOURCE_DIR}/src/codecs/music_modplug.c)
 endif()
 
@@ -182,8 +172,7 @@ if(USE_MIKMOD)
     include_directories(${AUDIO_CODECS_PATH}/libmikmod/include)
     list(APPEND SDLMixerX_LINK_LIBS mikmod)
     list(APPEND SDLMixerX_SOURCES
-        ${SDLMixerX_SOURCE_DIR}/src/codecs/dynamic_mod.c
-        ${SDLMixerX_SOURCE_DIR}/src/codecs/music_mod.c)
+        ${SDLMixerX_SOURCE_DIR}/src/codecs/music_mikmod.c)
 endif()
 
 option(USE_GME             "Build with Game Music Emulators library" ON)
@@ -231,7 +220,7 @@ if(USE_MIDI)
         include_directories(${AUDIO_CODECS_PATH}/libtimidity/include)
         list(APPEND SDLMixerX_LINK_LIBS timidity)
         list(APPEND SDLMixerX_SOURCES
-            ${SDLMixerX_SOURCE_DIR}/src/codecs/music_midi_timidity.c)
+            ${SDLMixerX_SOURCE_DIR}/src/codecs/music_timidity.c)
     endif()
 
     option(USE_MIDI_FLUIDSYNTH "Build with FluidSynth wave table MIDI sequencer support" OFF)
@@ -240,7 +229,6 @@ if(USE_MIDI)
         include_directories(${AUDIO_CODECS_PATH}/FluidLite/include)
         list(APPEND SDLMixerX_LINK_LIBS fluidlite)
         list(APPEND SDLMixerX_SOURCES
-            ${SDLMixerX_SOURCE_DIR}/src/codecs/dynamic_fluidsynth.c
             ${SDLMixerX_SOURCE_DIR}/src/codecs/music_fluidsynth.c)
     endif()
 
@@ -313,7 +301,6 @@ endif()
 list(APPEND SDLMixerX_LINK_LIBS stdc++)
 
 list(APPEND SDLMixerX_SOURCES
-        ${SDLMixerX_SOURCE_DIR}/src/resample/my_resample.c
         ${SDLMixerX_SOURCE_DIR}/src/audio_codec.c
         ${SDLMixerX_SOURCE_DIR}/src/effect_position.c
         ${SDLMixerX_SOURCE_DIR}/src/effects_internal.c

@@ -22,33 +22,10 @@
   chewi@aura-online.co.uk
 */
 
-#ifndef FLUIDSYNTH_H_
-#define FLUIDSYNTH_H_
+/* This file supports playing MIDI files with FluidSynth */
 
-#ifdef USE_FLUIDSYNTH_MIDI
+#include "music.h"
 
-#include "../audio_codec.h"
+extern Mix_MusicInterface Mix_MusicInterface_FLUIDSYNTH;
 
-#include "dynamic_fluidsynth.h"
-#include <SDL2/SDL_rwops.h>
-#include <SDL2/SDL_audio.h>
-
-typedef struct {
-    SDL_AudioCVT convert;
-    fluid_synth_t *synth;
-    fluid_player_t* player;
-} FluidSynthMidiSong;
-
-extern int fluidsynth_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixer);
-
-void    *fluidsynth_loadsong_RW(SDL_RWops *rw, int freerw);
-void    fluidsynth_freesong(void *song_p);
-void    fluidsynth_start(void *song_p);
-void    fluidsynth_stop(void *song_p);
-int     fluidsynth_active(void *song_p);
-void    fluidsynth_setvolume(void *song_p, int volume);
-int     fluidsynth_playsome(void *song_p, void *stream, int len);
-
-#endif /* USE_FLUIDSYNTH_MIDI */
-
-#endif /* FLUIDSYNTH_H_ */
+/* vi: set ts=4 sw=4 expandtab: */

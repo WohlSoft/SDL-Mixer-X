@@ -21,73 +21,15 @@
 
 
 #include "native_midi_common.h"
-#include "../../audio_codec.h"
 
-#include <SDL_mixer_ext/SDL_mixer_ext.h>
+#include "../SDL_mixer.h"
 
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
 
-extern int  native_midi_detect();
-
-extern void *native_midi_loadsong_RW(SDL_RWops *src, int freesrc);
-extern void native_midi_freesong(void *song);
-extern void native_midi_setloops(void *song, int loops);
-extern void native_midi_start(void *song);
-extern void native_midi_pause(void *song);/*FIXME: Implement this*/
-extern void native_midi_resume(void *song);/*FIXME: Implement this*/
-extern void native_midi_stop(void *midi);
-extern int  native_midi_active(void *midi);
-extern int  native_midi_paused(void *midi);/*FIXME: Implement this*/
-extern void native_midi_setvolume(void *midi, int volume);
-
-static Uint32 native_midi_caps()
-{
-    return ACODEC_ASYNC|ACODEC_SINGLETON|ACODEC_HAS_PAUSE;
-}
-
-int NativeMIDI_init2(Mix_MusicInterface *codec)
-{
-    initMusicInterface(codec);
-
-    codec->isValid          = native_midi_detect();
-
-    codec->capabilities     = native_midi_caps;
-
-    codec->open             = native_midi_loadsong_RW;
-    codec->openEx           = music_interface_dummy_cb_openEx;
-    codec->close            = native_midi_freesong;
-
-    codec->play             = native_midi_start;
-    codec->pause            = native_midi_pause;
-    codec->resume           = native_midi_resume;
-    codec->stop             = native_midi_stop;
-
-    codec->isPlaying        = native_midi_active;
-    codec->isPaused         = native_midi_paused;
-
-    codec->setLoops         = native_midi_setloops;
-    codec->setVolume        = native_midi_setvolume;
-
-    codec->jumpToTime       = music_interface_dummy_cb_seek;
-    codec->getCurrentTime   = music_interface_dummy_cb_tell;
-    codec->getTimeLength    = music_interface_dummy_cb_tell;
-
-    codec->metaTitle        = music_interface_dummy_meta_tag;
-    codec->metaArtist       = music_interface_dummy_meta_tag;
-    codec->metaAlbum        = music_interface_dummy_meta_tag;
-    codec->metaCopyright    = music_interface_dummy_meta_tag;
-
-    codec->playAudio        = music_interface_dummy_playAudio;
-
-    return(codec->isValid ? 0 : -1);
-}
-
-
-/* The maximum number of midi tracks that we can handle
-#define MIDI_TRACKS 32 */
-
+/* The constant 'MThd' */
+#define MIDI_MAGIC	0x4d546864
 
 /* A single midi track as read from the midi file */
 typedef struct
@@ -117,7 +59,6 @@ typedef struct
              (((x)>>24)&0xFF))
 #endif
 
-char *common_nm_error = NULL;
 
 
 /* Get Variable Length Quantity */
@@ -286,7 +227,7 @@ static MIDIEvent *MIDItoStream(MIDIFile *mididata)
     if (NULL == head)
         return NULL;
 
-    track = (MIDIEvent**) calloc(1, sizeof(MIDIEvent*) * (unsigned int)mididata->nTracks);
+    track = (MIDIEvent**) calloc(1, sizeof(MIDIEvent*) * mididata->nTracks);
     if (NULL == track)
     {
         free(head);
@@ -346,48 +287,26 @@ static int ReadMIDIFile(MIDIFile *mididata, SDL_RWops *src)
     Uint16  division;
 
     if (!mididata)
-    {
-        common_nm_error=(char*)"MIDI-data is null";
         return 0;
-    }
     if (!src)
-    {
-        common_nm_error=(char*)"Source is null";
         return 0;
-    }
 
     /* Make sure this is really a MIDI file */
-    SDL_RWseek(src, 0, RW_SEEK_SET);
     SDL_RWread(src, &ID, 1, 4);
-    switch(BE_LONG(ID))
-    {
-    case (Uint32)0x4D546864:/* 'MThd' */
-        break;
-    case (Uint32)0x52494646:/* 'RIFF' */
-        SDL_RWseek(src, 24, RW_SEEK_SET);
-        break;
-    default:
-        common_nm_error=(char*)"Wrong magic number!";
+    if (BE_LONG(ID) != MIDI_MAGIC)
         return 0;
-    }
 
     /* Header size must be 6 */
     SDL_RWread(src, &size, 1, 4);
     size = BE_LONG(size);
     if (size != 6)
-    {
-        common_nm_error=(char*)"Bad header size!";
         return 0;
-    }
 
     /* We only support format 0 and 1, but not 2 */
     SDL_RWread(src, &format, 1, 2);
     format = BE_SHORT(format);
     if (format != 0 && format != 1)
-    {
-        common_nm_error=(char*)"MIDI Format suported only 0 or 1!";
         return 0;
-    }
 
     SDL_RWread(src, &tracks, 1, 2);
     tracks = BE_SHORT(tracks);
@@ -397,7 +316,6 @@ static int ReadMIDIFile(MIDIFile *mididata, SDL_RWops *src)
     mididata->track = (MIDITrack*) calloc(1, sizeof(MIDITrack) * mididata->nTracks);
     if (NULL == mididata->track)
     {
-        common_nm_error=(char*)"Out of memory";
         Mix_SetError("Out of memory");
         goto bail;
     }
@@ -439,14 +357,9 @@ MIDIEvent *CreateMIDIEventList(SDL_RWops *src, Uint16 *division)
     MIDIEvent *eventList;
     int trackID;
 
-    common_nm_error = NULL;
-
     mididata = calloc(1, sizeof(MIDIFile));
     if (!mididata)
-    {
-        common_nm_error=(char*)"Out of memory";
         return NULL;
-    }
 
     /* Open the file */
     if ( src != NULL )
@@ -460,7 +373,6 @@ MIDIEvent *CreateMIDIEventList(SDL_RWops *src, Uint16 *division)
     }
     else
     {
-        common_nm_error=(char*)"Source is null";
         free(mididata);
         return NULL;
     }
@@ -474,7 +386,6 @@ MIDIEvent *CreateMIDIEventList(SDL_RWops *src, Uint16 *division)
         free(mididata);
         return NULL;
     }
-
     for(trackID = 0; trackID < mididata->nTracks; trackID++)
     {
         if (mididata->track[trackID].data)

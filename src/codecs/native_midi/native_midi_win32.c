@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include <SDL2/SDL_config.h>
+#include "SDL_config.h"
 
 /* everything below is currently one very big bad hack ;) Proff */
 
@@ -36,7 +36,6 @@
 struct _NativeMidiSong {
   int MusicLoaded;
   int MusicPlaying;
-  int MusicPaused;
   int Loops;
   int CurrentHdr;
   MIDIHDR MidiStreamHdr[2];
@@ -49,13 +48,6 @@ struct _NativeMidiSong {
 static UINT MidiDevice=MIDI_MAPPER;
 static HMIDISTRM hMidiStream;
 static NativeMidiSong *currentsong;
-enum NM_errorCode{
-    NM_NoError=0,
-    NM_OutOfMemory,
-    NM_CreateMidiEventListFail
-};
-
-static int NM_error = NM_NoError;
 
 static int BlockOut(NativeMidiSong *song)
 {
@@ -65,7 +57,7 @@ static int BlockOut(NativeMidiSong *song)
 
   if ((song->MusicLoaded) && (song->NewEvents))
   {
-    /*  proff 12/8/98: Added for safety */
+    // proff 12/8/98: Added for safety
     song->CurrentHdr = !song->CurrentHdr;
     hdr = &song->MidiStreamHdr[song->CurrentHdr];
     midiOutUnprepareHeader((HMIDIOUT)hMidiStream,hdr,sizeof(MIDIHDR));
@@ -174,9 +166,6 @@ static void MIDItoStream(NativeMidiSong *song, MIDIEvent *evntlist)
 void CALLBACK MidiProc( HMIDIIN hMidi, UINT uMsg, DWORD_PTR dwInstance,
                         DWORD_PTR dwParam1, DWORD_PTR dwParam2 )
 {
-    (void)hMidi;
-    (void)dwInstance;
-    (void)dwParam2;
     switch( uMsg )
     {
     case MOM_DONE:
@@ -200,7 +189,7 @@ void CALLBACK MidiProc( HMIDIIN hMidi, UINT uMsg, DWORD_PTR dwInstance,
     }
 }
 
-int native_midi_detect()
+int native_midi_detect(void)
 {
   MMRESULT merr;
   HMIDISTRM MidiStream;
@@ -212,16 +201,13 @@ int native_midi_detect()
   return 1;
 }
 
-void *native_midi_loadsong_RW(SDL_RWops *src, int freesrc)
+NativeMidiSong *native_midi_loadsong_RW(SDL_RWops *src, int freesrc)
 {
     NativeMidiSong *newsong;
     MIDIEvent       *evntlist = NULL;
 
-    NM_error=NM_NoError;
-
     newsong=malloc(sizeof(NativeMidiSong));
     if (!newsong) {
-        NM_error=NM_OutOfMemory;
         return NULL;
     }
     memset(newsong,0,sizeof(NativeMidiSong));
@@ -230,7 +216,6 @@ void *native_midi_loadsong_RW(SDL_RWops *src, int freesrc)
     evntlist = CreateMIDIEventList(src, &newsong->ppqn);
     if (!evntlist)
     {
-        NM_error=NM_CreateMidiEventListFail;
         free(newsong);
         return NULL;
     }
@@ -245,9 +230,8 @@ void *native_midi_loadsong_RW(SDL_RWops *src, int freesrc)
     return newsong;
 }
 
-void native_midi_freesong(void *song_p)
+void native_midi_freesong(NativeMidiSong *song)
 {
-  NativeMidiSong *song = (NativeMidiSong *)song_p;
   if (hMidiStream)
   {
     midiStreamStop(hMidiStream);
@@ -261,32 +245,25 @@ void native_midi_freesong(void *song_p)
   }
 }
 
-void native_midi_setloops(void *song_p, int loops)
+void native_midi_start(NativeMidiSong *song, int loops)
 {
-    NativeMidiSong *song = (NativeMidiSong*)song_p;
-    song->Loops=loops;
-}
-
-void native_midi_start(void *song_p)
-{
-  NativeMidiSong *song = (NativeMidiSong*)song_p;
   MMRESULT merr;
   MIDIPROPTIMEDIV mptd;
 
-  native_midi_stop(song_p);
+  native_midi_stop();
   if (!hMidiStream)
   {
     merr=midiStreamOpen(&hMidiStream,&MidiDevice,(DWORD)1,(DWORD_PTR)MidiProc,(DWORD_PTR)0,CALLBACK_FUNCTION);
     if (merr!=MMSYSERR_NOERROR)
     {
-      hMidiStream = NULL; /*  should I do midiStreamClose(hMidiStream) before? */
+      hMidiStream = NULL; // should I do midiStreamClose(hMidiStream) before?
       return;
     }
-    /* midiStreamStop(hMidiStream); */
+    //midiStreamStop(hMidiStream);
     currentsong=song;
     currentsong->NewPos=0;
-    currentsong->MusicPlaying = 1;
-    currentsong->MusicPaused = 0;
+    currentsong->MusicPlaying=1;
+    currentsong->Loops=loops;
     mptd.cbStruct=sizeof(MIDIPROPTIMEDIV);
     mptd.dwTimeDiv=currentsong->ppqn;
     merr=midiStreamProperty(hMidiStream,(LPBYTE)&mptd,MIDIPROP_SET | MIDIPROP_TIMEDIV);
@@ -295,33 +272,22 @@ void native_midi_start(void *song_p)
   }
 }
 
-void native_midi_pause(void *song_p)
+void native_midi_pause(void)
 {
-    NativeMidiSong *song = (NativeMidiSong*)song_p;
-    if (!hMidiStream)
-      return;
-    midiStreamPause(hMidiStream);
-    song->MusicPaused = 1;
+  if (!hMidiStream)
+    return;
+  midiStreamPause(hMidiStream);
 }
 
-void native_midi_resume(void *song_p)
+void native_midi_resume(void)
 {
-    NativeMidiSong *song = (NativeMidiSong*)song_p;
-    if (!hMidiStream)
-      return;
-    midiStreamRestart(hMidiStream);
-    song->MusicPaused = 0;
+  if (!hMidiStream)
+    return;
+  midiStreamRestart(hMidiStream);
 }
 
-int native_midi_paused(void *song_p)
+void native_midi_stop(void)
 {
-    NativeMidiSong *song = (NativeMidiSong*)song_p;
-    return (song->MusicPaused && song->MusicPlaying);
-}
-
-void native_midi_stop(void *midi)
-{
-  (void)midi;
   if (!hMidiStream)
     return;
   midiStreamStop(hMidiStream);
@@ -330,15 +296,13 @@ void native_midi_stop(void *midi)
   hMidiStream = NULL;
 }
 
-int native_midi_active(void *midi)
+int native_midi_active(void)
 {
-  (void)midi;
   return currentsong->MusicPlaying;
 }
 
-void native_midi_setvolume(void *midi_p, int volume)
+void native_midi_setvolume(int volume)
 {
-  (void)midi_p;
   int calcVolume;
   if (volume > 128)
     volume = 128;
@@ -351,18 +315,7 @@ void native_midi_setvolume(void *midi_p, int volume)
 
 const char *native_midi_error(void)
 {
-    switch(NM_error)
-    {
-    case NM_NoError:
-        return "Unknown error";
-    case NM_OutOfMemory:
-        return "Our of memory";
-    case NM_CreateMidiEventListFail:
-        if(common_nm_error)
-            return common_nm_error;
-        return "CreateMIDIEventList is failed";
-    }
-  return "huh???";
+  return "";
 }
 
 #endif /* Windows native MIDI support */

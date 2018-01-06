@@ -18,9 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include <SDL2/SDL_config.h>
-#include <SDL2/SDL_endian.h>
-#include "../../mixer.h"
+#include "SDL_config.h"
+#include "SDL_endian.h"
+#include "../mixer.h"
 
 #if __MACOS__ /*|| __MACOSX__ */
 
@@ -83,13 +83,13 @@ static char         gErrorBuffer[ERROR_BUF_SIZE] = "";
 
 
 /* Check whether QuickTime is available */
-int native_midi_detect()
+int native_midi_detect(void)
 {
     /* TODO */
     return 1;
 }
 
-void *native_midi_loadsong_RW(SDL_RWops *src, int freesrc)
+NativeMidiSong *native_midi_loadsong_RW(SDL_RWops *src, int freesrc)
 {
     NativeMidiSong  *song = NULL;
     MIDIEvent       *evntlist = NULL;
@@ -154,15 +154,14 @@ bail:
     return NULL;
 }
 
-void native_midi_freesong(void *song_p)
+void native_midi_freesong(NativeMidiSong *song)
 {
-    NativeMidiSong *song = (NativeMidiSong *)song_p;
     if(!song || !song->tuneSequence)
         return;
 
     /* If this is the currently playing song, stop it now */
     if (song->tuneSequence == gCurrentTuneSequence)
-        native_midi_stop(song_p);
+        native_midi_stop();
 
     /* Finally, free the data storage */
     free(song->tuneSequence);
@@ -178,28 +177,21 @@ void native_midi_freesong(void *song_p)
     }
 }
 
-void native_midi_setloops(void *song_p, int loops)
+void native_midi_start(NativeMidiSong *song, int loops)
 {
-    (void)song_p;
-    (void)loops;
-}
-
-void native_midi_start(void *song_p)
-{
-    NativeMidiSong *song = (NativeMidiSong*)song_p;
     UInt32      queueFlags = 0;
     ComponentResult tpError;
 
     assert (gTunePlayer != NULL);
 
     /* FIXME: is this code even used anymore? */
-    /* assert (loops == 0); */
+    assert (loops == 0);
 
     SDL_PauseAudio(1);
     Mix_UnlockAudio();
 
     /* First, stop the currently playing music */
-    native_midi_stop(song_p);
+    native_midi_stop();
 
     /* Set up the queue flags */
     queueFlags = kTuneStartNow;
@@ -250,28 +242,16 @@ done:
     SDL_PauseAudio(0);
 }
 
-void native_midi_pause(void *song_p)
+void native_midi_pause(void)
 {
-    NativeMidiSong *song = (NativeMidiSong*)song_p;
-    /*FIXME: Implement this!*/
 }
 
-void native_midi_resume(void *song_p)
+void native_midi_resume(void)
 {
-    NativeMidiSong *song = (NativeMidiSong*)song_p;
-    /*FIXME: Implement this!*/
 }
 
-int native_midi_paused(void *song_p)
+void native_midi_stop(void)
 {
-    NativeMidiSong *song = (NativeMidiSong*)song_p;
-    /*FIXME: Implement this!*/
-    return 0;
-}
-
-void native_midi_stop(void *midi)
-{
-    (void)midi;
     if (gTunePlayer == NULL)
         return;
 
@@ -282,9 +262,8 @@ void native_midi_stop(void *midi)
     TuneUnroll(gTunePlayer);
 }
 
-int native_midi_active(void *midi)
+int native_midi_active(void)
 {
-    (void)midi;
     if (gTunePlayer != NULL)
     {
         TuneStatus  ts;
@@ -296,9 +275,8 @@ int native_midi_active(void *midi)
         return 0;
 }
 
-void native_midi_setvolume(void *midi_p, int volume)
+void native_midi_setvolume(int volume)
 {
-    (void)midi_p;
     if (gTunePlayer == NULL)
         return;
 

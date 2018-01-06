@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include <SDL2/SDL_config.h>
+#include "SDL_config.h"
 
 #ifdef __HAIKU__
 #include <stdio.h>
@@ -206,7 +206,7 @@ struct _NativeMidiSong {
 
 char lasterr[1024];
 
-int native_midi_detect()
+int native_midi_detect(void)
 {
   status_t res = synth.EnableInput(true, false);
   return res == B_OK;
@@ -253,6 +253,7 @@ void native_midi_freesong(NativeMidiSong *song)
   delete song->store;
   delete song; song = 0;
 }
+
 void native_midi_start(NativeMidiSong *song, int loops)
 {
   native_midi_stop();
@@ -261,7 +262,16 @@ void native_midi_start(NativeMidiSong *song, int loops)
   song->store->Start();
   currentSong = song;
 }
-void native_midi_stop()
+
+void native_midi_pause(void)
+{
+}
+
+void native_midi_resume(void)
+{
+}
+
+void native_midi_stop(void)
 {
   if (currentSong == NULL) return;
   currentSong->store->Stop();
@@ -270,7 +280,8 @@ void native_midi_stop()
     usleep(1000);
   currentSong = NULL;
 }
-int native_midi_active()
+
+int native_midi_active(void)
 {
   if (currentSong == NULL) return 0;
   return currentSong->store->IsPlaying();

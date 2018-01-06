@@ -19,10 +19,10 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-/* This file supports an external command for playing music */
+/* This file supports playing MOD files with libmikmod */
 
 #include "music.h"
 
-extern Mix_MusicInterface Mix_MusicInterface_CMD;
+extern Mix_MusicInterface Mix_MusicInterface_MIKMOD;
 
 /* vi: set ts=4 sw=4 expandtab: */

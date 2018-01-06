@@ -17,20 +17,10 @@
   2. Altered source versions must be plainly marked as such, and must not be
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
-
-  Header to handle loading FLAC music files in SDL.
-    ~ Austen Dicken (admin@cvpcs.org)
 */
 
-/* $Id:  $ */
+#include "music.h"
 
-#ifdef FLAC_MUSIC
+extern Mix_MusicInterface Mix_MusicInterface_FLAC;
 
-#include "../audio_codec.h"
-
-/* Initialize the FLAC player, with the given mixer settings
-   This function returns 0, or -1 if there was an error.
- */
-extern int FLAC_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixer);
-
-#endif /* FLAC_MUSIC */
+/* vi: set ts=4 sw=4 expandtab: */
