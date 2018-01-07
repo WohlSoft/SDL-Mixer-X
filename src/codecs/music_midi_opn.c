@@ -279,7 +279,7 @@ int OPNMIDI_playing(void *music_p)
 int OPNMIDI_playAudio(void *music_p, Uint8 *stream, int len)
 {
     struct MUSIC_MIDIOPN *music = (struct MUSIC_MIDIOPN*)music_p;
-    int srgArraySize, srcLen, gottenLen, dest_len;
+    int srcArraySize, srcLen, gottenLen, dest_len;
     short* buf = NULL;
 
     if( music == NULL )
@@ -291,9 +291,15 @@ int OPNMIDI_playAudio(void *music_p, Uint8 *stream, int len)
     if( len < 0 )
         return 0;
 
-    srgArraySize = len * music->cvt.len_mult;
-    buf = (short*)SDL_malloc((size_t)srgArraySize);
-    srcLen = (int)((double)(len/2.0)/music->cvt.len_ratio);
+    srcArraySize = (len / 2) * music->cvt.len_mult;
+    srcLen = (int)((double)(len / 2.0) / music->cvt.len_ratio);
+    /* size is "elements * channels * len-of-16bit-sample = elements * 4" */
+    buf = (short *)SDL_malloc((size_t)(srcArraySize > srcLen ? srcArraySize : srcLen) * 4);
+    if(!buf)
+    {
+        SDL_OutOfMemory();
+        return 0;
+    }
 
     gottenLen = opn2_play( music->opnmidi, srcLen, buf );
     if( gottenLen <= 0 )

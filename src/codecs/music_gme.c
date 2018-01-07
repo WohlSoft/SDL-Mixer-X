@@ -271,10 +271,10 @@ static int GME_playAudio(void *music_p, Uint8 *stream, int len)
 {
     struct MUSIC_GME *music = (struct MUSIC_GME*)music_p;
     int dest_len;
-    int srgArraySize;
+    int srcArraySize;
     int srcLen;
     short *buf = NULL;
-    char *err = NULL;
+    const char *err = NULL;
 
     if(music == NULL)
         return 1;
@@ -285,11 +285,17 @@ static int GME_playAudio(void *music_p, Uint8 *stream, int len)
     if(len < 0)
         return 0;
 
-    srgArraySize = len * music->cvt.len_mult;
-    buf = (short *)SDL_malloc((size_t)srgArraySize);
-    srcLen = (int)((double)(len / 2) / music->cvt.len_ratio);
+    srcArraySize = (len / 2) * music->cvt.len_mult;
+    srcLen = (int)((double)(len / 2.0) / music->cvt.len_ratio);
+    /* size is "elements * channels * len-of-16bit-sample = elements * 4" */
+    buf = (short *)SDL_malloc((size_t)(srcArraySize > srcLen ? srcArraySize : srcLen) * 4);
+    if(!buf)
+    {
+        SDL_OutOfMemory();
+        return 0;
+    }
 
-    err = (char *)gme_play(music->game_emu, srcLen, buf);
+    err = gme_play(music->game_emu, srcLen, buf);
     if(err != NULL)
     {
         Mix_SetError("GAME-EMU: %s", err);
@@ -308,9 +314,9 @@ static int GME_playAudio(void *music_p, Uint8 *stream, int len)
     }
 
     if(music->volume == MIX_MAX_VOLUME)
-        SDL_memcpy(stream, (Uint8 *)buf, dest_len);
+        SDL_memcpy(stream, (Uint8 *)buf, (size_t)dest_len);
     else
-        SDL_MixAudioFormat(stream, (Uint8 *)buf, mixer.format, dest_len, music->volume);
+        SDL_MixAudioFormat(stream, (Uint8 *)buf, mixer.format, (Uint32)dest_len, music->volume);
 
     SDL_free(buf);
     return len - dest_len;

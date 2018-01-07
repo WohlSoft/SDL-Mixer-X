@@ -329,7 +329,7 @@ int ADLMIDI_playAudio(void *music_p, Uint8 *stream, int len)
 {
     struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
 
-    int srgArraySize, srcLen, gottenLen, dest_len;
+    int srcArraySize, srcLen, gottenLen, dest_len;
     short *buf = NULL;
 
     if(music == NULL)
@@ -341,9 +341,15 @@ int ADLMIDI_playAudio(void *music_p, Uint8 *stream, int len)
     if(len < 0)
         return 0;
 
-    srgArraySize = len * music->cvt.len_mult;
-    buf = (short *)SDL_malloc((size_t)srgArraySize);
+    srcArraySize = (len / 2) * music->cvt.len_mult;
     srcLen = (int)((double)(len / 2.0) / music->cvt.len_ratio);
+    /* size is "elements * channels * len-of-16bit-sample = elements * 4" */
+    buf = (short *)SDL_malloc((size_t)(srcArraySize > srcLen ? srcArraySize : srcLen) * 4);
+    if(!buf)
+    {
+        SDL_OutOfMemory();
+        return 0;
+    }
 
     gottenLen = adl_play(music->adlmidi, srcLen, buf);
     if(gottenLen <= 0)
