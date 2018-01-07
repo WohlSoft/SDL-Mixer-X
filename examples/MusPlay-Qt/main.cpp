@@ -63,14 +63,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         error(QString("Failed to initialize mixer: ") + Mix_GetError());
 
     #ifndef MUSPLAY_USE_WINAPI
-    qDebug() << QString(a.applicationDirPath()+"/timidity/");
-    Mix_Timidity_addToPathList(QString(a.applicationDirPath()+"/timidity/").toLocal8Bit().data());
+    QString timidityPath(a.applicationDirPath() + "/timidity/");
+    if(QDir(timidityPath).exists())
+    {
+        qDebug() << "Timidity path is" << timidityPath;
+        QByteArray tp = timidityPath.toUtf8();
+        Mix_Timidity_addToPathList(tp.data());
+    }
     #else
-    Mix_Timidity_addToPathList("./timidity/");
+    Mix_Timidity_addToPathList("./timidity");
     #endif
 
     #ifndef MUSPLAY_USE_WINAPI
-    Mix_SetSoundFonts(QString(a.applicationDirPath()+"/gm.sf2").toUtf8().data());
+    Mix_SetSoundFonts(QString(a.applicationDirPath() + "/gm.sf2").toUtf8().data());
     #else
     Mix_SetSoundFonts("./gm.sf2");
     #endif
