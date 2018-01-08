@@ -27,7 +27,7 @@
 
 #include "SDL.h"
 
-#include "SDL_mixer.h"
+#include "SDL_mixer_ext.h"
 #include "mixer.h"
 #include "music.h"
 #include "load_aiff.h"

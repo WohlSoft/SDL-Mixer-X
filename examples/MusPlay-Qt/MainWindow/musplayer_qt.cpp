@@ -46,8 +46,13 @@ MusPlayer_Qt::MusPlayer_Qt(QWidget *parent) : QMainWindow(parent),
     this->setWindowIcon(QIcon(":/cat_musplay.ico"));
 #endif
     ui->fmbank->clear();
+    #ifdef SDL_MIXER_X
     int totalBakns = Mix_ADLMIDI_getTotalBanks();
     const char *const *names = Mix_ADLMIDI_getBankNames();
+    #else
+    int totalBakns = 0;
+    const char *const *names = {0};
+    #endif
 
     for(int i = 0; i < totalBakns; i++)
         ui->fmbank->addItem(QString("%1 = %2").arg(i).arg(names[i]));
@@ -81,23 +86,33 @@ MusPlayer_Qt::MusPlayer_Qt(QWidget *parent) : QMainWindow(parent),
     });
     connect(ui->tremolo, &QCheckBox::clicked, this, [this](int)
     {
+        #ifdef SDL_MIXER_X
         Mix_ADLMIDI_setTremolo(tristateToInt(ui->tremolo->checkState()));
+        #endif
     });
     connect(ui->vibrato, &QCheckBox::clicked, this, [this](int)
     {
+        #ifdef SDL_MIXER_X
         Mix_ADLMIDI_setVibrato(tristateToInt(ui->vibrato->checkState()));
+        #endif
     });
     connect(ui->modulation, &QCheckBox::clicked, this, [this](int)
     {
+        #ifdef SDL_MIXER_X
         Mix_ADLMIDI_setScaleMod(tristateToInt(ui->modulation->checkState()));
+        #endif
     });
     connect(ui->adlibMode, &QCheckBox::clicked, this, [this](int)
     {
+        #ifdef SDL_MIXER_X
         Mix_ADLMIDI_setAdLibMode(tristateToInt(ui->adlibMode->checkState()));
+        #endif
     });
     connect(ui->logVolumes, &QCheckBox::clicked, this, [this](int)
     {
+        #ifdef SDL_MIXER_X
         Mix_ADLMIDI_setLogarithmicVolumes(tristateToInt(ui->logVolumes->checkState()));
+        #endif
     });
 
     connect(ui->opn_use_custom, &QCheckBox::clicked, this, &MusPlayer_Qt::on_opn_bank_editingFinished);
@@ -125,6 +140,7 @@ MusPlayer_Qt::MusPlayer_Qt(QWidget *parent) : QMainWindow(parent),
     ui->opnmidi_extra->setVisible(ui->mididevice->currentIndex() == 3);
     ui->adlmidi_xtra->setVisible(ui->mididevice->currentIndex() == 0);
 
+    #ifdef SDL_MIXER_X
     switch(ui->mididevice->currentIndex())
     {
     case 0:
@@ -146,27 +162,42 @@ MusPlayer_Qt::MusPlayer_Qt(QWidget *parent) : QMainWindow(parent),
         Mix_SetMidiDevice(MIDI_ADLMIDI);
         break;
     }
+    #endif
 
     ui->fmbank->setCurrentIndex(setup.value("ADLMIDI-Bank-ID", 58).toInt());
+    #ifdef SDL_MIXER_X
     Mix_ADLMIDI_setBankID(ui->fmbank->currentIndex());
+    #endif
 
     ui->volumeModel->setCurrentIndex(setup.value("ADLMIDI-VolumeModel", 0).toInt());
+    #ifdef SDL_MIXER_X
     Mix_ADLMIDI_setVolumeModel(ui->volumeModel->currentIndex());
+    #endif
 
     ui->tremolo->setCheckState((Qt::CheckState)setup.value("ADLMIDI-Tremolo", Qt::PartiallyChecked).toInt());
+    #ifdef SDL_MIXER_X
     Mix_ADLMIDI_setTremolo(tristateToInt(ui->tremolo->checkState()));
+    #endif
 
     ui->vibrato->setCheckState((Qt::CheckState)setup.value("ADLMIDI-Vibrato", Qt::PartiallyChecked).toInt());
+    #ifdef SDL_MIXER_X
     Mix_ADLMIDI_setVibrato(tristateToInt(ui->vibrato->checkState()));
+    #endif
 
     ui->adlibMode->setCheckState((Qt::CheckState)setup.value("ADLMIDI-AdLib-Drums-Mode", Qt::Unchecked).toInt());
+    #ifdef SDL_MIXER_X
     Mix_ADLMIDI_setAdLibMode(tristateToInt(ui->adlibMode->checkState()));
+    #endif
 
     ui->modulation->setCheckState((Qt::CheckState)setup.value("ADLMIDI-Scalable-Modulation", Qt::Unchecked).toInt());
+    #ifdef SDL_MIXER_X
     Mix_ADLMIDI_setScaleMod(tristateToInt(ui->modulation->checkState()));
+    #endif
 
     ui->logVolumes->setCheckState((Qt::CheckState)setup.value("ADLMIDI-LogarithmicVolumes", Qt::Unchecked).toInt());
+    #ifdef SDL_MIXER_X
     Mix_ADLMIDI_setLogarithmicVolumes(tristateToInt(ui->logVolumes->checkState()));
+    #endif
 
     ui->adl_bank->setText(setup.value("ADLMIDI-Bank", "").toString());
     ui->adl_use_custom->setChecked(setup.value("ADLMIDI-Bank-UseCustom", true).toBool());
@@ -404,6 +435,7 @@ void MusPlayer_Qt::switchMidiDevice(int index)
     ui->opnmidi_extra->setVisible(false);
     ui->midi_setup->setVisible(true);
 
+#ifdef SDL_MIXER_X
     switch(index)
     {
     case 0:
@@ -428,6 +460,9 @@ void MusPlayer_Qt::switchMidiDevice(int index)
         ui->adlmidi_xtra->setVisible(true);
         break;
     }
+#else
+    (void)index;
+#endif
 }
 
 void MusPlayer_Qt::on_open_clicked()
@@ -493,7 +528,14 @@ void MusPlayer_Qt::on_play_clicked()
 
     bool playSuccess = false;
 
-    if(PGE_MusicPlayer::MUS_openFile(currentMusic + "|" + ui->trackID->text()))
+    QString musicPath =
+    #ifdef SDL_MIXER_X
+            currentMusic + "|" + ui->trackID->text();
+    #else
+            currentMusic;
+    #endif
+
+    if(PGE_MusicPlayer::MUS_openFile(musicPath))
     {
         PGE_MusicPlayer::MUS_changeVolume(ui->volume->value());
         playSuccess = PGE_MusicPlayer::MUS_playMusic();
@@ -508,7 +550,12 @@ void MusPlayer_Qt::on_play_clicked()
 
     if(playSuccess)
     {
-        double total = Mix_GetMusicTotalTime(PGE_MusicPlayer::play_mus);
+        double total =
+            #ifdef SDL_MIXER_X
+                Mix_GetMusicTotalTime(PGE_MusicPlayer::play_mus);
+            #else
+                -1.0;
+            #endif
         if(total > 0)
         {
             ui->musicPosition->setEnabled(true);
@@ -519,7 +566,13 @@ void MusPlayer_Qt::on_play_clicked()
         }
         ui->musicPosition->setVisible(ui->musicPosition->isEnabled());
 
-        double loopStart = Mix_GetMusicLoopStartTime(PGE_MusicPlayer::play_mus);
+
+        double loopStart =
+            #ifdef SDL_MIXER_X
+                Mix_GetMusicLoopStartTime(PGE_MusicPlayer::play_mus);
+            #else
+                -1.0;
+            #endif
         if(loopStart >= 0.0)
             ui->isLooping->setVisible(true);
 
@@ -545,12 +598,12 @@ void MusPlayer_Qt::on_play_clicked()
             ui->midi_setup->setVisible(true);
             ui->frame->setVisible(true);
             break;
-
+#ifdef SDL_MIXER_X
         case MUS_SPC:
             ui->gme_setup->setVisible(true);
             ui->frame->setVisible(true);
             break;
-
+#endif
         default:
             break;
         }
@@ -583,6 +636,7 @@ void MusPlayer_Qt::on_mididevice_currentIndexChanged(int index)
 
 void MusPlayer_Qt::on_trackID_editingFinished()
 {
+    #ifdef SDL_MIXER_X
     if(Mix_PlayingMusic())
     {
         if((PGE_MusicPlayer::type == MUS_SPC) && (m_prevTrackID != ui->trackID->value()))
@@ -591,6 +645,7 @@ void MusPlayer_Qt::on_trackID_editingFinished()
             on_play_clicked();
         }
     }
+    #endif
 }
 
 void MusPlayer_Qt::on_recordWav_clicked(bool checked)
@@ -633,11 +688,13 @@ void MusPlayer_Qt::on_resetDefaultADLMIDI_clicked()
     ui->adlibMode->setChecked(false);
     ui->modulation->setChecked(false);
     ui->logVolumes->setChecked(false);
+#ifdef SDL_MIXER_X
     Mix_ADLMIDI_setTremolo(tristateToInt(ui->tremolo->checkState()));
     Mix_ADLMIDI_setVibrato(tristateToInt(ui->vibrato->checkState()));
     Mix_ADLMIDI_setAdLibMode(tristateToInt(ui->adlibMode->checkState()));
     Mix_ADLMIDI_setScaleMod(tristateToInt(ui->modulation->checkState()));
     Mix_ADLMIDI_setLogarithmicVolumes(tristateToInt(ui->logVolumes->checkState()));
+#endif
     on_volumeModel_currentIndexChanged(ui->volumeModel->currentIndex());
     on_fmbank_currentIndexChanged(ui->fmbank->currentIndex());
 }
@@ -654,7 +711,12 @@ void MusPlayer_Qt::_blink_red()
 
 void MusPlayer_Qt::updatePositionSlider()
 {
-    double pos = Mix_GetMusicPosition(PGE_MusicPlayer::play_mus);
+    double pos =
+#ifdef SDL_MIXER_X
+    Mix_GetMusicPosition(PGE_MusicPlayer::play_mus);
+#else
+    -1.0;
+#endif
     m_positionWatcherLock = true;
     ui->musicPosition->setValue((int)std::floor(pos));
     ui->playingTimeLabel->setText(QDateTime::fromTime_t((uint)std::floor(pos)).toUTC().toString("hh:mm:ss"));
@@ -704,6 +766,7 @@ void MusPlayer_Qt::on_sfx_play_clicked()
     if(!m_testSfx)
         return;
 
+#ifdef SDL_MIXER_X
     if(Mix_PlayChannelTimedVolume(0,
                                   m_testSfx,
                                   ui->sfx_loops->value(),
@@ -712,6 +775,16 @@ void MusPlayer_Qt::on_sfx_play_clicked()
     {
         QMessageBox::warning(this, "SFX play error!", QString("Mix_PlayChannelTimedVolume: ") + Mix_GetError());
     }
+#else
+    int chan = Mix_PlayChannelTimed(0,
+                                    m_testSfx,
+                                    ui->sfx_loops->value(),
+                                    ui->sfx_timed->value());
+    if(chan == -1)
+        QMessageBox::warning(this, "SFX play error!", QString("Mix_PlayChannelTimed: ") + Mix_GetError());
+    else
+        Mix_Volume(chan, ui->sfx_volume->value());
+#endif
 }
 
 void MusPlayer_Qt::on_sfx_fadeIn_clicked()
@@ -719,6 +792,7 @@ void MusPlayer_Qt::on_sfx_fadeIn_clicked()
     if(!m_testSfx)
         return;
 
+#ifdef SDL_MIXER_X
     if(Mix_FadeInChannelTimedVolume(0,
                                     m_testSfx,
                                     ui->sfx_loops->value(),
@@ -728,6 +802,17 @@ void MusPlayer_Qt::on_sfx_fadeIn_clicked()
     {
         QMessageBox::warning(this, "SFX play error!", QString("Mix_PlayChannelTimedVolume: ") + Mix_GetError());
     }
+#else
+    int chan = Mix_FadeInChannelTimed(0,
+                                     m_testSfx,
+                                     ui->sfx_loops->value(),
+                                     ui->sfx_fadems->value(),
+                                     ui->sfx_timed->value());
+    if(chan == -1)
+        QMessageBox::warning(this, "SFX play error!", QString("Mix_PlayChannelTimed: ") + Mix_GetError());
+    else
+        Mix_Volume(chan, ui->sfx_volume->value());
+#endif
 }
 
 void MusPlayer_Qt::on_sfx_stop_clicked()
@@ -760,6 +845,7 @@ void MusPlayer_Qt::on_opn_bank_browse_clicked()
 
 void MusPlayer_Qt::on_opn_bank_editingFinished()
 {
+    #ifdef SDL_MIXER_X
     QString file = ui->opn_bank->text();
     if(!file.isEmpty() && QFile::exists(file) && ui->opn_use_custom->isChecked())
     {
@@ -767,10 +853,12 @@ void MusPlayer_Qt::on_opn_bank_editingFinished()
     } else {
         Mix_OPNMIDI_setCustomBankFile(NULL);
     }
+    #endif
 }
 
 void MusPlayer_Qt::on_adl_bank_browse_clicked()
 {
+    #ifdef SDL_MIXER_X
     QString path = QFileDialog::getOpenFileName(this,
                                                 tr("Select WOPL bank file"),
                                                 ui->adl_bank->text(),
@@ -781,10 +869,12 @@ void MusPlayer_Qt::on_adl_bank_browse_clicked()
         ui->adl_bank->setText(path);
         on_adl_bank_editingFinished();
     }
+    #endif
 }
 
 void MusPlayer_Qt::on_adl_bank_editingFinished()
 {
+    #ifdef SDL_MIXER_X
     QString file = ui->adl_bank->text();
     if(!file.isEmpty() && QFile::exists(file) && ui->adl_use_custom->isChecked())
     {
@@ -792,6 +882,7 @@ void MusPlayer_Qt::on_adl_bank_editingFinished()
     } else {
         Mix_ADLMIDI_setCustomBankFile(NULL);
     }
+    #endif
 }
 
 #endif

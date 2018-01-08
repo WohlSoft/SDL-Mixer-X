@@ -19,7 +19,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifdef USE_ADL_MIDI
+#ifdef MUSIC_MIDI_ADLMIDI
 
 /* This file supports libADLMIDI music streams */
 

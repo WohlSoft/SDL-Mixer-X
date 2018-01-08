@@ -24,7 +24,7 @@
 
 /* $Id: music_gme.h Wohlstand $ */
 
-#ifdef GME_MUSIC
+#ifdef MUSIC_GME
 
 #include "../audio_codec.h"
 

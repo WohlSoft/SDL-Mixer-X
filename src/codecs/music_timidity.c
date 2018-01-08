@@ -25,7 +25,7 @@
 
 #include "music_timidity.h"
 
-#include "timidity/timidity.h"
+#include <timidity.h>
 
 
 typedef struct

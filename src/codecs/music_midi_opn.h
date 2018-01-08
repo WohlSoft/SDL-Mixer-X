@@ -24,7 +24,7 @@
 
 /* $Id: music_gme.h Wohlstand $ */
 
-#ifdef USE_OPN2_MIDI
+#ifdef MUSIC_MIDI_OPNMIDI
 
 #include "../audio_codec.h"
 

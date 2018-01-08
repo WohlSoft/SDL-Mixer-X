@@ -34,13 +34,16 @@ namespace PGE_MusicPlayer
                    type == MUS_CMD ? "CMD" :
                    type == MUS_WAV ? "PCM Wave" :
                    type == MUS_MOD ? "MikMod" :
-                   type == MUS_MODPLUG ? "ModPlug" :
+                   type == MUS_MODPLUG_UNUSED ? "ModPlug" :
                    type == MUS_MID ? "MIDI/IMF" :
                    type == MUS_OGG ? "OGG" :
                    type == MUS_MP3 ? "MP3 (SMPEG)" :
-                   type == MUS_MP3_MAD ? "MP3 (LibMAD)" :
+                   type == MUS_MP3_MAD_UNUSED ? "MP3 (LibMAD)" :
                    type == MUS_FLAC ? "FLAC" :
-                   type == MUS_GME ? "Game Music Emulator" : "<Unknown>");
+                   #ifdef SDL_MIXER_X
+                   type == MUS_GME ? "Game Music Emulator" :
+                   #endif
+                   "<Unknown>");
     }
     QString musicType()
     {
@@ -77,9 +80,11 @@ namespace PGE_MusicPlayer
      */
     QString MUS_getMusTitle()
     {
+        #ifdef SDL_MIXER_X
         if(play_mus)
             return QString(Mix_GetMusicTitle(play_mus));
         else
+        #endif
             return QString("[No music]");
     }
 
@@ -89,9 +94,11 @@ namespace PGE_MusicPlayer
      */
     QString MUS_getMusArtist()
     {
+        #ifdef SDL_MIXER_X
         if(play_mus)
             return QString(Mix_GetMusicArtistTag(play_mus));
         else
+        #endif
             return QString("[Unknown Artist]");
     }
 
@@ -101,9 +108,11 @@ namespace PGE_MusicPlayer
      */
     QString MUS_getMusAlbum()
     {
+        #ifdef SDL_MIXER_X
         if(play_mus)
             return QString(Mix_GetMusicAlbumTag(play_mus));
         else
+        #endif
             return QString("[Unknown Album]");
     }
 
@@ -113,9 +122,11 @@ namespace PGE_MusicPlayer
      */
     QString MUS_getMusCopy()
     {
+        #ifdef SDL_MIXER_X
         if(play_mus)
             return QString(Mix_GetMusicCopyrightTag(play_mus));
         else
+        #endif
             return QString("");
     }
     #else

@@ -19,7 +19,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifdef USE_OPN2_MIDI
+#ifdef MUSIC_MIDI_OPNMIDI
 
 /* This file supports libOPNMIDI music streams */
 

@@ -31,7 +31,7 @@
 typedef struct SDL_Overlay SDL_Overlay;
 #endif
 
-#include "smpeg.h"
+#include <smpeg/smpeg.h>
 
 typedef struct {
     int loaded;

@@ -19,11 +19,11 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifdef GME_MUSIC
+#ifdef MUSIC_GME
 
 /* This file supports Game Music Emulators music streams */
 
-#include <SDL_mixer_ext/SDL_mixer_ext.h>
+#include "SDL_mixer_ext.h"
 
 /* First parameter of most gme_ functions is a pointer to the Music_Emu */
 typedef struct Music_Emu Music_Emu;
@@ -31,12 +31,10 @@ typedef struct Music_Emu Music_Emu;
 #include "music_gme.h"
 
 #include <gme.h>
-#include "../resample/my_resample.h"
-
 #include <stdio.h>
 
 /* This file supports Game Music Emulator music streams */
-struct MUSIC_GME
+typedef struct
 {
     Music_Emu* game_emu;
     int playing;
@@ -47,7 +45,7 @@ struct MUSIC_GME
     char *mus_album;
     char *mus_copyright;
     SDL_AudioCVT cvt;
-};
+} GME_Music;
 
 /* This is the format of the audio mixer data */
 static SDL_AudioSpec mixer;
@@ -81,58 +79,15 @@ static double   GME_get_cur_time(void *music_p);
 /* Play some of a stream previously started with GME_play() */
 static int GME_playAudio(void *music_p, Uint8 *stream, int len);
 
-/*
- * Initialize the Game Music Emulators player, with the given mixer settings
- * This function returns 0, or -1 if there was an error.
- */
-int GME_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixerfmt)
-{
-    mixer = *mixerfmt;
-
-    initMusicInterface(codec);
-
-    codec->isValid = 1;
-
-    codec->capabilities     = music_interface_default_capabilities;
-
-    codec->open             = GME_new_RW;
-    codec->openEx           = GME_new_RWEx;
-    codec->close            = GME_delete;
-
-    codec->play             = GME_play;
-    codec->pause            = music_interface_dummy_cb_void_1arg;
-    codec->resume           = music_interface_dummy_cb_void_1arg;
-    codec->stop             = GME_stop;
-
-    codec->isPlaying        = GME_playing;
-    codec->isPaused         = music_interface_dummy_cb_int_1arg;
-
-    codec->setLoops         = music_interface_dummy_cb_regulator;
-    codec->setVolume        = GME_setvolume;
-
-    codec->jumpToTime       = GME_jump_to_time;
-    codec->getCurrentTime   = GME_get_cur_time;
-    codec->getTimeLength    = music_interface_dummy_cb_tell;
-
-    codec->metaTitle        = GME_metaTitle;
-    codec->metaArtist       = GME_metaArtist;
-    codec->metaAlbum        = GME_metaAlbum;
-    codec->metaCopyright    = GME_metaCopyright;
-
-    codec->playAudio        = GME_playAudio;
-
-    return(0);
-}
-
 /* Set the volume for a MOD stream */
 void GME_setvolume(void *music_p, int volume)
 {
-    struct MUSIC_GME *music = (struct MUSIC_GME*)music_p;
+    GME_Music *music = (GME_Music*)music_p;
     if(music)
         music->volume = (int)round(128.0f * sqrt(((float)volume) * (1.f / 128.f)));
 }
 
-struct MUSIC_GME *GME_LoadSongRW(SDL_RWops *src, int trackNum)
+GME_Music *GME_LoadSongRW(SDL_RWops *src, int trackNum)
 {
     if(src != NULL)
     {
@@ -141,7 +96,7 @@ struct MUSIC_GME *GME_LoadSongRW(SDL_RWops *src, int trackNum)
         unsigned char byte[1];
         Music_Emu *game_emu;
         gme_info_t *musInfo;
-        struct MUSIC_GME *spcSpec;
+        GME_Music *spcSpec;
         char *err;
 
         Sint64 length = 0;
@@ -188,7 +143,7 @@ struct MUSIC_GME *GME_LoadSongRW(SDL_RWops *src, int trackNum)
             return NULL;
         }
 
-        spcSpec = (struct MUSIC_GME *)SDL_malloc(sizeof(struct MUSIC_GME));
+        spcSpec = (GME_Music *)SDL_malloc(sizeof(GME_Music));
         spcSpec->game_emu = game_emu;
         spcSpec->playing = 0;
         spcSpec->gme_t_sample_rate = mixer.freq;
@@ -230,7 +185,7 @@ struct MUSIC_GME *GME_LoadSongRW(SDL_RWops *src, int trackNum)
 /* Load a Game Music Emulators stream from an SDL_RWops object */
 static void *GME_new_RWEx(struct SDL_RWops *src, int freesrc, const char *extraSettings)
 {
-    struct MUSIC_GME *gmeMusic;
+    GME_Music *gmeMusic;
     int trackNumber = extraSettings ? atoi(extraSettings) : 0;
     gmeMusic = GME_LoadSongRW(src, trackNumber);
     if(!gmeMusic)
@@ -251,7 +206,7 @@ static void *GME_new_RW(struct SDL_RWops *src, int freesrc)
 /* Start playback of a given Game Music Emulators stream */
 static void GME_play(void *music_p)
 {
-    struct MUSIC_GME *music = (struct MUSIC_GME*)music_p;
+    GME_Music *music = (GME_Music*)music_p;
     if(music)
         music->playing = 1;
 }
@@ -259,7 +214,7 @@ static void GME_play(void *music_p)
 /* Return non-zero if a stream is currently playing */
 static int GME_playing(void *music_p)
 {
-    struct MUSIC_GME *music = (struct MUSIC_GME*)music_p;
+    GME_Music *music = (GME_Music*)music_p;
     if(music)
         return music->playing;
     else
@@ -269,7 +224,7 @@ static int GME_playing(void *music_p)
 /* Play some of a stream previously started with GME_play() */
 static int GME_playAudio(void *music_p, Uint8 *stream, int len)
 {
-    struct MUSIC_GME *music = (struct MUSIC_GME*)music_p;
+    GME_Music *music = (GME_Music*)music_p;
     int dest_len;
     int srgArraySize;
     int srcLen;
@@ -319,7 +274,7 @@ static int GME_playAudio(void *music_p, Uint8 *stream, int len)
 /* Stop playback of a stream previously started with GME_play() */
 static void GME_stop(void *music_p)
 {
-    struct MUSIC_GME *music = (struct MUSIC_GME*)music_p;
+    GME_Music *music = (GME_Music*)music_p;
     if(music)
         music->playing = -1;
 }
@@ -327,7 +282,7 @@ static void GME_stop(void *music_p)
 /* Close the given Game Music Emulators stream */
 static void GME_delete(void *music_p)
 {
-    struct MUSIC_GME *music = (struct MUSIC_GME*)music_p;
+    GME_Music *music = (GME_Music*)music_p;
     if(music)
     {
         if(music->mus_title)
@@ -350,42 +305,86 @@ static void GME_delete(void *music_p)
 
 static const char *GME_metaTitle(void *music_p)
 {
-    struct MUSIC_GME *music = (struct MUSIC_GME *)music_p;
+    GME_Music *music = (GME_Music *)music_p;
     return music->mus_title ? music->mus_title : "";
 }
 
 static const char *GME_metaArtist(void *music_p)
 {
-    struct MUSIC_GME *music = (struct MUSIC_GME *)music_p;
+    GME_Music *music = (GME_Music *)music_p;
     return music->mus_artist ? music->mus_artist : "";
 }
 
 static const char *GME_metaAlbum(void *music_p)
 {
-    struct MUSIC_GME *music = (struct MUSIC_GME *)music_p;
+    GME_Music *music = (GME_Music *)music_p;
     return music->mus_album ? music->mus_album : "";
 }
 
 static const char *GME_metaCopyright(void *music_p)
 {
-    struct MUSIC_GME *music = (struct MUSIC_GME *)music_p;
+    GME_Music *music = (GME_Music *)music_p;
     return music->mus_copyright ? music->mus_copyright : "";
 }
 
 /* Jump (seek) to a given position (time is in seconds) */
 static void GME_jump_to_time(void *music_p, double time)
 {
-    struct MUSIC_GME *music = (struct MUSIC_GME*)music_p;
+    GME_Music *music = (GME_Music*)music_p;
     if(music)
         gme_seek(music->game_emu, (int)round(time * 1000));
 }
 
 static double GME_get_cur_time(void *music_p)
 {
-    struct MUSIC_GME *music = (struct MUSIC_GME*)music_p;
+    GME_Music *music = (GME_Music*)music_p;
     if(music)
         return (double)gme_tell(music->game_emu) / 1000.0;
     return -1.0;
+}
+
+
+/*
+ * Initialize the Game Music Emulators player, with the given mixer settings
+ * This function returns 0, or -1 if there was an error.
+ */
+int GME_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixerfmt)
+{
+    mixer = *mixerfmt;
+
+    initMusicInterface(codec);
+
+    codec->isValid = 1;
+
+    codec->capabilities     = music_interface_default_capabilities;
+
+    codec->open             = GME_new_RW;
+    codec->openEx           = GME_new_RWEx;
+    codec->close            = GME_delete;
+
+    codec->play             = GME_play;
+    codec->pause            = music_interface_dummy_cb_void_1arg;
+    codec->resume           = music_interface_dummy_cb_void_1arg;
+    codec->stop             = GME_stop;
+
+    codec->isPlaying        = GME_playing;
+    codec->isPaused         = music_interface_dummy_cb_int_1arg;
+
+    codec->setLoops         = music_interface_dummy_cb_regulator;
+    codec->setVolume        = GME_setvolume;
+
+    codec->jumpToTime       = GME_jump_to_time;
+    codec->getCurrentTime   = GME_get_cur_time;
+    codec->getTimeLength    = music_interface_dummy_cb_tell;
+
+    codec->metaTitle        = GME_metaTitle;
+    codec->metaArtist       = GME_metaArtist;
+    codec->metaAlbum        = GME_metaAlbum;
+    codec->metaCopyright    = GME_metaCopyright;
+
+    codec->playAudio        = GME_playAudio;
+
+    return(0);
 }
 
 #endif

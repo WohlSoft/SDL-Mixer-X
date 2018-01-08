@@ -83,16 +83,16 @@ set(SDLMixerX_LINK_LIBS)
 
 option(USE_WAV             "Build with WAV codec" ON)
 if(USE_WAV)
-    add_definitions(-DWAV_MUSIC)
+    add_definitions(-DMUSIC_WAV)
     list(APPEND SDLMixerX_SOURCES
         ${SDLMixerX_SOURCE_DIR}/src/codecs/load_aiff.c
         ${SDLMixerX_SOURCE_DIR}/src/codecs/load_voc.c
-        ${SDLMixerX_SOURCE_DIR}/src/codecs/music_wave.c)
+        ${SDLMixerX_SOURCE_DIR}/src/codecs/music_wav.c)
 endif()
 
 option(USE_OGG_VORBIS      "Build with OGG Vorbis codec" ON)
 if(USE_OGG_VORBIS)
-    add_definitions(-DOGG_MUSIC)
+    add_definitions(-DMUSIC_OGG)
     include_directories(${AUDIO_CODECS_PATH}/libogg/include)
     include_directories(${AUDIO_CODECS_PATH}/libvorbis/include)
     list(APPEND SDLMixerX_LINK_LIBS vorbisfile vorbis)
@@ -103,7 +103,7 @@ endif()
 
 option(USE_FLAC            "Build with FLAC codec" ON)
 if(USE_FLAC)
-    add_definitions(-DFLAC_MUSIC -DFLAC__NO_DLL)
+    add_definitions(-DMUSIC_FLAC -DFLAC__NO_DLL)
     include_directories(${AUDIO_CODECS_PATH}/libogg/include)
     include_directories(${AUDIO_CODECS_PATH}/libFLAC/include)
     set(LIBOGG_NEEDED ON)
@@ -118,7 +118,7 @@ endif()
 
 option(USE_MP3_MAD         "Build with MAD MP3 codec" ON)
 if(USE_MP3_MAD)
-    add_definitions(-DMP3_MAD_MUSIC)
+    add_definitions(-DMUSIC_MP3_MAD)
     list(APPEND SDLMixerX_LINK_LIBS mad id3tag)
     include_directories(${AUDIO_CODECS_PATH}/libmad/include)
     include_directories(${AUDIO_CODECS_PATH}/libid3tag/include)
@@ -128,7 +128,7 @@ endif()
 
 option(USE_MP3_SMPEG       "Build with SMPEG MP3 codec" OFF)
 if(USE_MP3_SMPEG)
-    add_definitions(-DMP3_MUSIC)
+    add_definitions(-DMUSIC_MP3_SMPEG)
     list(APPEND SDLMixerX_LINK_LIBS smpeg id3tag)
     include_directories(${AUDIO_CODECS_PATH}/smpeg/include)
     include_directories(${AUDIO_CODECS_PATH}/libid3tag/include)
@@ -138,9 +138,9 @@ endif()
 
 option(USE_MP3_MPG123     "[WIP, DON'T USE IT] Build with MPG123 MP3 codec" OFF)
 if(USE_MP3_MPG123)
-    add_definitions(-DMP3_MPG_MUSIC)
+    add_definitions(-DMUSIC_MP3_MPG123)
 
-    message(WARNING "MPG123 SUPPORT IS WIP, DON'T USE IT!!!")
+    message(WARNING "MPG123 SUPPORT IS WIP, DON'T USE IT IN PRODUCTION!!!")
     # ======= Until AudioCodecs will receive buildable mpg123, detect it externally =======
     include(cmake/FindMpg123.cmake)
 
@@ -159,7 +159,7 @@ endif()
 
 option(USE_MODPLUG         "Build with ModPlug library" ON)
 if(USE_MODPLUG)
-    add_definitions(-DMODPLUG_MUSIC -DMODPLUG_STATIC)
+    add_definitions(-DMUSIC_MOD_MODPLUG -DMODPLUG_STATIC -DMODPLUG_HEADER=<modplug.h>)
     include_directories(${AUDIO_CODECS_PATH}/libmodplug/include)
     list(APPEND SDLMixerX_LINK_LIBS modplug)
     list(APPEND SDLMixerX_SOURCES
@@ -168,7 +168,7 @@ endif()
 
 option(USE_MIKMOD          "Build with MikMod library" OFF)
 if(USE_MIKMOD)
-    add_definitions(-DMOD_MUSIC)
+    add_definitions(-DMUSIC_MOD_MIKMOD)
     include_directories(${AUDIO_CODECS_PATH}/libmikmod/include)
     list(APPEND SDLMixerX_LINK_LIBS mikmod)
     list(APPEND SDLMixerX_SOURCES
@@ -177,7 +177,7 @@ endif()
 
 option(USE_GME             "Build with Game Music Emulators library" ON)
 if(USE_GME)
-    add_definitions(-DGME_MUSIC)
+    add_definitions(-DMUSIC_GME)
     include_directories(${AUDIO_CODECS_PATH}/libgme/include)
     include_directories(${AUDIO_CODECS_PATH}/zlib/include)
     list(APPEND SDLMixerX_LINK_LIBS gme zlib)
@@ -187,7 +187,7 @@ endif()
 
 option(USE_CMD             "Build with CMD music player support" ON)
 if(USE_CMD)
-    add_definitions(-DCMD_MUSIC)
+    add_definitions(-DMUSIC_CMD)
     list(APPEND SDLMixerX_SOURCES
         ${SDLMixerX_SOURCE_DIR}/src/codecs/music_cmd.c)
 endif()
@@ -198,7 +198,7 @@ if(USE_MIDI)
 
     option(USE_MIDI_ADLMIDI    "Build with libADLMIDI OPL3 Emulator based MIDI sequencer support" ON)
     if(USE_MIDI_ADLMIDI)
-        add_definitions(-DUSE_ADL_MIDI)
+        add_definitions(-DMUSIC_MIDI_ADLMIDI)
         include_directories(${AUDIO_CODECS_PATH}/libADLMIDI/include)
         list(APPEND SDLMixerX_LINK_LIBS ADLMIDI)
         list(APPEND SDLMixerX_SOURCES
@@ -207,7 +207,7 @@ if(USE_MIDI)
 
     option(USE_MIDI_OPNMIDI    "Build with libOPNMIDI OPN2 Emulator based MIDI sequencer support" ON)
     if(USE_MIDI_OPNMIDI)
-        add_definitions(-DUSE_OPN2_MIDI)
+        add_definitions(-DMUSIC_MIDI_OPNMIDI)
         include_directories(${AUDIO_CODECS_PATH}/libOPNMIDI/include)
         list(APPEND SDLMixerX_LINK_LIBS OPNMIDI)
         list(APPEND SDLMixerX_SOURCES
@@ -216,7 +216,7 @@ if(USE_MIDI)
 
     option(USE_MIDI_TIMIDITY   "Build with Timidity wave table MIDI sequencer support" ON)
     if(USE_MIDI_TIMIDITY)
-        add_definitions(-DUSE_TIMIDITY_MIDI)
+        add_definitions(-DMUSIC_MID_TIMIDITY)
         include_directories(${AUDIO_CODECS_PATH}/libtimidity/include)
         list(APPEND SDLMixerX_LINK_LIBS timidity)
         list(APPEND SDLMixerX_SOURCES
@@ -317,6 +317,11 @@ if(SDL_MIXER_X_SHARED)
     add_library(SDL2_mixer_ext SHARED ${SDLMixerX_SOURCES})
     target_link_libraries(SDL2_mixer_ext ${SDLMixerX_LINK_LIBS})
     target_include_directories(SDL2_mixer_ext PUBLIC ${SDLMixerX_SOURCE_DIR}/include)
+    target_include_directories(SDL2_mixer_ext PRIVATE
+        ${SDLMixerX_SOURCE_DIR}/include/SDL_mixer_ext
+        ${SDLMixerX_SOURCE_DIR}/src
+        ${SDLMixerX_SOURCE_DIR}/src/codecs
+        ${AUDIO_CODECS_INSTALL_DIR}/include/SDL2)
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY AND AUDIO_CODECS_REPO_PATH)
         add_dependencies(SDL2_mixer_ext AudioCodecs)
     endif()
@@ -328,7 +333,7 @@ if(SDL_MIXER_X_SHARED)
     )
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
         add_custom_command(
-            TARGET SDL2_mixer_ext_Static POST_BUILD
+            TARGET SDL2_mixer_ext POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy
                     ${CMAKE_SOURCE_DIR}/include/SDL_mixer_ext/SDL_mixer_ext.h
                     ${AUDIO_CODECS_INSTALL_DIR}/include/SDL2)
@@ -340,6 +345,11 @@ if(SDL_MIXER_X_STATIC)
     add_library(SDL2_mixer_ext_Static STATIC ${SDLMixerX_SOURCES})
     set_target_properties(SDL2_mixer_ext_Static PROPERTIES OUTPUT_NAME SDL2_mixer_ext)
     target_include_directories(SDL2_mixer_ext_Static PUBLIC ${SDLMixerX_SOURCE_DIR}/include)
+    target_include_directories(SDL2_mixer_ext_Static PRIVATE
+        ${SDLMixerX_SOURCE_DIR}/include/SDL_mixer_ext
+        ${SDLMixerX_SOURCE_DIR}/src
+        ${SDLMixerX_SOURCE_DIR}/src/codecs
+        ${AUDIO_CODECS_INSTALL_DIR}/include/SDL2)
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY AND AUDIO_CODECS_REPO_PATH)
         add_dependencies(SDL2_mixer_ext_Static AudioCodecs)
     endif()

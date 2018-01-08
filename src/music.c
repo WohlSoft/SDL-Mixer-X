@@ -20,11 +20,11 @@
 */
 #include <string.h> /* for strtok() and strtok_s() */
 
-#include <SDL2/SDL_hints.h>
-#include <SDL2/SDL_log.h>
-#include <SDL2/SDL_timer.h>
+#include "SDL_hints.h"
+#include "SDL_log.h"
+#include "SDL_timer.h"
 
-#include "SDL_mixer.h"
+#include "SDL_mixer_ext.h"
 #include "mixer.h"
 #include "music.h"
 
