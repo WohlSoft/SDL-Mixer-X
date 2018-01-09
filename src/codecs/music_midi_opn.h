@@ -1,6 +1,3 @@
-#ifndef MUSIC_MIDI_OPN_H
-#define MUSIC_MIDI_OPN_H
-
 /*
   SDL_mixer:  An audio mixer library based on the SDL library
   Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
@@ -22,86 +19,118 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-/* $Id: music_gme.h Wohlstand $ */
+/* This file supports playing MIDI files with libOPNMIDI */
 
-#ifdef MUSIC_MIDI_OPNMIDI
+#include "music.h"
 
-#include "../audio_codec.h"
+extern Mix_MusicInterface Mix_MusicInterface_OPNMIDI;
 
-struct OPN2_MIDIPlayer;
 
-/* This structure supports OPNMIDI-based MIDI music streams */
-struct MUSIC_MIDIOPN
-{
-    struct OPN2_MIDIPlayer *opnmidi;
-    int playing;
-    int volume;
-    int gme_t_sample_rate;
-    char *mus_title;
-    SDL_AudioCVT cvt;
-};
 
-extern int OPNMIDI_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixer);
+//#ifndef MUSIC_MIDI_OPN_H
+//#define MUSIC_MIDI_OPN_H
 
-/*Setup editing functions (changes applying on file reopening)*/
-extern int  OPNMIDI_getScaleMod();
-extern void OPNMIDI_setScaleMod(int sc);
-extern int  OPNMIDI_getLogarithmicVolumes();
-extern void OPNMIDI_setLogarithmicVolumes(int vm);
-extern int  OPNMIDI_getVolumeModel();
-extern void OPNMIDI_setVolumeModel(int vm);
+///*
+//  SDL_mixer:  An audio mixer library based on the SDL library
+//  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
-extern void OPNMIDI_setCustomBankFile(const char *bank_wonp_path);
+//  This software is provided 'as-is', without any express or implied
+//  warranty.  In no event will the authors be held liable for any damages
+//  arising from the use of this software.
 
-/* Reset all properties to default values */
-extern void OPNMIDI_setDefaults();
+//  Permission is granted to anyone to use this software for any purpose,
+//  including commercial applications, and to alter it and redistribute it
+//  freely, subject to the following restrictions:
 
-extern void OPNMIDI_setLoops(void *music_p, int loop);
+//  1. The origin of this software must not be misrepresented; you must not
+//     claim that you wrote the original software. If you use this software
+//     in a product, an acknowledgment in the product documentation would be
+//     appreciated but is not required.
+//  2. Altered source versions must be plainly marked as such, and must not be
+//     misrepresented as being the original software.
+//  3. This notice may not be removed or altered from any source distribution.
+//*/
 
-extern int OPNMIDI_init(SDL_AudioSpec *mixer);
+///* $Id: music_gme.h Wohlstand $ */
 
-/* Uninitialize the music players */
-extern void OPNMIDI_exit(void);
+//#ifdef MUSIC_MIDI_OPNMIDI
 
-/* Set the volume for a OPN MIDI stream */
-extern void OPNMIDI_setvolume(void *music_p, int volume);
+//#include "../audio_codec.h"
 
-/* Load a OPN MIDI stream from an SDL_RWops object */
-extern void *OPNMIDI_new_RW(SDL_RWops *rw, int freerw);
+//struct OPN2_MIDIPlayer;
 
-/* Start playback of a given OPN MIDI stream */
-extern void OPNMIDI_play(void *music_p);
+///* This structure supports OPNMIDI-based MIDI music streams */
+//struct MUSIC_MIDIOPN
+//{
+//    struct OPN2_MIDIPlayer *opnmidi;
+//    int playing;
+//    int volume;
+//    int gme_t_sample_rate;
+//    char *mus_title;
+//    SDL_AudioCVT cvt;
+//};
 
-/* Return non-zero if a stream is currently playing */
-extern int OPNMIDI_playing(void *music_p);
+//extern int OPNMIDI_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixer);
 
-/* Play some of a stream previously started with OPNMIDI_play() */
-extern int OPNMIDI_playAudio(void *music_p, Uint8 *stream, int len);
+///*Setup editing functions (changes applying on file reopening)*/
+//extern int  OPNMIDI_getScaleMod();
+//extern void OPNMIDI_setScaleMod(int sc);
+//extern int  OPNMIDI_getLogarithmicVolumes();
+//extern void OPNMIDI_setLogarithmicVolumes(int vm);
+//extern int  OPNMIDI_getVolumeModel();
+//extern void OPNMIDI_setVolumeModel(int vm);
 
-/* Stop playback of a stream previously started with OPNMIDI_play() */
-extern void OPNMIDI_stop(void *music_p);
+//extern void OPNMIDI_setCustomBankFile(const char *bank_wonp_path);
 
-/* Close the given OPN MIDI stream */
-extern void OPNMIDI_delete(void *music_p);
+///* Reset all properties to default values */
+//extern void OPNMIDI_setDefaults();
 
-/* Jump (seek) to a given position (time is in seconds) */
-extern void OPNMIDI_jump_to_time(void *music_p, double time);
+//extern void OPNMIDI_setLoops(void *music_p, int loop);
 
-/* Tell a current position */
-extern double OPNMIDI_currentPosition(Mix_MusicInterfaceStream* music);
+//extern int OPNMIDI_init(SDL_AudioSpec *mixer);
 
-/* Total length of a song */
-extern double OPNMIDI_songLength(Mix_MusicInterfaceStream* music);
+///* Uninitialize the music players */
+//extern void OPNMIDI_exit(void);
 
-/* Loop start position */
-extern double OPNMIDI_loopStart(Mix_MusicInterfaceStream* music);
+///* Set the volume for a OPN MIDI stream */
+//extern void OPNMIDI_setvolume(void *music_p, int volume);
 
-/* Loop end position */
-extern double OPNMIDI_loopEnd(Mix_MusicInterfaceStream* music);
+///* Load a OPN MIDI stream from an SDL_RWops object */
+//extern void *OPNMIDI_new_RW(SDL_RWops *rw, int freerw);
 
-/* Loop length time*/
-extern double OPNMIDI_loopLength(Mix_MusicInterfaceStream* music);
+///* Start playback of a given OPN MIDI stream */
+//extern void OPNMIDI_play(void *music_p);
 
-#endif /* USE_OPN2_MIDI */
+///* Return non-zero if a stream is currently playing */
+//extern int OPNMIDI_playing(void *music_p);
 
-#endif /* MUSIC_MIDI_OPN_H */
+///* Play some of a stream previously started with OPNMIDI_play() */
+//extern int OPNMIDI_playAudio(void *music_p, Uint8 *stream, int len);
+
+///* Stop playback of a stream previously started with OPNMIDI_play() */
+//extern void OPNMIDI_stop(void *music_p);
+
+///* Close the given OPN MIDI stream */
+//extern void OPNMIDI_delete(void *music_p);
+
+///* Jump (seek) to a given position (time is in seconds) */
+//extern void OPNMIDI_jump_to_time(void *music_p, double time);
+
+///* Tell a current position */
+//extern double OPNMIDI_currentPosition(Mix_MusicInterfaceStream* music);
+
+///* Total length of a song */
+//extern double OPNMIDI_songLength(Mix_MusicInterfaceStream* music);
+
+///* Loop start position */
+//extern double OPNMIDI_loopStart(Mix_MusicInterfaceStream* music);
+
+///* Loop end position */
+//extern double OPNMIDI_loopEnd(Mix_MusicInterfaceStream* music);
+
+///* Loop length time*/
+//extern double OPNMIDI_loopLength(Mix_MusicInterfaceStream* music);
+
+//#endif /* USE_OPN2_MIDI */
+
+//#endif /* MUSIC_MIDI_OPN_H */

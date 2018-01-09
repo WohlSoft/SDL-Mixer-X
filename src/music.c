@@ -42,6 +42,8 @@
 #include "music_flac.h"
 #include "native_midi/native_midi.h"
 #include "music_gme.h"
+#include "music_midi_adl.h"
+#include "music_midi_opn.h"
 
 /* Check to make sure we are building with a new enough SDL */
 #if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 7)
@@ -78,6 +80,20 @@ static int num_decoders = 0;
 /* Semicolon-separated SoundFont paths */
 static char* soundfont_paths = NULL;
 
+/*  ======== MIDI toggler ======== */
+/* Next MIDI device to open */
+static int mididevice_next    = MIDI_ANY;
+
+/* MIDI device currently in use */
+static int mididevice_current = MIDI_ANY;
+
+/* Reset MIDI settings every file reopening (to allow right argument passing) */
+static int mididevice_need_Reset = 1;
+
+/* Denies MIDI arguments */
+static int mididevice_args_lock = 0;
+/*  ======== MIDI toggler END ==== */
+
 /* Interfaces for the various music interfaces, ordered by priority */
 static Mix_MusicInterface *s_music_interfaces[] =
 {
@@ -98,6 +114,12 @@ static Mix_MusicInterface *s_music_interfaces[] =
 #endif
 #ifdef MUSIC_GME
     &Mix_MusicInterface_GME,
+#endif
+#ifdef MUSIC_MID_ADLMIDI
+    &Mix_MusicInterface_ADLMIDI,
+#endif
+#ifdef MUSIC_MID_OPNMIDI
+    &Mix_MusicInterface_OPNMIDI,
 #endif
 #ifdef MUSIC_MP3_MAD
     &Mix_MusicInterface_MAD,
@@ -223,6 +245,7 @@ int music_pcm_getaudio(void *context, void *data, int bytes, int volume,
 /* Mixing function */
 void SDLCALL music_mixer(void *udata, Uint8 *stream, int len)
 {
+    (void)udata;
     while (music_playing && music_active && len > 0) {
         /* Handle fading */
         if (music_playing->fading != MIX_NO_FADING) {
@@ -306,8 +329,10 @@ SDL_bool load_music_type(Mix_MusicType type)
 /* Open the music interfaces for a given music type */
 SDL_bool open_music_type(Mix_MusicType type)
 {
-    int i, opened = 0;
-    SDL_bool use_native_midi = SDL_FALSE;
+    size_t i;
+    int opened = 0;
+    SDL_bool use_native_midi = SDL_FALSE, use_any_midi = SDL_FALSE;
+    Mix_MusicAPI target_midi_api = MIX_MUSIC_NATIVEMIDI;
 
     if (!music_spec.format) {
         /* Music isn't opened yet */
@@ -317,8 +342,46 @@ SDL_bool open_music_type(Mix_MusicType type)
 #ifdef MUSIC_MID_NATIVE
     if (type == MUS_MID && SDL_GetHintBoolean("SDL_NATIVE_MUSIC", SDL_FALSE) && native_midi_detect()) {
         use_native_midi = SDL_TRUE;
+        target_midi_api = MIX_MUSIC_NATIVEMIDI;
+        mididevice_current = MIDI_Native;
     }
 #endif
+
+    if (!use_native_midi && type == MUS_MID && mididevice_next != mididevice_current) {
+        switch (mididevice_next) {
+        #ifdef MUSIC_MID_ADLMIDI
+        case MIDI_ADLMIDI:
+            target_midi_api = MIX_MUSIC_ADLMIDI;
+            break;
+        #endif
+        #ifdef MUSIC_MID_OPNMIDI
+        case MIDI_OPNMIDI:
+            target_midi_api = MIX_MUSIC_OPNMIDI;
+            break;
+        #endif
+        #ifdef MUSIC_MID_TIMIDITY
+        case MIDI_Timidity:
+            target_midi_api = MIX_MUSIC_TIMIDITY;
+            break;
+        #endif
+        #ifdef MUSIC_MID_FLUIDSYNTH
+        case MIDI_Fluidsynth:
+            target_midi_api = MIX_MUSIC_FLUIDSYNTH;
+            break;
+        #endif
+        #ifdef MUSIC_MID_NATIVE
+        case MIDI_Native:
+            target_midi_api = MIX_MUSIC_NATIVEMIDI;
+            break;
+        #endif
+        default:
+            mididevice_next = MIDI_ANY;
+            break;
+        }
+        mididevice_current = mididevice_next;
+    }
+    if (mididevice_current == MIDI_ANY)
+        use_any_midi = SDL_TRUE;
 
     for (i = 0; i < SDL_arraysize(s_music_interfaces); ++i) {
         Mix_MusicInterface *interface = s_music_interfaces[i];
@@ -329,7 +392,7 @@ SDL_bool open_music_type(Mix_MusicType type)
             continue;
         }
 
-        if (interface->type == MUS_MID && use_native_midi && interface->api != MIX_MUSIC_NATIVEMIDI) {
+        if (interface->type == MUS_MID && !use_any_midi && interface->api != target_midi_api) {
             continue;
         }
 
@@ -1155,6 +1218,52 @@ int Mix_EachSoundFont(int (SDLCALL *function)(const char*, void*), void *data)
         return 1;
     else
         return 0;
+}
+
+
+int SDLCALLCC Mix_GetMidiDevice()
+{
+    return mididevice_current;
+}
+
+int SDLCALLCC Mix_GetNextMidiDevice()
+{
+    return mididevice_next;
+}
+
+int SDLCALLCC Mix_SetMidiDevice(int device)
+{
+    switch(device)
+    {
+        #ifdef MID_MUSIC
+        #ifdef MUSIC_MID_ADLMIDI
+    case MIDI_ADLMIDI:
+        #endif
+        #ifdef MUSIC_MID_OPNMIDI
+    case MIDI_OPNMIDI:
+        #endif
+        #ifdef MUSIC_MID_TIMIDITY
+    case MIDI_Timidity:
+        #endif
+        #ifdef MUSIC_MID_NATIVE
+    case MIDI_Native:
+        #endif
+        #ifdef MUSIC_MID_FLUIDSYNTH
+    case MIDI_Fluidsynth:
+        #endif
+        mididevice_next = device;
+        mididevice_need_Reset = 0;
+        return 0;
+        #endif
+    default:
+        Mix_SetError("Unknown MIDI Device");
+        return -1;
+    }
+}
+
+void SDLCALLCC Mix_SetLockMIDIArgs(int lock_midiargs)
+{
+    mididevice_args_lock = lock_midiargs;
 }
 
 /* vi: set ts=4 sw=4 expandtab: */

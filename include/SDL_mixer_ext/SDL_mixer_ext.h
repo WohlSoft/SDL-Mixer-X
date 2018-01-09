@@ -174,6 +174,7 @@ typedef enum {
     MIDI_Timidity,
     MIDI_OPNMIDI,
     MIDI_Fluidsynth,
+    MIDI_ANY,
     MIDI_KnuwnDevices   /* Count of MIDI device types */
 } Mix_MIDI_Device;
 

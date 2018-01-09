@@ -19,11 +19,12 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifdef MUSIC_MIDI_ADLMIDI
+#ifdef MUSIC_MID_ADLMIDI
 
 /* This file supports libADLMIDI music streams */
 
-#include <SDL_mixer_ext/SDL_mixer_ext.h>
+#include "SDL_mixer_ext.h"
+
 #include "music_midi_adl.h"
 
 #include <adlmidi.h>
@@ -39,6 +40,23 @@ static int adlmidi_adlibdrums   = 0;
 static int adlmidi_logVolumes   = 0;
 static int adlmidi_volumeModel  = 0;
 static char adlmidi_customBankPath[2048] = "";
+
+typedef struct
+{
+    int play_count;
+    struct ADL_MIDIPlayer *adlmidi;
+    int volume;
+
+    SDL_AudioStream *stream;
+    void *buffer;
+    size_t buffer_size;
+
+    char *mus_title;
+    char *mus_artist;
+    char *mus_album;
+    char *mus_copyright;
+} AdlMIDI_Music;
+
 
 int ADLMIDI_getBanksCount()
 {
@@ -122,16 +140,10 @@ void ADLMIDI_setVolumeModel(int vm)
         adlmidi_volumeModel = 0;
 }
 
-void ADLMIDI_setInfiniteLoop(struct MUSIC_MIDIADL *music, int loop)
+void ADLMIDI_setInfiniteLoop(AdlMIDI_Music *music, int loop)
 {
     if(music)
         adl_setLoopEnabled(music->adlmidi, loop);
-}
-
-static void ADLMIDI_setLoops(void *music_p, int loops)
-{
-    struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
-    ADLMIDI_setInfiniteLoop(music, loops < 0 ? 1 : 0);
 }
 
 void ADLMIDI_setDefaults()
@@ -143,61 +155,11 @@ void ADLMIDI_setDefaults()
     adlmidi_bank        = 58;
 }
 
-/*
- * Initialize the ADLMIDI player, with the given mixer settings
- * This function returns 0, or -1 if there was an error.
- */
-
-/* This is the format of the audio mixer data */
-static SDL_AudioSpec mixer;
-
-int ADLMIDI_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixerfmt)
-{
-    mixer = *mixerfmt;
-
-    initMusicInterface(codec);
-
-    codec->isValid = 1;
-
-    codec->capabilities     = music_interface_default_capabilities;
-
-    codec->open             = ADLMIDI_new_RW;
-    codec->openEx           = music_interface_dummy_cb_openEx;
-    codec->close            = ADLMIDI_delete;
-
-    codec->play             = ADLMIDI_play;
-    codec->pause            = music_interface_dummy_cb_void_1arg;
-    codec->resume           = music_interface_dummy_cb_void_1arg;
-    codec->stop             = ADLMIDI_stop;
-
-    codec->isPlaying        = ADLMIDI_playing;
-    codec->isPaused         = music_interface_dummy_cb_int_1arg;
-
-    codec->setLoops         = ADLMIDI_setLoops;
-    codec->setVolume        = ADLMIDI_setvolume;
-
-    codec->jumpToTime       = ADLMIDI_jump_to_time;
-    codec->getCurrentTime   = ADLMIDI_currentPosition;
-    codec->getTimeLength    = ADLMIDI_songLength;
-
-    codec->getLoopStartTime = ADLMIDI_loopStart;
-    codec->getLoopEndTime   = ADLMIDI_loopEnd;
-    codec->getLoopLengthTime= ADLMIDI_loopLength;
-
-    codec->metaTitle        = music_interface_dummy_meta_tag;
-    codec->metaArtist       = music_interface_dummy_meta_tag;
-    codec->metaAlbum        = music_interface_dummy_meta_tag;
-    codec->metaCopyright    = music_interface_dummy_meta_tag;
-
-    codec->playAudio        = ADLMIDI_playAudio;
-
-    return(0);
-}
 
 /* Set the volume for a ADLMIDI stream */
-void ADLMIDI_setvolume(void *music_p, int volume)
+static void ADLMIDI_setvolume(void *music_p, int volume)
 {
-    struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
+    AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
     if(music)
         music->volume = (int)round(128.0 * sqrt(((double)volume) * (1.0 / 128.0)));
 }
@@ -210,7 +172,9 @@ void ADLMIDI_setCustomBankFile(const char *bank_wonl_path)
         adlmidi_customBankPath[0] = '\0';
 }
 
-struct MUSIC_MIDIADL *ADLMIDI_LoadSongRW(SDL_RWops *src)
+static void ADLMIDI_delete(void *music_p);
+
+static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src)
 {
     if(src != NULL)
     {
@@ -220,8 +184,23 @@ struct MUSIC_MIDIADL *ADLMIDI_LoadSongRW(SDL_RWops *src)
         Sint64 length = 0;
         size_t bytes_l;
         unsigned char byte[1];
-        struct ADL_MIDIPlayer *adl_midiplayer = NULL;
-        struct MUSIC_MIDIADL *adlMidi = NULL;
+        AdlMIDI_Music *music = NULL;
+
+        music = (AdlMIDI_Music *)SDL_calloc(1, sizeof(AdlMIDI_Music));
+
+        music->stream = SDL_NewAudioStream(AUDIO_S16, 2, music_spec.freq,
+                                           music_spec.format, music_spec.channels, music_spec.freq);
+        if (!music->stream) {
+            ADLMIDI_delete(music);
+            return NULL;
+        }
+
+        music->buffer_size = music_spec.samples * sizeof(Sint16) * 2/*channels*/ * music_spec.channels;
+        music->buffer = SDL_malloc(music->buffer_size);
+        if (!music->buffer) {
+            ADLMIDI_delete(music);
+            return NULL;
+        }
 
         length = SDL_RWseek(src, 0, RW_SEEK_END);
         if(length < 0)
@@ -242,60 +221,59 @@ struct MUSIC_MIDIADL *ADLMIDI_LoadSongRW(SDL_RWops *src)
 
         if(filesize == 0)
         {
-            Mix_SetError("ADL-MIDI: wrong file\n");
             SDL_free(bytes);
+            ADLMIDI_delete(music);
+            Mix_SetError("ADL-MIDI: wrong file\n");
             return NULL;
         }
 
-        adl_midiplayer = adl_init(mixer.freq);
+        music->adlmidi = adl_init(music_spec.freq);
 
-        adl_setHVibrato(adl_midiplayer, adlmidi_vibrato);
-        adl_setHTremolo(adl_midiplayer, adlmidi_tremolo);
+        adl_setHVibrato(music->adlmidi, adlmidi_vibrato);
+        adl_setHTremolo(music->adlmidi, adlmidi_tremolo);
         if(adlmidi_customBankPath[0] != '\0')
-            err = adl_openBankFile(adl_midiplayer, (char*)adlmidi_customBankPath);
+            err = adl_openBankFile(music->adlmidi, (char*)adlmidi_customBankPath);
         else
-            err = adl_setBank(adl_midiplayer, adlmidi_bank);
+            err = adl_setBank(music->adlmidi, adlmidi_bank);
         if(err < 0)
         {
-            Mix_SetError("ADL-MIDI: %s", adl_errorInfo(adl_midiplayer));
-            adl_close(adl_midiplayer);
+            Mix_SetError("ADL-MIDI: %s", adl_errorInfo(music->adlmidi));
             SDL_free(bytes);
+            ADLMIDI_delete(music);
             return NULL;
         }
 
-        adl_setScaleModulators(adl_midiplayer, adlmidi_scalemod);
-        adl_setPercMode(adl_midiplayer, adlmidi_adlibdrums);
-        adl_setLogarithmicVolumes(adl_midiplayer, adlmidi_logVolumes);
-        adl_setVolumeRangeModel(adl_midiplayer, adlmidi_volumeModel);
-        adl_setNumCards(adl_midiplayer, 4);
+        adl_setScaleModulators(music->adlmidi, adlmidi_scalemod);
+        adl_setPercMode(music->adlmidi, adlmidi_adlibdrums);
+        adl_setLogarithmicVolumes(music->adlmidi, adlmidi_logVolumes);
+        adl_setVolumeRangeModel(music->adlmidi, adlmidi_volumeModel);
+        adl_setNumCards(music->adlmidi, 4);
 
-        err = adl_openData(adl_midiplayer, bytes, (unsigned long)filesize);
+        err = adl_openData(music->adlmidi, bytes, (unsigned long)filesize);
         SDL_free(bytes);
 
         if(err != 0)
         {
-            Mix_SetError("ADL-MIDI: %s", adl_errorInfo(adl_midiplayer));
-            adl_close(adl_midiplayer);
+            Mix_SetError("ADL-MIDI: %s", adl_errorInfo(music->adlmidi));
+            ADLMIDI_delete(music);
             return NULL;
         }
 
-        adlMidi = (struct MUSIC_MIDIADL *)SDL_malloc(sizeof(struct MUSIC_MIDIADL));
-        adlMidi->adlmidi                = adl_midiplayer;
-        adlMidi->playing                = 0;
-        adlMidi->gme_t_sample_rate      = mixer.freq;
-        adlMidi->volume                 = MIX_MAX_VOLUME;
-        adlMidi->mus_title              = NULL;
-        SDL_BuildAudioCVT(&adlMidi->cvt, AUDIO_S16, 2, mixer.freq, mixer.format, mixer.channels, mixer.freq);
+        music->volume                 = MIX_MAX_VOLUME;
+        music->mus_title = NULL;
+        music->mus_artist = NULL;
+        music->mus_album = NULL;
+        music->mus_copyright = NULL;
 
-        return adlMidi;
+        return music;
     }
     return NULL;
 }
 
 /* Load ADLMIDI stream from an SDL_RWops object */
-void *ADLMIDI_new_RW(struct SDL_RWops *src, int freesrc)
+static void *ADLMIDI_new_RW(struct SDL_RWops *src, int freesrc)
 {
-    struct MUSIC_MIDIADL *adlmidiMusic;
+    AdlMIDI_Music *adlmidiMusic;
 
     adlmidiMusic = ADLMIDI_LoadSongRW(src);
     if(!adlmidiMusic)
@@ -307,141 +285,138 @@ void *ADLMIDI_new_RW(struct SDL_RWops *src, int freesrc)
 }
 
 /* Start playback of a given Game Music Emulators stream */
-void ADLMIDI_play(void *music_p)
+static int ADLMIDI_play(void *music_p, int play_counts)
 {
-    struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
-    if(music)
-        music->playing = 1;
+    AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
+    adl_positionRewind(music->adlmidi);
+    music->play_count = play_counts;
+    adl_setLoopEnabled(music->adlmidi, (play_counts < 0));
+    return 0;
 }
 
-/* Return non-zero if a stream is currently playing */
-int ADLMIDI_playing(void *music_p)
+static int ADLMIDI_playSome(void *context, void *data, int bytes, SDL_bool *done)
 {
-    struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
-    if(music)
-        return music->playing;
-    else
+    AdlMIDI_Music *music = (AdlMIDI_Music *)context;
+    int filled, gottenLen, amount;
+
+    filled = SDL_AudioStreamGet(music->stream, data, bytes);
+    if (filled != 0) {
+        return filled;
+    }
+
+    if (!music->play_count) {
+        /* All done */
+        *done = SDL_TRUE;
         return 0;
+    }
+
+    gottenLen = adl_play(music->adlmidi, (bytes / 2), (short*)music->buffer);
+    if (gottenLen <= 0) {
+        *done = SDL_TRUE;
+        return 0;
+    }
+
+    amount = gottenLen * 2;
+    if (amount > 0) {
+        if (SDL_AudioStreamPut(music->stream, music->buffer, amount) < 0) {
+            return -1;
+        }
+    } else {
+        if (music->play_count == 1) {
+            music->play_count = 0;
+            SDL_AudioStreamFlush(music->stream);
+        } else {
+            int play_count = -1;
+            if (music->play_count > 0) {
+                play_count = (music->play_count - 1);
+            }
+            adl_positionRewind(music->adlmidi);
+        }
+    }
+
+    return 0;
 }
 
 /* Play some of a stream previously started with ADLMIDI_play() */
-int ADLMIDI_playAudio(void *music_p, Uint8 *stream, int len)
+static int ADLMIDI_playAudio(void *music_p, void *stream, int len)
 {
-    struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
-
-    int srgArraySize, srcLen, gottenLen, dest_len;
-    short *buf = NULL;
-
-    if(music == NULL)
-        return 0;
-    if(music->adlmidi == NULL)
-        return 0;
-    if(music->playing <= 0)
-        return 0;
-    if(len < 0)
-        return 0;
-
-    srgArraySize = len * music->cvt.len_mult;
-    buf = (short *)SDL_malloc((size_t)srgArraySize);
-    srcLen = (int)((double)(len / 2.0) / music->cvt.len_ratio);
-
-    gottenLen = adl_play(music->adlmidi, srcLen, buf);
-    if(gottenLen <= 0)
-    {
-        SDL_free(buf);
-        music->playing = 0;
-        return len - 1;
-    }
-
-    dest_len = gottenLen * 2;
-
-    if(music->cvt.needed)
-    {
-        music->cvt.len = dest_len;
-        music->cvt.buf = (Uint8 *)buf;
-        SDL_ConvertAudio(&music->cvt);
-        dest_len = music->cvt.len_cvt;
-    }
-
-    if(music->volume == MIX_MAX_VOLUME)
-        SDL_memcpy(stream, (Uint8 *)buf, (size_t)dest_len);
-    else
-        SDL_MixAudioFormat(stream, (Uint8 *)buf, mixer.format, (Uint32)dest_len, music->volume);
-
-    SDL_free(buf);
-    return len - dest_len;
-}
-
-/* Stop playback of a stream previously started with ADLMIDI_play() */
-void ADLMIDI_stop(void *music_p)
-{
-    struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
-    if(music)
-    {
-        music->playing = 0;
-        adl_reset(music->adlmidi);
-    }
+    AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
+    return music_pcm_getaudio(music_p, stream, len, music->volume, ADLMIDI_playSome);
 }
 
 /* Close the given Game Music Emulators stream */
-void ADLMIDI_delete(void *music_p)
+static void ADLMIDI_delete(void *music_p)
 {
-    struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
+    AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
     if(music)
     {
+        /* META-TAGS */
         if(music->mus_title)
             SDL_free(music->mus_title);
-        music->playing = 0;
-        if(music->adlmidi)
+        if(music->mus_artist)
+            SDL_free(music->mus_artist);
+        if(music->mus_album)
+            SDL_free(music->mus_album);
+        if(music->mus_copyright)
+            SDL_free(music->mus_copyright);
+        /* META-TAGS */
+
+        if(music->adlmidi) {
             adl_close(music->adlmidi);
-        music->adlmidi = NULL;
+        }
+        if (music->stream) {
+            SDL_FreeAudioStream(music->stream);
+        }
+        if (music->buffer) {
+            SDL_free(music->buffer);
+        }
         SDL_free(music);
     }
 }
 
 /* Jump (seek) to a given position (time is in seconds) */
-void ADLMIDI_jump_to_time(void *music_p, double time)
+int ADLMIDI_jump_to_time(void *music_p, double time)
 {
-    struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
-    if(music)
-        adl_positionSeek(music->adlmidi, time);
+    AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
+    adl_positionSeek(music->adlmidi, time);
+    return 0;
 }
 
-double ADLMIDI_currentPosition(Mix_MusicInterfaceStream* music_p)
+double ADLMIDI_currentPosition(void *music_p)
 {
-    struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
+    AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
     if(music)
         return adl_positionTell(music->adlmidi);
     return -1;
 }
 
-double ADLMIDI_songLength(Mix_MusicInterfaceStream* music_p)
+double ADLMIDI_songLength(void *music_p)
 {
-    struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
+    AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
     if(music)
         return adl_totalTimeLength(music->adlmidi);
     return -1;
 }
 
-double ADLMIDI_loopStart(Mix_MusicInterfaceStream* music_p)
+double ADLMIDI_loopStart(void *music_p)
 {
-    struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
+    AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
     if(music)
         return adl_loopStartTime(music->adlmidi);
     return -1;
 }
 
-double ADLMIDI_loopEnd(Mix_MusicInterfaceStream* music_p)
+double ADLMIDI_loopEnd(void *music_p)
 {
-    struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
+    AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
     if(music)
         return adl_loopEndTime(music->adlmidi);
     return -1;
 }
 
-double ADLMIDI_loopLength(Mix_MusicInterfaceStream* music_p)
+double ADLMIDI_loopLength(void *music_p)
 {
-    struct MUSIC_MIDIADL *music = (struct MUSIC_MIDIADL *)music_p;
+    AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
     if(music)
     {
         double start = adl_loopStartTime(music->adlmidi);
@@ -451,6 +426,82 @@ double ADLMIDI_loopLength(Mix_MusicInterfaceStream* music_p)
     }
     return -1;
 }
+
+/*
+ * Initialize the ADLMIDI player, with the given mixer settings
+ * This function returns 0, or -1 if there was an error.
+ */
+
+/* This is the format of the audio mixer data */
+//static SDL_AudioSpec mixer;
+
+//int ADLMIDI_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixerfmt)
+//{
+//    mixer = *mixerfmt;
+
+//    initMusicInterface(codec);
+
+//    codec->isValid = 1;
+
+//    codec->capabilities     = music_interface_default_capabilities;
+
+//    codec->open             = ADLMIDI_new_RW;
+//    codec->openEx           = music_interface_dummy_cb_openEx;
+//    codec->close            = ADLMIDI_delete;
+
+//    codec->play             = ADLMIDI_play;
+//    codec->pause            = music_interface_dummy_cb_void_1arg;
+//    codec->resume           = music_interface_dummy_cb_void_1arg;
+//    codec->stop             = ADLMIDI_stop;
+
+//    codec->isPlaying        = ADLMIDI_playing;
+//    codec->isPaused         = music_interface_dummy_cb_int_1arg;
+
+//    codec->setLoops         = ADLMIDI_setLoops;
+//    codec->setVolume        = ADLMIDI_setvolume;
+
+//    codec->jumpToTime       = ADLMIDI_jump_to_time;
+//    codec->getCurrentTime   = ADLMIDI_currentPosition;
+//    codec->getTimeLength    = ADLMIDI_songLength;
+
+//    codec->getLoopStartTime = ADLMIDI_loopStart;
+//    codec->getLoopEndTime   = ADLMIDI_loopEnd;
+//    codec->getLoopLengthTime= ADLMIDI_loopLength;
+
+//    codec->metaTitle        = music_interface_dummy_meta_tag;
+//    codec->metaArtist       = music_interface_dummy_meta_tag;
+//    codec->metaAlbum        = music_interface_dummy_meta_tag;
+//    codec->metaCopyright    = music_interface_dummy_meta_tag;
+
+//    codec->playAudio        = ADLMIDI_playAudio;
+
+//    return(0);
+//}
+
+Mix_MusicInterface Mix_MusicInterface_ADLMIDI =
+{
+    "ADLMIDI",
+    MIX_MUSIC_ADLMIDI,
+    MUS_MID,
+    SDL_FALSE,
+    SDL_FALSE,
+
+    NULL,   /* Load */
+    NULL,   /* Open */
+    ADLMIDI_new_RW,
+    NULL,   /* CreateFromFile */
+    ADLMIDI_setvolume,
+    ADLMIDI_play,
+    NULL,   /* IsPlaying */
+    ADLMIDI_playAudio,
+    ADLMIDI_jump_to_time,
+    NULL,   /* Pause */
+    NULL,   /* Resume */
+    NULL,   /* Stop */
+    ADLMIDI_delete,
+    NULL,   /* Close */
+    NULL,   /* Unload */
+};
 
 #endif
 

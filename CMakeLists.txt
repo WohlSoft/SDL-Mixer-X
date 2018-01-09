@@ -198,7 +198,7 @@ if(USE_MIDI)
 
     option(USE_MIDI_ADLMIDI    "Build with libADLMIDI OPL3 Emulator based MIDI sequencer support" ON)
     if(USE_MIDI_ADLMIDI)
-        add_definitions(-DMUSIC_MIDI_ADLMIDI)
+        add_definitions(-DMUSIC_MID_ADLMIDI)
         include_directories(${AUDIO_CODECS_PATH}/libADLMIDI/include)
         list(APPEND SDLMixerX_LINK_LIBS ADLMIDI)
         list(APPEND SDLMixerX_SOURCES
@@ -207,7 +207,7 @@ if(USE_MIDI)
 
     option(USE_MIDI_OPNMIDI    "Build with libOPNMIDI OPN2 Emulator based MIDI sequencer support" ON)
     if(USE_MIDI_OPNMIDI)
-        add_definitions(-DMUSIC_MIDI_OPNMIDI)
+        add_definitions(-DMUSIC_MID_OPNMIDI)
         include_directories(${AUDIO_CODECS_PATH}/libOPNMIDI/include)
         list(APPEND SDLMixerX_LINK_LIBS OPNMIDI)
         list(APPEND SDLMixerX_SOURCES
@@ -243,8 +243,9 @@ if(USE_MIDI)
 
     option(USE_MIDI_NATIVE     "Build with operating system native MIDI output support" ${NATIVE_MIDI_SUPPORTED})
     if(USE_MIDI_NATIVE)
-        add_definitions(-DUSE_NATIVE_MIDI)
+        add_definitions(-DMUSIC_MID_NATIVE)
         list(APPEND SDLMixerX_SOURCES
+            ${SDLMixerX_SOURCE_DIR}/src/codecs/music_nativemidi.c
             ${SDLMixerX_SOURCE_DIR}/src/codecs/native_midi/native_midi_common.c)
         if(WIN32)
             list(APPEND SDLMixerX_SOURCES

@@ -66,7 +66,6 @@ GME_Music *GME_LoadSongRW(SDL_RWops *src, int trackNum)
         void *bytes = 0;
         long spcsize, bytes_l;
         unsigned char byte[1];
-        Music_Emu *game_emu;
         gme_info_t *musInfo;
         GME_Music *music;
         const char *err;
@@ -114,7 +113,7 @@ GME_Music *GME_LoadSongRW(SDL_RWops *src, int trackNum)
             return NULL;
         }
 
-        err = gme_open_data(bytes, spcsize, &game_emu, music_spec.freq);
+        err = gme_open_data(bytes, spcsize, &music->game_emu, music_spec.freq);
         /* spc_load_spc( snes_spc, bytes, spcsize ); */
         SDL_free(bytes);
         if(err != 0)
@@ -124,10 +123,10 @@ GME_Music *GME_LoadSongRW(SDL_RWops *src, int trackNum)
             return NULL;
         }
 
-        if((trackNum < 0) || (trackNum >= gme_track_count(game_emu)))
-            trackNum = gme_track_count(game_emu) - 1;
+        if((trackNum < 0) || (trackNum >= gme_track_count(music->game_emu)))
+            trackNum = gme_track_count(music->game_emu) - 1;
 
-        err = gme_start_track(game_emu, trackNum);
+        err = gme_start_track(music->game_emu, trackNum);
         if(err != 0)
         {
             GME_delete(music);
@@ -135,7 +134,6 @@ GME_Music *GME_LoadSongRW(SDL_RWops *src, int trackNum)
             return NULL;
         }
 
-        music->game_emu = game_emu;
         music->volume = MIX_MAX_VOLUME;
         music->mus_title = NULL;
         music->mus_artist = NULL;
