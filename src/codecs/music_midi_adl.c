@@ -310,6 +310,11 @@ static int ADLMIDI_playSome(void *context, void *data, int bytes, SDL_bool *done
         return 0;
     }
 
+    /* Align bytes length to correctly capture a stereo input */
+    if ((bytes % 4) != 0) {
+        bytes += (4 - (bytes % 4));
+    }
+
     gottenLen = adl_play(music->adlmidi, (bytes / 2), (short*)music->buffer);
     if (gottenLen <= 0) {
         *done = SDL_TRUE;

@@ -257,6 +257,11 @@ static int OPNMIDI_playSome(void *context, void *data, int bytes, SDL_bool *done
         return 0;
     }
 
+    /* Align bytes length to correctly capture a stereo input */
+    if ((bytes % 4) != 0) {
+        bytes += (4 - (bytes % 4));
+    }
+
     gottenLen = opn2_play(music->opnmidi, (bytes / 2), (short*)music->buffer);
     if (gottenLen <= 0) {
         *done = SDL_TRUE;
