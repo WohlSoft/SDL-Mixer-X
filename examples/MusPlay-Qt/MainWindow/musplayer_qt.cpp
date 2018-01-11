@@ -599,7 +599,7 @@ void MusPlayer_Qt::on_play_clicked()
             ui->frame->setVisible(true);
             break;
 #ifdef SDL_MIXER_X
-        case MUS_SPC:
+        case MUS_GME:
             ui->gme_setup->setVisible(true);
             ui->frame->setVisible(true);
             break;
@@ -639,7 +639,7 @@ void MusPlayer_Qt::on_trackID_editingFinished()
     #ifdef SDL_MIXER_X
     if(Mix_PlayingMusic())
     {
-        if((PGE_MusicPlayer::type == MUS_SPC) && (m_prevTrackID != ui->trackID->value()))
+        if((PGE_MusicPlayer::type == MUS_GME) && (m_prevTrackID != ui->trackID->value()))
         {
             PGE_MusicPlayer::MUS_stopMusic();
             on_play_clicked();

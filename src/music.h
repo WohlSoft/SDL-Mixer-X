@@ -45,6 +45,15 @@ typedef enum
     MIX_MUSIC_LAST
 } Mix_MusicAPI;
 
+/* MIXER-X: Supported meta-tags */
+
+typedef enum
+{
+    MIX_META_TITLE,
+    MIX_META_ARTIST,
+    MIX_META_ALBUM,
+    MIX_META_COPYRIGHT,
+} Mix_MusicMetaTag;
 
 /* Music API implementation */
 
@@ -67,8 +76,21 @@ typedef struct
      */
     void *(*CreateFromRW)(SDL_RWops *src, int freesrc);
 
+    /* MIXER-X
+     * Create a music object from an SDL_RWops stream
+     * If the function returns NULL, 'src' will be freed if needed by the caller.
+     * 'extra_settings' will contain a string with extra setup supported by the codec.
+     */
+    void *(*CreateFromRWex)(SDL_RWops *src, int freesrc, const char *extra_settings);
+
     /* Create a music object from a file, if SDL_RWops are not supported */
     void *(*CreateFromFile)(const char *file);
+
+    /* MIXER-X
+     * Create a music object from a file, if SDL_RWops are not supported.
+     * With support of extra settings
+     */
+    void *(*CreateFromFileEx)(const char *file, const char *extra_settings);
 
     /* Set the volume */
     void (*SetVolume)(void *music, int volume);
@@ -84,6 +106,24 @@ typedef struct
 
     /* Seek to a play position (in seconds) */
     int (*Seek)(void *music, double position);
+
+    /* MIXER-X: Tell a play position (in seconds) */
+    double (*Tell)(void *music);
+
+    /* MIXER-X: Tell a total length of a track (in seconds) */
+    double (*FullLength)(void *music);
+
+    /* MIXER-X: Tell a loop start position (in seconds) */
+    double (*LoopStart)(void *music);
+
+    /* MIXER-X: Tell a loop end position (in seconds) */
+    double (*LoopEnd)(void *music);
+
+    /* MIXER-X: Tell a loop length position (in seconds) */
+    double (*LoopLength)(void *music);
+
+    /* MIXER-X: Get a meta-tag string if available */
+    const char* (*GetMetaTag)(void *music, Mix_MusicMetaTag tag_type);
 
     /* Pause playing music */
     void (*Pause)(void *music);
@@ -108,7 +148,7 @@ typedef struct
 
 extern int get_num_music_interfaces(void);
 extern Mix_MusicInterface *get_music_interface(int index);
-extern Mix_MusicType detect_music_type_from_magic(const Uint8 *magic);
+extern Mix_MusicType detect_music_type_from_magic(SDL_RWops *src);
 extern SDL_bool load_music_type(Mix_MusicType type);
 extern SDL_bool open_music_type(Mix_MusicType type);
 extern SDL_bool has_music(Mix_MusicType type);

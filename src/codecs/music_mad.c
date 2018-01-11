@@ -438,12 +438,20 @@ Mix_MusicInterface Mix_MusicInterface_MAD =
     NULL,   /* Load */
     NULL,   /* Open */
     MAD_CreateFromRW,
+    NULL,   /* CreateFromRWex [MIXER-X]*/
     NULL,   /* CreateFromFile */
+    NULL,   /* CreateFromFileEx [MIXER-X]*/
     MAD_SetVolume,
     MAD_Play,
     NULL,   /* IsPlaying */
     MAD_GetAudio,
     MAD_Seek,
+    NULL,   /* Tell [MIXER-X]*/
+    NULL,   /* FullLength [MIXER-X]*/
+    NULL,   /* LoopStart [MIXER-X]*/
+    NULL,   /* LoopEnd [MIXER-X]*/
+    NULL,   /* LoopLength [MIXER-X]*/
+    NULL,   /* GetMetaTag [MIXER-X]*/
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */

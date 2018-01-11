@@ -21,12 +21,22 @@
 
 /* This file supports playing MIDI files with timidity */
 
-#ifdef MUSIC_MID_TIMIDITY
-
 #include "music_timidity.h"
 
+#ifdef MUSIC_MID_TIMIDITY
 #include <timidity.h>
+#endif
 
+void SDLCALLCC Mix_Timidity_addToPathList(const char *path)
+{
+    #ifdef MUSIC_MID_TIMIDITY
+    Timidity_AddConfigPath(path);
+    #else
+    (void)path;
+    #endif
+}
+
+#ifdef MUSIC_MID_TIMIDITY
 
 typedef struct
 {
@@ -201,12 +211,20 @@ Mix_MusicInterface Mix_MusicInterface_TIMIDITY =
     NULL,   /* Load */
     TIMIDITY_Open,
     TIMIDITY_CreateFromRW,
+    NULL,   /* CreateFromRWex [MIXER-X]*/
     NULL,   /* CreateFromFile */
+    NULL,   /* CreateFromFileEx [MIXER-X]*/
     TIMIDITY_SetVolume,
     TIMIDITY_Play,
     NULL,   /* IsPlaying */
     TIMIDITY_GetAudio,
     TIMIDITY_Seek,
+    NULL,   /* Tell [MIXER-X]*/
+    NULL,   /* FullLength [MIXER-X]*/
+    NULL,   /* LoopStart [MIXER-X]*/
+    NULL,   /* LoopEnd [MIXER-X]*/
+    NULL,   /* LoopLength [MIXER-X]*/
+    NULL,   /* GetMetaTag [MIXER-X]*/
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */

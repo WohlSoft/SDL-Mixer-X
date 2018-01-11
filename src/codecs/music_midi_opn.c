@@ -19,24 +19,71 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifdef MUSIC_MID_OPNMIDI
-
 /* This file supports libOPNMIDI music streams */
-
-#include "SDL_mixer_ext.h"
 
 #include "music_midi_opn.h"
 
+#ifdef MUSIC_MID_OPNMIDI
 #include <opnmidi.h>
 #include "OPNMIDI/gm_opn_bank.h"
-
 #include <stdio.h>
+#endif
 
 /* Global OPNMIDI flags which are applying on initializing of MIDI player with a file */
-static int opnmidi_scalemod     = 0;
+/* static int opnmidi_scalemod     = 0; */
 static int opnmidi_logVolumes   = 0;
 static int opnmidi_volumeModel  = 0;
 static char opnmidi_customBankPath[2048] = "";
+
+/*
+int SDLCALLCC OPNMIDI_getScaleMod()
+{
+    return opnmidi_scalemod;
+}
+
+void SDLCALLCC OPNMIDI_setScaleMod(int sc)
+{
+    opnmidi_scalemod = sc;
+}
+
+int SDLCALLCC OPNMIDI_getLogarithmicVolumes()
+{
+    return opnmidi_logVolumes;
+}
+
+void SDLCALLCC OPNMIDI_setLogarithmicVolumes(int vm)
+{
+    opnmidi_logVolumes = vm;
+}
+
+int SDLCALLCC OPNMIDI_getVolumeModel()
+{
+    return opnmidi_volumeModel;
+}
+
+void SDLCALLCC OPNMIDI_setVolumeModel(int vm)
+{
+    opnmidi_volumeModel = vm;
+    if(vm < 0)
+        opnmidi_volumeModel = 0;
+}
+
+void SDLCALLCC OPNMIDI_setDefaults()
+{
+    opnmidi_scalemod    = 0;
+    opnmidi_logVolumes  = 0;
+}
+*/
+
+void SDLCALLCC Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path)
+{
+    if(bank_wonp_path)
+        SDL_strlcpy(opnmidi_customBankPath, bank_wonp_path, 2048);
+    else
+        opnmidi_customBankPath[0] = '\0';
+}
+
+#ifdef MUSIC_MID_OPNMIDI
 
 /* This structure supports OPNMIDI-based MIDI music streams */
 typedef struct
@@ -58,55 +105,6 @@ typedef struct
 } OpnMIDI_Music;
 
 
-int OPNMIDI_getScaleMod()
-{
-    return opnmidi_scalemod;
-}
-
-void OPNMIDI_setScaleMod(int sc)
-{
-    opnmidi_scalemod = sc;
-}
-
-int OPNMIDI_getLogarithmicVolumes()
-{
-    return opnmidi_logVolumes;
-}
-
-void OPNMIDI_setLogarithmicVolumes(int vm)
-{
-    opnmidi_logVolumes = vm;
-}
-
-int OPNMIDI_getVolumeModel()
-{
-    return opnmidi_volumeModel;
-}
-
-void OPNMIDI_setVolumeModel(int vm)
-{
-    opnmidi_volumeModel = vm;
-    if(vm < 0)
-        opnmidi_volumeModel = 0;
-}
-
-void OPNMIDI_setLoops(void *music_p, int loop)
-{
-    OpnMIDI_Music *music = (OpnMIDI_Music*)music_p;
-    if(music)
-        opn2_setLoopEnabled(music->opnmidi, (loop >=0 ? 0 : 1));
-}
-
-void OPNMIDI_setDefaults()
-{
-    opnmidi_scalemod    = 0;
-}
-
-/*
- * Initialize the OPNMIDI player, with the given mixer settings
- * This function returns 0, or -1 if there was an error.
- */
-
 /* Set the volume for a OPNMIDI stream */
 static void OPNMIDI_setvolume(void *music_p, int volume)
 {
@@ -117,15 +115,20 @@ static void OPNMIDI_setvolume(void *music_p, int volume)
     }
 }
 
-void OPNMIDI_setCustomBankFile(const char *bank_wonp_path)
-{
-    if(bank_wonp_path)
-        strcpy(opnmidi_customBankPath, bank_wonp_path);
-    else
-        opnmidi_customBankPath[0] = '\0';
-}
-
 static void OPNMIDI_delete(void *music_p);
+
+static char * copyMetaTag(const char *input)
+{
+    char *out;
+    size_t len;
+    if (!input)
+        return NULL;
+    len = SDL_strlen(input);
+    out = (char *)SDL_malloc(sizeof(char) * len + 1);
+    SDL_memset(out, 0, len + 1);
+    SDL_strlcpy(out, input, len +1);
+    return out;
+}
 
 static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src)
 {
@@ -207,11 +210,10 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src)
         }
 
         music->volume                 = MIX_MAX_VOLUME;
-        music->mus_title = NULL;
+        music->mus_title = copyMetaTag(opn2_metaMusicTitle(music->opnmidi));
         music->mus_artist = NULL;
         music->mus_album = NULL;
-        music->mus_copyright = NULL;
-
+        music->mus_copyright = copyMetaTag(opn2_metaMusicCopyright(music->opnmidi));
         return music;
     }
     return NULL;
@@ -326,6 +328,22 @@ static void OPNMIDI_delete(void *music_p)
     }
 }
 
+static const char* OPNMIDI_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
+{
+    OpnMIDI_Music *music = (OpnMIDI_Music *)context;
+    switch (tag_type) {
+    case MIX_META_TITLE:
+        return music->mus_title ? music->mus_title : "";
+    case MIX_META_ARTIST:
+        return music->mus_artist ? music->mus_artist : "";
+    case MIX_META_ALBUM:
+        return music->mus_album ? music->mus_album : "";
+    case MIX_META_COPYRIGHT:
+        return music->mus_copyright ? music->mus_copyright : "";
+    }
+    return "";
+}
+
 /* Jump (seek) to a given position (time is in seconds) */
 static int OPNMIDI_jump_to_time(void *music_p, double time)
 {
@@ -372,48 +390,6 @@ static double OPNMIDI_loopLength(void* music_p)
     return -1;
 }
 
-//int OPNMIDI_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixerfmt)
-//{
-//    mixer = *mixerfmt;
-
-//    initMusicInterface(codec);
-
-//    codec->isValid = 1;
-
-//    codec->capabilities     = music_interface_default_capabilities;
-
-//    codec->open             = OPNMIDI_new_RW;
-//    codec->openEx           = music_interface_dummy_cb_openEx;
-//    codec->close            = OPNMIDI_delete;
-
-//    codec->play             = OPNMIDI_play;
-//    codec->pause            = music_interface_dummy_cb_void_1arg;
-//    codec->resume           = music_interface_dummy_cb_void_1arg;
-//    codec->stop             = OPNMIDI_stop;
-
-//    codec->isPlaying        = OPNMIDI_playing;
-//    codec->isPaused         = music_interface_dummy_cb_int_1arg;
-
-//    codec->setLoops         = OPNMIDI_setLoops;
-//    codec->setVolume        = OPNMIDI_setvolume;
-
-//    codec->jumpToTime       = OPNMIDI_jump_to_time;
-//    codec->getCurrentTime   = OPNMIDI_currentPosition;
-//    codec->getTimeLength    = OPNMIDI_songLength;
-
-//    codec->getLoopStartTime = OPNMIDI_loopStart;
-//    codec->getLoopEndTime   = OPNMIDI_loopEnd;
-//    codec->getLoopLengthTime= OPNMIDI_loopLength;
-
-//    codec->metaTitle        = music_interface_dummy_meta_tag;
-//    codec->metaArtist       = music_interface_dummy_meta_tag;
-//    codec->metaAlbum        = music_interface_dummy_meta_tag;
-//    codec->metaCopyright    = music_interface_dummy_meta_tag;
-
-//    codec->playAudio        = OPNMIDI_playAudio;
-
-//    return(0);
-//}
 
 Mix_MusicInterface Mix_MusicInterface_OPNMIDI =
 {
@@ -426,12 +402,20 @@ Mix_MusicInterface Mix_MusicInterface_OPNMIDI =
     NULL,   /* Load */
     NULL,   /* Open */
     OPNMIDI_new_RW,
+    NULL,   /* CreateFromRWex [MIXER-X]*/
     NULL,   /* CreateFromFile */
+    NULL,   /* CreateFromFileEx [MIXER-X]*/
     OPNMIDI_setvolume,
     OPNMIDI_play,
     NULL,   /* IsPlaying */
     OPNMIDI_playAudio,
     OPNMIDI_jump_to_time,
+    OPNMIDI_currentPosition,   /* Tell [MIXER-X]*/
+    OPNMIDI_songLength,   /* FullLength [MIXER-X]*/
+    OPNMIDI_loopStart,   /* LoopStart [MIXER-X]*/
+    OPNMIDI_loopEnd,   /* LoopEnd [MIXER-X]*/
+    OPNMIDI_loopLength,   /* LoopLength [MIXER-X]*/
+    OPNMIDI_GetMetaTag,   /* GetMetaTag [MIXER-X]*/
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */

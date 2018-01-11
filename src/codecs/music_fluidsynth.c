@@ -290,12 +290,20 @@ Mix_MusicInterface Mix_MusicInterface_FLUIDSYNTH =
     FLUIDSYNTH_Load,
     FLUIDSYNTH_Open,
     FLUIDSYNTH_CreateFromRW,
+    NULL,   /* CreateFromRWex [MIXER-X]*/
     NULL,   /* CreateFromFile */
+    NULL,   /* CreateFromFileEx [MIXER-X]*/
     FLUIDSYNTH_SetVolume,
     FLUIDSYNTH_Play,
     FLUIDSYNTH_IsPlaying,
     FLUIDSYNTH_GetAudio,
     NULL,   /* Seek */
+    NULL,   /* Tell [MIXER-X]*/
+    NULL,   /* FullLength [MIXER-X]*/
+    NULL,   /* LoopStart [MIXER-X]*/
+    NULL,   /* LoopEnd [MIXER-X]*/
+    NULL,   /* LoopLength [MIXER-X]*/
+    NULL,   /* GetMetaTag [MIXER-X]*/
     NULL,   /* Pause */
     NULL,   /* Resume */
     FLUIDSYNTH_Stop,

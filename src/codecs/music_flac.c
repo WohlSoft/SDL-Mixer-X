@@ -548,12 +548,20 @@ Mix_MusicInterface Mix_MusicInterface_FLAC =
     FLAC_Load,
     NULL,   /* Open */
     FLAC_CreateFromRW,
+    NULL,   /* CreateFromRWex [MIXER-X]*/
     NULL,   /* CreateFromFile */
+    NULL,   /* CreateFromFileEx [MIXER-X]*/
     FLAC_SetVolume,
     FLAC_Play,
     NULL,   /* IsPlaying */
     FLAC_GetAudio,
     FLAC_Seek,
+    NULL,   /* Tell [MIXER-X]*/
+    NULL,   /* FullLength [MIXER-X]*/
+    NULL,   /* LoopStart [MIXER-X]*/
+    NULL,   /* LoopEnd [MIXER-X]*/
+    NULL,   /* LoopLength [MIXER-X]*/
+    NULL,   /* GetMetaTag [MIXER-X]*/
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */

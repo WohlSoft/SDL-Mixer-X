@@ -59,6 +59,20 @@ void GME_setvolume(void *music_p, int volume)
         music->volume = (int)round(128.0 * sqrt(((double)volume) * (1.0 / 128.0)));
 }
 
+static char * copyMetaTag(const char *input)
+{
+    char *out;
+    size_t len;
+    if (!input)
+        return NULL;
+    len = SDL_strlen(input);
+    out = (char *)SDL_malloc(sizeof(char) * len + 1);
+    SDL_memset(out, 0, len + 1);
+    SDL_strlcpy(out, input, len +1);
+    return out;
+}
+
+
 GME_Music *GME_LoadSongRW(SDL_RWops *src, int trackNum)
 {
     if(src != NULL)
@@ -153,14 +167,11 @@ GME_Music *GME_LoadSongRW(SDL_RWops *src, int trackNum)
          * Implement loop and length management to catch loop times and be able
          * to limit song to play specified loops count
          */
-        music->mus_title = (char *)SDL_malloc(sizeof(char) * strlen(musInfo->song) + 1);
-        strcpy(music->mus_title, musInfo->song);
-        music->mus_artist = (char *)SDL_malloc(sizeof(char) * strlen(musInfo->author) + 1);
-        strcpy(music->mus_artist, musInfo->author);
-        music->mus_album = (char *)SDL_malloc(sizeof(char) * strlen(musInfo->game) + 1);
-        strcpy(music->mus_album, musInfo->game);
-        music->mus_copyright = (char *)SDL_malloc(sizeof(char) * strlen(musInfo->copyright) + 1);
-        strcpy(music->mus_copyright, musInfo->copyright);
+
+        music->mus_title     = copyMetaTag(musInfo->song);
+        music->mus_artist    = copyMetaTag(musInfo->author);
+        music->mus_album     = copyMetaTag(musInfo->game);
+        music->mus_copyright = copyMetaTag(musInfo->copyright);
         gme_free_info(musInfo);
 
         return music;
@@ -283,28 +294,20 @@ static void GME_delete(void *context)
     }
 }
 
-static const char *GME_metaTitle(void *music_p)
+static const char* GME_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
 {
-    GME_Music *music = (GME_Music *)music_p;
-    return music->mus_title ? music->mus_title : "";
-}
-
-static const char *GME_metaArtist(void *music_p)
-{
-    GME_Music *music = (GME_Music *)music_p;
-    return music->mus_artist ? music->mus_artist : "";
-}
-
-static const char *GME_metaAlbum(void *music_p)
-{
-    GME_Music *music = (GME_Music *)music_p;
-    return music->mus_album ? music->mus_album : "";
-}
-
-static const char *GME_metaCopyright(void *music_p)
-{
-    GME_Music *music = (GME_Music *)music_p;
-    return music->mus_copyright ? music->mus_copyright : "";
+    GME_Music *music = (GME_Music *)context;
+    switch (tag_type) {
+    case MIX_META_TITLE:
+        return music->mus_title ? music->mus_title : "";
+    case MIX_META_ARTIST:
+        return music->mus_artist ? music->mus_artist : "";
+    case MIX_META_ALBUM:
+        return music->mus_album ? music->mus_album : "";
+    case MIX_META_COPYRIGHT:
+        return music->mus_copyright ? music->mus_copyright : "";
+    }
+    return "";
 }
 
 /* Jump (seek) to a given position (time is in seconds) */
@@ -332,12 +335,20 @@ Mix_MusicInterface Mix_MusicInterface_GME =
     NULL,   /* Load */
     NULL,   /* Open */
     GME_new_RW,
+    NULL,   /* CreateFromRWex [MIXER-X]*/
     NULL,   /* CreateFromFile */
+    NULL,   /* CreateFromFileEx [MIXER-X]*/
     GME_setvolume,
     GME_play,
     NULL,   /* IsPlaying */
     GME_playAudio,
-    GME_jump_to_time,
+    GME_jump_to_time,   /* Seek */
+    GME_get_cur_time,   /* Tell [MIXER-X]*/
+    NULL,   /* FullLength [MIXER-X]*/
+    NULL,   /* LoopStart [MIXER-X]*/
+    NULL,   /* LoopEnd [MIXER-X]*/
+    NULL,   /* LoopLength [MIXER-X]*/
+    GME_GetMetaTag,/* GetMetaTag [MIXER-X]*/
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */

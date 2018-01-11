@@ -19,17 +19,9 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifdef MUSIC_MID_ADLMIDI
-
 /* This file supports libADLMIDI music streams */
 
-#include "SDL_mixer_ext.h"
-
 #include "music_midi_adl.h"
-
-#include <adlmidi.h>
-
-#include <stdio.h>
 
 /* Global ADLMIDI flags which are applying on initializing of MIDI player with a file */
 static int adlmidi_bank         = 58;
@@ -40,6 +32,120 @@ static int adlmidi_adlibdrums   = 0;
 static int adlmidi_logVolumes   = 0;
 static int adlmidi_volumeModel  = 0;
 static char adlmidi_customBankPath[2048] = "";
+
+#ifdef MUSIC_MID_ADLMIDI
+#include <adlmidi.h>
+#include <stdio.h>
+#endif//MUSIC_MID_ADLMIDI
+
+int SDLCALLCC Mix_ADLMIDI_getTotalBanks()
+{
+    #ifdef MUSIC_MID_ADLMIDI
+    return adl_getBanksCount();
+    #else
+    return 0;
+    #endif
+}
+
+const char *const * SDLCALLCC Mix_ADLMIDI_getBankNames()
+{
+    #ifdef MUSIC_MID_ADLMIDI
+    return adl_getBankNames();
+    #else
+    return NULL;
+    #endif
+}
+
+int SDLCALLCC Mix_ADLMIDI_getBankID()
+{
+    return adlmidi_bank;
+}
+
+void SDLCALLCC Mix_ADLMIDI_setBankID(int bnk)
+{
+    adlmidi_bank = bnk;
+}
+
+int SDLCALLCC Mix_ADLMIDI_getTremolo()
+{
+    return adlmidi_tremolo;
+}
+void SDLCALLCC Mix_ADLMIDI_setTremolo(int tr)
+{
+    adlmidi_tremolo = tr;
+}
+
+int SDLCALLCC Mix_ADLMIDI_getVibrato()
+{
+    return adlmidi_vibrato;
+}
+
+void SDLCALLCC Mix_ADLMIDI_setVibrato(int vib)
+{
+    adlmidi_vibrato = vib;
+}
+
+
+int SDLCALLCC Mix_ADLMIDI_getAdLibMode()
+{
+    return adlmidi_adlibdrums;
+}
+
+void SDLCALLCC Mix_ADLMIDI_setAdLibMode(int ald)
+{
+    adlmidi_adlibdrums = ald;
+}
+
+int SDLCALLCC Mix_ADLMIDI_getScaleMod()
+{
+    return adlmidi_scalemod;
+}
+
+void SDLCALLCC Mix_ADLMIDI_setScaleMod(int sc)
+{
+    adlmidi_scalemod = sc;
+}
+
+int SDLCALLCC Mix_ADLMIDI_getLogarithmicVolumes()
+{
+    return adlmidi_logVolumes;
+}
+
+void SDLCALLCC Mix_ADLMIDI_setLogarithmicVolumes(int vm)
+{
+    adlmidi_logVolumes = vm;
+}
+
+int SDLCALLCC Mix_ADLMIDI_getVolumeModel()
+{
+    return adlmidi_volumeModel;
+}
+
+void SDLCALLCC Mix_ADLMIDI_setVolumeModel(int vm)
+{
+    adlmidi_volumeModel = vm;
+    if(vm < 0)
+        adlmidi_volumeModel = 0;
+}
+
+void SDLCALLCC Mix_ADLMIDI_setSetDefaults()
+{
+    adlmidi_tremolo     = 1;
+    adlmidi_vibrato     = 1;
+    adlmidi_scalemod    = 0;
+    adlmidi_adlibdrums  = 0;
+    adlmidi_bank        = 58;
+}
+
+void SDLCALLCC Mix_ADLMIDI_setCustomBankFile(const char *bank_wonl_path)
+{
+    if(bank_wonl_path)
+        SDL_strlcpy(adlmidi_customBankPath, bank_wonl_path, 2048);
+    else
+        adlmidi_customBankPath[0] = '\0';
+}
+
+#ifdef MUSIC_MID_ADLMIDI
 
 typedef struct
 {
@@ -57,105 +163,6 @@ typedef struct
     char *mus_copyright;
 } AdlMIDI_Music;
 
-
-int ADLMIDI_getBanksCount()
-{
-    return adl_getBanksCount();
-}
-
-const char *const *ADLMIDI_getBankNames()
-{
-    return adl_getBankNames();
-}
-
-int ADLMIDI_getBankID()
-{
-    return adlmidi_bank;
-}
-
-void ADLMIDI_setBankID(int bnk)
-{
-    adlmidi_bank = bnk;
-}
-
-int ADLMIDI_getTremolo()
-{
-    return adlmidi_tremolo;
-}
-void ADLMIDI_setTremolo(int tr)
-{
-    adlmidi_tremolo = tr;
-}
-
-int ADLMIDI_getVibrato()
-{
-    return adlmidi_vibrato;
-}
-
-void ADLMIDI_setVibrato(int vib)
-{
-    adlmidi_vibrato = vib;
-}
-
-
-int ADLMIDI_getAdLibDrumsMode()
-{
-    return adlmidi_adlibdrums;
-}
-
-void ADLMIDI_setAdLibDrumsMode(int ald)
-{
-    adlmidi_adlibdrums = ald;
-}
-
-int ADLMIDI_getScaleMod()
-{
-    return adlmidi_scalemod;
-}
-
-void ADLMIDI_setScaleMod(int sc)
-{
-    adlmidi_scalemod = sc;
-}
-
-int ADLMIDI_getLogarithmicVolumes()
-{
-    return adlmidi_logVolumes;
-}
-
-void ADLMIDI_setLogarithmicVolumes(int vm)
-{
-    adlmidi_logVolumes = vm;
-}
-
-int ADLMIDI_getVolumeModel()
-{
-    return adlmidi_volumeModel;
-}
-
-void ADLMIDI_setVolumeModel(int vm)
-{
-    adlmidi_volumeModel = vm;
-    if(vm < 0)
-        adlmidi_volumeModel = 0;
-}
-
-void ADLMIDI_setInfiniteLoop(AdlMIDI_Music *music, int loop)
-{
-    if(music)
-        adl_setLoopEnabled(music->adlmidi, loop);
-}
-
-void ADLMIDI_setDefaults()
-{
-    adlmidi_tremolo     = 1;
-    adlmidi_vibrato     = 1;
-    adlmidi_scalemod    = 0;
-    adlmidi_adlibdrums  = 0;
-    adlmidi_bank        = 58;
-}
-
-
 /* Set the volume for a ADLMIDI stream */
 static void ADLMIDI_setvolume(void *music_p, int volume)
 {
@@ -164,15 +171,20 @@ static void ADLMIDI_setvolume(void *music_p, int volume)
         music->volume = (int)round(128.0 * sqrt(((double)volume) * (1.0 / 128.0)));
 }
 
-void ADLMIDI_setCustomBankFile(const char *bank_wonl_path)
-{
-    if(bank_wonl_path)
-        strcpy(adlmidi_customBankPath, bank_wonl_path);
-    else
-        adlmidi_customBankPath[0] = '\0';
-}
-
 static void ADLMIDI_delete(void *music_p);
+
+static char * copyMetaTag(const char *input)
+{
+    char *out;
+    size_t len;
+    if (!input)
+        return NULL;
+    len = SDL_strlen(input);
+    out = (char *)SDL_malloc(sizeof(char) * len + 1);
+    SDL_memset(out, 0, len + 1);
+    SDL_strlcpy(out, input, len +1);
+    return out;
+}
 
 static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src)
 {
@@ -260,11 +272,10 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src)
         }
 
         music->volume                 = MIX_MAX_VOLUME;
-        music->mus_title = NULL;
+        music->mus_title = copyMetaTag(adl_metaMusicTitle(music->adlmidi));
         music->mus_artist = NULL;
         music->mus_album = NULL;
-        music->mus_copyright = NULL;
-
+        music->mus_copyright = copyMetaTag(adl_metaMusicCopyright(music->adlmidi));
         return music;
     }
     return NULL;
@@ -356,13 +367,13 @@ static void ADLMIDI_delete(void *music_p)
     if(music)
     {
         /* META-TAGS */
-        if(music->mus_title)
+        if (music->mus_title)
             SDL_free(music->mus_title);
-        if(music->mus_artist)
+        if (music->mus_artist)
             SDL_free(music->mus_artist);
-        if(music->mus_album)
+        if (music->mus_album)
             SDL_free(music->mus_album);
-        if(music->mus_copyright)
+        if (music->mus_copyright)
             SDL_free(music->mus_copyright);
         /* META-TAGS */
 
@@ -379,15 +390,31 @@ static void ADLMIDI_delete(void *music_p)
     }
 }
 
+static const char* ADLMIDI_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
+{
+    AdlMIDI_Music *music = (AdlMIDI_Music *)context;
+    switch (tag_type) {
+    case MIX_META_TITLE:
+        return music->mus_title ? music->mus_title : "";
+    case MIX_META_ARTIST:
+        return music->mus_artist ? music->mus_artist : "";
+    case MIX_META_ALBUM:
+        return music->mus_album ? music->mus_album : "";
+    case MIX_META_COPYRIGHT:
+        return music->mus_copyright ? music->mus_copyright : "";
+    }
+    return "";
+}
+
 /* Jump (seek) to a given position (time is in seconds) */
-int ADLMIDI_jump_to_time(void *music_p, double time)
+static int ADLMIDI_jump_to_time(void *music_p, double time)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
     adl_positionSeek(music->adlmidi, time);
     return 0;
 }
 
-double ADLMIDI_currentPosition(void *music_p)
+static double ADLMIDI_currentPosition(void *music_p)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
     if(music)
@@ -395,7 +422,7 @@ double ADLMIDI_currentPosition(void *music_p)
     return -1;
 }
 
-double ADLMIDI_songLength(void *music_p)
+static double ADLMIDI_songLength(void *music_p)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
     if(music)
@@ -403,7 +430,7 @@ double ADLMIDI_songLength(void *music_p)
     return -1;
 }
 
-double ADLMIDI_loopStart(void *music_p)
+static double ADLMIDI_loopStart(void *music_p)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
     if(music)
@@ -411,7 +438,7 @@ double ADLMIDI_loopStart(void *music_p)
     return -1;
 }
 
-double ADLMIDI_loopEnd(void *music_p)
+static double ADLMIDI_loopEnd(void *music_p)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
     if(music)
@@ -419,7 +446,7 @@ double ADLMIDI_loopEnd(void *music_p)
     return -1;
 }
 
-double ADLMIDI_loopLength(void *music_p)
+static double ADLMIDI_loopLength(void *music_p)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
     if(music)
@@ -432,56 +459,6 @@ double ADLMIDI_loopLength(void *music_p)
     return -1;
 }
 
-/*
- * Initialize the ADLMIDI player, with the given mixer settings
- * This function returns 0, or -1 if there was an error.
- */
-
-/* This is the format of the audio mixer data */
-//static SDL_AudioSpec mixer;
-
-//int ADLMIDI_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixerfmt)
-//{
-//    mixer = *mixerfmt;
-
-//    initMusicInterface(codec);
-
-//    codec->isValid = 1;
-
-//    codec->capabilities     = music_interface_default_capabilities;
-
-//    codec->open             = ADLMIDI_new_RW;
-//    codec->openEx           = music_interface_dummy_cb_openEx;
-//    codec->close            = ADLMIDI_delete;
-
-//    codec->play             = ADLMIDI_play;
-//    codec->pause            = music_interface_dummy_cb_void_1arg;
-//    codec->resume           = music_interface_dummy_cb_void_1arg;
-//    codec->stop             = ADLMIDI_stop;
-
-//    codec->isPlaying        = ADLMIDI_playing;
-//    codec->isPaused         = music_interface_dummy_cb_int_1arg;
-
-//    codec->setLoops         = ADLMIDI_setLoops;
-//    codec->setVolume        = ADLMIDI_setvolume;
-
-//    codec->jumpToTime       = ADLMIDI_jump_to_time;
-//    codec->getCurrentTime   = ADLMIDI_currentPosition;
-//    codec->getTimeLength    = ADLMIDI_songLength;
-
-//    codec->getLoopStartTime = ADLMIDI_loopStart;
-//    codec->getLoopEndTime   = ADLMIDI_loopEnd;
-//    codec->getLoopLengthTime= ADLMIDI_loopLength;
-
-//    codec->metaTitle        = music_interface_dummy_meta_tag;
-//    codec->metaArtist       = music_interface_dummy_meta_tag;
-//    codec->metaAlbum        = music_interface_dummy_meta_tag;
-//    codec->metaCopyright    = music_interface_dummy_meta_tag;
-
-//    codec->playAudio        = ADLMIDI_playAudio;
-
-//    return(0);
-//}
 
 Mix_MusicInterface Mix_MusicInterface_ADLMIDI =
 {
@@ -494,12 +471,20 @@ Mix_MusicInterface Mix_MusicInterface_ADLMIDI =
     NULL,   /* Load */
     NULL,   /* Open */
     ADLMIDI_new_RW,
+    NULL,   /* CreateFromRWex [MIXER-X]*/
     NULL,   /* CreateFromFile */
+    NULL,   /* CreateFromFileEx [MIXER-X]*/
     ADLMIDI_setvolume,
     ADLMIDI_play,
     NULL,   /* IsPlaying */
     ADLMIDI_playAudio,
     ADLMIDI_jump_to_time,
+    ADLMIDI_currentPosition,   /* Tell [MIXER-X]*/
+    ADLMIDI_songLength,   /* FullLength [MIXER-X]*/
+    ADLMIDI_loopStart,   /* LoopStart [MIXER-X]*/
+    ADLMIDI_loopEnd,   /* LoopEnd [MIXER-X]*/
+    ADLMIDI_loopLength,   /* LoopLength [MIXER-X]*/
+    ADLMIDI_GetMetaTag,   /* GetMetaTag [MIXER-X]*/
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */
@@ -508,6 +493,40 @@ Mix_MusicInterface Mix_MusicInterface_ADLMIDI =
     NULL,   /* Unload */
 };
 
-#endif
+/* Same as Mix_MusicInterface_ADLMIDI. Created to play special music formats separately from off MIDI interfaces */
+Mix_MusicInterface Mix_MusicInterface_ADLIMF =
+{
+    "ADLIMF",
+    MIX_MUSIC_ADLMIDI,
+    MUS_ADLMIDI,
+    SDL_FALSE,
+    SDL_FALSE,
+
+    NULL,   /* Load */
+    NULL,   /* Open */
+    ADLMIDI_new_RW,
+    NULL,   /* CreateFromRWex [MIXER-X]*/
+    NULL,   /* CreateFromFile */
+    NULL,   /* CreateFromFileEx [MIXER-X]*/
+    ADLMIDI_setvolume,
+    ADLMIDI_play,
+    NULL,   /* IsPlaying */
+    ADLMIDI_playAudio,
+    ADLMIDI_jump_to_time,
+    ADLMIDI_currentPosition,   /* Tell [MIXER-X]*/
+    ADLMIDI_songLength,   /* FullLength [MIXER-X]*/
+    ADLMIDI_loopStart,   /* LoopStart [MIXER-X]*/
+    ADLMIDI_loopEnd,   /* LoopEnd [MIXER-X]*/
+    ADLMIDI_loopLength,   /* LoopLength [MIXER-X]*/
+    ADLMIDI_GetMetaTag,   /* GetMetaTag [MIXER-X]*/
+    NULL,   /* Pause */
+    NULL,   /* Resume */
+    NULL,   /* Stop */
+    ADLMIDI_delete,
+    NULL,   /* Close */
+    NULL,   /* Unload */
+};
+
+#endif //MUSIC_MID_ADLMIDI
 
 

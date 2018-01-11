@@ -83,16 +83,19 @@ static char* soundfont_paths = NULL;
 /*  ======== MIDI toggler ======== */
 /* Next MIDI device to open */
 static int mididevice_next    = MIDI_ANY;
-
 /* MIDI device currently in use */
 static int mididevice_current = MIDI_ANY;
-
 /* Reset MIDI settings every file reopening (to allow right argument passing) */
 static int mididevice_need_Reset = 1;
-
 /* Denies MIDI arguments */
 static int mididevice_args_lock = 0;
 /*  ======== MIDI toggler END ==== */
+
+/*  ======== Music file arguments ======== */
+static char *music_file = NULL;
+static char *music_args = NULL;
+static char *music_filename = NULL; /* Reference, not a pointer! */
+/*  ======== Music file arguments END ==== */
 
 /* Interfaces for the various music interfaces, ordered by priority */
 static Mix_MusicInterface *s_music_interfaces[] =
@@ -117,6 +120,7 @@ static Mix_MusicInterface *s_music_interfaces[] =
 #endif
 #ifdef MUSIC_MID_ADLMIDI
     &Mix_MusicInterface_ADLMIDI,
+    &Mix_MusicInterface_ADLIMF,
 #endif
 #ifdef MUSIC_MID_OPNMIDI
     &Mix_MusicInterface_OPNMIDI,
@@ -179,7 +183,7 @@ static void add_music_decoder(const char *decoder)
         }
     }
 
-    ptr = SDL_realloc((void *)music_decoders, (num_decoders + 1) * sizeof (const char *));
+    ptr = SDL_realloc((void *)music_decoders, ((size_t)num_decoders + 1) * sizeof (const char *));
     if (ptr == NULL) {
         return;  /* oh well, go on without it. */
     }
@@ -220,7 +224,7 @@ int music_pcm_getaudio(void *context, void *data, int bytes, int volume,
     if (volume == MIX_MAX_VOLUME) {
         dst = snd;
     } else {
-        dst = SDL_stack_alloc(Uint8, bytes);
+        dst = SDL_stack_alloc(Uint8, (size_t)bytes);
     }
     while (len > 0 && !done) {
         int consumed = GetSome(context, dst, len, &done);
@@ -300,7 +304,8 @@ void SDLCALL music_mixer(void *udata, Uint8 *stream, int len)
 /* Load the music interface libraries for a given music type */
 SDL_bool load_music_type(Mix_MusicType type)
 {
-    int i, loaded = 0;
+    size_t i;
+    int loaded = 0;
     for (i = 0; i < SDL_arraysize(s_music_interfaces); ++i) {
         Mix_MusicInterface *interface = s_music_interfaces[i];
         if (interface->type != type) {
@@ -326,18 +331,10 @@ SDL_bool load_music_type(Mix_MusicType type)
     return (loaded > 0) ? SDL_TRUE : SDL_FALSE;
 }
 
-/* Open the music interfaces for a given music type */
-SDL_bool open_music_type(Mix_MusicType type)
+Mix_MusicAPI get_current_midi_api()
 {
-    size_t i;
-    int opened = 0;
-    SDL_bool use_native_midi = SDL_FALSE, use_any_midi = SDL_FALSE;
     Mix_MusicAPI target_midi_api = MIX_MUSIC_NATIVEMIDI;
-
-    if (!music_spec.format) {
-        /* Music isn't opened yet */
-        return SDL_FALSE;
-    }
+    SDL_bool use_native_midi = SDL_FALSE;
 
 #ifdef MUSIC_MID_NATIVE
     if (type == MUS_MID && SDL_GetHintBoolean("SDL_NATIVE_MUSIC", SDL_FALSE) && native_midi_detect()) {
@@ -347,7 +344,7 @@ SDL_bool open_music_type(Mix_MusicType type)
     }
 #endif
 
-    if (!use_native_midi && type == MUS_MID && mididevice_next != mididevice_current) {
+    if (!use_native_midi) {
         switch (mididevice_next) {
         #ifdef MUSIC_MID_ADLMIDI
         case MIDI_ADLMIDI:
@@ -380,8 +377,29 @@ SDL_bool open_music_type(Mix_MusicType type)
         }
         mididevice_current = mididevice_next;
     }
-    if (mididevice_current == MIDI_ANY)
-        use_any_midi = SDL_TRUE;
+
+    return target_midi_api;
+}
+
+/* Open the music interfaces for a given music type */
+SDL_bool open_music_type(Mix_MusicType type)
+{
+    size_t i;
+    int opened = 0;
+    SDL_bool use_any_midi = SDL_FALSE;
+    Mix_MusicAPI target_midi_api = MIX_MUSIC_NATIVEMIDI;
+
+    if (!music_spec.format) {
+        /* Music isn't opened yet */
+        return SDL_FALSE;
+    }
+
+    if (type == MUS_MID) {
+        target_midi_api = get_current_midi_api();
+        if (mididevice_current == MIDI_ANY) {
+            use_any_midi = SDL_TRUE;
+        }
+    }
 
     for (i = 0; i < SDL_arraysize(s_music_interfaces); ++i) {
         Mix_MusicInterface *interface = s_music_interfaces[i];
@@ -453,13 +471,13 @@ void open_music(const SDL_AudioSpec *spec)
     Mix_VolumeMusic(MIX_MAX_VOLUME);
 
     /* Calculate the number of ms for each callback */
-    ms_per_step = (int) (((float)spec->samples * 1000.0) / spec->freq);
+    ms_per_step = (int) (((double)spec->samples * 1000.0) / spec->freq);
 }
 
 /* Return SDL_TRUE if the music type is available */
 SDL_bool has_music(Mix_MusicType type)
 {
-    int i;
+    size_t i;
     for (i = 0; i < SDL_arraysize(s_music_interfaces); ++i) {
         Mix_MusicInterface *interface = s_music_interfaces[i];
         if (interface->type != type) {
@@ -472,8 +490,172 @@ SDL_bool has_music(Mix_MusicType type)
     return SDL_FALSE;
 }
 
-Mix_MusicType detect_music_type_from_magic(const Uint8 *magic)
+/*
+    XMI and MUS are can be played on ADLMIDI or OPNMIDI only. Yet.
+ */
+#if defined(MUSIC_MID_ADLMIDI) || defined(MUSIC_MID_OPNMIDI)
+static Mix_MusicType xmi_compatible_midi_player()
 {
+#if defined(MUSIC_MID_ADLMIDI) && defined(MUSIC_MID_OPNMIDI)
+    if((mididevice_next != MIDI_ADLMIDI) && (mididevice_next != MIDI_OPNMIDI))
+        return MUS_ADLMIDI;
+    else
+#elif defined defined(MUSIC_MID_ADLMIDI)
+    if (mididevice_next != MIDI_ADLMIDI)
+        return MUS_ADLMIDI;
+    else
+#endif
+        return MUS_MID;
+}
+#endif
+
+#ifdef MUSIC_MID_ADLMIDI
+static int detect_imf(SDL_RWops *in, Sint64 start)
+{
+    Uint16 chunksize, buff, i = 42;
+    Uint32 sum1 = 0,  sum2 = 0;
+    Uint16 word;
+
+    if(!in)
+        return 0;
+
+    SDL_RWseek(in, start, RW_SEEK_SET);
+
+    if(SDL_RWread(in, &word, 1, 2) != 2)
+    {
+        SDL_RWseek(in, start, RW_SEEK_SET);
+        return 0;
+    }
+    chunksize = SDL_SwapLE16(word);
+    if((chunksize == 0) || (chunksize & 3))
+    {
+        SDL_RWseek(in, start, RW_SEEK_SET);
+        return 0;
+    }
+
+    while(i > 0)
+    {
+        if(SDL_RWread(in, &word, 1, 2) != 2)
+        {
+            SDL_RWseek(in, start, RW_SEEK_SET);
+            break;
+        }
+        buff = SDL_SwapLE16(word);
+        sum1 += buff;
+        if(SDL_RWread(in, &word, 1, 2) != 2)
+        {
+            SDL_RWseek(in, start, RW_SEEK_SET);
+            break;
+        }
+        buff = SDL_SwapLE16(word);
+        sum2 += buff;
+        i--;
+    }
+    SDL_RWseek(in, start, RW_SEEK_SET);
+    return (sum1 > sum2);
+}
+#endif
+
+#if defined(MUSIC_MP3_MAD) || defined(MUSIC_MP3_MPG123) || defined(MUSIC_MP3_SMPEG)
+static int detect_mp3(Uint8 *magic, SDL_RWops *src, Sint64 start)
+{
+    /* if first 4 bytes are zeros */
+    Uint32 null = 0;
+    Uint8  magic2[5];
+    unsigned char byte = 0;
+    /* Sint64 end = 0; */
+    Sint64 notNullPos = 0;
+
+    SDL_memcpy(magic2, magic, 5);
+
+    if(SDL_strncmp((char *)magic2, "ID3", 3) == 0)
+    {
+        SDL_RWseek(src, start, RW_SEEK_SET);
+        return 1;
+    }
+
+    SDL_RWseek(src, start, RW_SEEK_SET);
+
+    /* If first bytes are zero */
+    if(SDL_memcmp(magic2, &null, 4) != 0)
+        goto readHeader;
+
+digMoreBytes:
+    {
+        /* Find nearest non zero */
+        /* Look for FF byte */
+        while((SDL_RWread(src, &byte, 1, 1) == 1) &&
+              (byte != 0xFF) &&
+              (SDL_RWtell(src) < (start + 10240)))
+        {}
+
+        /* with offset -1 byte */
+        notNullPos = SDL_RWtell(src) - 1;
+        SDL_RWseek(src, notNullPos, RW_SEEK_SET);
+
+        /* If file contains only null bytes */
+        if(byte != 0xFF)
+        {
+            /* printf("WRONG BYTE\n"); */
+            SDL_RWseek(src, start, RW_SEEK_SET);
+            return 0;
+        }
+        if(SDL_RWread(src, magic2, 1, 4) != 4)
+        {
+            /* printf("MAGIC WRONG\n"); */
+            SDL_RWseek(src, start, RW_SEEK_SET);
+            return 0;
+        }
+    }
+
+readHeader:
+    /* Detection code lifted from SMPEG */
+    if(
+        ((magic2[0] & 0xff) != 0xff) || ((magic2[1] & 0xf0) != 0xf0) || /*  No sync bits */
+        ((magic2[2] & 0xf0) == 0x00) || /*  Bitrate is 0 */
+        ((magic2[2] & 0xf0) == 0xf0) || /*  Bitrate is 15 */
+        ((magic2[2] & 0x0c) == 0x0c) || /*  Frequency is 3 */
+        ((magic2[1] & 0x06) == 0x00)   /*  Layer is 4 */
+    )
+    {
+        /* printf("WRONG BITS\n"); */
+        goto digMoreBytes;
+    }
+    SDL_RWseek(src, start, RW_SEEK_SET);
+    return 1;
+}
+#endif
+
+
+Mix_MusicType detect_music_type_from_magic(SDL_RWops *src)
+{
+    Uint8 magic[5];
+    Uint8 moremagic[9];
+    Uint8 extramagic[25];
+    Uint8 lessmagic[3];
+
+    Sint64 start = SDL_RWtell(src);
+    if (SDL_RWread(src, extramagic, 1, 24) != 24) {
+        Mix_SetError("Couldn't read from RWops");
+        return MUS_NONE;
+    }
+    SDL_RWseek(src, start, RW_SEEK_SET);
+    SDL_memcpy(lessmagic, extramagic,   2);
+    SDL_memcpy(magic,     extramagic,   4);
+    SDL_memcpy(moremagic, extramagic + 4, 8);
+    lessmagic[2]   = '\0';
+    magic[4]       = '\0';
+    moremagic[8]   = '\0';
+    extramagic[24] = '\0';
+
+    /* Drop out some known but not supported file types (Archives, etc.) */
+    if (SDL_memcmp(magic, "PK\x03\x04", 3) == 0) {
+        return MUS_NONE;
+    }
+    if (SDL_memcmp(extramagic, "\x37\x7A\xBC\xAF\x27\x1C", 6) == 0) {
+        return MUS_NONE;
+    }
+
     /* Ogg Vorbis files have the magic four bytes "OggS" */
     if (SDL_memcmp(magic, "OggS", 4) == 0) {
         return MUS_OGG;
@@ -487,6 +669,28 @@ Mix_MusicType detect_music_type_from_magic(const Uint8 *magic)
     /* MIDI files have the magic four bytes "MThd" */
     if (SDL_memcmp(magic, "MThd", 4) == 0) {
         return MUS_MID;
+    }
+    #if defined(MUSIC_MID_ADLMIDI) || defined(MUSIC_MID_OPNMIDI)
+    if (SDL_memcmp(magic, "MUS\x1A", 4) == 0) {
+        return xmi_compatible_midi_player();
+    }
+    if ((SDL_memcmp(magic, "FORM", 4) == 0) && (SDL_memcmp(extramagic + 8, "XDIR", 4) == 0)) {
+        return xmi_compatible_midi_player();
+    }
+    #endif
+
+    /* WAVE files have the magic four bytes "RIFF"
+           AIFF files have the magic 12 bytes "FORM" XXXX "AIFF" */
+    if (((SDL_memcmp(magic, "RIFF", 4) == 0) && (SDL_memcmp((moremagic + 4), "WAVE", 4) == 0)) ||
+       ((SDL_memcmp(magic, "FORM", 4) == 0) && (SDL_memcmp((moremagic + 4), "XDIR", 4) != 0))) {
+        return MUS_WAV;
+    }
+
+    if (SDL_memcmp(magic, "GMF\x1", 4) == 0) {
+        return MUS_ADLMIDI;
+    }
+    if (SDL_memcmp(magic, "CTMF", 4) == 0) {
+        return MUS_ADLMIDI;
     }
 
     if (SDL_memcmp(magic, "ID3", 3) == 0 ||
@@ -520,6 +724,23 @@ Mix_MusicType detect_music_type_from_magic(const Uint8 *magic)
     if(SDL_memcmp(magic, "\x1f\x8b", 2) == 0)
         return MUS_GME;
 
+    #if defined(MUSIC_MP3_MAD) || defined(MUSIC_MP3_MPG123) || defined(MUSIC_MP3_SMPEG)
+    /* Detect MP3 format [needs scanning of bigger part of the file] */
+    if (detect_mp3(extramagic, src, start)) {
+          return MUS_MP3;
+    }
+    #endif
+
+    #ifdef MUSIC_MID_ADLMIDI
+    /* Detect id Software Music Format file */
+    if (detect_imf(src, start)) {
+          return MUS_ADLMIDI;
+    }
+    #endif
+
+      /* Reset position to zero! */
+    SDL_RWseek(src, start, RW_SEEK_SET);
+
     /* Assume MOD format.
      *
      * Apparently there is no way to check if the file is really a MOD,
@@ -541,21 +762,100 @@ static Mix_MusicType detect_music_type(SDL_RWops *src)
     /* WAVE files have the magic four bytes "RIFF"
        AIFF files have the magic 12 bytes "FORM" XXXX "AIFF" */
     if (((SDL_memcmp(magic, "RIFF", 4) == 0) && (SDL_memcmp((magic+8), "WAVE", 4) == 0)) ||
-        (SDL_memcmp(magic, "FORM", 4) == 0)) {
+       ((SDL_memcmp(magic, "FORM", 4) == 0) && (SDL_memcmp((magic+8), "XDIR", 4) != 0))) {
         return MUS_WAV;
     }
 
-    return detect_music_type_from_magic(magic);
+    return detect_music_type_from_magic(src);
+}
+
+/*
+ * Split path and arguments after "|" character.
+ */
+static int split_path_and_params(const char *path, char *args)
+{
+    int hasArgs = 0;
+    int srclen = (int)SDL_strlen(path);
+    int i, j;
+    for(i = 0; i < srclen; i++)
+        if(music_file[i] == '|') hasArgs = 1;
+    if(hasArgs == 1)
+    {
+        /* char trackNum[strlen(path)]; */
+        for(i = (int)SDL_strlen(path) - 1; i >= 0; i--)
+        {
+            args[i] = music_file[i];
+            if(music_file[i] == '|')
+            {
+                if(i == 0)
+                {
+                    Mix_SetError("Empty filename!");
+                    return 0;
+                }
+                music_file[i] = '\0';
+                i++;
+                break;
+            }
+        }
+        for(j = 0; i < srclen; i++, j++)
+            args[j] = args[i];
+        if(j < srclen) args[j] = '\0';
+    }
+    return 1;
 }
 
 /* Load a music file */
 Mix_Music *Mix_LoadMUS(const char *file)
 {
-    int i;
+    size_t i, file_str_len;
     void *context;
     char *ext;
     Mix_MusicType type;
     SDL_RWops *src;
+
+    /* ========== Path arguments ========== */
+    if (music_file)
+        SDL_free(music_file);
+    if (music_args)
+        SDL_free(music_args);
+    music_file = NULL;
+    music_args = NULL;
+    music_filename = NULL;
+
+    if(!file)
+    {
+        Mix_SetError("Null filename!");
+        return NULL;
+    }
+    file_str_len = SDL_strlen(file);
+    music_file = (char *)SDL_malloc(file_str_len + 1);
+    music_args = (char *)SDL_malloc(file_str_len + 1);
+    SDL_memset(music_file, 0, file_str_len + 1);
+    SDL_memset(music_args, 0, file_str_len + 1);
+    SDL_strlcpy(music_file, file, file_str_len);
+    #ifdef _WIN32
+    if (music_file) {
+        int i = 0;
+        for (i = 0; music_file[i] != '\0'; i++) {
+            if (music_file[i] == '\\') {
+                music_file[i] = '/';
+            }
+        }
+    }
+    #endif
+    if (split_path_and_params(music_file, music_args) == 0) {
+        Mix_SetError("Invalid path argument syntax!");
+        return NULL;
+    }
+
+    music_filename = (SDL_strstr(music_file, "/")) ? SDL_strrchr(music_file, '/') : music_file;
+    if (SDL_strstr(music_filename, ".")) {
+        ext = SDL_strrchr(music_filename, '.');
+    }
+
+    /* Use path with stripped down arguments after stick | sign*/
+    file = music_file;
+    /* ========== Path arguments END ====== */
 
     for (i = 0; i < SDL_arraysize(s_music_interfaces); ++i) {
         Mix_MusicInterface *interface = s_music_interfaces[i];
@@ -643,7 +943,7 @@ Mix_Music *Mix_LoadMUS_RW(SDL_RWops *src, int freesrc)
 
 Mix_Music *Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int freesrc)
 {
-    int i;
+    size_t i;
     void *context;
     Sint64 start;
 
@@ -668,9 +968,17 @@ Mix_Music *Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int freesrc)
     Mix_ClearError();
 
     if (load_music_type(type) && open_music_type(type)) {
+        Mix_MusicAPI target_midi_api = get_current_midi_api();
+        SDL_bool use_any_midi = SDL_FALSE;
+        if (mididevice_current == MIDI_ANY) {
+            use_any_midi = SDL_TRUE;
+        }
         for (i = 0; i < SDL_arraysize(s_music_interfaces); ++i) {
             Mix_MusicInterface *interface = s_music_interfaces[i];
             if (!interface->opened || type != interface->type || !interface->CreateFromRW) {
+                continue;
+            }
+            if (interface->type == MUS_MID && !use_any_midi && interface->api != target_midi_api) {
                 continue;
             }
 
@@ -749,6 +1057,55 @@ Mix_MusicType Mix_GetMusicType(const Mix_Music *music)
         Mix_UnlockAudio();
     }
     return(type);
+}
+
+static const char * get_music_tag_internal(const Mix_Music *music, Mix_MusicMetaTag tag_type)
+{
+    (void)music;
+    const char *tag = "";
+    Mix_LockAudio();
+    if (music_playing) {
+        if (music_playing->interface->GetMetaTag) {
+            tag = music_playing->interface->GetMetaTag(music_playing->context, tag_type);
+        }
+    } else {
+        Mix_SetError("Music isn't playing");
+    }
+    Mix_UnlockAudio();
+    return tag;
+}
+
+const char *SDLCALLCC Mix_GetMusicTitleTag(const Mix_Music *music)
+{
+    return get_music_tag_internal(music, MIX_META_TITLE);
+}
+
+/* Get music title from meta-tag if possible */
+const char *SDLCALLCC Mix_GetMusicTitle(const Mix_Music *music)
+{
+    const char *tag = Mix_GetMusicTitleTag(music);
+    if (SDL_strlen(tag) > 0) {
+        return tag;
+    }
+    if (music_filename != NULL) {
+        return music_filename;
+    }
+    return "";
+}
+
+const char *SDLCALLCC Mix_GetMusicArtistTag(const Mix_Music *music)
+{
+    return get_music_tag_internal(music, MIX_META_ARTIST);
+}
+
+const char *SDLCALLCC Mix_GetMusicAlbumTag(const Mix_Music *music)
+{
+    return get_music_tag_internal(music, MIX_META_ALBUM);
+}
+
+const char *SDLCALLCC Mix_GetMusicCopyrightTag(const Mix_Music *music)
+{
+    return get_music_tag_internal(music, MIX_META_COPYRIGHT);
 }
 
 /* Play a music chunk.  Returns 0, or -1 if there was an error.
@@ -877,6 +1234,133 @@ int Mix_SetMusicPosition(double position)
 
     return(retval);
 }
+
+/* Set the playing music position */
+double music_internal_position_get()
+{
+    if (music_playing->interface->Tell) {
+        return music_playing->interface->Tell(music_playing->context);
+    }
+    return -1;
+}
+double Mix_GetMusicPosition(Mix_Music *music)
+{
+    (void)music;
+    double retval;
+
+    Mix_LockAudio();
+    if (music_playing) {
+        retval = music_internal_position_get();
+    } else {
+        Mix_SetError("Music isn't playing");
+        retval = -1.0;
+    }
+    Mix_UnlockAudio();
+
+    return(retval);
+}
+
+/* Get total playing music position */
+double music_internal_position_total()
+{
+    if (music_playing->interface->FullLength) {
+        return music_playing->interface->FullLength(music_playing->context);
+    }
+    return -1;
+}
+double Mix_GetMusicTotalTime(Mix_Music *music)
+{
+    (void)music;
+    double retval;
+
+    Mix_LockAudio();
+    if (music_playing) {
+        retval = music_internal_position_total();
+    } else {
+        Mix_SetError("Music isn't playing");
+        retval = -1.0;
+    }
+    Mix_UnlockAudio();
+
+    return(retval);
+}
+
+/* Get Loop start position */
+double music_internal_loop_start()
+{
+    if (music_playing->interface->LoopStart) {
+        return music_playing->interface->LoopStart(music_playing->context);
+    }
+    return -1;
+}
+double Mix_GetMusicLoopStartTime(Mix_Music *music)
+{
+    (void)music;
+    double retval;
+
+    Mix_LockAudio();
+    if (music_playing) {
+        retval = music_internal_loop_start();
+    } else {
+        Mix_SetError("Music isn't playing");
+        retval = -1.0;
+    }
+    Mix_UnlockAudio();
+
+    return(retval);
+}
+
+/* Get Loop end position */
+double music_internal_loop_end()
+{
+    if (music_playing->interface->LoopEnd) {
+        return music_playing->interface->LoopEnd(music_playing->context);
+    }
+    return -1;
+}
+double Mix_GetMusicLoopEndTime(Mix_Music *music)
+{
+    (void)music;
+    double retval;
+
+    Mix_LockAudio();
+    if (music_playing) {
+        retval = music_internal_loop_end();
+    } else {
+        Mix_SetError("Music isn't playing");
+        retval = -1.0;
+    }
+    Mix_UnlockAudio();
+
+    return(retval);
+}
+
+/* Get Loop end position */
+double music_internal_loop_length()
+{
+    if (music_playing->interface->LoopLength) {
+        return music_playing->interface->LoopLength(music_playing->context);
+    }
+    return -1;
+}
+double Mix_GetMusicLoopLengthTime(Mix_Music *music)
+{
+    (void)music;
+    double retval;
+
+    Mix_LockAudio();
+    if (music_playing) {
+        retval = music_internal_loop_length();
+    } else {
+        Mix_SetError("Music isn't playing");
+        retval = -1.0;
+    }
+    Mix_UnlockAudio();
+
+    return(retval);
+}
+
+
 
 /* Set the music's initial volume */
 static void music_internal_initialize_volume(void)
@@ -1071,6 +1555,7 @@ int Mix_SetMusicCMD(const char *command)
 
 int Mix_SetSynchroValue(int i)
 {
+    (void)i;
     /* Not supported by any players at this time */
     return(-1);
 }
@@ -1085,7 +1570,7 @@ int Mix_GetSynchroValue(void)
 /* Uninitialize the music interfaces */
 void close_music(void)
 {
-    int i;
+    size_t i;
 
     Mix_HaltMusic();
 
@@ -1106,6 +1591,16 @@ void close_music(void)
         soundfont_paths = NULL;
     }
 
+    if (music_file) {
+        SDL_free(music_file);
+    }
+    if (music_args) {
+        SDL_free(music_args);
+    }
+    music_file = NULL;
+    music_args = NULL;
+    music_filename = NULL;
+
     /* rcg06042009 report available decoders at runtime. */
     if (music_decoders) {
         SDL_free((void *)music_decoders);
@@ -1119,7 +1614,7 @@ void close_music(void)
 /* Unload the music interface libraries */
 void unload_music(void)
 {
-    int i;
+    size_t i;
     for (i = 0; i < SDL_arraysize(s_music_interfaces); ++i) {
         Mix_MusicInterface *interface = s_music_interfaces[i];
         if (!interface || !interface->loaded) {

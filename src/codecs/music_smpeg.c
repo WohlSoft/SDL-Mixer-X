@@ -217,12 +217,20 @@ Mix_MusicInterface Mix_MusicInterface_SMPEG =
     SMPEG_Load,
     NULL,   /* Open */
     SMPEG_CreateFromRW,
+    NULL,   /* CreateFromRWex [MIXER-X]*/
     NULL,   /* CreateFromFile */
+    NULL,   /* CreateFromFileEx [MIXER-X]*/
     SMPEG_SetVolume,
     SMPEG_Play,
     SMPEG_IsPlaying,
     SMPEG_GetAudio,
     SMPEG_Seek,
+    NULL,   /* Tell [MIXER-X]*/
+    NULL,   /* FullLength [MIXER-X]*/
+    NULL,   /* LoopStart [MIXER-X]*/
+    NULL,   /* LoopEnd [MIXER-X]*/
+    NULL,   /* LoopLength [MIXER-X]*/
+    NULL,   /* GetMetaTag [MIXER-X]*/
     NULL,   /* Pause */
     NULL,   /* Resume */
     SMPEG_Stop,

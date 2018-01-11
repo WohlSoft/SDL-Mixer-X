@@ -468,12 +468,20 @@ Mix_MusicInterface Mix_MusicInterface_MIKMOD =
     MIKMOD_Load,
     MIKMOD_Open,
     MIKMOD_CreateFromRW,
+    NULL,   /* CreateFromRWex [MIXER-X]*/
     NULL,   /* CreateFromFile */
+    NULL,   /* CreateFromFileEx [MIXER-X]*/
     MIKMOD_SetVolume,
     MIKMOD_Play,
     MIKMOD_IsPlaying,
     MIKMOD_GetAudio,
     MIKMOD_Seek,
+    NULL,   /* Tell [MIXER-X]*/
+    NULL,   /* FullLength [MIXER-X]*/
+    NULL,   /* LoopStart [MIXER-X]*/
+    NULL,   /* LoopEnd [MIXER-X]*/
+    NULL,   /* LoopLength [MIXER-X]*/
+    NULL,   /* GetMetaTag [MIXER-X]*/
     NULL,   /* Pause */
     NULL,   /* Resume */
     MIKMOD_Stop,

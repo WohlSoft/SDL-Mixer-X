@@ -33,7 +33,7 @@
 #include "begin_code.h"
 
 /* Let applications recogonize which SDL Mixer edition is in use: Official or Extended fork by Wohlstand */
-/* #define SDL_MIXER_X 1 */
+#define SDL_MIXER_X 1
 
 #if defined(FORCE_STDCALLS) && defined(_WIN32)
 #ifdef SDLCALL
@@ -162,9 +162,8 @@ typedef enum {
     MUS_MP3_MAD_UNUSED,
     MUS_FLAC,
     MUS_MODPLUG_UNUSED,
-    MUS_SPC, /* Deprecated, use MUS_GME instead */
-    MUS_GME = MUS_SPC,
-    MUS_ADLMIDI,
+    MUS_GME,
+    MUS_ADLMIDI,/*Use ADLMIDI coded for super-special formats like IMF, MUS or XMI are can't be played without ADLMIDI*/
     MUS_KnownCodecs     /* Count of codec types */
 } Mix_MusicType;
 

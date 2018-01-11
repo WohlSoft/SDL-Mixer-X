@@ -35,12 +35,13 @@ namespace PGE_MusicPlayer
                    type == MUS_WAV ? "PCM Wave" :
                    type == MUS_MOD ? "MikMod" :
                    type == MUS_MODPLUG_UNUSED ? "ModPlug" :
-                   type == MUS_MID ? "MIDI/IMF" :
+                   type == MUS_MID ? "MIDI" :
                    type == MUS_OGG ? "OGG" :
                    type == MUS_MP3 ? "MP3 (SMPEG)" :
                    type == MUS_MP3_MAD_UNUSED ? "MP3 (LibMAD)" :
                    type == MUS_FLAC ? "FLAC" :
                    #ifdef SDL_MIXER_X
+                   type == MUS_ADLMIDI ? "IMF/MUS/XMI" :
                    type == MUS_GME ? "Game Music Emulator" :
                    #endif
                    "<Unknown>");
