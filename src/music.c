@@ -81,8 +81,6 @@ static int num_decoders = 0;
 static char* soundfont_paths = NULL;
 
 /*  ======== MIDI toggler ======== */
-/* Next MIDI device to open */
-static int mididevice_next    = MIDI_ANY;
 /* MIDI device currently in use */
 static int mididevice_current = MIDI_ANY;
 /* Reset MIDI settings every file reopening (to allow right argument passing) */
@@ -345,7 +343,7 @@ Mix_MusicAPI get_current_midi_api()
 #endif
 
     if (!use_native_midi) {
-        switch (mididevice_next) {
+        switch (mididevice_current) {
         #ifdef MUSIC_MID_ADLMIDI
         case MIDI_ADLMIDI:
             target_midi_api = MIX_MUSIC_ADLMIDI;
@@ -372,10 +370,9 @@ Mix_MusicAPI get_current_midi_api()
             break;
         #endif
         default:
-            mididevice_next = MIDI_ANY;
+            mididevice_current = MIDI_ANY;
             break;
         }
-        mididevice_current = mididevice_next;
     }
 
     return target_midi_api;
@@ -497,7 +494,7 @@ SDL_bool has_music(Mix_MusicType type)
 static Mix_MusicType xmi_compatible_midi_player()
 {
 #if defined(MUSIC_MID_ADLMIDI) && defined(MUSIC_MID_OPNMIDI)
-    if((mididevice_next != MIDI_ADLMIDI) && (mididevice_next != MIDI_OPNMIDI))
+    if((mididevice_current != MIDI_ADLMIDI) && (mididevice_current != MIDI_OPNMIDI))
         return MUS_ADLMIDI;
     else
 #elif defined defined(MUSIC_MID_ADLMIDI)
@@ -1746,13 +1743,12 @@ int SDLCALLCC Mix_GetMidiDevice()
 
 int SDLCALLCC Mix_GetNextMidiDevice()
 {
-    return mididevice_next;
+    return mididevice_current;
 }
 
 int SDLCALLCC Mix_SetMidiDevice(int device)
 {
-    switch(device)
-    {
+    switch (device) {
         #ifdef MID_MUSIC
         #ifdef MUSIC_MID_ADLMIDI
     case MIDI_ADLMIDI:
@@ -1769,7 +1765,7 @@ int SDLCALLCC Mix_SetMidiDevice(int device)
         #ifdef MUSIC_MID_FLUIDSYNTH
     case MIDI_Fluidsynth:
         #endif
-        mididevice_next = device;
+        mididevice_current = device;
         mididevice_need_Reset = 0;
         return 0;
         #endif
