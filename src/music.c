@@ -941,6 +941,29 @@ Mix_Music *Mix_LoadMUS_RW(SDL_RWops *src, int freesrc)
     return Mix_LoadMUSType_RW(src, MUS_NONE, freesrc);
 }
 
+Mix_Music *SDLCALLCC Mix_LoadMUS_RW_ARG(SDL_RWops *src, int freesrc, char *args)
+{
+    size_t args_len = SDL_strlen(args);
+    if (music_args) {
+        SDL_free(music_args);
+    }
+    music_args = (char *)SDL_malloc(sizeof(char) * args_len + 1);
+    music_args[0] = '\0';
+    SDL_strlcpy(music_args, args, args_len);
+    return Mix_LoadMUSType_RW(src, MUS_NONE, freesrc);
+}
+
+Mix_Music *SDLCALLCC Mix_LoadMUS_RW_GME(SDL_RWops *src, int freesrc, int trackID)
+{
+    if (music_args) {
+        SDL_free(music_args);
+    }
+    music_args = (char *)SDL_malloc(sizeof(char) * 25);
+    music_args[0] = '\0';
+    SDL_snprintf(music_args, 25, "%i", trackID);
+    return Mix_LoadMUSType_RW(src, MUS_NONE, freesrc);
+}
+
 Mix_Music *Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int freesrc)
 {
     size_t i;

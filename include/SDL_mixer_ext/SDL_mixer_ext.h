@@ -25,11 +25,11 @@
 #ifndef SDL_MIXER_H_
 #define SDL_MIXER_H_
 
-#include <SDL2/SDL_stdinc.h>
-#include <SDL2/SDL_rwops.h>
-#include <SDL2/SDL_audio.h>
-#include <SDL2/SDL_endian.h>
-#include <SDL2/SDL_version.h>
+#include "SDL_stdinc.h"
+#include "SDL_rwops.h"
+#include "SDL_audio.h"
+#include "SDL_endian.h"
+#include "SDL_version.h"
 #include "begin_code.h"
 
 /* Let applications recogonize which SDL Mixer edition is in use: Official or Extended fork by Wohlstand */
@@ -208,7 +208,13 @@ extern DECLSPEC int SDLCALL Mix_AllocateChannels(int numchans);
  */
 extern DECLSPEC int SDLCALL Mix_QuerySpec(int *frequency,Uint16 *format,int *channels);
 
-/* Load a wave file or a music (.mod .s3m .it .xm) file */
+/* Load a wave file or a music (.mod .s3m .it .xm) file
+    IMPORTANT: To choice a track number of NSF, GBM, HES, etc file,
+               you must append "|xxx" to end of file path for
+               Mix_LoadMUS function.
+               Where xxx - actual number of chip track, (from 0 to N-1)
+               Examples: "file.nsf|12", "file.hes|2"
+*/
 extern DECLSPEC Mix_Chunk * SDLCALL Mix_LoadWAV_RW(SDL_RWops *src, int freesrc);
 #define Mix_LoadWAV(file)   Mix_LoadWAV_RW(SDL_RWFromFile(file, "rb"), 1)
 extern DECLSPEC Mix_Music * SDLCALL Mix_LoadMUS(const char *file);
@@ -216,6 +222,17 @@ extern DECLSPEC Mix_Music * SDLCALL Mix_LoadMUS(const char *file);
 /* Load a music file from an SDL_RWop object (Ogg and MikMod specific currently)
    Matt Campbell (matt@campbellhome.dhs.org) April 2000 */
 extern DECLSPEC Mix_Music * SDLCALL Mix_LoadMUS_RW(SDL_RWops *src, int freesrc);
+
+/* Load a music file from an SDL_RWop object with custom arguments (trackID for GME or settings for a MIDI playing)
+ * Arguments are taking no effect for file formats which are not supports extra arguments.
+  */
+extern DECLSPEC Mix_Music *SDLCALL Mix_LoadMUS_RW_ARG(SDL_RWops *src, int freesrc, char *args);
+
+/* Load a music file from an SDL_RWop object with custom trackID for GME.
+ * trackID argument takes no effect for non-NSF,HES,GBM,etc. file formats.
+ * Default value should be 0
+ */
+extern DECLSPEC Mix_Music *SDLCALL Mix_LoadMUS_RW_GME(SDL_RWops *src, int freesrc, int trackID);
 
 /* Load a music file from an SDL_RWop object assuming a specific format */
 extern DECLSPEC Mix_Music * SDLCALL Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int freesrc);
@@ -789,28 +806,8 @@ extern DECLSPEC void SDLCALL Mix_SetLockMIDIArgs(int lock_midiargs);
     because some applications are still use them, to don't break ABI we will keep those
     aliases until we will remove all usages of them from applications and libraries are used them
 */
-DEPRECATED(extern DECLSPEC void SDLCALL MIX_Timidity_addToPathList(const char *path));
-DEPRECATED(extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getTotalBanks());
-DEPRECATED(extern DECLSPEC const char *const *SDLCALL MIX_ADLMIDI_getBankNames());
-DEPRECATED(extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getBankID());
-DEPRECATED(extern DECLSPEC void SDLCALL MIX_ADLMIDI_setBankID(int bnk));
-DEPRECATED(extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getTremolo());
-DEPRECATED(extern DECLSPEC void SDLCALL MIX_ADLMIDI_setTremolo(int tr));
-DEPRECATED(extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getVibrato());
-DEPRECATED(extern DECLSPEC void SDLCALL MIX_ADLMIDI_setVibrato(int vib));
-DEPRECATED(extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getScaleMod());
-DEPRECATED(extern DECLSPEC void SDLCALL MIX_ADLMIDI_setScaleMod(int sc));
-DEPRECATED(extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getAdLibMode());
-DEPRECATED(extern DECLSPEC void SDLCALL MIX_ADLMIDI_setAdLibMode(int tr));
-DEPRECATED(extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getLogarithmicVolumes());
-DEPRECATED(extern DECLSPEC void SDLCALL MIX_ADLMIDI_setLogarithmicVolumes(int lv));
-DEPRECATED(extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getVolumeModel());
-DEPRECATED(extern DECLSPEC void SDLCALL MIX_ADLMIDI_setVolumeModel(int vm));
-DEPRECATED(extern DECLSPEC void SDLCALL MIX_ADLMIDI_setSetDefaults());
-DEPRECATED(extern DECLSPEC void SDLCALL MIX_OPNMIDI_setCustomBankFile(const char *bank_wonp_path));
-DEPRECATED(extern DECLSPEC int  SDLCALL MIX_SetMidiDevice(int device));
-DEPRECATED(extern DECLSPEC void SDLCALL MIX_SetLockMIDIArgs(int lock_midiargs));
-/* deprecated names */
+/* All deprecated functions has been nuked :3. So, No way you will use them again :-P
+ * Just go to fix your software to use same functions with new names. */
 
 /* We'll use SDL for reporting errors */
 #define Mix_SetError    SDL_SetError

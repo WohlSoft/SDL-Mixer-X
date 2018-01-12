@@ -302,12 +302,12 @@ endif()
 list(APPEND SDLMixerX_LINK_LIBS stdc++)
 
 list(APPEND SDLMixerX_SOURCES
-        ${SDLMixerX_SOURCE_DIR}/src/audio_codec.c
         ${SDLMixerX_SOURCE_DIR}/src/effect_position.c
         ${SDLMixerX_SOURCE_DIR}/src/effects_internal.c
         ${SDLMixerX_SOURCE_DIR}/src/effect_stereoreverse.c
         ${SDLMixerX_SOURCE_DIR}/src/mixer.c
         ${SDLMixerX_SOURCE_DIR}/src/music.c
+        ${SDLMixerX_SOURCE_DIR}/src/mixer_x_deprecated.c
     )
 
 file(GLOB SDLMixerX_SOURCES ${SDLMixerX_SOURCES})
