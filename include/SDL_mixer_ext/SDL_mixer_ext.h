@@ -1,5 +1,5 @@
 /*
-  SDL_mixer_ext:  An extended audio mixer library, forked from SDL_mixer
+  SDL Mixer X:  An extended audio mixer library, forked from SDL_mixer
   Copyright (C) 2014-2018 Vitaly Novichkov <admin@wohlnet.ru>
 
   SDL_mixer:  An audio mixer library based on the SDL library
