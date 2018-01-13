@@ -176,8 +176,13 @@ static void process_args(const char *args)
     if (args == NULL) {
         return;
     }
+    maxlen = SDL_strlen(args);
+    if (maxlen == 0) {
+        return;
+    }
 
-    maxlen = SDL_strlen(args) + 1;
+    maxlen += 1;
+    Mix_ADLMIDI_setSetDefaults();
 
     for (i = 0; i < maxlen; i++) {
         char c = args[i];
