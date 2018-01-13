@@ -24,7 +24,7 @@
 /* This file supports streaming WAV files */
 
 #include "music_wav.h"
-
+#include "music_id3tag.h"
 
 typedef struct {
     SDL_bool active;
@@ -47,6 +47,7 @@ typedef struct {
     SDL_AudioStream *stream;
     int numloops;
     WAVLoopPoint *loops;
+    Mix_MusicMetaTags tags;
 } WAV_Music;
 
 /*
@@ -65,6 +66,8 @@ typedef struct {
 #define FMT         0x20746D66      /* "fmt " */
 #define DATA        0x61746164      /* "data" */
 #define SMPL        0x6c706d73      /* "smpl" */
+#define LIST        0x5453494c      /* "LIST" */
+#define ID3_        0x20336469      /* "id3 " */
 #define PCM_CODE    1
 #define ADPCM_CODE  2
 #define WAVE_MONO   1
@@ -306,12 +309,19 @@ static double WAV_Length(void *context)
     return (double)(music->stop - music->start) / (double)(music->spec.freq * music->samplesize);
 }
 
+static const char* WAV_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
+{
+    WAV_Music *music = (WAV_Music *)context;
+    return meta_tags_get(&music->tags, tag_type);
+}
+
 /* Close the given WAV stream */
 static void WAV_Delete(void *context)
 {
     WAV_Music *music = (WAV_Music *)context;
 
     /* Clean up associated data */
+    meta_tags_clear(&music->tags);
     if (music->loops) {
         SDL_free(music->loops);
     }
@@ -445,6 +455,98 @@ static SDL_bool ParseSMPL(WAV_Music *wave, Uint32 chunk_length)
     return loaded;
 }
 
+static void read_meta_field(Mix_MusicMetaTags *tags, Mix_MusicMetaTag tag_type, size_t *i, Uint32 chunk_length, Uint8 *data, size_t fieldOffset)
+{
+    Uint32 len = 0;
+    int isID3 = fieldOffset == 7;
+    char *field = NULL;
+    *i += 4;
+    len = isID3 ?
+          SDL_SwapBE32(*((Uint32 *)(data + *i))) : /* ID3  */
+          SDL_SwapLE32(*((Uint32 *)(data + *i))); /* LIST */
+    if (len > chunk_length) {
+        return; /* Do nothing due to broken lenght */
+    }
+    *i += fieldOffset;
+    field = (char *)SDL_malloc(len + 1);
+    SDL_memset(field, 0, (len + 1));
+    SDL_strlcpy(field, (char *)(data + *i), isID3 ? len - 1 : len);
+    *i += len;
+    meta_tags_set(tags, tag_type, field);
+    SDL_free(field);
+}
+
+static SDL_bool ParseLIST(WAV_Music *wave, Uint32 chunk_length)
+{
+    SDL_bool loaded = SDL_FALSE;
+
+    Uint8 *data;
+    data = (Uint8 *)SDL_malloc(chunk_length);
+    if (!data) {
+        Mix_SetError("Out of memory");
+        return SDL_FALSE;
+    }
+
+    if (!SDL_RWread(wave->src, data, chunk_length, 1)) {
+        Mix_SetError("Couldn't read %d bytes from WAV file", chunk_length);
+        return SDL_FALSE;
+    }
+
+    if (SDL_strncmp((char *)data, "INFO", 4) == 0) {
+        size_t i = 4;
+        for (i = 4; i < chunk_length - 4;) {
+            if(SDL_strncmp((char *)(data + i), "INAM", 4) == 0) {
+                read_meta_field(&wave->tags, MIX_META_TITLE, &i, chunk_length, data, 4);
+                continue;
+            } else if(SDL_strncmp((char *)(data + i), "IART", 4) == 0) {
+                read_meta_field(&wave->tags, MIX_META_ARTIST, &i, chunk_length, data, 4);
+                continue;
+            } else if(SDL_strncmp((char *)(data + i), "IALB", 4) == 0) {
+                read_meta_field(&wave->tags, MIX_META_ALBUM, &i, chunk_length, data, 4);
+                continue;
+            } else if (SDL_strncmp((char *)(data + i), "BCPR", 4) == 0) {
+                read_meta_field(&wave->tags, MIX_META_COPYRIGHT, &i, chunk_length, data, 4);
+                continue;
+            }
+            i++;
+        }
+        loaded = SDL_TRUE;
+    }
+
+    /* done: */
+    SDL_free(data);
+
+    return loaded;
+}
+
+static SDL_bool ParseID3(WAV_Music *wave, Uint32 chunk_length)
+{
+    SDL_bool loaded = SDL_FALSE;
+
+    Uint8 *data;
+    data = (Uint8 *)SDL_malloc(chunk_length);
+
+    if (!data) {
+        Mix_SetError("Out of memory");
+        return SDL_FALSE;
+    }
+
+    if (!SDL_RWread(wave->src, data, chunk_length, 1)) {
+        Mix_SetError("Couldn't read %d bytes from WAV file", chunk_length);
+        return SDL_FALSE;
+    }
+
+    if (SDL_strncmp((char *)data, "ID3", 3) == 0) {
+        id3tag_fetchTagsFromMemory(&wave->tags, data, chunk_length);
+        loaded = SDL_TRUE;
+    }
+
+    /* done: */
+    SDL_free(data);
+
+    return loaded;
+}
+
 static SDL_bool LoadWAVMusic(WAV_Music *wave)
 {
     SDL_RWops *src = wave->src;
@@ -456,6 +558,8 @@ static SDL_bool LoadWAVMusic(WAV_Music *wave)
     /* WAV magic header */
     Uint32 wavelen;
     Uint32 WAVEmagic;
+
+    meta_tags_init(&wave->tags);
 
     /* Check the magic header */
     wavelen = SDL_ReadLE32(src);
@@ -483,6 +587,14 @@ static SDL_bool LoadWAVMusic(WAV_Music *wave)
             break;
         case SMPL:
             if (!ParseSMPL(wave, chunk_length))
+                return SDL_FALSE;
+            break;
+        case LIST:
+            if (!ParseLIST(wave, chunk_length))
+                return SDL_FALSE;
+            break;
+        case ID3_:
+            if (!ParseID3(wave, chunk_length))
                 return SDL_FALSE;
             break;
         default:
@@ -658,7 +770,7 @@ Mix_MusicInterface Mix_MusicInterface_WAV =
     NULL,   /* LoopStart [MIXER-X]*/
     NULL,   /* LoopEnd [MIXER-X]*/
     NULL,   /* LoopLength [MIXER-X]*/
-    NULL,   /* GetMetaTag [MIXER-X]*/
+    WAV_GetMetaTag,   /* GetMetaTag [MIXER-X]*/
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */
