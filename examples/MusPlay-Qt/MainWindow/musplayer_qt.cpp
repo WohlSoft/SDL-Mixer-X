@@ -528,11 +528,22 @@ void MusPlayer_Qt::on_play_clicked()
 
     bool playSuccess = false;
 
-    QString musicPath =
+    QString musicPath = currentMusic;
     #ifdef SDL_MIXER_X
-            currentMusic + "|" + ui->trackID->text();
+    if(ui->gme_setup->isVisible())
+        musicPath += "|" + ui->trackID->text();
+    else if(ui->midi_setup->isVisible())
+    {
+        if(ui->midiRawArgs->text().isEmpty())
+            Mix_SetLockMIDIArgs(1);
+        else
+        {
+            Mix_SetLockMIDIArgs(0);
+            musicPath += "|" + ui->midiRawArgs->text();
+        }
+    }
     #else
-            currentMusic;
+        currentMusic;
     #endif
 
     if(PGE_MusicPlayer::MUS_openFile(musicPath))

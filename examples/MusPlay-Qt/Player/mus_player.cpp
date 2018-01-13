@@ -244,8 +244,10 @@ namespace PGE_MusicPlayer
             Mix_FreeMusic(play_mus);
             play_mus = NULL;
         }
+
         #ifndef MUSPLAY_USE_WINAPI
-        play_mus = Mix_LoadMUS(musFile.toUtf8().data());
+        QByteArray p = musFile.toUtf8();
+        play_mus = Mix_LoadMUS(p.data());
         #else
         play_mus = Mix_LoadMUS(musFile.c_str());
         #endif
