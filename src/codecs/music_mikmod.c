@@ -170,6 +170,7 @@ typedef struct
     SDL_AudioStream *stream;
     SBYTE *buffer;
     ULONG buffer_size;
+    Mix_MusicMetaTags tags;
 } MIKMOD_Music;
 
 
@@ -326,6 +327,9 @@ void *MIKMOD_CreateFromRW(SDL_RWops *src, int freesrc)
     music->module->loop    = 1;
     music->module->fadeout = 0;
 
+    meta_tags_init(&music->tags);
+    meta_tags_set(&music->tags, MIX_META_TITLE, music->module->songname);
+
     if ((*mikmod.md_mode & DMODE_16BITS) == DMODE_16BITS) {
         format = AUDIO_S16SYS;
     } else {
@@ -440,11 +444,18 @@ static void MIKMOD_Stop(void *context)
     mikmod.Player_Stop();
 }
 
+static const char* MIKMOD_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
+{
+    MIKMOD_Music *music = (MIKMOD_Music *)context;
+    return meta_tags_get(&music->tags, tag_type);
+}
+
 /* Close the given MOD stream */
 static void MIKMOD_Delete(void *context)
 {
     MIKMOD_Music *music = (MIKMOD_Music *)context;
 
+    meta_tags_clear(&music->tags);
     if (music->module) {
         mikmod.Player_Free(music->module);
     }
@@ -481,7 +492,7 @@ Mix_MusicInterface Mix_MusicInterface_MIKMOD =
     NULL,   /* LoopStart [MIXER-X]*/
     NULL,   /* LoopEnd [MIXER-X]*/
     NULL,   /* LoopLength [MIXER-X]*/
-    NULL,   /* GetMetaTag [MIXER-X]*/
+    MIKMOD_GetMetaTag,/* GetMetaTag [MIXER-X]*/
     NULL,   /* Pause */
     NULL,   /* Resume */
     MIKMOD_Stop,
