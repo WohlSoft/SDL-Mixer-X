@@ -23,6 +23,9 @@
 #ifndef MUSIC_H_
 #define MUSIC_H_
 
+/* Prevent "Unused" warning on specified object */
+#define MIX_UNUSED(object) (void)object
+
 /* Supported music APIs, in order of preference */
 
 typedef enum

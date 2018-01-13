@@ -51,8 +51,7 @@ static void GME_delete(void *context);
 void GME_setvolume(void *music_p, int volume)
 {
     GME_Music *music = (GME_Music*)music_p;
-    if(music)
-        music->volume = (int)round(128.0 * sqrt(((double)volume) * (1.0 / 128.0)));
+    music->volume = (int)(round(128.0 * sqrt(((double)volume) * (1.0 / 128.0))));
 }
 
 
@@ -275,14 +274,14 @@ static const char* GME_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
 static int GME_jump_to_time(void *music_p, double time)
 {
     GME_Music *music = (GME_Music*)music_p;
-    gme_seek(music->game_emu, (int)round(time * 1000.0));
+    gme_seek(music->game_emu, (int)(round(time * 1000.0)));
     return 0;
 }
 
 static double GME_get_cur_time(void *music_p)
 {
     GME_Music *music = (GME_Music*)music_p;
-    return (double)gme_tell(music->game_emu) / 1000.0;
+    return (double)(gme_tell(music->game_emu)) / 1000.0;
 }
 
 Mix_MusicInterface Mix_MusicInterface_GME =

@@ -558,6 +558,8 @@ static SDL_bool LoadWAVMusic(WAV_Music *wave)
     /* WAV magic header */
     Uint32 wavelen;
     Uint32 WAVEmagic;
+    MIX_UNUSED(WAVEmagic);
+    MIX_UNUSED(wavelen);
 
     meta_tags_init(&wave->tags);
 
@@ -664,6 +666,8 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
     Uint16 samplesize = 0;
     Uint8 sane_freq[10];
     Uint32 frequency = 0;
+
+    MIX_UNUSED(blocksize);
 
     /* Check the magic header */
     chunk_length = SDL_ReadBE32(src);
