@@ -14,9 +14,11 @@ macx:
 }
 
 SOURCES += \
-    $$PWD/native_midi/native_midi_haiku.cpp
+    $$PWD/native_midi/native_midi_haiku.cpp \
+    $$PWD/music_nativemidi.c
 
 HEADERS += \
-    $$PWD/native_midi/native_midi.h \
+    $$PWD/music_nativemidi.h \
+    $$PWD/native_midi/native_midi.h
     $$PWD/native_midi/native_midi_common.h
 

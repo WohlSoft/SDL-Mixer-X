@@ -66,6 +66,7 @@ exists($$PWD/../../_common/build_props.pri):{
     DESTDIR = $$PWD/../_builds/$$TARGETOS/lib
     LIBS += -L$$PWD/../_builds/$$TARGETOS/lib
     INCLUDEPATH += $$PWD/../_builds/$$TARGETOS/include
+    INCLUDEPATH += $$PWD/../_builds/$$TARGETOS/include/SDL2
     QMAKE_POST_LINK = \
         $$COPY $$shell_path($$PWD/include/SDL_mixer_ext/SDL_mixer_ext.h) \
         $$shell_path($$PWD/../_builds/$$TARGETOS/include/SDL2)
@@ -83,6 +84,7 @@ exists($$PWD/../../_common/build_props.pri):{
     # As standalone library
     exists($$PWD/../AudioCodecs/build/lib/):{
         LIBS += -L$$PWD/../AudioCodecs/build/lib/
+        INCLUDEPATH += $$PWD/../AudioCodecs/build/include/SDL2/
     }
     LIBS += -L$$PWD/build/lib/
     INCLUDEPATH += -L$$PWD/build/include/
@@ -91,6 +93,7 @@ exists($$PWD/../../_common/build_props.pri):{
 
 
 INCLUDEPATH += $$PWD/include/
+INCLUDEPATH += $$PWD/include/SDL_mixer_ext
 
 linux-g++||unix:!macx:!android:{
     DEFINES += HAVE_INTTYPES_H HAVE_SETENV HAVE_SINF HAVE_FORK
@@ -138,47 +141,47 @@ android:{
 
 
 # Let user disable or enable component by adding extra CONFIG+= values
-enable-flac:  DEFAULT_CODECS += FLAC_MUSIC
-disable-flac: DEFAULT_CODECS -= FLAC_MUSIC
+enable-flac:  DEFAULT_CODECS += MUSIC_FLAC
+disable-flac: DEFAULT_CODECS -= MUSIC_FLAC
 
-enable-midi:  DEFAULT_CODECS += MID_MUSIC
-disable-midi: DEFAULT_CODECS -= MID_MUSIC
+enable-midi:  DEFAULT_CODECS += MUSIC_MIDI
+disable-midi: DEFAULT_CODECS -= MUSIC_MIDI
 
-enable-midi-adlmidi:  DEFAULT_CODECS += USE_ADL_MIDI
-disable-midi-adlmidi: DEFAULT_CODECS -= USE_ADL_MIDI
+enable-midi-adlmidi:  DEFAULT_CODECS += MUSIC_MID_ADLMIDI
+disable-midi-adlmidi: DEFAULT_CODECS -= MUSIC_MID_ADLMIDI
 
-enable-midi-timidity:  DEFAULT_CODECS += USE_TIMIDITY_MIDI
-disable-midi-timidity: DEFAULT_CODECS -= USE_TIMIDITY_MIDI
+enable-midi-timidity:  DEFAULT_CODECS += MUSIC_MID_TIMIDITY
+disable-midi-timidity: DEFAULT_CODECS -= MUSIC_MID_TIMIDITY
 
-enable-midi-native:  DEFAULT_CODECS += USE_NATIVE_MIDI
-disable-midi-native: DEFAULT_CODECS -= USE_NATIVE_MIDI
+enable-midi-native:  DEFAULT_CODECS += MUSIC_MID_NATIVE
+disable-midi-native: DEFAULT_CODECS -= MUSIC_MID_NATIVE
 
-enable-midi-opnmidi:  DEFAULT_CODECS += USE_OPN2_MIDI
-disable-midi-opnmidi: DEFAULT_CODECS -= USE_OPN2_MIDI
+enable-midi-opnmidi:  DEFAULT_CODECS += MUSIC_MID_OPNMIDI
+disable-midi-opnmidi: DEFAULT_CODECS -= MUSIC_MID_OPNMIDI
 
-enable-midi-fluidsynth:  DEFAULT_CODECS += USE_FLUIDSYNTH_MIDI
-disable-midi-fluidsynth: DEFAULT_CODECS -= USE_FLUIDSYNTH_MIDI
+enable-midi-fluidsynth:  DEFAULT_CODECS += MUSIC_MID_FLUIDSYNTH
+disable-midi-fluidsynth: DEFAULT_CODECS -= MUSIC_MID_FLUIDSYNTH
 
-enable-mp3:  DEFAULT_CODECS += MP3_MAD_MUSIC
-disable-mp3: DEFAULT_CODECS -= MP3_MAD_MUSIC
+enable-mp3:  DEFAULT_CODECS += MUSIC_MP3_MAD
+disable-mp3: DEFAULT_CODECS -= MUSIC_MP3_MAD
 
-enable-mp3-smpeg:  DEFAULT_CODECS += MP3_MUSIC
-disable-mp3-smpeg: DEFAULT_CODECS -= MP3_MUSIC
+enable-mp3-smpeg:  DEFAULT_CODECS += MUSIC_MP3_SMPEG
+disable-mp3-smpeg: DEFAULT_CODECS -= MUSIC_MP3_SMPEG
 
-enable-ogg:  DEFAULT_CODECS += OGG_MUSIC
-disable-ogg: DEFAULT_CODECS -= OGG_MUSIC
+enable-ogg:  DEFAULT_CODECS += MUSIC_OGG
+disable-ogg: DEFAULT_CODECS -= MUSIC_OGG
 
-enable-gme:  DEFAULT_CODECS += GME_MUSIC
-disable-gme: DEFAULT_CODECS -= GME_MUSIC
+enable-gme:  DEFAULT_CODECS += MUSIC_GME
+disable-gme: DEFAULT_CODECS -= MUSIC_GME
 
-enable-mikmod:  DEFAULT_CODECS += MOD_MUSIC
-disable-mikmod: DEFAULT_CODECS -= MOD_MUSIC
+enable-mikmod:  DEFAULT_CODECS += MUSIC_MOD_MIKMOD
+disable-mikmod: DEFAULT_CODECS -= MUSIC_MOD_MIKMOD
 
-enable-modplug:  DEFAULT_CODECS += MODPLUG_MUSIC
-disable-modplug: DEFAULT_CODECS -= MODPLUG_MUSIC
+enable-modplug:  DEFAULT_CODECS += MUSIC_MOD_MODPLUG
+disable-modplug: DEFAULT_CODECS -= MUSIC_MOD_MODPLUG
 
-enable-cmd:  DEFAULT_CODECS += CMD_MUSIC
-disable-cmd: DEFAULT_CODECS -= CMD_MUSIC
+enable-cmd:  DEFAULT_CODECS += MUSIC_CMD
+disable-cmd: DEFAULT_CODECS -= MUSIC_CMD
 
 android: {
 DEFINES += \
@@ -201,33 +204,32 @@ DEFINES += \
     _USE_MATH_DEFINES \
 
 include($$PWD/src/codecs/play_wave.pri)
-contains(DEFINES, USE_ADL_MIDI):        include($$PWD/src/codecs/play_midi_adl.pri)
-contains(DEFINES, USE_OPN2_MIDI):       include($$PWD/src/codecs/play_midi_opn.pri)
-contains(DEFINES, USE_TIMIDITY_MIDI):   include($$PWD/src/codecs/play_midi_timidity.pri)
-contains(DEFINES, USE_NATIVE_MIDI):     include($$PWD/src/codecs/play_midi_native.pri)
-contains(DEFINES, USE_FLUIDSYNTH_MIDI): include($$PWD/src/codecs/play_midi_fluid.pri)
-contains(DEFINES, OGG_MUSIC):           include($$PWD/src/codecs/play_ogg.pri)
-contains(DEFINES, FLAC_MUSIC):          include($$PWD/src/codecs/play_flac.pri)
-contains(DEFINES, MOD_MUSIC):           include($$PWD/src/codecs/play_mikmod.pri)
-contains(DEFINES, MODPLUG_MUSIC):       include($$PWD/src/codecs/play_modplug.pri)
-contains(DEFINES, MP3_MAD_MUSIC):       include($$PWD/src/codecs/play_mp3.pri)
-contains(DEFINES, GME_MUSIC):           include($$PWD/src/codecs/play_gme.pri)
-contains(DEFINES, CMD_MUSIC):           include($$PWD/src/codecs/play_cmdmusic.pri)
+contains(DEFINES, MUSIC_MID_ADLMIDI):   include($$PWD/src/codecs/play_midi_adl.pri)
+contains(DEFINES, MUSIC_MID_OPNMIDI):   include($$PWD/src/codecs/play_midi_opn.pri)
+contains(DEFINES, MUSIC_MID_TIMIDITY):  include($$PWD/src/codecs/play_midi_timidity.pri)
+contains(DEFINES, MUSIC_MID_NATIVE):    include($$PWD/src/codecs/play_midi_native.pri)
+contains(DEFINES, MUSIC_MID_FLUIDSYNTH):include($$PWD/src/codecs/play_midi_fluid.pri)
+contains(DEFINES, MUSIC_OGG):           include($$PWD/src/codecs/play_ogg.pri)
+contains(DEFINES, MUSIC_FLAC):          include($$PWD/src/codecs/play_flac.pri)
+contains(DEFINES, MUSIC_MOD_MIKMOD):    include($$PWD/src/codecs/play_mikmod.pri)
+contains(DEFINES, MUSIC_MOD_MODPLUG):   include($$PWD/src/codecs/play_modplug.pri)
+contains(DEFINES, MUSIC_MP3_MAD):       include($$PWD/src/codecs/play_smpeg.pri)
+contains(DEFINES, MUSIC_MP3_SMPEG):     include($$PWD/src/codecs/play_smpeg.pri)
+contains(DEFINES, MUSIC_GME):           include($$PWD/src/codecs/play_gme.pri)
+contains(DEFINES, MUSIC_CMD):           include($$PWD/src/codecs/play_cmdmusic.pri)
 
 HEADERS += \
     include/SDL_mixer_ext/SDL_mixer_ext.h \
     include/SDL_mixer_ext/begin_code.h \
     include/SDL_mixer_ext/close_code.h \
-    src/audio_codec.h \
     src/effects_internal.h \
-    src/resample/my_resample.h \
     src/mixer.h \
 
 SOURCES += \
-    src/audio_codec.c \
     src/effect_position.c \
     src/effect_stereoreverse.c \
     src/effects_internal.c \
     src/mixer.c \
     src/music.c \
-    src/resample/my_resample.c
+    src/mixer_x_deprecated.c \
+
