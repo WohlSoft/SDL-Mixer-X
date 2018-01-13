@@ -33,12 +33,10 @@ namespace PGE_MusicPlayer
                    type == MUS_NONE ? "No Music" :
                    type == MUS_CMD ? "CMD" :
                    type == MUS_WAV ? "PCM Wave" :
-                   type == MUS_MOD ? "MikMod" :
-                   type == MUS_MODPLUG_UNUSED ? "ModPlug" :
+                   type == MUS_MOD ? "Tracker music" :
                    type == MUS_MID ? "MIDI" :
                    type == MUS_OGG ? "OGG" :
-                   type == MUS_MP3 ? "MP3 (SMPEG)" :
-                   type == MUS_MP3_MAD_UNUSED ? "MP3 (LibMAD)" :
+                   type == MUS_MP3 ? "MP3" :
                    type == MUS_FLAC ? "FLAC" :
                    #ifdef SDL_MIXER_X
                    type == MUS_ADLMIDI ? "IMF/MUS/XMI" :
