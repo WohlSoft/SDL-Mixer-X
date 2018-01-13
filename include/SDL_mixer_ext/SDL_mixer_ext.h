@@ -237,6 +237,10 @@ extern DECLSPEC Mix_Music *SDLCALL Mix_LoadMUS_RW_GME(SDL_RWops *src, int freesr
 /* Load a music file from an SDL_RWop object assuming a specific format */
 extern DECLSPEC Mix_Music * SDLCALL Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int freesrc);
 
+/* Load a music file from an SDL_RWop object assuming a specific format
+   with custom arguments (trackID for GME or settings for a MIDI playing) */
+extern DECLSPEC Mix_Music * SDLCALL Mix_LoadMUSType_RW_ARG(SDL_RWops *src, Mix_MusicType type, int freesrc, const char *args);
+
 /* Load a wave file of the mixer format from a memory buffer */
 extern DECLSPEC Mix_Chunk * SDLCALL Mix_QuickLoad_WAV(Uint8 *mem);
 

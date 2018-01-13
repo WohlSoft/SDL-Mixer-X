@@ -296,7 +296,7 @@ Mix_MusicInterface Mix_MusicInterface_GME =
     NULL,   /* Load */
     NULL,   /* Open */
     GME_new_RW,
-    NULL,   /* CreateFromRWex [MIXER-X]*/
+    GME_new_RWEx,   /* CreateFromRWex [MIXER-X]*/
     NULL,   /* CreateFromFile */
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     GME_setvolume,

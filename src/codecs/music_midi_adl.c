@@ -167,9 +167,68 @@ static void ADLMIDI_setvolume(void *music_p, int volume)
         music->volume = (int)round(128.0 * sqrt(((double)volume) * (1.0 / 128.0)));
 }
 
+static void process_args(const char *args)
+{
+    char arg[1024];
+    char type = 'x';
+    size_t maxlen = 0;
+    size_t i, j = 0;
+    int value_opened = 0;
+    if (args == NULL) {
+        return;
+    }
+
+    maxlen = SDL_strlen(args) + 1;
+
+    for (i = 0; i < maxlen; i++) {
+        char c = args[i];
+        if(value_opened == 1) {
+            if ((c == ';') || (c == '\0')) {
+                int value;
+                arg[j] = '\0';
+                value = atoi(arg);
+                switch(type)
+                {
+                case 'b':
+                    Mix_ADLMIDI_setBankID(value);
+                    break;
+                case 't':
+                    Mix_ADLMIDI_setTremolo(value);
+                    break;
+                case 'v':
+                    Mix_ADLMIDI_setVibrato(value);
+                    break;
+                case 'a':
+                    Mix_ADLMIDI_setAdLibMode(value);
+                    break;
+                case 'm':
+                    Mix_ADLMIDI_setScaleMod(value);
+                    break;
+                case 'l':
+                    Mix_ADLMIDI_setVolumeModel(value);
+                    break;
+                case '\0':
+                    break;
+                default:
+                    break;
+                }
+                value_opened = 0;
+            }
+            arg[j++] = c;
+        } else {
+            if (c == '\0') {
+                return;
+            }
+            type = c;
+            value_opened = 1;
+            j = 0;
+        }
+    }
+}
+
 static void ADLMIDI_delete(void *music_p);
 
-static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src)
+static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
 {
     if(src != NULL)
     {
@@ -180,6 +239,8 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src)
         size_t bytes_l;
         unsigned char byte[1];
         AdlMIDI_Music *music = NULL;
+
+        process_args(args);
 
         music = (AdlMIDI_Music *)SDL_calloc(1, sizeof(AdlMIDI_Music));
 
@@ -264,11 +325,11 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src)
 }
 
 /* Load ADLMIDI stream from an SDL_RWops object */
-static void *ADLMIDI_new_RW(struct SDL_RWops *src, int freesrc)
+static void *ADLMIDI_new_RWex(struct SDL_RWops *src, int freesrc, const char *args)
 {
     AdlMIDI_Music *adlmidiMusic;
 
-    adlmidiMusic = ADLMIDI_LoadSongRW(src);
+    adlmidiMusic = ADLMIDI_LoadSongRW(src, args);
     if(!adlmidiMusic)
         return NULL;
     if(freesrc)
@@ -276,6 +337,12 @@ static void *ADLMIDI_new_RW(struct SDL_RWops *src, int freesrc)
 
     return adlmidiMusic;
 }
+
+static void *ADLMIDI_new_RW(struct SDL_RWops *src, int freesrc)
+{
+    return ADLMIDI_new_RWex(src, freesrc, NULL);
+}
+
 
 /* Start playback of a given Game Music Emulators stream */
 static int ADLMIDI_play(void *music_p, int play_counts)
@@ -433,7 +500,7 @@ Mix_MusicInterface Mix_MusicInterface_ADLMIDI =
     NULL,   /* Load */
     NULL,   /* Open */
     ADLMIDI_new_RW,
-    NULL,   /* CreateFromRWex [MIXER-X]*/
+    ADLMIDI_new_RWex,   /* CreateFromRWex [MIXER-X]*/
     NULL,   /* CreateFromFile */
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     ADLMIDI_setvolume,
@@ -467,7 +534,7 @@ Mix_MusicInterface Mix_MusicInterface_ADLIMF =
     NULL,   /* Load */
     NULL,   /* Open */
     ADLMIDI_new_RW,
-    NULL,   /* CreateFromRWex [MIXER-X]*/
+    ADLMIDI_new_RWex,   /* CreateFromRWex [MIXER-X]*/
     NULL,   /* CreateFromFile */
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     ADLMIDI_setvolume,
