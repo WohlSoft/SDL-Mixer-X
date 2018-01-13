@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html401/loose.dtd">
 <html>
-<!-- Created on November 26, 2017 by texi2html 1.82
+<!-- Created on January 13, 2018 by texi2html 1.82
 texi2html was written by: 
             Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -3259,141 +3259,145 @@ Music is therefore manipulated separately, except in post-processing hooks.
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fLoadMUS">5.5.3 Mix_LoadMUS</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">              Load a music file into a Mix_Music
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fLoadMUS_005fRW">5.5.4 Mix_LoadMUS_RW</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">           Load Music through SDL RWops (not implemented yet)
+<tr><td align="left" valign="top"><a href="#Mix_005fLoadMUS_005fRW">5.5.4 Mix_LoadMUS_RW</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">           Load Music through SDL RWops
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fLoadMUS_005fRW_005fARG">5.5.5 Mix_LoadMUS_RW_ARG</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">       Load music through SDL RWops with passing of extra arguments string <b>[Mixer X]</b>
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fLoadMUS_005fRW_005fGME">5.5.6 Mix_LoadMUS_RW_GME</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">       Load music through SDL RWops with passing of GME track number <b>[Mixer X]</b>
 </td></tr>
+<tr><td align="left" valign="top"><a href="#Mix_005fLoadMUSType_005fRW">5.5.7 Mix_LoadMUSType_RW</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">       Load a music file from an SDL RWops object assuming a specific format
+</td></tr>
+<tr><td align="left" valign="top"><a href="#Mix_005fLoadMUSType_005fRW_005fARG">5.5.8 Mix_LoadMUSType_RW_ARG</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">   Load a music file from an SDL RWops object assuming a specific format with passing of extra arguments string <b>[Mixer X]</b>
+</td></tr>
 <tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
 <b>Free</b>
-</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fFreeMusic">5.5.7 Mix_FreeMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Free a Mix_Music
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fFreeMusic">5.5.9 Mix_FreeMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Free a Mix_Music
 </td></tr>
 <tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
 <b>Playing</b>
-</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fPlayMusic">5.5.8 Mix_PlayMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Play music, with looping
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fPlayMusic">5.5.10 Mix_PlayMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Play music, with looping
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fFadeInMusic">5.5.9 Mix_FadeInMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">          Play music, with looping, and fade in
+<tr><td align="left" valign="top"><a href="#Mix_005fFadeInMusic">5.5.11 Mix_FadeInMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">          Play music, with looping, and fade in
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fFadeInMusicPos">5.5.10 Mix_FadeInMusicPos</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">       Play music from a start point, with looping, and fade in
+<tr><td align="left" valign="top"><a href="#Mix_005fFadeInMusicPos">5.5.12 Mix_FadeInMusicPos</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">       Play music from a start point, with looping, and fade in
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fHookMusic">5.5.11 Mix_HookMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Hook for a custom music player
+<tr><td align="left" valign="top"><a href="#Mix_005fHookMusic">5.5.13 Mix_HookMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Hook for a custom music player
 </td></tr>
 <tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
 <b>Settings</b>
-</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fVolumeMusic">5.5.12 Mix_VolumeMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">             Set music volume
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fVolumeMusic">5.5.14 Mix_VolumeMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">             Set music volume
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fPauseMusic">5.5.13 Mix_PauseMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">              Pause music
+<tr><td align="left" valign="top"><a href="#Mix_005fPauseMusic">5.5.15 Mix_PauseMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">              Pause music
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fResumeMusic">5.5.14 Mix_ResumeMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">             Resume paused music
+<tr><td align="left" valign="top"><a href="#Mix_005fResumeMusic">5.5.16 Mix_ResumeMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">             Resume paused music
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fRewindMusic">5.5.15 Mix_RewindMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">             Rewind music to beginning
+<tr><td align="left" valign="top"><a href="#Mix_005fRewindMusic">5.5.17 Mix_RewindMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">             Rewind music to beginning
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fSetMusicPosition">5.5.16 Mix_SetMusicPosition</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Set position of playback in stream
+<tr><td align="left" valign="top"><a href="#Mix_005fSetMusicPosition">5.5.18 Mix_SetMusicPosition</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Set position of playback in stream
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicPosition">5.5.17 Mix_GetMusicPosition</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Get the time current position of music stream <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicPosition">5.5.19 Mix_GetMusicPosition</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Get the time current position of music stream <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicTotalTime">5.5.18 Mix_GetMusicTotalTime</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">       Get the total time length of music stream <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicTotalTime">5.5.20 Mix_GetMusicTotalTime</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">       Get the total time length of music stream <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicLoopStartTime">5.5.19 Mix_GetMusicLoopStartTime</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">   Get the loop start time position of music stream <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicLoopStartTime">5.5.21 Mix_GetMusicLoopStartTime</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">   Get the loop start time position of music stream <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicLoopEndTime">5.5.20 Mix_GetMusicLoopEndTime</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">     Get the loop end time position of music stream <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicLoopEndTime">5.5.22 Mix_GetMusicLoopEndTime</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">     Get the loop end time position of music stream <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicLoopLengthTime">5.5.21 Mix_GetMusicLoopLengthTime</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">  Get the loop time length of music stream <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicLoopLengthTime">5.5.23 Mix_GetMusicLoopLengthTime</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">  Get the loop time length of music stream <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fSetMusicCMD">5.5.22 Mix_SetMusicCMD</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">             Use external program for music playback
+<tr><td align="left" valign="top"><a href="#Mix_005fSetMusicCMD">5.5.24 Mix_SetMusicCMD</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">             Use external program for music playback
 </td></tr>
 <tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
 <b>MIDI settings</b>
-</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fGetMidiDevice">5.5.23 Mix_GetMidiDevice</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Get type of MIDI device currently in use <b>[Mixer X]</b>
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fGetMidiDevice">5.5.25 Mix_GetMidiDevice</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Get type of MIDI device currently in use <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fGetNextMidiDevice">5.5.24 Mix_GetNextMidiDevice</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">    Get type of MIDI device prepared for next opening of MIDI file <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fGetNextMidiDevice">5.5.26 Mix_GetNextMidiDevice</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">    Get type of MIDI device prepared for next opening of MIDI file <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fSetMidiDevice">5.5.25 Mix_SetMidiDevice</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Set a MIDI sequencer to play MIDI music <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fSetMidiDevice">5.5.27 Mix_SetMidiDevice</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Set a MIDI sequencer to play MIDI music <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fSetLockMIDIArgs">5.5.26 Mix_SetLockMIDIArgs</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">      Enable ignoring of MIDI arguments and locking of current MIDI setup <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fSetLockMIDIArgs">5.5.28 Mix_SetLockMIDIArgs</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">      Enable ignoring of MIDI arguments and locking of current MIDI setup <b>[Mixer X]</b>
 </td></tr>
 <tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
 <b>Stopping</b>
-</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fHaltMusic">5.5.27 Mix_HaltMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Stop music playback
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fHaltMusic">5.5.29 Mix_HaltMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Stop music playback
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fFadeOutMusic">5.5.28 Mix_FadeOutMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">         Stop music, with fade out
+<tr><td align="left" valign="top"><a href="#Mix_005fFadeOutMusic">5.5.30 Mix_FadeOutMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">         Stop music, with fade out
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fHookMusicFinished">5.5.29 Mix_HookMusicFinished</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">    Set a callback for when music stops
+<tr><td align="left" valign="top"><a href="#Mix_005fHookMusicFinished">5.5.31 Mix_HookMusicFinished</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">    Set a callback for when music stops
 </td></tr>
 <tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
 <b>Info</b>
-</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fGetMusicType">5.5.30 Mix_GetMusicType</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">         Get the music encoding type
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fGetMusicType">5.5.32 Mix_GetMusicType</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">         Get the music encoding type
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fPlayingMusic">5.5.31 Mix_PlayingMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">         Test whether music is playing
+<tr><td align="left" valign="top"><a href="#Mix_005fPlayingMusic">5.5.33 Mix_PlayingMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">         Test whether music is playing
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fPausedMusic">5.5.32 Mix_PausedMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">          Test whether music is paused
+<tr><td align="left" valign="top"><a href="#Mix_005fPausedMusic">5.5.34 Mix_PausedMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">          Test whether music is paused
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fFadingMusic">5.5.33 Mix_FadingMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">          Get status of current music fade activity
+<tr><td align="left" valign="top"><a href="#Mix_005fFadingMusic">5.5.35 Mix_FadingMusic</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">          Get status of current music fade activity
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicHookData">5.5.34 Mix_GetMusicHookData</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">     Retrieve the Mix_HookMusic <var>arg</var>
+<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicHookData">5.5.36 Mix_GetMusicHookData</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">     Retrieve the Mix_HookMusic <var>arg</var>
 </td></tr>
 <tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
 <b>Meta-Tags</b>
-</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fGetMusicTitle">5.5.35 Mix_GetMusicTitle</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Retrieve the title meta-tag of currently playing <var>music</var> <b>[Mixer X]</b>
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fGetMusicTitle">5.5.37 Mix_GetMusicTitle</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Retrieve the title meta-tag of currently playing <var>music</var> <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicTitleTag">5.5.36 Mix_GetMusicTitleTag</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">     Retrieve the title meta-tag of currently playing <var>music</var> <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicTitleTag">5.5.38 Mix_GetMusicTitleTag</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">     Retrieve the title meta-tag of currently playing <var>music</var> <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicArtistTag">5.5.37 Mix_GetMusicArtistTag</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">    Retrieve the artist meta-tag of currently playing <var>music</var> <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicArtistTag">5.5.39 Mix_GetMusicArtistTag</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">    Retrieve the artist meta-tag of currently playing <var>music</var> <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicAlbumTag">5.5.38 Mix_GetMusicAlbumTag</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">     Retrieve the album meta-tag of currently playing <var>music</var> <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicAlbumTag">5.5.40 Mix_GetMusicAlbumTag</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">     Retrieve the album meta-tag of currently playing <var>music</var> <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicCopyrightTag">5.5.39 Mix_GetMusicCopyrightTag</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top"> Retrieve the copyright meta-tag of currently playing <var>music</var> <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicCopyrightTag">5.5.41 Mix_GetMusicCopyrightTag</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top"> Retrieve the copyright meta-tag of currently playing <var>music</var> <b>[Mixer X]</b>
 </td></tr>
 <tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
 <b>FluidSynth Extra Settings</b>
-</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fSetSoundFonts">5.5.40 Mix_SetSoundFonts</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Set SoundFonts paths to use by supported FluidSynth MIDI backend <b>[Mixer 2.0]</b>
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fSetSoundFonts">5.5.42 Mix_SetSoundFonts</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Set SoundFonts paths to use by supported FluidSynth MIDI backend <b>[Mixer 2.0]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fGetSoundFonts">5.5.41 Mix_GetSoundFonts</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Get SoundFonts paths to use by supported FluidSynth MIDI backend <b>[Mixer 2.0]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fGetSoundFonts">5.5.43 Mix_GetSoundFonts</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Get SoundFonts paths to use by supported FluidSynth MIDI backend <b>[Mixer 2.0]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fEachSoundFont">5.5.42 Mix_EachSoundFont</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Iterate SoundFonts paths to use by supported FluidSynth MIDI backend <b>[Mixer 2.0]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fEachSoundFont">5.5.44 Mix_EachSoundFont</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Iterate SoundFonts paths to use by supported FluidSynth MIDI backend <b>[Mixer 2.0]</b>
 </td></tr>
 <tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
 <b>libADLMIDI Extra Settings</b>
-</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fgetTotalBanks">5.5.43 Mix_ADLMIDI_getTotalBanks</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">               Get total count of available embedded banks <b>[Mixer X]</b>
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fgetTotalBanks">5.5.45 Mix_ADLMIDI_getTotalBanks</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">               Get total count of available embedded banks <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fgetBankNames">5.5.44 Mix_ADLMIDI_getBankNames</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                Get array of embedded bank titles <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fgetBankNames">5.5.46 Mix_ADLMIDI_getBankNames</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                Get array of embedded bank titles <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fgetBankID">5.5.45 Mix_ADLMIDI_getBankID</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                   Get ID of currently set bank <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fgetBankID">5.5.47 Mix_ADLMIDI_getBankID</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                   Get ID of currently set bank <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetBankID">5.5.46 Mix_ADLMIDI_setBankID</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                   Change current bank. Applying on MIDI file reopen. <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetBankID">5.5.48 Mix_ADLMIDI_setBankID</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                   Change current bank. Applying on MIDI file reopen. <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fgetTremolo">5.5.47 Mix_ADLMIDI_getTremolo</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                  Get current state of &quot;Deep Tremolo&quot; OPL3 flag <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fgetTremolo">5.5.49 Mix_ADLMIDI_getTremolo</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                  Get current state of &quot;Deep Tremolo&quot; OPL3 flag <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetTremolo">5.5.48 Mix_ADLMIDI_setTremolo</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                  Set state of &quot;Deep Tremolo&quot; OPL3 flag. Applying on MIDI file reopen. <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetTremolo">5.5.50 Mix_ADLMIDI_setTremolo</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                  Set state of &quot;Deep Tremolo&quot; OPL3 flag. Applying on MIDI file reopen. <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fgetVibrato">5.5.49 Mix_ADLMIDI_getVibrato</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                  Get current state of &quot;Deep Vibrato&quot; OPL3 flag <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fgetVibrato">5.5.51 Mix_ADLMIDI_getVibrato</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                  Get current state of &quot;Deep Vibrato&quot; OPL3 flag <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetVibrato">5.5.50 Mix_ADLMIDI_setVibrato</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                  Set state of &quot;Deep Vibrato&quot; OPL3 flag. Applying on MIDI file reopen. <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetVibrato">5.5.52 Mix_ADLMIDI_setVibrato</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                  Set state of &quot;Deep Vibrato&quot; OPL3 flag. Applying on MIDI file reopen. <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fgetScaleMod">5.5.51 Mix_ADLMIDI_getScaleMod</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                 Get current state of &quot;Scalable modulation mode&quot; flag <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fgetScaleMod">5.5.53 Mix_ADLMIDI_getScaleMod</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                 Get current state of &quot;Scalable modulation mode&quot; flag <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetScaleMod">5.5.52 Mix_ADLMIDI_setScaleMod</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                 Turn on/off scalable modulation mode flag. Applying on MIDI file reopen. <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetScaleMod">5.5.54 Mix_ADLMIDI_setScaleMod</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                 Turn on/off scalable modulation mode flag. Applying on MIDI file reopen. <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fgetAdLibMode">5.5.53 Mix_ADLMIDI_getAdLibMode</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                Get current state of &quot;Rythm Mode&quot; OPL flag <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fgetAdLibMode">5.5.55 Mix_ADLMIDI_getAdLibMode</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                Get current state of &quot;Rythm Mode&quot; OPL flag <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetAdLibMode">5.5.54 Mix_ADLMIDI_setAdLibMode</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                Set state of &quot;Rythm Mode&quot; OPL flag. Applying on MIDI file reopen. <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetAdLibMode">5.5.56 Mix_ADLMIDI_setAdLibMode</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                Set state of &quot;Rythm Mode&quot; OPL flag. Applying on MIDI file reopen. <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fgetLogarithmicVolumes">5.5.55 Mix_ADLMIDI_getLogarithmicVolumes</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">       Get current state of &quot;Logarithmic volumes&quot; flag <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fgetLogarithmicVolumes">5.5.57 Mix_ADLMIDI_getLogarithmicVolumes</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">       Get current state of &quot;Logarithmic volumes&quot; flag <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetLogarithmicVolumes">5.5.56 Mix_ADLMIDI_setLogarithmicVolumes</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">       Set state of &quot;logarithmic volumes&quot; flag. Applying on MIDI file reopen. <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetLogarithmicVolumes">5.5.58 Mix_ADLMIDI_setLogarithmicVolumes</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">       Set state of &quot;logarithmic volumes&quot; flag. Applying on MIDI file reopen. <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fgetVolumeModel">5.5.57 Mix_ADLMIDI_getVolumeModel</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">              Get ID of current volumes model <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fgetVolumeModel">5.5.59 Mix_ADLMIDI_getVolumeModel</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">              Get ID of current volumes model <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetVolumeModel">5.5.58 Mix_ADLMIDI_setVolumeModel</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">              Change current volume model. Applying on MIDI file reopen. <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetVolumeModel">5.5.60 Mix_ADLMIDI_setVolumeModel</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">              Change current volume model. Applying on MIDI file reopen. <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetSetDefaults">5.5.59 Mix_ADLMIDI_setSetDefaults</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">              Reset ADLMIDI settings to default state. Applying on MIDI file reopen. <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetSetDefaults">5.5.61 Mix_ADLMIDI_setSetDefaults</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">              Reset ADLMIDI settings to default state. Applying on MIDI file reopen. <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetCustomBankFile">5.5.60 Mix_ADLMIDI_setCustomBankFile</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">           Path to custom WOPL bank file. Applying on MIDI file reopen. <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetCustomBankFile">5.5.62 Mix_ADLMIDI_setCustomBankFile</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">           Path to custom WOPL bank file. Applying on MIDI file reopen. <b>[Mixer X]</b>
 </td></tr>
 <tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
 <b>libOPNMIDI Extra Settings</b>
-</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fOPNMIDI_005fsetCustomBankFile">5.5.61 Mix_OPNMIDI_setCustomBankFile</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">           Path to custom WOPN bank file. Applying on MIDI file reopen. <b>[Mixer X]</b>
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fOPNMIDI_005fsetCustomBankFile">5.5.63 Mix_OPNMIDI_setCustomBankFile</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">           Path to custom WOPN bank file. Applying on MIDI file reopen. <b>[Mixer X]</b>
 </td></tr>
 <tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
 </pre></th></tr></table>
@@ -3576,7 +3580,7 @@ if(!music) {
 </p></dd>
 </dl>
 
-<p>Load music file to use.
+<p>Load a music file from an SDL_RWop object
 </p>
 <p><b>Returns</b>: A pointer to a Mix_Music.  NULL is returned on errors.
 </p>
@@ -3596,6 +3600,8 @@ if(!music) {
 <a href="#Mix_005fMusic">Mix_Music</a>,
 <a href="#Mix_005fLoadMUS_005fRW_005fARG">Mix_LoadMUS_RW_ARG</a>,
 <a href="#Mix_005fLoadMUS_005fRW_005fGME">Mix_LoadMUS_RW_GME</a>,
+<a href="#Mix_005fLoadMUSType_005fRW">Mix_LoadMUSType_RW</a>,
+<a href="#Mix_005fLoadMUSType_005fRW_005fARG">Mix_LoadMUSType_RW_ARG</a>,
 <a href="#Mix_005fSetMusicCMD">Mix_SetMusicCMD</a>,
 <a href="#Mix_005fPlayMusic">Mix_PlayMusic</a>,
 <a href="#Mix_005fFadeInMusic">Mix_FadeInMusic</a>,
@@ -3624,7 +3630,7 @@ if(!music) {
 <h3 class="subsection">5.5.5 Mix_LoadMUS_RW_ARG</h3>
 <a name="index-Mix_005fLoadMUS_005fRW_005fARG"></a>
 
-<p><code>Mix_Music *<b>Mix_LoadMUS_RW_ARG</b>(SDL_RWops *<var>src</var>, int <var>freesrc</var>, char *<var>args</var>)</code>
+<p><code>Mix_Music *<b>Mix_LoadMUS_RW_ARG</b>(SDL_RWops *<var>src</var>, int <var>freesrc</var>, const char *<var>args</var>)</code>
 </p>
 <dl compact="compact">
 <dt> <var>src</var></dt>
@@ -3638,7 +3644,7 @@ if(!music) {
 </p></dd>
 </dl>
 
-<p>Load music file to use.
+<p>Load a music file from an SDL_RWop object with custom arguments
 </p>
 <p><b>Returns</b>: A pointer to a Mix_Music.  NULL is returned on errors.
 </p>
@@ -3648,7 +3654,7 @@ Mix_Music *music;
 SDL_RWops *file = SDL_RWopen(&quot;music.mid&quot;, &quot;rb&quot;);
 music = Mix_LoadMUS_RW_ARG(file, 1, &quot;s0;t1;v1;b68;&quot;);
 if(!music) {
-    printf(&quot;Mix_LoadMUS_RW_ARG(file, 1, &quot;s0;t1;v1;b68;&quot;): %s\n&quot;, Mix_GetError());
+    printf(&quot;Mix_LoadMUS_RW_ARG(file, 1, \&quot;s0;t1;v1;b68;\&quot;): %s\n&quot;, Mix_GetError());
     // this might be a critical error...
 }
 </pre></td></tr></table>
@@ -3658,6 +3664,8 @@ if(!music) {
 <a href="#Mix_005fMusic">Mix_Music</a>,
 <a href="#Mix_005fLoadMUS_005fRW">Mix_LoadMUS_RW</a>,
 <a href="#Mix_005fLoadMUS_005fRW_005fGME">Mix_LoadMUS_RW_GME</a>,
+<a href="#Mix_005fLoadMUSType_005fRW">Mix_LoadMUSType_RW</a>,
+<a href="#Mix_005fLoadMUSType_005fRW_005fARG">Mix_LoadMUSType_RW_ARG</a>,
 <a href="#Mix_005fSetMusicCMD">Mix_SetMusicCMD</a>,
 <a href="#Mix_005fPlayMusic">Mix_PlayMusic</a>,
 <a href="#Mix_005fFadeInMusic">Mix_FadeInMusic</a>,
@@ -3668,7 +3676,7 @@ if(!music) {
 <a name="Mix_005fLoadMUS_005fRW_005fGME"></a>
 <table cellpadding="1" cellspacing="1" border="0">
 <tr><td valign="middle" align="left">[<a href="#Mix_005fLoadMUS_005fRW_005fARG" title="Previous section in reading order"> &lt; </a>]</td>
-<td valign="middle" align="left">[<a href="#Mix_005fFreeMusic" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Mix_005fLoadMUSType_005fRW" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Functions" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#Music" title="Up section"> Up </a>]</td>
@@ -3720,6 +3728,8 @@ if(!music) {
 <a href="#Mix_005fMusic">Mix_Music</a>,
 <a href="#Mix_005fLoadMUS_005fRW">Mix_LoadMUS_RW</a>,
 <a href="#Mix_005fLoadMUS_005fRW_005fARG">Mix_LoadMUS_RW_ARG</a>,
+<a href="#Mix_005fLoadMUSType_005fRW">Mix_LoadMUSType_RW</a>,
+<a href="#Mix_005fLoadMUSType_005fRW_005fARG">Mix_LoadMUSType_RW_ARG</a>,
 <a href="#Mix_005fSetMusicCMD">Mix_SetMusicCMD</a>,
 <a href="#Mix_005fPlayMusic">Mix_PlayMusic</a>,
 <a href="#Mix_005fFadeInMusic">Mix_FadeInMusic</a>,
@@ -3727,9 +3737,140 @@ if(!music) {
 </p>
 
 <hr size="6">
-<a name="Mix_005fFreeMusic"></a>
+<a name="Mix_005fLoadMUSType_005fRW"></a>
 <table cellpadding="1" cellspacing="1" border="0">
 <tr><td valign="middle" align="left">[<a href="#Mix_005fLoadMUS_005fRW_005fGME" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Mix_005fLoadMUSType_005fRW_005fARG" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#Functions" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Music" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="#Types" title="Next chapter"> &gt;&gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<a name="Mix_005fLoadMUSType_005fRW-1"></a>
+<h3 class="subsection">5.5.7 Mix_LoadMUSType_RW</h3>
+<a name="index-Mix_005fLoadMUSType_005fRW"></a>
+
+<p><code>Mix_Music *<b>Mix_LoadMUSType_RW</b>(SDL_RWops *<var>src</var>, Mix_MusicType <var>type</var>, int <var>freesrc</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>src</var></dt>
+<dd><p>SDL RWops instance of music file / memory
+</p></dd>
+<dt> <var>type</var></dt>
+<dd><p>A music type identificator
+</p></dd>
+<dt> <var>freesrc</var></dt>
+<dd><p>Automatically close SDL_RWops instance on complete loading of music
+</p></dd>
+</dl>
+
+<p>Load a music file from an SDL_RWop object assuming a specific format
+</p>
+<p><b>Returns</b>: A pointer to a Mix_Music.  NULL is returned on errors.
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">// load the MIDI file &quot;music.mid&quot; to play as music with ADLMIDI synthesizer
+Mix_Music *music;
+SDL_RWops *file = SDL_RWopen(&quot;music.mid&quot;, &quot;rb&quot;);
+music = Mix_LoadMUSType_RW(file, MUS_MID, 1);
+if(!music) {
+    printf(&quot;Mix_LoadMUSType_RW(file, MUS_MID, 1): %s\n&quot;, Mix_GetError());
+    // this might be a critical error...
+}
+</pre></td></tr></table>
+</td></tr></table>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fMusic">Mix_Music</a>,
+<a href="#Mix_005fLoadMUS_005fRW">Mix_LoadMUS_RW</a>,
+<a href="#Mix_005fLoadMUS_005fRW_005fGME">Mix_LoadMUS_RW_GME</a>,
+<a href="#Mix_005fLoadMUSType_005fRW_005fARG">Mix_LoadMUSType_RW_ARG</a>,
+<a href="#Mix_005fSetMusicCMD">Mix_SetMusicCMD</a>,
+<a href="#Mix_005fPlayMusic">Mix_PlayMusic</a>,
+<a href="#Mix_005fFadeInMusic">Mix_FadeInMusic</a>,
+<a href="#Mix_005fFadeInMusicPos">Mix_FadeInMusicPos</a>
+</p>
+
+<hr size="6">
+<a name="Mix_005fLoadMUSType_005fRW_005fARG"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#Mix_005fLoadMUSType_005fRW" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Mix_005fFreeMusic" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#Functions" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Music" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="#Types" title="Next chapter"> &gt;&gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<a name="Mix_005fLoadMUSType_005fRW_005fARG-1"></a>
+<h3 class="subsection">5.5.8 Mix_LoadMUSType_RW_ARG</h3>
+<a name="index-Mix_005fLoadMUSType_005fRW_005fARG"></a>
+
+<p><code>Mix_Music *<b>Mix_LoadMUSType_RW_ARG</b>(SDL_RWops *<var>src</var>, Mix_MusicType <var>type</var>, int <var>freesrc</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>src</var></dt>
+<dd><p>SDL RWops instance of music file / memory
+</p></dd>
+<dt> <var>type</var></dt>
+<dd><p>A music type identificator
+</p></dd>
+<dt> <var>freesrc</var></dt>
+<dd><p>Automatically close SDL_RWops instance on complete loading of music
+</p></dd>
+<dt> <var>args</var></dt>
+<dd><p>An arguments string supported by specific library
+</p></dd>
+</dl>
+
+<p>Load a music file from an SDL_RWop object assuming a specific format with custom arguments (trackID for GME or settings for a MIDI playing)
+</p>
+<p><b>Returns</b>: A pointer to a Mix_Music.  NULL is returned on errors.
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">// load the MIDI file &quot;music.mid&quot; to play as music with ADLMIDI synthesizer
+Mix_Music *music;
+SDL_RWops *file = SDL_RWopen(&quot;music.mid&quot;, &quot;rb&quot;);
+music = Mix_LoadMUSType_RW_ARG(file, MUS_MID, 1, &quot;s0;t1;v1;b68;&quot;);
+if(!music) {
+    printf(&quot;Mix_LoadMUSType_RW_ARG(file, MUS_MID, 1, \&quot;s0;t1;v1;b68;\&quot;): %s\n&quot;, Mix_GetError());
+    // this might be a critical error...
+}
+</pre></td></tr></table>
+</td></tr></table>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fMusic">Mix_Music</a>,
+<a href="#Mix_005fLoadMUS_005fRW">Mix_LoadMUS_RW</a>,
+<a href="#Mix_005fLoadMUS_005fRW_005fGME">Mix_LoadMUS_RW_GME</a>,
+<a href="#Mix_005fLoadMUSType_005fRW">Mix_LoadMUSType_RW</a>,
+<a href="#Mix_005fSetMusicCMD">Mix_SetMusicCMD</a>,
+<a href="#Mix_005fPlayMusic">Mix_PlayMusic</a>,
+<a href="#Mix_005fFadeInMusic">Mix_FadeInMusic</a>,
+<a href="#Mix_005fFadeInMusicPos">Mix_FadeInMusicPos</a>
+</p>
+
+
+
+<hr size="6">
+<a name="Mix_005fFreeMusic"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#Mix_005fLoadMUSType_005fRW_005fARG" title="Previous section in reading order"> &lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#Mix_005fPlayMusic" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Functions" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
@@ -3745,7 +3886,7 @@ if(!music) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fFreeMusic-1"></a>
-<h3 class="subsection">5.5.7 Mix_FreeMusic</h3>
+<h3 class="subsection">5.5.9 Mix_FreeMusic</h3>
 <a name="index-Mix_005fFreeMusic"></a>
 
 <p><code>void <b>Mix_FreeMusic</b>(Mix_Music *<var>music</var>)</code>
@@ -3789,7 +3930,7 @@ music=NULL; // so we know we freed it...
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fPlayMusic-1"></a>
-<h3 class="subsection">5.5.8 Mix_PlayMusic</h3>
+<h3 class="subsection">5.5.10 Mix_PlayMusic</h3>
 <a name="index-Mix_005fPlayMusic"></a>
 
 <p><code>int <b>Mix_PlayMusic</b>(Mix_Music *<var>music</var>, int <var>loops</var>)</code>
@@ -3842,7 +3983,7 @@ if(Mix_PlayMusic(music, -1)==-1) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fFadeInMusic-1"></a>
-<h3 class="subsection">5.5.9 Mix_FadeInMusic</h3>
+<h3 class="subsection">5.5.11 Mix_FadeInMusic</h3>
 <a name="index-Mix_005fFadeInMusic"></a>
 
 <p><code>int <b>Mix_FadeInMusic</b>(Mix_Music *<var>music</var>, int <var>loops</var>, int <var>ms</var>)</code>
@@ -3902,7 +4043,7 @@ if(Mix_FadeInMusic(music, -1, 2000)==-1) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fFadeInMusicPos-1"></a>
-<h3 class="subsection">5.5.10 Mix_FadeInMusicPos</h3>
+<h3 class="subsection">5.5.12 Mix_FadeInMusicPos</h3>
 <a name="index-Mix_005fFadeInMusicPos"></a>
 
 <p><code>int <b>Mix_FadeInMusicPos</b>(Mix_Music *<var>music</var>, int <var>loops</var>, int <var>ms</var>, double <var>position</var>)</code>
@@ -3966,7 +4107,7 @@ if(Mix_FadeInMusicPos(music, -1, 2000)==-1) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fHookMusic-1"></a>
-<h3 class="subsection">5.5.11 Mix_HookMusic</h3>
+<h3 class="subsection">5.5.13 Mix_HookMusic</h3>
 <a name="index-Mix_005fHookMusic"></a>
 
 <table><tr><td>&nbsp;</td><td><pre class="example">void <b>Mix_HookMusic</b>(void (*<var>mix_func</var>)(void *udata, Uint8 *stream, int len),
@@ -4032,7 +4173,7 @@ Mix_HookMusic(myMusicPlayer, &amp;music_pos);
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fVolumeMusic-1"></a>
-<h3 class="subsection">5.5.12 Mix_VolumeMusic</h3>
+<h3 class="subsection">5.5.14 Mix_VolumeMusic</h3>
 <a name="index-Mix_005fVolumeMusic"></a>
 
 <p><code>int <b>Mix_VolumeMusic</b>(int <var>volume</var>)</code>
@@ -4081,7 +4222,7 @@ printf(&quot;volume is now : %d\n&quot;, Mix_VolumeMusic(-1));
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fPauseMusic-1"></a>
-<h3 class="subsection">5.5.13 Mix_PauseMusic</h3>
+<h3 class="subsection">5.5.15 Mix_PauseMusic</h3>
 <a name="index-Mix_005fPauseMusic"></a>
 
 <p><code>void <b>Mix_PauseMusic</b>()</code>
@@ -4120,7 +4261,7 @@ Mix_PauseMusic();
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fResumeMusic-1"></a>
-<h3 class="subsection">5.5.14 Mix_ResumeMusic</h3>
+<h3 class="subsection">5.5.16 Mix_ResumeMusic</h3>
 <a name="index-Mix_005fResumeMusic"></a>
 
 <p><code>void <b>Mix_ResumeMusic</b>()</code>
@@ -4157,7 +4298,7 @@ Mix_ResumeMusic();
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fRewindMusic-1"></a>
-<h3 class="subsection">5.5.15 Mix_RewindMusic</h3>
+<h3 class="subsection">5.5.17 Mix_RewindMusic</h3>
 <a name="index-Mix_005fRewindMusic"></a>
 
 <p><code>void <b>Mix_RewindMusic</b>()</code>
@@ -4195,7 +4336,7 @@ Mix_RewindMusic();
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fSetMusicPosition-1"></a>
-<h3 class="subsection">5.5.16 Mix_SetMusicPosition</h3>
+<h3 class="subsection">5.5.18 Mix_SetMusicPosition</h3>
 <a name="index-Mix_005fSetMusicPosition"></a>
 
 <p><code>int <b>Mix_SetMusicPosition</b>(double <var>position</var>)</code>
@@ -4264,7 +4405,7 @@ if(Mix_SetMusicPosition(60.0)==-1) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fGetMusicPosition-1"></a>
-<h3 class="subsection">5.5.17 Mix_GetMusicPosition</h3>
+<h3 class="subsection">5.5.19 Mix_GetMusicPosition</h3>
 <a name="index-Mix_005fGetMusicPosition"></a>
 
 <p><code>double <b>Mix_GetMusicPosition</b>(Mix_Music *<var>music</var>)</code>
@@ -4304,7 +4445,7 @@ if(Mix_SetMusicPosition(60.0)==-1) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fGetMusicTotalTime-1"></a>
-<h3 class="subsection">5.5.18 Mix_GetMusicTotalTime</h3>
+<h3 class="subsection">5.5.20 Mix_GetMusicTotalTime</h3>
 <a name="index-Mix_005fGetMusicTotalTime"></a>
 
 <p><code>double <b>Mix_GetMusicTotalTime</b>(Mix_Music *<var>music</var>)</code>
@@ -4344,7 +4485,7 @@ if(Mix_SetMusicPosition(60.0)==-1) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fGetMusicLoopStartTime-1"></a>
-<h3 class="subsection">5.5.19 Mix_GetMusicLoopStartTime</h3>
+<h3 class="subsection">5.5.21 Mix_GetMusicLoopStartTime</h3>
 <a name="index-Mix_005fGetMusicLoopStartTime"></a>
 
 <p><code>double <b>Mix_GetMusicLoopStartTime</b>(Mix_Music *<var>music</var>)</code>
@@ -4384,7 +4525,7 @@ if(Mix_SetMusicPosition(60.0)==-1) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fGetMusicLoopEndTime-1"></a>
-<h3 class="subsection">5.5.20 Mix_GetMusicLoopEndTime</h3>
+<h3 class="subsection">5.5.22 Mix_GetMusicLoopEndTime</h3>
 <a name="index-Mix_005fGetMusicLoopEndTime"></a>
 
 <p><code>double <b>Mix_GetMusicLoopEndTime</b>(Mix_Music *<var>music</var>)</code>
@@ -4423,7 +4564,7 @@ if(Mix_SetMusicPosition(60.0)==-1) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fGetMusicLoopLengthTime-1"></a>
-<h3 class="subsection">5.5.21 Mix_GetMusicLoopLengthTime</h3>
+<h3 class="subsection">5.5.23 Mix_GetMusicLoopLengthTime</h3>
 <a name="index-Mix_005fGetMusicLoopLengthTime"></a>
 
 <p><code>double <b>Mix_GetMusicLoopEndTime</b>(Mix_Music *<var>music</var>)</code>
@@ -4462,7 +4603,7 @@ if(Mix_SetMusicPosition(60.0)==-1) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fSetMusicCMD-1"></a>
-<h3 class="subsection">5.5.22 Mix_SetMusicCMD</h3>
+<h3 class="subsection">5.5.24 Mix_SetMusicCMD</h3>
 <a name="index-Mix_005fSetMusicCMD"></a>
 
 <p><code>int <b>Mix_SetMusicCMD</b>(const char *<var>command</var>)</code>
@@ -4522,7 +4663,7 @@ if(Mix_SetMusicCMD(&quot;mpg123 -q&quot;)==-1) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fGetMidiDevice-1"></a>
-<h3 class="subsection">5.5.23 Mix_GetMidiDevice</h3>
+<h3 class="subsection">5.5.25 Mix_GetMidiDevice</h3>
 <a name="index-Mix_005fGetMidiDevice"></a>
 
 <p><code>int <b>Mix_GetMidiDevice</b>()</code>
@@ -4580,7 +4721,7 @@ switch(Mix_GetMidiDevice())
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fGetNextMidiDevice-1"></a>
-<h3 class="subsection">5.5.24 Mix_GetNextMidiDevice</h3>
+<h3 class="subsection">5.5.26 Mix_GetNextMidiDevice</h3>
 <a name="index-Mix_005fGetNextMidiDevice"></a>
 
 <p><code>int <b>Mix_GetNextMidiDevice</b>()</code>
@@ -4640,7 +4781,7 @@ switch(Mix_GetNextMidiDevice())
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fSetMidiDevice-1"></a>
-<h3 class="subsection">5.5.25 Mix_SetMidiDevice</h3>
+<h3 class="subsection">5.5.27 Mix_SetMidiDevice</h3>
 <a name="index-Mix_005fSetMidiDevice"></a>
 
 <p><code>int <b>Mix_SetMidiDevice</b>(int <var>device</var>)</code>
@@ -4684,7 +4825,7 @@ Mix_SetMidiDevice(MIDI_OPNMIDI);
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fSetLockMIDIArgs-1"></a>
-<h3 class="subsection">5.5.26 Mix_SetLockMIDIArgs</h3>
+<h3 class="subsection">5.5.28 Mix_SetLockMIDIArgs</h3>
 <a name="index-Mix_005fSetLockMIDIArgs"></a>
 
 <p><code>void <b>Mix_SetLockMIDIArgs</b>(int <var>lock_midiargs</var>)</code>
@@ -4727,7 +4868,7 @@ Mix_SetLockMIDIArgs(1);
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fHaltMusic-1"></a>
-<h3 class="subsection">5.5.27 Mix_HaltMusic</h3>
+<h3 class="subsection">5.5.29 Mix_HaltMusic</h3>
 <a name="index-Mix_005fHaltMusic"></a>
 
 <p><code>int <b>Mix_HaltMusic</b>()</code>
@@ -4767,7 +4908,7 @@ Mix_HaltMusic();
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fFadeOutMusic-1"></a>
-<h3 class="subsection">5.5.28 Mix_FadeOutMusic</h3>
+<h3 class="subsection">5.5.30 Mix_FadeOutMusic</h3>
 <a name="index-Mix_005fFadeOutMusic"></a>
 
 <p><code>int <b>Mix_FadeOutMusic</b>(int <var>ms</var>)</code>
@@ -4819,7 +4960,7 @@ while(!Mix_FadeOutMusic(3000) &amp;&amp; Mix_PlayingMusic()) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fHookMusicFinished-1"></a>
-<h3 class="subsection">5.5.29 Mix_HookMusicFinished</h3>
+<h3 class="subsection">5.5.31 Mix_HookMusicFinished</h3>
 <a name="index-Mix_005fHookMusicFinished"></a>
 
 <p><code>void <b>Mix_HookMusicFinished</b>(void (*<var>music_finished</var>)())</code>
@@ -4870,7 +5011,7 @@ Mix_HookMusicFinished(musicFinished);
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fGetMusicType-1"></a>
-<h3 class="subsection">5.5.30 Mix_GetMusicType</h3>
+<h3 class="subsection">5.5.32 Mix_GetMusicType</h3>
 <a name="index-Mix_005fGetMusicType"></a>
 
 <p><code>Mix_MusicType <b>Mix_GetMusicType</b>(const Mix_Music *<var>music</var>)</code>
@@ -4952,7 +5093,7 @@ switch(Mix_GetMusicType(NULL))
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fPlayingMusic-1"></a>
-<h3 class="subsection">5.5.31 Mix_PlayingMusic</h3>
+<h3 class="subsection">5.5.33 Mix_PlayingMusic</h3>
 <a name="index-Mix_005fPlayingMusic"></a>
 
 <p><code>int <b>Mix_PlayingMusic</b>()</code>
@@ -4993,7 +5134,7 @@ printf(&quot;music is%s playing.\n&quot;, Mix_PlayingMusic()?&quot;&quot;:&quot;
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fPausedMusic-1"></a>
-<h3 class="subsection">5.5.32 Mix_PausedMusic</h3>
+<h3 class="subsection">5.5.34 Mix_PausedMusic</h3>
 <a name="index-Mix_005fPausedMusic"></a>
 
 <p><code>int <b>Mix_PausedMusic</b>()</code>
@@ -5034,7 +5175,7 @@ printf(&quot;music is%s paused\n&quot;, Mix_PausedMusic()?&quot;&quot;:&quot; no
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fFadingMusic-1"></a>
-<h3 class="subsection">5.5.33 Mix_FadingMusic</h3>
+<h3 class="subsection">5.5.35 Mix_FadingMusic</h3>
 <a name="index-Mix_005fFadingMusic"></a>
 
 <p><code>Mix_Fading <b>Mix_FadingMusic</b>()</code>
@@ -5086,7 +5227,7 @@ switch(Mix_FadingMusic()) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fGetMusicHookData-1"></a>
-<h3 class="subsection">5.5.34 Mix_GetMusicHookData</h3>
+<h3 class="subsection">5.5.36 Mix_GetMusicHookData</h3>
 <a name="index-Mix_005fGetMusicHookData"></a>
 
 <p><code>void *<b>Mix_GetMusicHookData</b>()</code>
@@ -5125,7 +5266,7 @@ data=Mix_GetMusicHookData();
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fGetMusicTitle-1"></a>
-<h3 class="subsection">5.5.35 Mix_GetMusicTitle</h3>
+<h3 class="subsection">5.5.37 Mix_GetMusicTitle</h3>
 <a name="index-Mix_005fGetMusicTitle"></a>
 
 <p><code>const char *<b>Mix_GetMusicTitle</b>(const Mix_Music *music)</code>
@@ -5167,7 +5308,7 @@ title=Mix_GetMusicTitle(myMusic);
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fGetMusicTitleTag-1"></a>
-<h3 class="subsection">5.5.36 Mix_GetMusicTitleTag</h3>
+<h3 class="subsection">5.5.38 Mix_GetMusicTitleTag</h3>
 <a name="index-Mix_005fGetMusicTitleTag"></a>
 
 <p><code>const char *<b>Mix_GetMusicTitleTag</b>(const Mix_Music *music)</code>
@@ -5209,7 +5350,7 @@ title=Mix_GetMusicTitleTag(myMusic);
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fGetMusicArtistTag-1"></a>
-<h3 class="subsection">5.5.37 Mix_GetMusicArtistTag</h3>
+<h3 class="subsection">5.5.39 Mix_GetMusicArtistTag</h3>
 <a name="index-Mix_005fGetMusicArtistTag"></a>
 
 <p><code>const char *<b>Mix_GetMusicArtistTag</b>(const Mix_Music *music)</code>
@@ -5251,7 +5392,7 @@ title=Mix_GetMusicArtistTag(myMusic);
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fGetMusicAlbumTag-1"></a>
-<h3 class="subsection">5.5.38 Mix_GetMusicAlbumTag</h3>
+<h3 class="subsection">5.5.40 Mix_GetMusicAlbumTag</h3>
 <a name="index-Mix_005fGetMusicAlbumTag"></a>
 
 <p><code>const char *<b>Mix_GetMusicAlbumTag</b>(const Mix_Music *music)</code>
@@ -5293,7 +5434,7 @@ title=Mix_GetMusicAlbumTag(myMusic);
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fGetMusicCopyrightTag-1"></a>
-<h3 class="subsection">5.5.39 Mix_GetMusicCopyrightTag</h3>
+<h3 class="subsection">5.5.41 Mix_GetMusicCopyrightTag</h3>
 <a name="index-Mix_005fGetMusicCopyrightTag"></a>
 
 <p><code>const char *<b>Mix_GetMusicCopyrightTag</b>(const Mix_Music *music)</code>
@@ -5336,7 +5477,7 @@ title=Mix_GetMusicCopyrightTag(myMusic);
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fSetSoundFonts-1"></a>
-<h3 class="subsection">5.5.40 Mix_SetSoundFonts</h3>
+<h3 class="subsection">5.5.42 Mix_SetSoundFonts</h3>
 <a name="index-Mix_005fSetSoundFonts"></a>
 
 <p><code>int <b>Mix_SetSoundFonts</b>(const char *<var>paths</var>)</code>
@@ -5384,7 +5525,7 @@ title=Mix_GetMusicCopyrightTag(myMusic);
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fGetSoundFonts-1"></a>
-<h3 class="subsection">5.5.41 Mix_GetSoundFonts</h3>
+<h3 class="subsection">5.5.43 Mix_GetSoundFonts</h3>
 <a name="index-Mix_005fGetSoundFonts"></a>
 
 <p><code>const char *<b>Mix_GetSoundFonts</b>()</code>
@@ -5438,7 +5579,7 @@ for(path = strtok_r(fonts, &quot;;&quot;, &amp;context); path; path = strtok_r(N
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fEachSoundFont-1"></a>
-<h3 class="subsection">5.5.42 Mix_EachSoundFont</h3>
+<h3 class="subsection">5.5.44 Mix_EachSoundFont</h3>
 <a name="index-Mix_005fEachSoundFont"></a>
 
 <p><code>const char *<b>Mix_EachSoundFont</b>(int (*<var>function</var>)(const char *, void *), void *<var>data</var>)</code>
@@ -5505,7 +5646,7 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fADLMIDI_005fgetTotalBanks-1"></a>
-<h3 class="subsection">5.5.43 Mix_ADLMIDI_getTotalBanks</h3>
+<h3 class="subsection">5.5.45 Mix_ADLMIDI_getTotalBanks</h3>
 <a name="index-Mix_005fADLMIDI_005fgetTotalBanks"></a>
 
 <p><code>int <b>Mix_ADLMIDI_getTotalBanks</b>()</code>
@@ -5534,7 +5675,7 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fADLMIDI_005fgetBankNames-1"></a>
-<h3 class="subsection">5.5.44 Mix_ADLMIDI_getBankNames</h3>
+<h3 class="subsection">5.5.46 Mix_ADLMIDI_getBankNames</h3>
 <a name="index-Mix_005fADLMIDI_005fgetBankNames"></a>
 
 <p><code>const char *const * <b>Mix_ADLMIDI_getBankNames</b>()</code>
@@ -5564,7 +5705,7 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fADLMIDI_005fgetBankID-1"></a>
-<h3 class="subsection">5.5.45 Mix_ADLMIDI_getBankID</h3>
+<h3 class="subsection">5.5.47 Mix_ADLMIDI_getBankID</h3>
 <a name="index-Mix_005fADLMIDI_005fgetBankID"></a>
 
 <p><code>int <b>Mix_ADLMIDI_getBankID</b>()</code>
@@ -5594,7 +5735,7 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fADLMIDI_005fsetBankID-1"></a>
-<h3 class="subsection">5.5.46 Mix_ADLMIDI_setBankID</h3>
+<h3 class="subsection">5.5.48 Mix_ADLMIDI_setBankID</h3>
 <a name="index-Mix_005fADLMIDI_005fsetBankID"></a>
 
 <p><code>void <b>Mix_ADLMIDI_setBankID</b>(int <var>bnk</var>)</code>
@@ -5628,7 +5769,7 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fADLMIDI_005fgetTremolo-1"></a>
-<h3 class="subsection">5.5.47 Mix_ADLMIDI_getTremolo</h3>
+<h3 class="subsection">5.5.49 Mix_ADLMIDI_getTremolo</h3>
 <a name="index-Mix_005fADLMIDI_005fgetTremolo"></a>
 
 <p><code>int <b>Mix_ADLMIDI_getTremolo</b>()</code>
@@ -5658,7 +5799,7 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fADLMIDI_005fsetTremolo-1"></a>
-<h3 class="subsection">5.5.48 Mix_ADLMIDI_setTremolo</h3>
+<h3 class="subsection">5.5.50 Mix_ADLMIDI_setTremolo</h3>
 <a name="index-Mix_005fADLMIDI_005fsetTremolo"></a>
 
 <p><code>void <b>Mix_ADLMIDI_setTremolo</b>(int <var>tr</var>)</code>
@@ -5693,7 +5834,7 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fADLMIDI_005fgetVibrato-1"></a>
-<h3 class="subsection">5.5.49 Mix_ADLMIDI_getVibrato</h3>
+<h3 class="subsection">5.5.51 Mix_ADLMIDI_getVibrato</h3>
 <a name="index-Mix_005fADLMIDI_005fgetVibrato"></a>
 
 <p><code>int <b>Mix_ADLMIDI_getVibrato</b>()</code>
@@ -5723,7 +5864,7 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fADLMIDI_005fsetVibrato-1"></a>
-<h3 class="subsection">5.5.50 Mix_ADLMIDI_setVibrato</h3>
+<h3 class="subsection">5.5.52 Mix_ADLMIDI_setVibrato</h3>
 <a name="index-Mix_005fADLMIDI_005fsetVibrato"></a>
 
 <p><code>void <b>Mix_ADLMIDI_setVibrato</b>(int <var>vib</var>)</code>
@@ -5758,7 +5899,7 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fADLMIDI_005fgetScaleMod-1"></a>
-<h3 class="subsection">5.5.51 Mix_ADLMIDI_getScaleMod</h3>
+<h3 class="subsection">5.5.53 Mix_ADLMIDI_getScaleMod</h3>
 <a name="index-Mix_005fADLMIDI_005fgetScaleMod"></a>
 
 <p><code>int <b>Mix_ADLMIDI_getScaleMod</b>()</code>
@@ -5788,7 +5929,7 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fADLMIDI_005fsetScaleMod-1"></a>
-<h3 class="subsection">5.5.52 Mix_ADLMIDI_setScaleMod</h3>
+<h3 class="subsection">5.5.54 Mix_ADLMIDI_setScaleMod</h3>
 <a name="index-Mix_005fADLMIDI_005fsetScaleMod"></a>
 
 <p><code>void <b>Mix_ADLMIDI_setScaleMod</b>(int <var>sc</var>)</code>
@@ -5823,7 +5964,7 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fADLMIDI_005fgetAdLibMode-1"></a>
-<h3 class="subsection">5.5.53 Mix_ADLMIDI_getAdLibMode</h3>
+<h3 class="subsection">5.5.55 Mix_ADLMIDI_getAdLibMode</h3>
 <a name="index-Mix_005fADLMIDI_005fgetAdLibMode"></a>
 
 <p><code>int <b>Mix_ADLMIDI_getAdLibMode</b>()</code>
@@ -5853,7 +5994,7 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fADLMIDI_005fsetAdLibMode-1"></a>
-<h3 class="subsection">5.5.54 Mix_ADLMIDI_setAdLibMode</h3>
+<h3 class="subsection">5.5.56 Mix_ADLMIDI_setAdLibMode</h3>
 <a name="index-Mix_005fADLMIDI_005fsetAdLibMode"></a>
 
 <p><code>void <b>Mix_ADLMIDI_setAdLibMode</b>(int <var>al</var>)</code>
@@ -5888,7 +6029,7 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fADLMIDI_005fgetLogarithmicVolumes-1"></a>
-<h3 class="subsection">5.5.55 Mix_ADLMIDI_getLogarithmicVolumes</h3>
+<h3 class="subsection">5.5.57 Mix_ADLMIDI_getLogarithmicVolumes</h3>
 <a name="index-Mix_005fADLMIDI_005fgetLogarithmicVolumes"></a>
 
 <p><code>int <b>Mix_ADLMIDI_getLogarithmicVolumes</b>()</code>
@@ -5918,7 +6059,7 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fADLMIDI_005fsetLogarithmicVolumes-1"></a>
-<h3 class="subsection">5.5.56 Mix_ADLMIDI_setLogarithmicVolumes</h3>
+<h3 class="subsection">5.5.58 Mix_ADLMIDI_setLogarithmicVolumes</h3>
 <a name="index-Mix_005fADLMIDI_005fsetLogarithmicVolumes"></a>
 
 <p><code>void <b>Mix_ADLMIDI_setLogarithmicVolumes</b>(int <var>lv</var>)</code>
@@ -5954,7 +6095,7 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fADLMIDI_005fgetVolumeModel-1"></a>
-<h3 class="subsection">5.5.57 Mix_ADLMIDI_getVolumeModel</h3>
+<h3 class="subsection">5.5.59 Mix_ADLMIDI_getVolumeModel</h3>
 <a name="index-Mix_005fADLMIDI_005fgetVolumeModel"></a>
 
 <p><code>int <b>Mix_ADLMIDI_getVolumeModel</b>()</code>
@@ -5984,7 +6125,7 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fADLMIDI_005fsetVolumeModel-1"></a>
-<h3 class="subsection">5.5.58 Mix_ADLMIDI_setVolumeModel</h3>
+<h3 class="subsection">5.5.60 Mix_ADLMIDI_setVolumeModel</h3>
 <a name="index-Mix_005fADLMIDI_005fsetVolumeModel"></a>
 
 <p><code>void <b>Mix_ADLMIDI_setVolumeModel</b>(int <var>vm</var>)</code>
@@ -6018,7 +6159,7 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fADLMIDI_005fsetSetDefaults-1"></a>
-<h3 class="subsection">5.5.59 Mix_ADLMIDI_setSetDefaults</h3>
+<h3 class="subsection">5.5.61 Mix_ADLMIDI_setSetDefaults</h3>
 <a name="index-Mix_005fADLMIDI_005fsetSetDefaults"></a>
 
 <p><code>int <b>Mix_ADLMIDI_setSetDefaults</b>()</code>
@@ -6046,7 +6187,7 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) {
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fADLMIDI_005fsetCustomBankFile-1"></a>
-<h3 class="subsection">5.5.60 Mix_ADLMIDI_setCustomBankFile</h3>
+<h3 class="subsection">5.5.62 Mix_ADLMIDI_setCustomBankFile</h3>
 <a name="index-Mix_005fADLMIDI_005fsetCustomBankFile"></a>
 
 <p><code>void <b>Mix_ADLMIDI_setCustomBankFile</b>(const char *<var>bank_wonl_path</var>)</code>
@@ -6087,7 +6228,7 @@ Mix_ADLMIDI_setCustomBankFile(&quot;./music/my-gm-bank.wonl&quot;);
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fOPNMIDI_005fsetCustomBankFile-1"></a>
-<h3 class="subsection">5.5.61 Mix_OPNMIDI_setCustomBankFile</h3>
+<h3 class="subsection">5.5.63 Mix_OPNMIDI_setCustomBankFile</h3>
 <a name="index-Mix_005fOPNMIDI_005fsetCustomBankFile"></a>
 
 <p><code>void <b>Mix_OPNMIDI_setCustomBankFile</b>(const char *<var>bank_wonp_path</var>)</code>
@@ -7212,24 +7353,24 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <tr><td></td><td valign="top"><a href="#index-LSB">LSB</a></td><td valign="top"><a href="#Glossary">8. Glossary</a></td></tr>
 <tr><td colspan="3"> <hr></td></tr>
 <tr><th><a name="Index-1_cp_letter-M">M</a></th><td></td><td></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fgetAdLibMode"><code>Mix_ADLMIDI_getAdLibMode</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fgetAdLibMode">5.5.53 Mix_ADLMIDI_getAdLibMode</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fgetBankID"><code>Mix_ADLMIDI_getBankID</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fgetBankID">5.5.45 Mix_ADLMIDI_getBankID</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fgetBankNames"><code>Mix_ADLMIDI_getBankNames</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fgetBankNames">5.5.44 Mix_ADLMIDI_getBankNames</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fgetLogarithmicVolumes"><code>Mix_ADLMIDI_getLogarithmicVolumes</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fgetLogarithmicVolumes">5.5.55 Mix_ADLMIDI_getLogarithmicVolumes</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fgetScaleMod"><code>Mix_ADLMIDI_getScaleMod</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fgetScaleMod">5.5.51 Mix_ADLMIDI_getScaleMod</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fgetTotalBanks"><code>Mix_ADLMIDI_getTotalBanks</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fgetTotalBanks">5.5.43 Mix_ADLMIDI_getTotalBanks</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fgetTremolo"><code>Mix_ADLMIDI_getTremolo</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fgetTremolo">5.5.47 Mix_ADLMIDI_getTremolo</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fgetVibrato"><code>Mix_ADLMIDI_getVibrato</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fgetVibrato">5.5.49 Mix_ADLMIDI_getVibrato</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fgetVolumeModel"><code>Mix_ADLMIDI_getVolumeModel</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fgetVolumeModel">5.5.57 Mix_ADLMIDI_getVolumeModel</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fsetAdLibMode"><code>Mix_ADLMIDI_setAdLibMode</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fsetAdLibMode">5.5.54 Mix_ADLMIDI_setAdLibMode</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fsetBankID"><code>Mix_ADLMIDI_setBankID</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fsetBankID">5.5.46 Mix_ADLMIDI_setBankID</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fsetCustomBankFile"><code>Mix_ADLMIDI_setCustomBankFile</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fsetCustomBankFile">5.5.60 Mix_ADLMIDI_setCustomBankFile</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fsetLogarithmicVolumes"><code>Mix_ADLMIDI_setLogarithmicVolumes</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fsetLogarithmicVolumes">5.5.56 Mix_ADLMIDI_setLogarithmicVolumes</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fsetScaleMod"><code>Mix_ADLMIDI_setScaleMod</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fsetScaleMod">5.5.52 Mix_ADLMIDI_setScaleMod</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fsetSetDefaults"><code>Mix_ADLMIDI_setSetDefaults</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fsetSetDefaults">5.5.59 Mix_ADLMIDI_setSetDefaults</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fsetTremolo"><code>Mix_ADLMIDI_setTremolo</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fsetTremolo">5.5.48 Mix_ADLMIDI_setTremolo</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fsetVibrato"><code>Mix_ADLMIDI_setVibrato</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fsetVibrato">5.5.50 Mix_ADLMIDI_setVibrato</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fsetVolumeModel"><code>Mix_ADLMIDI_setVolumeModel</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fsetVolumeModel">5.5.58 Mix_ADLMIDI_setVolumeModel</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fgetAdLibMode"><code>Mix_ADLMIDI_getAdLibMode</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fgetAdLibMode">5.5.55 Mix_ADLMIDI_getAdLibMode</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fgetBankID"><code>Mix_ADLMIDI_getBankID</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fgetBankID">5.5.47 Mix_ADLMIDI_getBankID</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fgetBankNames"><code>Mix_ADLMIDI_getBankNames</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fgetBankNames">5.5.46 Mix_ADLMIDI_getBankNames</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fgetLogarithmicVolumes"><code>Mix_ADLMIDI_getLogarithmicVolumes</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fgetLogarithmicVolumes">5.5.57 Mix_ADLMIDI_getLogarithmicVolumes</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fgetScaleMod"><code>Mix_ADLMIDI_getScaleMod</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fgetScaleMod">5.5.53 Mix_ADLMIDI_getScaleMod</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fgetTotalBanks"><code>Mix_ADLMIDI_getTotalBanks</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fgetTotalBanks">5.5.45 Mix_ADLMIDI_getTotalBanks</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fgetTremolo"><code>Mix_ADLMIDI_getTremolo</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fgetTremolo">5.5.49 Mix_ADLMIDI_getTremolo</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fgetVibrato"><code>Mix_ADLMIDI_getVibrato</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fgetVibrato">5.5.51 Mix_ADLMIDI_getVibrato</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fgetVolumeModel"><code>Mix_ADLMIDI_getVolumeModel</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fgetVolumeModel">5.5.59 Mix_ADLMIDI_getVolumeModel</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fsetAdLibMode"><code>Mix_ADLMIDI_setAdLibMode</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fsetAdLibMode">5.5.56 Mix_ADLMIDI_setAdLibMode</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fsetBankID"><code>Mix_ADLMIDI_setBankID</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fsetBankID">5.5.48 Mix_ADLMIDI_setBankID</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fsetCustomBankFile"><code>Mix_ADLMIDI_setCustomBankFile</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fsetCustomBankFile">5.5.62 Mix_ADLMIDI_setCustomBankFile</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fsetLogarithmicVolumes"><code>Mix_ADLMIDI_setLogarithmicVolumes</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fsetLogarithmicVolumes">5.5.58 Mix_ADLMIDI_setLogarithmicVolumes</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fsetScaleMod"><code>Mix_ADLMIDI_setScaleMod</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fsetScaleMod">5.5.54 Mix_ADLMIDI_setScaleMod</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fsetSetDefaults"><code>Mix_ADLMIDI_setSetDefaults</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fsetSetDefaults">5.5.61 Mix_ADLMIDI_setSetDefaults</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fsetTremolo"><code>Mix_ADLMIDI_setTremolo</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fsetTremolo">5.5.50 Mix_ADLMIDI_setTremolo</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fsetVibrato"><code>Mix_ADLMIDI_setVibrato</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fsetVibrato">5.5.52 Mix_ADLMIDI_setVibrato</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fsetVolumeModel"><code>Mix_ADLMIDI_setVolumeModel</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fsetVolumeModel">5.5.60 Mix_ADLMIDI_setVolumeModel</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fADLMIDI_005fVolumeModel"><code>Mix_ADLMIDI_VolumeModel</code></a></td><td valign="top"><a href="#Mix_005fADLMIDI_005fVolumeModel">6.5 Mix_ADLMIDI_VolumeModel</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fAllocateChannels"><code>Mix_AllocateChannels</code></a></td><td valign="top"><a href="#Mix_005fAllocateChannels">5.3.1 Mix_AllocateChannels</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fChannelFinished"><code>Mix_ChannelFinished</code></a></td><td valign="top"><a href="#Mix_005fChannelFinished">5.3.16 Mix_ChannelFinished</a></td></tr>
@@ -7241,7 +7382,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <tr><td></td><td valign="top"><a href="#index-MIX_005fDEFAULT_005fCHANNELS">MIX_DEFAULT_CHANNELS</a></td><td valign="top"><a href="#Defines">7. Defines</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-MIX_005fDEFAULT_005fFORMAT">MIX_DEFAULT_FORMAT</a></td><td valign="top"><a href="#Defines">7. Defines</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-MIX_005fDEFAULT_005fFREQUENCY">MIX_DEFAULT_FREQUENCY</a></td><td valign="top"><a href="#Defines">7. Defines</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fEachSoundFont"><code>Mix_EachSoundFont</code></a></td><td valign="top"><a href="#Mix_005fEachSoundFont">5.5.42 Mix_EachSoundFont</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fEachSoundFont"><code>Mix_EachSoundFont</code></a></td><td valign="top"><a href="#Mix_005fEachSoundFont">5.5.44 Mix_EachSoundFont</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fEffectDone_005ft"><code>Mix_EffectDone_t</code></a></td><td valign="top"><a href="#Mix_005fEffectDone_005ft">6.8 Mix_EffectDone_t</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fEffectFunc_005ft"><code>Mix_EffectFunc_t</code></a></td><td valign="top"><a href="#Mix_005fEffectFunc_005ft">6.7 Mix_EffectFunc_t</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-MIX_005fEFFECTSMAXSPEED">MIX_EFFECTSMAXSPEED</a></td><td valign="top"><a href="#Defines">7. Defines</a></td></tr>
@@ -7252,37 +7393,37 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <tr><td></td><td valign="top"><a href="#index-Mix_005fFadeInChannelTimed-1"><code>Mix_FadeInChannelTimed</code></a></td><td valign="top"><a href="#Mix_005fReserveChannels">5.4.1 Mix_ReserveChannels</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fFadeInChannelTimedVolume"><code>Mix_FadeInChannelTimedVolume</code></a></td><td valign="top"><a href="#Mix_005fFadeInChannelTimedVolume">5.3.10 Mix_FadeInChannelTimedVolume</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fFadeInChannelVolume"><code>Mix_FadeInChannelVolume</code></a></td><td valign="top"><a href="#Mix_005fFadeInChannelVolume">5.3.9 Mix_FadeInChannelVolume</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fFadeInMusic"><code>Mix_FadeInMusic</code></a></td><td valign="top"><a href="#Mix_005fFadeInMusic">5.5.9 Mix_FadeInMusic</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fFadeInMusicPos"><code>Mix_FadeInMusicPos</code></a></td><td valign="top"><a href="#Mix_005fFadeInMusicPos">5.5.10 Mix_FadeInMusicPos</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fFadeInMusic"><code>Mix_FadeInMusic</code></a></td><td valign="top"><a href="#Mix_005fFadeInMusic">5.5.11 Mix_FadeInMusic</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fFadeInMusicPos"><code>Mix_FadeInMusicPos</code></a></td><td valign="top"><a href="#Mix_005fFadeInMusicPos">5.5.12 Mix_FadeInMusicPos</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fFadeOutChannel"><code>Mix_FadeOutChannel</code></a></td><td valign="top"><a href="#Mix_005fFadeOutChannel">5.3.15 Mix_FadeOutChannel</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fFadeOutGroup"><code>Mix_FadeOutGroup</code></a></td><td valign="top"><a href="#Mix_005fFadeOutGroup">5.4.8 Mix_FadeOutGroup</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fFadeOutMusic"><code>Mix_FadeOutMusic</code></a></td><td valign="top"><a href="#Mix_005fFadeOutMusic">5.5.28 Mix_FadeOutMusic</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fFadeOutMusic"><code>Mix_FadeOutMusic</code></a></td><td valign="top"><a href="#Mix_005fFadeOutMusic">5.5.30 Mix_FadeOutMusic</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fFading"><code>Mix_Fading</code></a></td><td valign="top"><a href="#Mix_005fFading">6.6 Mix_Fading</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fFadingChannel"><code>Mix_FadingChannel</code></a></td><td valign="top"><a href="#Mix_005fFadingChannel">5.3.19 Mix_FadingChannel</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fFadingMusic"><code>Mix_FadingMusic</code></a></td><td valign="top"><a href="#Mix_005fFadingMusic">5.5.33 Mix_FadingMusic</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fFadingMusic"><code>Mix_FadingMusic</code></a></td><td valign="top"><a href="#Mix_005fFadingMusic">5.5.35 Mix_FadingMusic</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fFreeChunk"><code>Mix_FreeChunk</code></a></td><td valign="top"><a href="#Mix_005fFreeChunk">5.2.8 Mix_FreeChunk</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fFreeMusic"><code>Mix_FreeMusic</code></a></td><td valign="top"><a href="#Mix_005fFreeMusic">5.5.7 Mix_FreeMusic</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fFreeMusic"><code>Mix_FreeMusic</code></a></td><td valign="top"><a href="#Mix_005fFreeMusic">5.5.9 Mix_FreeMusic</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fGetChunk"><code>Mix_GetChunk</code></a></td><td valign="top"><a href="#Mix_005fGetChunk">5.3.20 Mix_GetChunk</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fGetChunkDecoder"><code>Mix_GetChunkDecoder</code></a></td><td valign="top"><a href="#Mix_005fGetChunkDecoder">5.2.2 Mix_GetChunkDecoder</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fGetError"><code>Mix_GetError</code></a></td><td valign="top"><a href="#Mix_005fGetError">5.1.7 Mix_GetError</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMidiDevice"><code>Mix_GetMidiDevice</code></a></td><td valign="top"><a href="#Mix_005fGetMidiDevice">5.5.23 Mix_GetMidiDevice</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicAlbumTag"><code>Mix_GetMusicAlbumTag</code></a></td><td valign="top"><a href="#Mix_005fGetMusicAlbumTag">5.5.38 Mix_GetMusicAlbumTag</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicArtistTag"><code>Mix_GetMusicArtistTag</code></a></td><td valign="top"><a href="#Mix_005fGetMusicArtistTag">5.5.37 Mix_GetMusicArtistTag</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicCopyrightTag"><code>Mix_GetMusicCopyrightTag</code></a></td><td valign="top"><a href="#Mix_005fGetMusicCopyrightTag">5.5.39 Mix_GetMusicCopyrightTag</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMidiDevice"><code>Mix_GetMidiDevice</code></a></td><td valign="top"><a href="#Mix_005fGetMidiDevice">5.5.25 Mix_GetMidiDevice</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicAlbumTag"><code>Mix_GetMusicAlbumTag</code></a></td><td valign="top"><a href="#Mix_005fGetMusicAlbumTag">5.5.40 Mix_GetMusicAlbumTag</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicArtistTag"><code>Mix_GetMusicArtistTag</code></a></td><td valign="top"><a href="#Mix_005fGetMusicArtistTag">5.5.39 Mix_GetMusicArtistTag</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicCopyrightTag"><code>Mix_GetMusicCopyrightTag</code></a></td><td valign="top"><a href="#Mix_005fGetMusicCopyrightTag">5.5.41 Mix_GetMusicCopyrightTag</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicDecoder"><code>Mix_GetMusicDecoder</code></a></td><td valign="top"><a href="#Mix_005fGetMusicDecoder">5.5.2 Mix_GetMusicDecoder</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicHookData"><code>Mix_GetMusicHookData</code></a></td><td valign="top"><a href="#Mix_005fGetMusicHookData">5.5.34 Mix_GetMusicHookData</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicLoopEndTime"><code>Mix_GetMusicLoopEndTime</code></a></td><td valign="top"><a href="#Mix_005fGetMusicLoopEndTime">5.5.20 Mix_GetMusicLoopEndTime</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicLoopLengthTime"><code>Mix_GetMusicLoopLengthTime</code></a></td><td valign="top"><a href="#Mix_005fGetMusicLoopLengthTime">5.5.21 Mix_GetMusicLoopLengthTime</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicLoopStartTime"><code>Mix_GetMusicLoopStartTime</code></a></td><td valign="top"><a href="#Mix_005fGetMusicLoopStartTime">5.5.19 Mix_GetMusicLoopStartTime</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicPosition"><code>Mix_GetMusicPosition</code></a></td><td valign="top"><a href="#Mix_005fGetMusicPosition">5.5.17 Mix_GetMusicPosition</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicTitle"><code>Mix_GetMusicTitle</code></a></td><td valign="top"><a href="#Mix_005fGetMusicTitle">5.5.35 Mix_GetMusicTitle</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicTitleTag"><code>Mix_GetMusicTitleTag</code></a></td><td valign="top"><a href="#Mix_005fGetMusicTitleTag">5.5.36 Mix_GetMusicTitleTag</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicTotalTime"><code>Mix_GetMusicTotalTime</code></a></td><td valign="top"><a href="#Mix_005fGetMusicTotalTime">5.5.18 Mix_GetMusicTotalTime</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicType"><code>Mix_GetMusicType</code></a></td><td valign="top"><a href="#Mix_005fGetMusicType">5.5.30 Mix_GetMusicType</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fGetNextMidiDevice"><code>Mix_GetNextMidiDevice</code></a></td><td valign="top"><a href="#Mix_005fGetNextMidiDevice">5.5.24 Mix_GetNextMidiDevice</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicHookData"><code>Mix_GetMusicHookData</code></a></td><td valign="top"><a href="#Mix_005fGetMusicHookData">5.5.36 Mix_GetMusicHookData</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicLoopEndTime"><code>Mix_GetMusicLoopEndTime</code></a></td><td valign="top"><a href="#Mix_005fGetMusicLoopEndTime">5.5.22 Mix_GetMusicLoopEndTime</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicLoopLengthTime"><code>Mix_GetMusicLoopLengthTime</code></a></td><td valign="top"><a href="#Mix_005fGetMusicLoopLengthTime">5.5.23 Mix_GetMusicLoopLengthTime</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicLoopStartTime"><code>Mix_GetMusicLoopStartTime</code></a></td><td valign="top"><a href="#Mix_005fGetMusicLoopStartTime">5.5.21 Mix_GetMusicLoopStartTime</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicPosition"><code>Mix_GetMusicPosition</code></a></td><td valign="top"><a href="#Mix_005fGetMusicPosition">5.5.19 Mix_GetMusicPosition</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicTitle"><code>Mix_GetMusicTitle</code></a></td><td valign="top"><a href="#Mix_005fGetMusicTitle">5.5.37 Mix_GetMusicTitle</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicTitleTag"><code>Mix_GetMusicTitleTag</code></a></td><td valign="top"><a href="#Mix_005fGetMusicTitleTag">5.5.38 Mix_GetMusicTitleTag</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicTotalTime"><code>Mix_GetMusicTotalTime</code></a></td><td valign="top"><a href="#Mix_005fGetMusicTotalTime">5.5.20 Mix_GetMusicTotalTime</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fGetMusicType"><code>Mix_GetMusicType</code></a></td><td valign="top"><a href="#Mix_005fGetMusicType">5.5.32 Mix_GetMusicType</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fGetNextMidiDevice"><code>Mix_GetNextMidiDevice</code></a></td><td valign="top"><a href="#Mix_005fGetNextMidiDevice">5.5.26 Mix_GetNextMidiDevice</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fGetNumChunkDecoders"><code>Mix_GetNumChunkDecoders</code></a></td><td valign="top"><a href="#Mix_005fGetNumChunkDecoders">5.2.1 Mix_GetNumChunkDecoders</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fGetNumMusicDecoders"><code>Mix_GetNumMusicDecoders</code></a></td><td valign="top"><a href="#Mix_005fGetNumMusicDecoders">5.5.1 Mix_GetNumMusicDecoders</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fGetSoundFonts"><code>Mix_GetSoundFonts</code></a></td><td valign="top"><a href="#Mix_005fGetSoundFonts">5.5.41 Mix_GetSoundFonts</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fGetSoundFonts"><code>Mix_GetSoundFonts</code></a></td><td valign="top"><a href="#Mix_005fGetSoundFonts">5.5.43 Mix_GetSoundFonts</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fGroupAvailable"><code>Mix_GroupAvailable</code></a></td><td valign="top"><a href="#Mix_005fGroupAvailable">5.4.5 Mix_GroupAvailable</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fGroupChannel"><code>Mix_GroupChannel</code></a></td><td valign="top"><a href="#Mix_005fGroupChannel">5.4.2 Mix_GroupChannel</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fGroupChannels"><code>Mix_GroupChannels</code></a></td><td valign="top"><a href="#Mix_005fGroupChannels">5.4.3 Mix_GroupChannels</a></td></tr>
@@ -7291,12 +7432,14 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <tr><td></td><td valign="top"><a href="#index-Mix_005fGroupOldest"><code>Mix_GroupOldest</code></a></td><td valign="top"><a href="#Mix_005fGroupOldest">5.4.6 Mix_GroupOldest</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fHaltChannel"><code>Mix_HaltChannel</code></a></td><td valign="top"><a href="#Mix_005fHaltChannel">5.3.13 Mix_HaltChannel</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fHaltGroup"><code>Mix_HaltGroup</code></a></td><td valign="top"><a href="#Mix_005fHaltGroup">5.4.9 Mix_HaltGroup</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fHaltMusic"><code>Mix_HaltMusic</code></a></td><td valign="top"><a href="#Mix_005fHaltMusic">5.5.27 Mix_HaltMusic</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fHookMusic"><code>Mix_HookMusic</code></a></td><td valign="top"><a href="#Mix_005fHookMusic">5.5.11 Mix_HookMusic</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fHookMusicFinished"><code>Mix_HookMusicFinished</code></a></td><td valign="top"><a href="#Mix_005fHookMusicFinished">5.5.29 Mix_HookMusicFinished</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fHaltMusic"><code>Mix_HaltMusic</code></a></td><td valign="top"><a href="#Mix_005fHaltMusic">5.5.29 Mix_HaltMusic</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fHookMusic"><code>Mix_HookMusic</code></a></td><td valign="top"><a href="#Mix_005fHookMusic">5.5.13 Mix_HookMusic</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fHookMusicFinished"><code>Mix_HookMusicFinished</code></a></td><td valign="top"><a href="#Mix_005fHookMusicFinished">5.5.31 Mix_HookMusicFinished</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fInit"><code>Mix_Init</code></a></td><td valign="top"><a href="#Mix_005fInit">5.1.2 Mix_Init</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fLinked_005fVersion"><code>Mix_Linked_Version</code></a></td><td valign="top"><a href="#Mix_005fLinked_005fVersion">5.1.1 Mix_Linked_Version</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fLoadMUS"><code>Mix_LoadMUS</code></a></td><td valign="top"><a href="#Mix_005fLoadMUS">5.5.3 Mix_LoadMUS</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fLoadMUSType_005fRW"><code>Mix_LoadMUSType_RW</code></a></td><td valign="top"><a href="#Mix_005fLoadMUSType_005fRW">5.5.7 Mix_LoadMUSType_RW</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fLoadMUSType_005fRW_005fARG"><code>Mix_LoadMUSType_RW_ARG</code></a></td><td valign="top"><a href="#Mix_005fLoadMUSType_005fRW_005fARG">5.5.8 Mix_LoadMUSType_RW_ARG</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fLoadMUS_005fRW"><code>Mix_LoadMUS_RW</code></a></td><td valign="top"><a href="#Mix_005fLoadMUS_005fRW">5.5.4 Mix_LoadMUS_RW</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fLoadMUS_005fRW_005fARG"><code>Mix_LoadMUS_RW_ARG</code></a></td><td valign="top"><a href="#Mix_005fLoadMUS_005fRW_005fARG">5.5.5 Mix_LoadMUS_RW_ARG</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fLoadMUS_005fRW_005fGME"><code>Mix_LoadMUS_RW_GME</code></a></td><td valign="top"><a href="#Mix_005fLoadMUS_005fRW_005fGME">5.5.6 Mix_LoadMUS_RW_GME</a></td></tr>
@@ -7309,12 +7452,12 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <tr><td></td><td valign="top"><a href="#index-Mix_005fMusic"><code>Mix_Music</code></a></td><td valign="top"><a href="#Mix_005fMusic">6.2 Mix_Music</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fMusicType"><code>Mix_MusicType</code></a></td><td valign="top"><a href="#Mix_005fMusicType">6.3 Mix_MusicType</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fOpenAudio"><code>Mix_OpenAudio</code></a></td><td valign="top"><a href="#Mix_005fOpenAudio">5.1.4 Mix_OpenAudio</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fOPNMIDI_005fsetCustomBankFile"><code>Mix_OPNMIDI_setCustomBankFile</code></a></td><td valign="top"><a href="#Mix_005fOPNMIDI_005fsetCustomBankFile">5.5.61 Mix_OPNMIDI_setCustomBankFile</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fOPNMIDI_005fsetCustomBankFile"><code>Mix_OPNMIDI_setCustomBankFile</code></a></td><td valign="top"><a href="#Mix_005fOPNMIDI_005fsetCustomBankFile">5.5.63 Mix_OPNMIDI_setCustomBankFile</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-MIX_005fPATCHLEVEL">MIX_PATCHLEVEL</a></td><td valign="top"><a href="#Defines">7. Defines</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fPause"><code>Mix_Pause</code></a></td><td valign="top"><a href="#Mix_005fPause">5.3.11 Mix_Pause</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fPaused"><code>Mix_Paused</code></a></td><td valign="top"><a href="#Mix_005fPaused">5.3.18 Mix_Paused</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fPausedMusic"><code>Mix_PausedMusic</code></a></td><td valign="top"><a href="#Mix_005fPausedMusic">5.5.32 Mix_PausedMusic</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fPauseMusic"><code>Mix_PauseMusic</code></a></td><td valign="top"><a href="#Mix_005fPauseMusic">5.5.13 Mix_PauseMusic</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fPausedMusic"><code>Mix_PausedMusic</code></a></td><td valign="top"><a href="#Mix_005fPausedMusic">5.5.34 Mix_PausedMusic</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fPauseMusic"><code>Mix_PauseMusic</code></a></td><td valign="top"><a href="#Mix_005fPauseMusic">5.5.15 Mix_PauseMusic</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fPlayChannel"><code>Mix_PlayChannel</code></a></td><td valign="top"><a href="#Mix_005fPlayChannel">5.3.3 Mix_PlayChannel</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fPlayChannel-1"><code>Mix_PlayChannel</code></a></td><td valign="top"><a href="#Mix_005fReserveChannels">5.4.1 Mix_ReserveChannels</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fPlayChannelTimed"><code>Mix_PlayChannelTimed</code></a></td><td valign="top"><a href="#Mix_005fPlayChannelTimed">5.3.4 Mix_PlayChannelTimed</a></td></tr>
@@ -7322,8 +7465,8 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <tr><td></td><td valign="top"><a href="#index-Mix_005fPlayChannelTimedVolume"><code>Mix_PlayChannelTimedVolume</code></a></td><td valign="top"><a href="#Mix_005fPlayChannelTimedVolume">5.3.6 Mix_PlayChannelTimedVolume</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fPlayChannelVol"><code>Mix_PlayChannelVol</code></a></td><td valign="top"><a href="#Mix_005fPlayChannelVol">5.3.5 Mix_PlayChannelVol</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fPlaying"><code>Mix_Playing</code></a></td><td valign="top"><a href="#Mix_005fPlaying">5.3.17 Mix_Playing</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fPlayingMusic"><code>Mix_PlayingMusic</code></a></td><td valign="top"><a href="#Mix_005fPlayingMusic">5.5.31 Mix_PlayingMusic</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fPlayMusic"><code>Mix_PlayMusic</code></a></td><td valign="top"><a href="#Mix_005fPlayMusic">5.5.8 Mix_PlayMusic</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fPlayingMusic"><code>Mix_PlayingMusic</code></a></td><td valign="top"><a href="#Mix_005fPlayingMusic">5.5.33 Mix_PlayingMusic</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fPlayMusic"><code>Mix_PlayMusic</code></a></td><td valign="top"><a href="#Mix_005fPlayMusic">5.5.10 Mix_PlayMusic</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fQuerySpec"><code>Mix_QuerySpec</code></a></td><td valign="top"><a href="#Mix_005fQuerySpec">5.1.8 Mix_QuerySpec</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fQuickLoad_005fRAW"><code>Mix_QuickLoad_RAW</code></a></td><td valign="top"><a href="#Mix_005fQuickLoad_005fRAW">5.2.6 Mix_QuickLoad_RAW</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fQuickLoad_005fWAV"><code>Mix_QuickLoad_WAV</code></a></td><td valign="top"><a href="#Mix_005fQuickLoad_005fWAV">5.2.5 Mix_QuickLoad_WAV</a></td></tr>
@@ -7331,25 +7474,25 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <tr><td></td><td valign="top"><a href="#index-Mix_005fRegisterEffect"><code>Mix_RegisterEffect</code></a></td><td valign="top"><a href="#Mix_005fRegisterEffect">5.6.1 Mix_RegisterEffect</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fReserveChannels"><code>Mix_ReserveChannels</code></a></td><td valign="top"><a href="#Mix_005fReserveChannels">5.4.1 Mix_ReserveChannels</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fResume"><code>Mix_Resume</code></a></td><td valign="top"><a href="#Mix_005fResume">5.3.12 Mix_Resume</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fResumeMusic"><code>Mix_ResumeMusic</code></a></td><td valign="top"><a href="#Mix_005fResumeMusic">5.5.14 Mix_ResumeMusic</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fRewindMusic"><code>Mix_RewindMusic</code></a></td><td valign="top"><a href="#Mix_005fRewindMusic">5.5.15 Mix_RewindMusic</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fResumeMusic"><code>Mix_ResumeMusic</code></a></td><td valign="top"><a href="#Mix_005fResumeMusic">5.5.16 Mix_ResumeMusic</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fRewindMusic"><code>Mix_RewindMusic</code></a></td><td valign="top"><a href="#Mix_005fRewindMusic">5.5.17 Mix_RewindMusic</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fSetDistance"><code>Mix_SetDistance</code></a></td><td valign="top"><a href="#Mix_005fSetDistance">5.6.6 Mix_SetDistance</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fSetError"><code>Mix_SetError</code></a></td><td valign="top"><a href="#Mix_005fSetError">5.1.6 Mix_SetError</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fSetLockMIDIArgs"><code>Mix_SetLockMIDIArgs</code></a></td><td valign="top"><a href="#Mix_005fSetLockMIDIArgs">5.5.26 Mix_SetLockMIDIArgs</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fSetMidiDevice"><code>Mix_SetMidiDevice</code></a></td><td valign="top"><a href="#Mix_005fSetMidiDevice">5.5.25 Mix_SetMidiDevice</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fSetMusicCMD"><code>Mix_SetMusicCMD</code></a></td><td valign="top"><a href="#Mix_005fSetMusicCMD">5.5.22 Mix_SetMusicCMD</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fSetMusicPosition"><code>Mix_SetMusicPosition</code></a></td><td valign="top"><a href="#Mix_005fSetMusicPosition">5.5.16 Mix_SetMusicPosition</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fSetLockMIDIArgs"><code>Mix_SetLockMIDIArgs</code></a></td><td valign="top"><a href="#Mix_005fSetLockMIDIArgs">5.5.28 Mix_SetLockMIDIArgs</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fSetMidiDevice"><code>Mix_SetMidiDevice</code></a></td><td valign="top"><a href="#Mix_005fSetMidiDevice">5.5.27 Mix_SetMidiDevice</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fSetMusicCMD"><code>Mix_SetMusicCMD</code></a></td><td valign="top"><a href="#Mix_005fSetMusicCMD">5.5.24 Mix_SetMusicCMD</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fSetMusicPosition"><code>Mix_SetMusicPosition</code></a></td><td valign="top"><a href="#Mix_005fSetMusicPosition">5.5.18 Mix_SetMusicPosition</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fSetPanning"><code>Mix_SetPanning</code></a></td><td valign="top"><a href="#Mix_005fSetPanning">5.6.5 Mix_SetPanning</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fSetPosition"><code>Mix_SetPosition</code></a></td><td valign="top"><a href="#Mix_005fSetPosition">5.6.7 Mix_SetPosition</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fSetPostMix"><code>Mix_SetPostMix</code></a></td><td valign="top"><a href="#Mix_005fSetPostMix">5.6.4 Mix_SetPostMix</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fSetReverseStereo"><code>Mix_SetReverseStereo</code></a></td><td valign="top"><a href="#Mix_005fSetReverseStereo">5.6.8 Mix_SetReverseStereo</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fSetSoundFonts"><code>Mix_SetSoundFonts</code></a></td><td valign="top"><a href="#Mix_005fSetSoundFonts">5.5.40 Mix_SetSoundFonts</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fSetSoundFonts"><code>Mix_SetSoundFonts</code></a></td><td valign="top"><a href="#Mix_005fSetSoundFonts">5.5.42 Mix_SetSoundFonts</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fTimidity_005faddToPathList"><code>Mix_Timidity_addToPathList</code></a></td><td valign="top"><a href="#Mix_005fTimidity_005faddToPathList">5.1.9 Mix_Timidity_addToPathList</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fUnregisterAllEffects"><code>Mix_UnregisterAllEffects</code></a></td><td valign="top"><a href="#Mix_005fUnregisterAllEffects">5.6.3 Mix_UnregisterAllEffects</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fUnregisterEffect"><code>Mix_UnregisterEffect</code></a></td><td valign="top"><a href="#Mix_005fUnregisterEffect">5.6.2 Mix_UnregisterEffect</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fVolume"><code>Mix_Volume</code></a></td><td valign="top"><a href="#Mix_005fVolume">5.3.2 Mix_Volume</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fVolumeChunk"><code>Mix_VolumeChunk</code></a></td><td valign="top"><a href="#Mix_005fVolumeChunk">5.2.7 Mix_VolumeChunk</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fVolumeMusic"><code>Mix_VolumeMusic</code></a></td><td valign="top"><a href="#Mix_005fVolumeMusic">5.5.12 Mix_VolumeMusic</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fVolumeMusic"><code>Mix_VolumeMusic</code></a></td><td valign="top"><a href="#Mix_005fVolumeMusic">5.5.14 Mix_VolumeMusic</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-MSB">MSB</a></td><td valign="top"><a href="#Glossary">8. Glossary</a></td></tr>
 <tr><td colspan="3"> <hr></td></tr>
 <tr><th><a name="Index-1_cp_letter-R">R</a></th><td></td><td></td></tr>
@@ -7470,61 +7613,63 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
       <li><a name="toc-Mix_005fLoadMUS_005fRW-1" href="#Mix_005fLoadMUS_005fRW">5.5.4 Mix_LoadMUS_RW</a></li>
       <li><a name="toc-Mix_005fLoadMUS_005fRW_005fARG-1" href="#Mix_005fLoadMUS_005fRW_005fARG">5.5.5 Mix_LoadMUS_RW_ARG</a></li>
       <li><a name="toc-Mix_005fLoadMUS_005fRW_005fGME-1" href="#Mix_005fLoadMUS_005fRW_005fGME">5.5.6 Mix_LoadMUS_RW_GME</a></li>
-      <li><a name="toc-Mix_005fFreeMusic-1" href="#Mix_005fFreeMusic">5.5.7 Mix_FreeMusic</a></li>
-      <li><a name="toc-Mix_005fPlayMusic-1" href="#Mix_005fPlayMusic">5.5.8 Mix_PlayMusic</a></li>
-      <li><a name="toc-Mix_005fFadeInMusic-1" href="#Mix_005fFadeInMusic">5.5.9 Mix_FadeInMusic</a></li>
-      <li><a name="toc-Mix_005fFadeInMusicPos-1" href="#Mix_005fFadeInMusicPos">5.5.10 Mix_FadeInMusicPos</a></li>
-      <li><a name="toc-Mix_005fHookMusic-1" href="#Mix_005fHookMusic">5.5.11 Mix_HookMusic</a></li>
-      <li><a name="toc-Mix_005fVolumeMusic-1" href="#Mix_005fVolumeMusic">5.5.12 Mix_VolumeMusic</a></li>
-      <li><a name="toc-Mix_005fPauseMusic-1" href="#Mix_005fPauseMusic">5.5.13 Mix_PauseMusic</a></li>
-      <li><a name="toc-Mix_005fResumeMusic-1" href="#Mix_005fResumeMusic">5.5.14 Mix_ResumeMusic</a></li>
-      <li><a name="toc-Mix_005fRewindMusic-1" href="#Mix_005fRewindMusic">5.5.15 Mix_RewindMusic</a></li>
-      <li><a name="toc-Mix_005fSetMusicPosition-1" href="#Mix_005fSetMusicPosition">5.5.16 Mix_SetMusicPosition</a></li>
-      <li><a name="toc-Mix_005fGetMusicPosition-1" href="#Mix_005fGetMusicPosition">5.5.17 Mix_GetMusicPosition</a></li>
-      <li><a name="toc-Mix_005fGetMusicTotalTime-1" href="#Mix_005fGetMusicTotalTime">5.5.18 Mix_GetMusicTotalTime</a></li>
-      <li><a name="toc-Mix_005fGetMusicLoopStartTime-1" href="#Mix_005fGetMusicLoopStartTime">5.5.19 Mix_GetMusicLoopStartTime</a></li>
-      <li><a name="toc-Mix_005fGetMusicLoopEndTime-1" href="#Mix_005fGetMusicLoopEndTime">5.5.20 Mix_GetMusicLoopEndTime</a></li>
-      <li><a name="toc-Mix_005fGetMusicLoopLengthTime-1" href="#Mix_005fGetMusicLoopLengthTime">5.5.21 Mix_GetMusicLoopLengthTime</a></li>
-      <li><a name="toc-Mix_005fSetMusicCMD-1" href="#Mix_005fSetMusicCMD">5.5.22 Mix_SetMusicCMD</a></li>
-      <li><a name="toc-Mix_005fGetMidiDevice-1" href="#Mix_005fGetMidiDevice">5.5.23 Mix_GetMidiDevice</a></li>
-      <li><a name="toc-Mix_005fGetNextMidiDevice-1" href="#Mix_005fGetNextMidiDevice">5.5.24 Mix_GetNextMidiDevice</a></li>
-      <li><a name="toc-Mix_005fSetMidiDevice-1" href="#Mix_005fSetMidiDevice">5.5.25 Mix_SetMidiDevice</a></li>
-      <li><a name="toc-Mix_005fSetLockMIDIArgs-1" href="#Mix_005fSetLockMIDIArgs">5.5.26 Mix_SetLockMIDIArgs</a></li>
-      <li><a name="toc-Mix_005fHaltMusic-1" href="#Mix_005fHaltMusic">5.5.27 Mix_HaltMusic</a></li>
-      <li><a name="toc-Mix_005fFadeOutMusic-1" href="#Mix_005fFadeOutMusic">5.5.28 Mix_FadeOutMusic</a></li>
-      <li><a name="toc-Mix_005fHookMusicFinished-1" href="#Mix_005fHookMusicFinished">5.5.29 Mix_HookMusicFinished</a></li>
-      <li><a name="toc-Mix_005fGetMusicType-1" href="#Mix_005fGetMusicType">5.5.30 Mix_GetMusicType</a></li>
-      <li><a name="toc-Mix_005fPlayingMusic-1" href="#Mix_005fPlayingMusic">5.5.31 Mix_PlayingMusic</a></li>
-      <li><a name="toc-Mix_005fPausedMusic-1" href="#Mix_005fPausedMusic">5.5.32 Mix_PausedMusic</a></li>
-      <li><a name="toc-Mix_005fFadingMusic-1" href="#Mix_005fFadingMusic">5.5.33 Mix_FadingMusic</a></li>
-      <li><a name="toc-Mix_005fGetMusicHookData-1" href="#Mix_005fGetMusicHookData">5.5.34 Mix_GetMusicHookData</a></li>
-      <li><a name="toc-Mix_005fGetMusicTitle-1" href="#Mix_005fGetMusicTitle">5.5.35 Mix_GetMusicTitle</a></li>
-      <li><a name="toc-Mix_005fGetMusicTitleTag-1" href="#Mix_005fGetMusicTitleTag">5.5.36 Mix_GetMusicTitleTag</a></li>
-      <li><a name="toc-Mix_005fGetMusicArtistTag-1" href="#Mix_005fGetMusicArtistTag">5.5.37 Mix_GetMusicArtistTag</a></li>
-      <li><a name="toc-Mix_005fGetMusicAlbumTag-1" href="#Mix_005fGetMusicAlbumTag">5.5.38 Mix_GetMusicAlbumTag</a></li>
-      <li><a name="toc-Mix_005fGetMusicCopyrightTag-1" href="#Mix_005fGetMusicCopyrightTag">5.5.39 Mix_GetMusicCopyrightTag</a></li>
-      <li><a name="toc-Mix_005fSetSoundFonts-1" href="#Mix_005fSetSoundFonts">5.5.40 Mix_SetSoundFonts</a></li>
-      <li><a name="toc-Mix_005fGetSoundFonts-1" href="#Mix_005fGetSoundFonts">5.5.41 Mix_GetSoundFonts</a></li>
-      <li><a name="toc-Mix_005fEachSoundFont-1" href="#Mix_005fEachSoundFont">5.5.42 Mix_EachSoundFont</a></li>
-      <li><a name="toc-Mix_005fADLMIDI_005fgetTotalBanks-1" href="#Mix_005fADLMIDI_005fgetTotalBanks">5.5.43 Mix_ADLMIDI_getTotalBanks</a></li>
-      <li><a name="toc-Mix_005fADLMIDI_005fgetBankNames-1" href="#Mix_005fADLMIDI_005fgetBankNames">5.5.44 Mix_ADLMIDI_getBankNames</a></li>
-      <li><a name="toc-Mix_005fADLMIDI_005fgetBankID-1" href="#Mix_005fADLMIDI_005fgetBankID">5.5.45 Mix_ADLMIDI_getBankID</a></li>
-      <li><a name="toc-Mix_005fADLMIDI_005fsetBankID-1" href="#Mix_005fADLMIDI_005fsetBankID">5.5.46 Mix_ADLMIDI_setBankID</a></li>
-      <li><a name="toc-Mix_005fADLMIDI_005fgetTremolo-1" href="#Mix_005fADLMIDI_005fgetTremolo">5.5.47 Mix_ADLMIDI_getTremolo</a></li>
-      <li><a name="toc-Mix_005fADLMIDI_005fsetTremolo-1" href="#Mix_005fADLMIDI_005fsetTremolo">5.5.48 Mix_ADLMIDI_setTremolo</a></li>
-      <li><a name="toc-Mix_005fADLMIDI_005fgetVibrato-1" href="#Mix_005fADLMIDI_005fgetVibrato">5.5.49 Mix_ADLMIDI_getVibrato</a></li>
-      <li><a name="toc-Mix_005fADLMIDI_005fsetVibrato-1" href="#Mix_005fADLMIDI_005fsetVibrato">5.5.50 Mix_ADLMIDI_setVibrato</a></li>
-      <li><a name="toc-Mix_005fADLMIDI_005fgetScaleMod-1" href="#Mix_005fADLMIDI_005fgetScaleMod">5.5.51 Mix_ADLMIDI_getScaleMod</a></li>
-      <li><a name="toc-Mix_005fADLMIDI_005fsetScaleMod-1" href="#Mix_005fADLMIDI_005fsetScaleMod">5.5.52 Mix_ADLMIDI_setScaleMod</a></li>
-      <li><a name="toc-Mix_005fADLMIDI_005fgetAdLibMode-1" href="#Mix_005fADLMIDI_005fgetAdLibMode">5.5.53 Mix_ADLMIDI_getAdLibMode</a></li>
-      <li><a name="toc-Mix_005fADLMIDI_005fsetAdLibMode-1" href="#Mix_005fADLMIDI_005fsetAdLibMode">5.5.54 Mix_ADLMIDI_setAdLibMode</a></li>
-      <li><a name="toc-Mix_005fADLMIDI_005fgetLogarithmicVolumes-1" href="#Mix_005fADLMIDI_005fgetLogarithmicVolumes">5.5.55 Mix_ADLMIDI_getLogarithmicVolumes</a></li>
-      <li><a name="toc-Mix_005fADLMIDI_005fsetLogarithmicVolumes-1" href="#Mix_005fADLMIDI_005fsetLogarithmicVolumes">5.5.56 Mix_ADLMIDI_setLogarithmicVolumes</a></li>
-      <li><a name="toc-Mix_005fADLMIDI_005fgetVolumeModel-1" href="#Mix_005fADLMIDI_005fgetVolumeModel">5.5.57 Mix_ADLMIDI_getVolumeModel</a></li>
-      <li><a name="toc-Mix_005fADLMIDI_005fsetVolumeModel-1" href="#Mix_005fADLMIDI_005fsetVolumeModel">5.5.58 Mix_ADLMIDI_setVolumeModel</a></li>
-      <li><a name="toc-Mix_005fADLMIDI_005fsetSetDefaults-1" href="#Mix_005fADLMIDI_005fsetSetDefaults">5.5.59 Mix_ADLMIDI_setSetDefaults</a></li>
-      <li><a name="toc-Mix_005fADLMIDI_005fsetCustomBankFile-1" href="#Mix_005fADLMIDI_005fsetCustomBankFile">5.5.60 Mix_ADLMIDI_setCustomBankFile</a></li>
-      <li><a name="toc-Mix_005fOPNMIDI_005fsetCustomBankFile-1" href="#Mix_005fOPNMIDI_005fsetCustomBankFile">5.5.61 Mix_OPNMIDI_setCustomBankFile</a></li>
+      <li><a name="toc-Mix_005fLoadMUSType_005fRW-1" href="#Mix_005fLoadMUSType_005fRW">5.5.7 Mix_LoadMUSType_RW</a></li>
+      <li><a name="toc-Mix_005fLoadMUSType_005fRW_005fARG-1" href="#Mix_005fLoadMUSType_005fRW_005fARG">5.5.8 Mix_LoadMUSType_RW_ARG</a></li>
+      <li><a name="toc-Mix_005fFreeMusic-1" href="#Mix_005fFreeMusic">5.5.9 Mix_FreeMusic</a></li>
+      <li><a name="toc-Mix_005fPlayMusic-1" href="#Mix_005fPlayMusic">5.5.10 Mix_PlayMusic</a></li>
+      <li><a name="toc-Mix_005fFadeInMusic-1" href="#Mix_005fFadeInMusic">5.5.11 Mix_FadeInMusic</a></li>
+      <li><a name="toc-Mix_005fFadeInMusicPos-1" href="#Mix_005fFadeInMusicPos">5.5.12 Mix_FadeInMusicPos</a></li>
+      <li><a name="toc-Mix_005fHookMusic-1" href="#Mix_005fHookMusic">5.5.13 Mix_HookMusic</a></li>
+      <li><a name="toc-Mix_005fVolumeMusic-1" href="#Mix_005fVolumeMusic">5.5.14 Mix_VolumeMusic</a></li>
+      <li><a name="toc-Mix_005fPauseMusic-1" href="#Mix_005fPauseMusic">5.5.15 Mix_PauseMusic</a></li>
+      <li><a name="toc-Mix_005fResumeMusic-1" href="#Mix_005fResumeMusic">5.5.16 Mix_ResumeMusic</a></li>
+      <li><a name="toc-Mix_005fRewindMusic-1" href="#Mix_005fRewindMusic">5.5.17 Mix_RewindMusic</a></li>
+      <li><a name="toc-Mix_005fSetMusicPosition-1" href="#Mix_005fSetMusicPosition">5.5.18 Mix_SetMusicPosition</a></li>
+      <li><a name="toc-Mix_005fGetMusicPosition-1" href="#Mix_005fGetMusicPosition">5.5.19 Mix_GetMusicPosition</a></li>
+      <li><a name="toc-Mix_005fGetMusicTotalTime-1" href="#Mix_005fGetMusicTotalTime">5.5.20 Mix_GetMusicTotalTime</a></li>
+      <li><a name="toc-Mix_005fGetMusicLoopStartTime-1" href="#Mix_005fGetMusicLoopStartTime">5.5.21 Mix_GetMusicLoopStartTime</a></li>
+      <li><a name="toc-Mix_005fGetMusicLoopEndTime-1" href="#Mix_005fGetMusicLoopEndTime">5.5.22 Mix_GetMusicLoopEndTime</a></li>
+      <li><a name="toc-Mix_005fGetMusicLoopLengthTime-1" href="#Mix_005fGetMusicLoopLengthTime">5.5.23 Mix_GetMusicLoopLengthTime</a></li>
+      <li><a name="toc-Mix_005fSetMusicCMD-1" href="#Mix_005fSetMusicCMD">5.5.24 Mix_SetMusicCMD</a></li>
+      <li><a name="toc-Mix_005fGetMidiDevice-1" href="#Mix_005fGetMidiDevice">5.5.25 Mix_GetMidiDevice</a></li>
+      <li><a name="toc-Mix_005fGetNextMidiDevice-1" href="#Mix_005fGetNextMidiDevice">5.5.26 Mix_GetNextMidiDevice</a></li>
+      <li><a name="toc-Mix_005fSetMidiDevice-1" href="#Mix_005fSetMidiDevice">5.5.27 Mix_SetMidiDevice</a></li>
+      <li><a name="toc-Mix_005fSetLockMIDIArgs-1" href="#Mix_005fSetLockMIDIArgs">5.5.28 Mix_SetLockMIDIArgs</a></li>
+      <li><a name="toc-Mix_005fHaltMusic-1" href="#Mix_005fHaltMusic">5.5.29 Mix_HaltMusic</a></li>
+      <li><a name="toc-Mix_005fFadeOutMusic-1" href="#Mix_005fFadeOutMusic">5.5.30 Mix_FadeOutMusic</a></li>
+      <li><a name="toc-Mix_005fHookMusicFinished-1" href="#Mix_005fHookMusicFinished">5.5.31 Mix_HookMusicFinished</a></li>
+      <li><a name="toc-Mix_005fGetMusicType-1" href="#Mix_005fGetMusicType">5.5.32 Mix_GetMusicType</a></li>
+      <li><a name="toc-Mix_005fPlayingMusic-1" href="#Mix_005fPlayingMusic">5.5.33 Mix_PlayingMusic</a></li>
+      <li><a name="toc-Mix_005fPausedMusic-1" href="#Mix_005fPausedMusic">5.5.34 Mix_PausedMusic</a></li>
+      <li><a name="toc-Mix_005fFadingMusic-1" href="#Mix_005fFadingMusic">5.5.35 Mix_FadingMusic</a></li>
+      <li><a name="toc-Mix_005fGetMusicHookData-1" href="#Mix_005fGetMusicHookData">5.5.36 Mix_GetMusicHookData</a></li>
+      <li><a name="toc-Mix_005fGetMusicTitle-1" href="#Mix_005fGetMusicTitle">5.5.37 Mix_GetMusicTitle</a></li>
+      <li><a name="toc-Mix_005fGetMusicTitleTag-1" href="#Mix_005fGetMusicTitleTag">5.5.38 Mix_GetMusicTitleTag</a></li>
+      <li><a name="toc-Mix_005fGetMusicArtistTag-1" href="#Mix_005fGetMusicArtistTag">5.5.39 Mix_GetMusicArtistTag</a></li>
+      <li><a name="toc-Mix_005fGetMusicAlbumTag-1" href="#Mix_005fGetMusicAlbumTag">5.5.40 Mix_GetMusicAlbumTag</a></li>
+      <li><a name="toc-Mix_005fGetMusicCopyrightTag-1" href="#Mix_005fGetMusicCopyrightTag">5.5.41 Mix_GetMusicCopyrightTag</a></li>
+      <li><a name="toc-Mix_005fSetSoundFonts-1" href="#Mix_005fSetSoundFonts">5.5.42 Mix_SetSoundFonts</a></li>
+      <li><a name="toc-Mix_005fGetSoundFonts-1" href="#Mix_005fGetSoundFonts">5.5.43 Mix_GetSoundFonts</a></li>
+      <li><a name="toc-Mix_005fEachSoundFont-1" href="#Mix_005fEachSoundFont">5.5.44 Mix_EachSoundFont</a></li>
+      <li><a name="toc-Mix_005fADLMIDI_005fgetTotalBanks-1" href="#Mix_005fADLMIDI_005fgetTotalBanks">5.5.45 Mix_ADLMIDI_getTotalBanks</a></li>
+      <li><a name="toc-Mix_005fADLMIDI_005fgetBankNames-1" href="#Mix_005fADLMIDI_005fgetBankNames">5.5.46 Mix_ADLMIDI_getBankNames</a></li>
+      <li><a name="toc-Mix_005fADLMIDI_005fgetBankID-1" href="#Mix_005fADLMIDI_005fgetBankID">5.5.47 Mix_ADLMIDI_getBankID</a></li>
+      <li><a name="toc-Mix_005fADLMIDI_005fsetBankID-1" href="#Mix_005fADLMIDI_005fsetBankID">5.5.48 Mix_ADLMIDI_setBankID</a></li>
+      <li><a name="toc-Mix_005fADLMIDI_005fgetTremolo-1" href="#Mix_005fADLMIDI_005fgetTremolo">5.5.49 Mix_ADLMIDI_getTremolo</a></li>
+      <li><a name="toc-Mix_005fADLMIDI_005fsetTremolo-1" href="#Mix_005fADLMIDI_005fsetTremolo">5.5.50 Mix_ADLMIDI_setTremolo</a></li>
+      <li><a name="toc-Mix_005fADLMIDI_005fgetVibrato-1" href="#Mix_005fADLMIDI_005fgetVibrato">5.5.51 Mix_ADLMIDI_getVibrato</a></li>
+      <li><a name="toc-Mix_005fADLMIDI_005fsetVibrato-1" href="#Mix_005fADLMIDI_005fsetVibrato">5.5.52 Mix_ADLMIDI_setVibrato</a></li>
+      <li><a name="toc-Mix_005fADLMIDI_005fgetScaleMod-1" href="#Mix_005fADLMIDI_005fgetScaleMod">5.5.53 Mix_ADLMIDI_getScaleMod</a></li>
+      <li><a name="toc-Mix_005fADLMIDI_005fsetScaleMod-1" href="#Mix_005fADLMIDI_005fsetScaleMod">5.5.54 Mix_ADLMIDI_setScaleMod</a></li>
+      <li><a name="toc-Mix_005fADLMIDI_005fgetAdLibMode-1" href="#Mix_005fADLMIDI_005fgetAdLibMode">5.5.55 Mix_ADLMIDI_getAdLibMode</a></li>
+      <li><a name="toc-Mix_005fADLMIDI_005fsetAdLibMode-1" href="#Mix_005fADLMIDI_005fsetAdLibMode">5.5.56 Mix_ADLMIDI_setAdLibMode</a></li>
+      <li><a name="toc-Mix_005fADLMIDI_005fgetLogarithmicVolumes-1" href="#Mix_005fADLMIDI_005fgetLogarithmicVolumes">5.5.57 Mix_ADLMIDI_getLogarithmicVolumes</a></li>
+      <li><a name="toc-Mix_005fADLMIDI_005fsetLogarithmicVolumes-1" href="#Mix_005fADLMIDI_005fsetLogarithmicVolumes">5.5.58 Mix_ADLMIDI_setLogarithmicVolumes</a></li>
+      <li><a name="toc-Mix_005fADLMIDI_005fgetVolumeModel-1" href="#Mix_005fADLMIDI_005fgetVolumeModel">5.5.59 Mix_ADLMIDI_getVolumeModel</a></li>
+      <li><a name="toc-Mix_005fADLMIDI_005fsetVolumeModel-1" href="#Mix_005fADLMIDI_005fsetVolumeModel">5.5.60 Mix_ADLMIDI_setVolumeModel</a></li>
+      <li><a name="toc-Mix_005fADLMIDI_005fsetSetDefaults-1" href="#Mix_005fADLMIDI_005fsetSetDefaults">5.5.61 Mix_ADLMIDI_setSetDefaults</a></li>
+      <li><a name="toc-Mix_005fADLMIDI_005fsetCustomBankFile-1" href="#Mix_005fADLMIDI_005fsetCustomBankFile">5.5.62 Mix_ADLMIDI_setCustomBankFile</a></li>
+      <li><a name="toc-Mix_005fOPNMIDI_005fsetCustomBankFile-1" href="#Mix_005fOPNMIDI_005fsetCustomBankFile">5.5.63 Mix_OPNMIDI_setCustomBankFile</a></li>
     </ul></li>
     <li><a name="toc-Effects-1" href="#Effects">5.6 Effects</a>
     <ul class="toc">
@@ -7587,7 +7732,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 </tr></table>
 <h1>About This Document</h1>
 <p>
-  This document was generated by <em>Vitaly</em> on <em>November 26, 2017</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
+  This document was generated by <em>Vitaly</em> on <em>January 13, 2018</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
 </p>
 <p>
   The buttons in the navigation panels have the following meaning:
@@ -7689,7 +7834,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <hr size="1">
 <p>
  <font size="-1">
-  This document was generated by <em>Vitaly</em> on <em>November 26, 2017</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
+  This document was generated by <em>Vitaly</em> on <em>January 13, 2018</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
  </font>
  <br>
 
