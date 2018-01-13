@@ -22,9 +22,9 @@
 #ifdef MUSIC_MP3_MAD
 
 #include "music_mad.h"
+#include "music_id3tag.h"
 
 #include "mad.h"
-
 
 /* NOTE: The dithering functions are GPL, which should be fine if your
          application is GPL (which would need to be true if you enabled
@@ -138,6 +138,7 @@ enum {
 typedef struct {
     int play_count;
     SDL_RWops *src;
+    Sint64 position_begin;
     int freesrc;
     struct mad_stream stream;
     struct mad_frame frame;
@@ -147,9 +148,62 @@ typedef struct {
     int status;
     SDL_AudioStream *audiostream;
 
+    double total_length;
+    int sample_rate;
+    int sample_position;
+    Mix_MusicMetaTags tags;
+
     unsigned char input_buffer[MAD_INPUT_BUFFER_SIZE + MAD_BUFFER_GUARD];
 } MAD_Music;
 
+
+static void read_update_buffer(struct mad_stream *stream, MAD_Music *music);
+
+static void calculate_total_time(MAD_Music *music)
+{
+    mad_timer_t time = mad_timer_zero;
+    struct mad_header header;
+    struct mad_stream stream;
+    mad_header_init(&header);
+    mad_stream_init(&stream);
+
+    SDL_RWseek(music->src, music->position_begin, RW_SEEK_SET);
+
+    while (1)
+    {
+        read_update_buffer(&stream, music);
+
+        if (mad_header_decode(&header, &stream) == -1) {
+            if (MAD_RECOVERABLE(stream.error)) {
+                if ((music->status & MS_input_error) == 0) {
+                    continue;
+                }
+                break;
+            } else if (stream.error == MAD_ERROR_BUFLEN) {
+                if ((music->status & MS_input_error) == 0) {
+                    continue;
+                }
+                break;
+            } else {
+                Mix_SetError("mad_frame_decode() failed, corrupt stream?");
+                music->status |= MS_decode_error;
+                break;
+            }
+        }
+
+        music->sample_rate = (int)header.samplerate;
+        mad_timer_add(&time, header.duration);
+    }
+
+    music->total_length = (double)(mad_timer_count(time, (enum mad_units)music->sample_rate)) / (double)music->sample_rate;
+    mad_stream_finish(&stream);
+    mad_header_finish(&header);
+    SDL_memset(music->input_buffer, 0, sizeof(music->input_buffer));
+
+    music->status = 0;
+
+    SDL_RWseek(music->src, music->position_begin, RW_SEEK_SET);
+}
 
 static int MAD_Seek(void *context, double position);
 
@@ -164,6 +218,10 @@ static void *MAD_CreateFromRW(SDL_RWops *src, int freesrc)
     }
     music->src = src;
     music->volume = MIX_MAX_VOLUME;
+
+    meta_tags_init(&music->tags);
+    music->position_begin = id3tag_fetchTags(&music->tags, music->src);
+    calculate_total_time(music);
 
     mad_stream_init(&music->stream);
     mad_frame_init(&music->frame);
@@ -188,13 +246,10 @@ static int MAD_Play(void *context, int play_count)
     return MAD_Seek(music, 0.0);
 }
 
-/* Reads the next frame from the file.
-   Returns true on success or false on failure.
- */
-static SDL_bool read_next_frame(MAD_Music *music)
+static void read_update_buffer(struct mad_stream *stream, MAD_Music *music)
 {
-    if (music->stream.buffer == NULL ||
-        music->stream.error == MAD_ERROR_BUFLEN) {
+    if (stream->buffer == NULL ||
+        stream->error == MAD_ERROR_BUFLEN) {
         size_t read_size;
         size_t remaining;
         unsigned char *read_start;
@@ -202,9 +257,9 @@ static SDL_bool read_next_frame(MAD_Music *music)
         /* There might be some bytes in the buffer left over from last
            time.    If so, move them down and read more bytes following
            them. */
-        if (music->stream.next_frame != NULL) {
-            remaining = music->stream.bufend - music->stream.next_frame;
-            memmove(music->input_buffer, music->stream.next_frame, remaining);
+        if (stream->next_frame != NULL) {
+            remaining = stream->bufend - stream->next_frame;
+            memmove(music->input_buffer, stream->next_frame, remaining);
             read_start = music->input_buffer + remaining;
             read_size = MAD_INPUT_BUFFER_SIZE - remaining;
 
@@ -230,10 +285,18 @@ static SDL_bool read_next_frame(MAD_Music *music)
         }
 
         /* Now feed those bytes into the libmad stream. */
-        mad_stream_buffer(&music->stream, music->input_buffer,
+        mad_stream_buffer(stream, music->input_buffer,
                                             read_size + remaining);
-        music->stream.error = MAD_ERROR_NONE;
+        stream->error = MAD_ERROR_NONE;
     }
+}
+
+/* Reads the next frame from the file.
+   Returns true on success or false on failure.
+ */
+static SDL_bool read_next_frame(MAD_Music *music)
+{
+    read_update_buffer(&music->stream, music);
 
     /* Now ask libmad to extract a frame from the data we just put in
        its buffer. */
@@ -319,6 +382,8 @@ static SDL_bool decode_frame(MAD_Music *music)
         }
     }
 
+    music->sample_position += nsamples;
+
     result = SDL_AudioStreamPut(music->audiostream, buffer, (nsamples * nchannels * sizeof(Sint16)));
     SDL_stack_free(buffer);
 
@@ -376,7 +441,9 @@ static int MAD_Seek(void *context, double position)
     int int_part;
 
     int_part = (int)position;
-    mad_timer_set(&target, int_part, (int)((position - int_part) * 1000000), 1000000);
+    mad_timer_set(&target, (unsigned long)int_part, (unsigned long)((position - int_part) * 1000000), 1000000);
+
+    music->sample_position = (int)(position * music->sample_rate);
 
     if (mad_timer_compare(music->next_frame_start, target) > 0) {
         /* In order to seek backwards in a VBR file, we have to rewind and
@@ -388,7 +455,8 @@ static int MAD_Seek(void *context, double position)
         mad_timer_reset(&music->next_frame_start);
         music->status &= ~MS_error_flags;
 
-        SDL_RWseek(music->src, 0, RW_SEEK_SET);
+        SDL_RWseek(music->src, music->position_begin, RW_SEEK_SET);
+        SDL_memset(music->input_buffer, 0, sizeof(music->input_buffer));
     }
 
     /* Now we have to skip frames until we come to the right one.
@@ -410,13 +478,31 @@ static int MAD_Seek(void *context, double position)
     return 0;
 }
 
+static double MAD_tell(void *context)
+{
+    MAD_Music *music = (MAD_Music *)context;
+    return (double)music->sample_position / (double)music->sample_rate;
+}
+
+static double MAD_total(void *context)
+{
+    MAD_Music *music = (MAD_Music *)context;
+    return music->total_length;
+}
+
+static const char* MAD_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
+{
+    MAD_Music *music = (MAD_Music *)context;
+    return meta_tags_get(&music->tags, tag_type);
+}
+
 static void MAD_Delete(void *context)
 {
     MAD_Music *music = (MAD_Music *)context;
-
     mad_stream_finish(&music->stream);
     mad_frame_finish(&music->frame);
     mad_synth_finish(&music->synth);
+    meta_tags_clear(&music->tags);
 
     if (music->audiostream) {
         SDL_FreeAudioStream(music->audiostream);
@@ -446,12 +532,12 @@ Mix_MusicInterface Mix_MusicInterface_MAD =
     NULL,   /* IsPlaying */
     MAD_GetAudio,
     MAD_Seek,
-    NULL,   /* Tell [MIXER-X]*/
-    NULL,   /* FullLength [MIXER-X]*/
+    MAD_tell, /* Tell [MIXER-X]*/
+    MAD_total,/* FullLength [MIXER-X]*/
     NULL,   /* LoopStart [MIXER-X]*/
     NULL,   /* LoopEnd [MIXER-X]*/
     NULL,   /* LoopLength [MIXER-X]*/
-    NULL,   /* GetMetaTag [MIXER-X]*/
+    MAD_GetMetaTag, /* GetMetaTag [MIXER-X]*/
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */

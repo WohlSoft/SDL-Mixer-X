@@ -116,12 +116,21 @@ if(LIBOGG_NEEDED)
     list(APPEND SDLMixerX_LINK_LIBS ogg)
 endif()
 
-option(USE_MP3_MAD         "Build with MAD MP3 codec" ON)
+option(USE_MP3_ID3TAG   "Build with MP3 Meta tags support provided by libID3Tag library" ON)
+if(USE_MP3_ID3TAG)
+    add_definitions(-DMUSIC_MP3_ID3TAG)
+    include_directories(${AUDIO_CODECS_PATH}/libid3tag/include)
+endif()
+
+option(USE_MP3_MAD      "Build with MAD MP3 codec" ON)
+option(USE_MP3_MAD_GPL_DITHERING "Enable GPL-Licensed dithering functions for MAD library" ON)
 if(USE_MP3_MAD)
     add_definitions(-DMUSIC_MP3_MAD)
+    if(USE_MP3_MAD_GPL_DITHERING)
+        add_definitions(-DMUSIC_MP3_MAD_GPL_DITHERING)
+    endif()
     list(APPEND SDLMixerX_LINK_LIBS mad id3tag)
     include_directories(${AUDIO_CODECS_PATH}/libmad/include)
-    include_directories(${AUDIO_CODECS_PATH}/libid3tag/include)
     list(APPEND SDLMixerX_SOURCES
         ${SDLMixerX_SOURCE_DIR}/src/codecs/music_mad.c)
 endif()
@@ -131,7 +140,6 @@ if(USE_MP3_SMPEG)
     add_definitions(-DMUSIC_MP3_SMPEG)
     list(APPEND SDLMixerX_LINK_LIBS smpeg id3tag)
     include_directories(${AUDIO_CODECS_PATH}/smpeg/include)
-    include_directories(${AUDIO_CODECS_PATH}/libid3tag/include)
     list(APPEND SDLMixerX_SOURCES
         ${SDLMixerX_SOURCE_DIR}/src/codecs/music_smpeg.c)
 endif()
@@ -155,6 +163,11 @@ if(USE_MP3_MPG123)
     list(APPEND SDLMixerX_LINK_LIBS mpg123)
     list(APPEND SDLMixerX_SOURCES
         ${SDLMixerX_SOURCE_DIR}/src/codecs/music_mpg123.c)
+endif()
+
+if(USE_MP3_MAD OR USE_MP3_MPG123 OR USE_MP3_SMPEG)
+    list(APPEND SDLMixerX_SOURCES
+        ${SDLMixerX_SOURCE_DIR}/src/codecs/music_id3tag.c)
 endif()
 
 option(USE_MODPLUG         "Build with ModPlug library" ON)
