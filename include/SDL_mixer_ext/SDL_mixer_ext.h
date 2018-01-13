@@ -226,7 +226,7 @@ extern DECLSPEC Mix_Music * SDLCALL Mix_LoadMUS_RW(SDL_RWops *src, int freesrc);
 /* Load a music file from an SDL_RWop object with custom arguments (trackID for GME or settings for a MIDI playing)
  * Arguments are taking no effect for file formats which are not supports extra arguments.
   */
-extern DECLSPEC Mix_Music *SDLCALL Mix_LoadMUS_RW_ARG(SDL_RWops *src, int freesrc, char *args);
+extern DECLSPEC Mix_Music *SDLCALL Mix_LoadMUS_RW_ARG(SDL_RWops *src, int freesrc, const char *args);
 
 /* Load a music file from an SDL_RWop object with custom trackID for GME.
  * trackID argument takes no effect for non-NSF,HES,GBM,etc. file formats.

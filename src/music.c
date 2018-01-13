@@ -1079,7 +1079,7 @@ Mix_Music *Mix_LoadMUS_RW(SDL_RWops *src, int freesrc)
     return Mix_LoadMUSType_RW(src, MUS_NONE, freesrc);
 }
 
-Mix_Music *SDLCALLCC Mix_LoadMUS_RW_ARG(SDL_RWops *src, int freesrc, char *args)
+Mix_Music *SDLCALLCC Mix_LoadMUS_RW_ARG(SDL_RWops *src, int freesrc, const char *args)
 {
     return Mix_LoadMUSType_RW_ARG(src, MUS_NONE, freesrc, args);
 }
