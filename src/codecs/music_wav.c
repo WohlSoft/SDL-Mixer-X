@@ -42,6 +42,7 @@ typedef struct {
     int play_count;
     Sint64 start;
     Sint64 stop;
+    Sint64 samplesize;
     Uint8 *buffer;
     SDL_AudioStream *stream;
     int numloops;
@@ -282,6 +283,29 @@ static int WAV_GetAudio(void *context, void *data, int bytes)
     return music_pcm_getaudio(context, data, bytes, music->volume, WAV_GetSome);
 }
 
+static int WAV_Seek(void *context, double position)
+{
+    WAV_Music *music = (WAV_Music *)context;
+    Sint64 destpos = music->start + (Sint64)(position * (double)music->spec.freq * music->samplesize);
+    if (destpos > music->stop)
+        return -1;
+    SDL_RWseek(music->src, destpos, RW_SEEK_SET);
+    return 0;
+}
+
+static double WAV_Tell(void *context)
+{
+    WAV_Music *music = (WAV_Music *)context;
+    Sint64 phys_pos = SDL_RWtell(music->src);
+    return (double)(phys_pos - music->start) / (double)(music->spec.freq * music->samplesize);
+}
+
+static double WAV_Length(void *context)
+{
+    WAV_Music *music = (WAV_Music *)context;
+    return (double)(music->stop - music->start) / (double)(music->spec.freq * music->samplesize);
+}
+
 /* Close the given WAV stream */
 static void WAV_Delete(void *context)
 {
@@ -349,6 +373,7 @@ static SDL_bool ParseFMT(WAV_Music *wave, Uint32 chunk_length)
     }
     spec->channels = (Uint8) SDL_SwapLE16(format->channels);
     spec->samples = 4096;       /* Good default buffer size */
+    wave->samplesize = spec->channels * (format->bitspersample / 8);
     /* SDL_CalculateAudioSpec */
     spec->size = SDL_AUDIO_BITSIZE(spec->format) / 8;
     spec->size *= spec->channels;
@@ -586,6 +611,7 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
         return SDL_FALSE;
     }
 
+    wave->samplesize = channels * (samplesize / 8);
     wave->stop = wave->start + channels * numsamples * (samplesize / 8);
 
     /* Decode the audio data format */
@@ -626,9 +652,9 @@ Mix_MusicInterface Mix_MusicInterface_WAV =
     WAV_Play,
     NULL,   /* IsPlaying */
     WAV_GetAudio,
-    NULL,   /* Seek */
-    NULL,   /* Tell [MIXER-X]*/
-    NULL,   /* FullLength [MIXER-X]*/
+    WAV_Seek,   /* Seek */
+    WAV_Tell,   /* Tell [MIXER-X]*/
+    WAV_Length, /* FullLength [MIXER-X]*/
     NULL,   /* LoopStart [MIXER-X]*/
     NULL,   /* LoopEnd [MIXER-X]*/
     NULL,   /* LoopLength [MIXER-X]*/
