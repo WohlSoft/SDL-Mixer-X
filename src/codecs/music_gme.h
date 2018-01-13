@@ -1,6 +1,3 @@
-#ifndef MUSIC_GME_H
-#define MUSIC_GME_H
-
 /*
   SDL_mixer:  An audio mixer library based on the SDL library
   Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
@@ -22,18 +19,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-/* $Id: music_gme.h Wohlstand $ */
+/* This file supports playing chiptune files with libGME */
 
-#ifdef GME_MUSIC
+#include "music.h"
 
-#include "../audio_codec.h"
-
-/* Initialize the Game Music Emulators player, with the given mixer settings
-   This function returns 0, or -1 if there was an error.
- */
-extern int GME_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixer);
-
-#endif /* GME_MUSIC */
-
-#endif /* MUSIC_GME_H */
-
+extern Mix_MusicInterface Mix_MusicInterface_GME;

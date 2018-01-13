@@ -19,21 +19,10 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-/* $Id: music_mod.h 4211 2008-12-08 00:27:32Z slouken $ */
+/* This file supports playing MIDI files with timidity */
 
-#ifdef MOD_MUSIC
+#include "music.h"
 
-#include "../audio_codec.h"
+extern Mix_MusicInterface Mix_MusicInterface_TIMIDITY;
 
-/* This file supports MOD tracker music streams */
-
-/* Initialize the MikMod player, with the given mixer settings
-   This function returns 0, or -1 if there was an error.
- */
-extern int MOD_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixer);
-
-/* Uninitialize the music players */
-extern void MOD_exit(void);
-
-
-#endif /* MOD_MUSIC */
+/* vi: set ts=4 sw=4 expandtab: */

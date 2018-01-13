@@ -19,10 +19,10 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifdef MODPLUG_MUSIC
+/* This file supports playing MOD files with libmodplug */
 
-#include "../audio_codec.h"
+#include "music.h"
 
-int modplug_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixer);
+extern Mix_MusicInterface Mix_MusicInterface_MODPLUG;
 
-#endif /* MODPLUG_MUSIC */
+/* vi: set ts=4 sw=4 expandtab: */

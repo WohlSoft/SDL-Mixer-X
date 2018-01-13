@@ -2347,9 +2347,11 @@ Music is therefore manipulated separately, except in post-processing hooks.
 * Mix_GetNumMusicDecoders::  Number of music format types that can be decoded
 * Mix_GetMusicDecoder::      Name of enumerated music format type decoder
 * Mix_LoadMUS::              Load a music file into a Mix_Music
-* Mix_LoadMUS_RW::           Load Music through SDL RWops (not implemented yet)
+* Mix_LoadMUS_RW::           Load Music through SDL RWops
 * Mix_LoadMUS_RW_ARG::       Load music through SDL RWops with passing of extra arguments string @b{[Mixer X]}
 * Mix_LoadMUS_RW_GME::       Load music through SDL RWops with passing of GME track number @b{[Mixer X]}
+* Mix_LoadMUSType_RW::       Load a music file from an SDL RWops object assuming a specific format
+* Mix_LoadMUSType_RW_ARG::   Load a music file from an SDL RWops object assuming a specific format with passing of extra arguments string @b{[Mixer X]}
 
 @b{Free}
 * Mix_FreeMusic::            Free a Mix_Music
@@ -2553,7 +2555,7 @@ Automatically close SDL_RWops instance on complete loading of music
 @end table
 
 @noindent
-Load music file to use.
+Load a music file from an SDL_RWop object
 
 @noindent
 @b{Returns}: A pointer to a Mix_Music.  NULL is returned on errors.
@@ -2576,6 +2578,8 @@ if(!music) @{
 @ref{Mix_Music},
 @ref{Mix_LoadMUS_RW_ARG},
 @ref{Mix_LoadMUS_RW_GME},
+@ref{Mix_LoadMUSType_RW},
+@ref{Mix_LoadMUSType_RW_ARG},
 @ref{Mix_SetMusicCMD},
 @ref{Mix_PlayMusic},
 @ref{Mix_FadeInMusic},
@@ -2588,7 +2592,7 @@ if(!music) @{
 @findex Mix_LoadMUS_RW_ARG
 
 @noindent
-@code{Mix_Music *@b{Mix_LoadMUS_RW_ARG}(SDL_RWops *@var{src}, int @var{freesrc}, char *@var{args})}
+@code{Mix_Music *@b{Mix_LoadMUS_RW_ARG}(SDL_RWops *@var{src}, int @var{freesrc}, const char *@var{args})}
 
 @table @var
 @item src
@@ -2600,7 +2604,7 @@ An arguments string supported by specific library
 @end table
 
 @noindent
-Load music file to use.
+Load a music file from an SDL_RWop object with custom arguments
 
 @noindent
 @b{Returns}: A pointer to a Mix_Music.  NULL is returned on errors.
@@ -2612,7 +2616,7 @@ Mix_Music *music;
 SDL_RWops *file = SDL_RWopen("music.mid", "rb");
 music = Mix_LoadMUS_RW_ARG(file, 1, "s0;t1;v1;b68;");
 if(!music) @{
-    printf("Mix_LoadMUS_RW_ARG(file, 1, "s0;t1;v1;b68;"): %s\n", Mix_GetError());
+    printf("Mix_LoadMUS_RW_ARG(file, 1, \"s0;t1;v1;b68;\"): %s\n", Mix_GetError());
     // this might be a critical error...
 @}
 @end example
@@ -2623,6 +2627,8 @@ if(!music) @{
 @ref{Mix_Music},
 @ref{Mix_LoadMUS_RW},
 @ref{Mix_LoadMUS_RW_GME},
+@ref{Mix_LoadMUSType_RW},
+@ref{Mix_LoadMUSType_RW_ARG},
 @ref{Mix_SetMusicCMD},
 @ref{Mix_PlayMusic},
 @ref{Mix_FadeInMusic},
@@ -2670,10 +2676,112 @@ if(!music) @{
 @ref{Mix_Music},
 @ref{Mix_LoadMUS_RW},
 @ref{Mix_LoadMUS_RW_ARG},
+@ref{Mix_LoadMUSType_RW},
+@ref{Mix_LoadMUSType_RW_ARG},
 @ref{Mix_SetMusicCMD},
 @ref{Mix_PlayMusic},
 @ref{Mix_FadeInMusic},
 @ref{Mix_FadeInMusicPos}
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_LoadMUSType_RW
+@subsection Mix_LoadMUSType_RW
+@findex Mix_LoadMUSType_RW
+
+@noindent
+@code{Mix_Music *@b{Mix_LoadMUSType_RW}(SDL_RWops *@var{src}, Mix_MusicType @var{type}, int @var{freesrc})}
+
+@table @var
+@item src
+SDL RWops instance of music file / memory
+@item type
+A music type identificator
+@item freesrc
+Automatically close SDL_RWops instance on complete loading of music
+@end table
+
+@noindent
+Load a music file from an SDL_RWop object assuming a specific format
+
+@noindent
+@b{Returns}: A pointer to a Mix_Music.  NULL is returned on errors.
+
+@cartouche
+@example
+// load the MIDI file "music.mid" to play as music with ADLMIDI synthesizer
+Mix_Music *music;
+SDL_RWops *file = SDL_RWopen("music.mid", "rb");
+music = Mix_LoadMUSType_RW(file, MUS_MID, 1);
+if(!music) @{
+    printf("Mix_LoadMUSType_RW(file, MUS_MID, 1): %s\n", Mix_GetError());
+    // this might be a critical error...
+@}
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_Music},
+@ref{Mix_LoadMUS_RW},
+@ref{Mix_LoadMUS_RW_GME},
+@ref{Mix_LoadMUSType_RW_ARG},
+@ref{Mix_SetMusicCMD},
+@ref{Mix_PlayMusic},
+@ref{Mix_FadeInMusic},
+@ref{Mix_FadeInMusicPos}
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_LoadMUSType_RW_ARG
+@subsection Mix_LoadMUSType_RW_ARG
+@findex Mix_LoadMUSType_RW_ARG
+
+@noindent
+@code{Mix_Music *@b{Mix_LoadMUSType_RW_ARG}(SDL_RWops *@var{src}, Mix_MusicType @var{type}, int @var{freesrc})}
+
+@table @var
+@item src
+SDL RWops instance of music file / memory
+@item type
+A music type identificator
+@item freesrc
+Automatically close SDL_RWops instance on complete loading of music
+@item args
+An arguments string supported by specific library
+@end table
+
+@noindent
+Load a music file from an SDL_RWop object assuming a specific format with custom arguments (trackID for GME or settings for a MIDI playing)
+
+@noindent
+@b{Returns}: A pointer to a Mix_Music.  NULL is returned on errors.
+
+@cartouche
+@example
+// load the MIDI file "music.mid" to play as music with ADLMIDI synthesizer
+Mix_Music *music;
+SDL_RWops *file = SDL_RWopen("music.mid", "rb");
+music = Mix_LoadMUSType_RW_ARG(file, MUS_MID, 1, "s0;t1;v1;b68;");
+if(!music) @{
+    printf("Mix_LoadMUSType_RW_ARG(file, MUS_MID, 1, \"s0;t1;v1;b68;\"): %s\n", Mix_GetError());
+    // this might be a critical error...
+@}
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_Music},
+@ref{Mix_LoadMUS_RW},
+@ref{Mix_LoadMUS_RW_GME},
+@ref{Mix_LoadMUSType_RW},
+@ref{Mix_SetMusicCMD},
+@ref{Mix_PlayMusic},
+@ref{Mix_FadeInMusic},
+@ref{Mix_FadeInMusicPos}
+
+
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page

@@ -59,9 +59,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     if(SDL_Init(SDL_INIT_AUDIO) ==-1 )
         error(QString("Failed to initialize audio: ") + SDL_GetError());
 
-    if(Mix_Init(MIX_INIT_FLAC | MIX_INIT_MP3 | MIX_INIT_OGG | MIX_INIT_MODPLUG )==-1)
+    if(Mix_Init(MIX_INIT_FLAC | MIX_INIT_MP3 | MIX_INIT_OGG | MIX_INIT_MOD | MIX_INIT_MID ) == -1)
         error(QString("Failed to initialize mixer: ") + Mix_GetError());
 
+#ifdef SDL_MIXER_X
     #ifndef MUSPLAY_USE_WINAPI
     QString timidityPath(a.applicationDirPath() + "/timidity/");
     if(QDir(timidityPath).exists())
@@ -73,6 +74,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     #else
     Mix_Timidity_addToPathList("./timidity");
     #endif
+#endif
 
     #ifndef MUSPLAY_USE_WINAPI
     Mix_SetSoundFonts(QString(a.applicationDirPath() + "/gm.sf2").toUtf8().data());
@@ -85,8 +87,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     Mix_AllocateChannels(16);
 
+#ifdef SDL_MIXER_X
     //Disallow auto-resetting MIDI properties (to allow manipulation with MIDI settings by functions)
     Mix_SetLockMIDIArgs(1);
+#endif
 
 #ifndef MUSPLAY_USE_WINAPI
     MusPlayer_Qt w;

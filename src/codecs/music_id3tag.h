@@ -19,31 +19,11 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifdef MODPLUG_MUSIC
+/* This file supports reading of ID3 tags of MP3 files with libID3Tag */
 
-#ifdef MODPLUG_HEADER
-#include MODPLUG_HEADER
-#else
-#include <modplug.h>
-#endif
+#include "music.h"
 
-typedef struct {
-    int loaded;
-    void *handle;
+extern Sint64 id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src);
+extern Sint64 id3tag_fetchTagsFromMemory(Mix_MusicMetaTags *out_tags, Uint8 *data, size_t length);
 
-    ModPlugFile* (*ModPlug_Load)(const void* data, int size);
-    void (*ModPlug_Unload)(ModPlugFile* file);
-    int  (*ModPlug_Read)(ModPlugFile* file, void* buffer, int size);
-    void (*ModPlug_Seek)(ModPlugFile* file, int millisecond);
-    void (*ModPlug_GetSettings)(ModPlug_Settings* settings);
-    void (*ModPlug_SetSettings)(const ModPlug_Settings* settings);
-    void (*ModPlug_SetMasterVolume)(ModPlugFile* file,unsigned int cvol) ;
-    const char* (*ModPlug_GetName)(ModPlugFile* file);
-} modplug_loader;
-
-extern modplug_loader modplug;
-
-#endif /* MODPLUG_MUSIC */
-
-extern int Mix_InitModPlug();
-extern void Mix_QuitModPlug();
+/* vi: set ts=4 sw=4 expandtab: */

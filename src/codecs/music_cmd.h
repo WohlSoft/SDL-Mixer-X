@@ -21,15 +21,8 @@
 
 /* This file supports an external command for playing music */
 
-#ifdef CMD_MUSIC
+#include "music.h"
 
-#include "../audio_codec.h"
+extern Mix_MusicInterface Mix_MusicInterface_CMD;
 
-int MusicCMD_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixerfmt);
-
-/*  Load a music stream from the given file
-    to free song, please use codec->close(music) function
-*/
-void *MusicCMD_LoadSong(const char *cmd, const char *file);
-
-#endif /* CMD_MUSIC */
+/* vi: set ts=4 sw=4 expandtab: */

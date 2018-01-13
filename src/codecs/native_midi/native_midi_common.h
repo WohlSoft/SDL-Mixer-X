@@ -19,10 +19,10 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef NATIVE_MIDI_COMMON_H_
-#define NATIVE_MIDI_COMMON_H_
+#ifndef _NATIVE_MIDI_COMMON_H_
+#define _NATIVE_MIDI_COMMON_H_
 
-#include <SDL2/SDL.h>
+#include "SDL.h"
 
 /* Midi Status Bytes */
 #define MIDI_STATUS_NOTE_OFF    0x8
@@ -33,8 +33,6 @@
 #define MIDI_STATUS_PRESSURE    0xD
 #define MIDI_STATUS_PITCH_WHEEL 0xE
 #define MIDI_STATUS_SYSEX       0xF
-
-extern char *common_nm_error;
 
 /* We store the midi events in a linked list; this way it is
    easy to shuffle the tracks together later on; and we are
@@ -62,4 +60,4 @@ MIDIEvent *CreateMIDIEventList(SDL_RWops *rw, Uint16 *division);
 void FreeMIDIEventList(MIDIEvent *head);
 
 
-#endif /* NATIVE_MIDI_COMMON_H_ */
+#endif /* _NATIVE_MIDI_COMMON_H_ */

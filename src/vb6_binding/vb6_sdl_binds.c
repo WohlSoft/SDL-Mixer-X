@@ -33,8 +33,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <SDL_mixer_ext/SDL_mixer_ext.h>
-#include <SDL2/SDL_rwops.h>
+#include "SDL_mixer_ext.h"
+#include "SDL_rwops.h"
 
 /* Needed for ADLMIDI_getBankNames() */
 #include "../codecs/music_midi_adl.h"
@@ -128,7 +128,7 @@ __declspec(dllexport) int __stdcall SDL_RWcloseVB6(SDL_RWops * ctx)
 
 __declspec(dllexport) const char* __stdcall MIX_ADLMIDI_getBankName(int bankID)
 {
-    return ADLMIDI_getBankNames()[bankID];
+    return Mix_ADLMIDI_getBankNames()[bankID];
 }
 
 #endif

@@ -1,7 +1,4 @@
 /*
-  SDL Mixer X:  An extended audio mixer library, forked from SDL_mixer
-  Copyright (C) 2014-2018 Vitaly Novichkov <admin@wohlnet.ru>
-
   SDL_mixer:  An audio mixer library based on the SDL library
   Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
@@ -31,30 +28,6 @@
 #include "SDL_endian.h"
 #include "SDL_version.h"
 #include "begin_code.h"
-
-/* Let applications recogonize which SDL Mixer edition is in use: Official or Extended fork by Wohlstand */
-#define SDL_MIXER_X 1
-
-#if defined(FORCE_STDCALLS) && defined(_WIN32)
-#ifdef SDLCALL
-#undef SDLCALL
-#endif
-#define SDLCALL   __stdcall
-#define SDLCALLCC __stdcall
-#else
-#define SDLCALLCC
-#endif
-
-#ifndef DEPRECATED
-#ifdef __GNUC__
-#define DEPRECATED(func) func __attribute__ ((deprecated))
-#elif defined(_MSC_VER)
-#define DEPRECATED(func) __declspec(deprecated) func
-#else
-#pragma message("WARNING: You need to implement DEPRECATED for this compiler")
-#define DEPRECATED(func) func
-#endif
-#endif
 
 /* Set up for C function definitions, even when using C++ */
 #ifdef __cplusplus
@@ -126,7 +99,7 @@ extern DECLSPEC void SDLCALL Mix_Quit(void);
 #endif
 
 /* Good default values for a PC soundcard */
-#define MIX_DEFAULT_FREQUENCY   44100
+#define MIX_DEFAULT_FREQUENCY   22050
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
 #define MIX_DEFAULT_FORMAT  AUDIO_S16LSB
 #else
@@ -161,31 +134,8 @@ typedef enum {
     MUS_MP3,
     MUS_MP3_MAD_UNUSED,
     MUS_FLAC,
-    MUS_MODPLUG_UNUSED,
-    MUS_GME,
-    MUS_ADLMIDI,/*Use ADLMIDI coded for super-special formats like IMF, MUS or XMI are can't be played without ADLMIDI*/
-    MUS_KnownCodecs     /* Count of codec types */
+    MUS_MODPLUG_UNUSED
 } Mix_MusicType;
-
-typedef enum {
-    MIDI_ADLMIDI,
-    MIDI_Native,
-    MIDI_Timidity,
-    MIDI_OPNMIDI,
-    MIDI_Fluidsynth,
-    MIDI_ANY,
-    MIDI_KnuwnDevices   /* Count of MIDI device types */
-} Mix_MIDI_Device;
-
-/* Volume model type in the ADLMIDI */
-typedef enum {
-    ADLMIDI_VM_AUTO,
-    ADLMIDI_VM_GENERIC,
-    ADLMIDI_VM_CMF,
-    ADLMIDI_VM_DMX,
-    ADLMIDI_VM_APOGEE,
-    ADLMIDI_VM_9X
-} Mix_ADLMIDI_VolumeModel;
 
 /* The internal format for a music chunk interpreted via mikmod */
 typedef struct _Mix_Music Mix_Music;
@@ -208,38 +158,17 @@ extern DECLSPEC int SDLCALL Mix_AllocateChannels(int numchans);
  */
 extern DECLSPEC int SDLCALL Mix_QuerySpec(int *frequency,Uint16 *format,int *channels);
 
-/* Load a wave file or a music (.mod .s3m .it .xm) file
-    IMPORTANT: To choice a track number of NSF, GBM, HES, etc file,
-               you must append "|xxx" to end of file path for
-               Mix_LoadMUS function.
-               Where xxx - actual number of chip track, (from 0 to N-1)
-               Examples: "file.nsf|12", "file.hes|2"
-*/
+/* Load a wave file or a music (.mod .s3m .it .xm) file */
 extern DECLSPEC Mix_Chunk * SDLCALL Mix_LoadWAV_RW(SDL_RWops *src, int freesrc);
 #define Mix_LoadWAV(file)   Mix_LoadWAV_RW(SDL_RWFromFile(file, "rb"), 1)
 extern DECLSPEC Mix_Music * SDLCALL Mix_LoadMUS(const char *file);
 
-/* Load a music file from an SDL_RWop object
- * Matt Campbell (matt@campbellhome.dhs.org) April 2000 */
+/* Load a music file from an SDL_RWop object (Ogg and MikMod specific currently)
+   Matt Campbell (matt@campbellhome.dhs.org) April 2000 */
 extern DECLSPEC Mix_Music * SDLCALL Mix_LoadMUS_RW(SDL_RWops *src, int freesrc);
-
-/* Load a music file from an SDL_RWop object with custom arguments (trackID for GME or settings for a MIDI playing)
- * Arguments are taking no effect for file formats which are not supports extra arguments.
-  */
-extern DECLSPEC Mix_Music *SDLCALL Mix_LoadMUS_RW_ARG(SDL_RWops *src, int freesrc, const char *args);
-
-/* Load a music file from an SDL_RWop object with custom trackID for GME.
- * trackID argument takes no effect for non-NSF,HES,GBM,etc. file formats.
- * Default value should be 0
- */
-extern DECLSPEC Mix_Music *SDLCALL Mix_LoadMUS_RW_GME(SDL_RWops *src, int freesrc, int trackID);
 
 /* Load a music file from an SDL_RWop object assuming a specific format */
 extern DECLSPEC Mix_Music * SDLCALL Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int freesrc);
-
-/* Load a music file from an SDL_RWop object assuming a specific format
-   with custom arguments (trackID for GME or settings for a MIDI playing) */
-extern DECLSPEC Mix_Music * SDLCALL Mix_LoadMUSType_RW_ARG(SDL_RWops *src, Mix_MusicType type, int freesrc, const char *args);
 
 /* Load a wave file of the mixer format from a memory buffer */
 extern DECLSPEC Mix_Chunk * SDLCALL Mix_QuickLoad_WAV(Uint8 *mem);
@@ -281,17 +210,6 @@ extern DECLSPEC SDL_bool SDLCALL Mix_HasMusicDecoder(const char *name);
    music, if 'music' is NULL.
 */
 extern DECLSPEC Mix_MusicType SDLCALL Mix_GetMusicType(const Mix_Music *music);
-
-/* Get music title from meta-tag if possible. If title tag is empty, filename will be returned */
-extern DECLSPEC const char *SDLCALL Mix_GetMusicTitle(const Mix_Music *music);
-/* Get music title from meta-tag if possible */
-extern DECLSPEC const char *SDLCALL Mix_GetMusicTitleTag(const Mix_Music *music);
-/* Get music artist from meta-tag if possible */
-extern DECLSPEC const char *SDLCALL Mix_GetMusicArtistTag(const Mix_Music *music);
-/* Get music album from meta-tag if possible */
-extern DECLSPEC const char *SDLCALL Mix_GetMusicAlbumTag(const Mix_Music *music);
-/* Get music copyright from meta-tag if possible */
-extern DECLSPEC const char *SDLCALL Mix_GetMusicCopyrightTag(const Mix_Music *music);
 
 /* Set a function that is called after all mixing is performed.
    This can be used to provide real-time visual display of the audio stream
@@ -631,17 +549,12 @@ extern DECLSPEC int SDLCALL Mix_GroupNewer(int tag);
 /* The same as above, but the sound is played at most 'ticks' milliseconds */
 extern DECLSPEC int SDLCALL Mix_PlayChannelTimed(int channel, Mix_Chunk *chunk, int loops, int ticks);
 extern DECLSPEC int SDLCALL Mix_PlayMusic(Mix_Music *music, int loops);
-#define Mix_PlayChannelVol(channel,chunk,loops,vol) Mix_PlayChannelTimedVolume(channel,chunk,loops,-1,vol)/*MIXER-X*/
-extern DECLSPEC int SDLCALL Mix_PlayChannelTimedVolume(int which, Mix_Chunk *chunk, int loops, int ticks, int volume);/*MIXER-X*/
 
 /* Fade in music or a channel over "ms" milliseconds, same semantics as the "Play" functions */
 extern DECLSPEC int SDLCALL Mix_FadeInMusic(Mix_Music *music, int loops, int ms);
 extern DECLSPEC int SDLCALL Mix_FadeInMusicPos(Mix_Music *music, int loops, int ms, double position);
 #define Mix_FadeInChannel(channel,chunk,loops,ms) Mix_FadeInChannelTimed(channel,chunk,loops,ms,-1)
 extern DECLSPEC int SDLCALL Mix_FadeInChannelTimed(int channel, Mix_Chunk *chunk, int loops, int ms, int ticks);
-#define Mix_FadeInChannelVolume(channel,chunk,loops,ms,vol) Mix_FadeInChannelTimed(channel,chunk,loops,ms,-1,vol)/*MIXER-X*/
-extern DECLSPEC int SDLCALL Mix_FadeInChannelTimedVolume(int which, Mix_Chunk *chunk, int loops, int ms, int ticks, int volume);/*MIXER-X*/
-
 
 /* Set the volume in the range of 0-128 of a specific channel or chunk.
    If the specified channel is -1, set volume for all channels.
@@ -689,37 +602,10 @@ extern DECLSPEC int SDLCALL Mix_PausedMusic(void);
 /* Set the current position in the music stream.
    This returns 0 if successful, or -1 if it failed or isn't implemented.
    This function is only implemented for MOD music formats (set pattern
-   order number) and for WAV, OGG, FLAC, MP3_MAD, MP3_MPG, and MODPLUG music
+   order number) and for OGG, FLAC, MP3_MAD, MP3_MPG and MODPLUG music
    (set position in seconds), at the moment.
 */
 extern DECLSPEC int SDLCALL Mix_SetMusicPosition(double position);
-/*
-    Get the time current position of music stream
-    returns -1.0 if this feature is not supported for some codec
- */
-extern DECLSPEC double SDLCALLCC Mix_GetMusicPosition(Mix_Music *music);
-/*
-    Get the total time length of music stream
-    returns -1.0 if this feature is not supported for some codec
- */
-extern DECLSPEC double SDLCALLCC Mix_GetMusicTotalTime(Mix_Music *music);
-
-/*
-    Get the loop start time position of music stream
-    returns -1.0 if this feature is not used for this music or not supported for some codec
- */
-extern DECLSPEC double SDLCALLCC Mix_GetMusicLoopStartTime(Mix_Music *music);
-/*
-    Get the loop end time position of music stream
-    returns -1.0 if this feature is not used for this music or not supported for some codec
- */
-extern DECLSPEC double SDLCALLCC Mix_GetMusicLoopEndTime(Mix_Music *music);
-/*
-    Get the loop time length of music stream
-    returns -1.0 if this feature is not used for this music or not supported for some codec
- */
-extern DECLSPEC double SDLCALLCC Mix_GetMusicLoopLengthTime(Mix_Music *music);
-
 
 /* Check the status of a specific channel.
    If the specified channel is -1, check all channels.
@@ -746,72 +632,6 @@ extern DECLSPEC Mix_Chunk * SDLCALL Mix_GetChunk(int channel);
 
 /* Close the mixer, halting all playing audio */
 extern DECLSPEC void SDLCALL Mix_CloseAudio(void);
-
-/* Add additional Timidity bank path */
-extern DECLSPEC void SDLCALL Mix_Timidity_addToPathList(const char *path);
-
-/* ADLMIDI Setup functions */
-/* Get count of available hardcoded banks */
-extern DECLSPEC int    SDLCALL Mix_ADLMIDI_getTotalBanks();
-/* Get array of the bank names */
-extern DECLSPEC const char *const *SDLCALL Mix_ADLMIDI_getBankNames();
-/* Get bank ID */
-extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getBankID();
-/* Set bank ID (Applying on stop/play) */
-extern DECLSPEC void SDLCALL Mix_ADLMIDI_setBankID(int bnk);
-/* Get state of deep vibrato */
-extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getTremolo();
-/* Set deep tremolo mode (0 off, 1 on) (Applying on stop/play) */
-extern DECLSPEC void SDLCALL Mix_ADLMIDI_setTremolo(int tr);
-/* Get state of deep vibrato */
-extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getVibrato();
-/* Set deep vibrato mode (0 off, 1 on) (Applying on stop/play) */
-extern DECLSPEC void SDLCALL Mix_ADLMIDI_setVibrato(int vib);
-/* Get state of scalable modulation mode */
-extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getScaleMod();
-/* Set scalable modulation mode (0 off, 1 on) (Applying on stop/play) */
-extern DECLSPEC void SDLCALL Mix_ADLMIDI_setScaleMod(int sc);
-/* Get state of adlib drums mode */
-extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getAdLibMode();
-/* Set adlib drums mode mode (0 off, 1 on) (Applying on stop/play) */
-extern DECLSPEC void SDLCALL Mix_ADLMIDI_setAdLibMode(int tr);
-/* Get state of logarithmic mode */
-extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getLogarithmicVolumes();
-/* Set logarithmic volumes mode in the generic/CMF volume models (0 off, 1 on) (Applying on stop/play) */
-extern DECLSPEC void SDLCALL Mix_ADLMIDI_setLogarithmicVolumes(int lv);
-/* Get current volume model ID */
-extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getVolumeModel();
-/* Change current volumes model (Applying on stop/play) */
-extern DECLSPEC void SDLCALL Mix_ADLMIDI_setVolumeModel(int vm);
-/* Reset all ADLMIDI properties to default state */
-extern DECLSPEC void SDLCALL Mix_ADLMIDI_setSetDefaults();
-
-/* Sets WOPL bank file for ADLMIDI playing device, affects on MIDI file reopen */
-extern DECLSPEC void SDLCALL Mix_ADLMIDI_setCustomBankFile(const char *bank_wonl_path);
-
-/* Sets WOPN bank file for OPNMIDI playing device, affects on MIDI file reopen */
-extern DECLSPEC void SDLCALL Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path);
-
-/* Get type of MIDI device currently in use */
-extern DECLSPEC int  SDLCALL Mix_GetMidiDevice();
-
-/* Get type of MIDI device prepared for next opening of MIDI file */
-extern DECLSPEC int  SDLCALL Mix_GetNextMidiDevice();
-
-/* Set the MIDI playing device (ADLMIDI, Timidity, Native MIDI (if available) and FluidSynth) */
-extern DECLSPEC int  SDLCALL Mix_SetMidiDevice(int device);
-
-/* Disables support of MIDI file arguments */
-extern DECLSPEC void SDLCALL Mix_SetLockMIDIArgs(int lock_midiargs);
-
-/*  DEPRECATED NAMES for new-added SDL Mixer X functions
-    Those names are made with mistake - beginning with "MIX_" than "Mix_"
-    which makes confusion when you looking for Mix_ function in your IDE
-    because some applications are still use them, to don't break ABI we will keep those
-    aliases until we will remove all usages of them from applications and libraries are used them
-*/
-/* All deprecated functions has been nuked :3. So, No way you will use them again :-P
- * Just go to fix your software to use same functions with new names. */
 
 /* We'll use SDL for reporting errors */
 #define Mix_SetError    SDL_SetError

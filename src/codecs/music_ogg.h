@@ -19,15 +19,10 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-/* $Id$ */
+/* This file supports Ogg Vorbis music streams */
 
-#ifdef OGG_MUSIC
+#include "music.h"
 
-#include "../audio_codec.h"
+extern Mix_MusicInterface Mix_MusicInterface_OGG;
 
-/* Initialize the Ogg Vorbis player, with the given mixer settings
-   This function returns 0, or -1 if there was an error.
- */
-extern int OGG_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixer);
-
-#endif /* OGG_MUSIC */
+/* vi: set ts=4 sw=4 expandtab: */

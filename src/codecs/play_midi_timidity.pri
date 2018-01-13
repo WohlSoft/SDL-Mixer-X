@@ -1,8 +1,8 @@
 LIBS += -ltimidity
 
 HEADERS += \
-    $$PWD/music_midi_timidity.h
+    $$PWD/music_timidity.h
 
 SOURCES += \
-    $$PWD/music_midi_timidity.c
+    $$PWD/music_timidity.c
 

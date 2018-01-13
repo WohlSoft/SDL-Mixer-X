@@ -19,13 +19,10 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-/* $Id$ */
-
 /* This file supports streaming WAV files */
 
-#include "../audio_codec.h"
+#include "music.h"
 
-/* Initialize the WAVStream player, with the given mixer settings
-   This function returns 0, or -1 if there was an error.
- */
-extern int WAVStream_Init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixer);
+extern Mix_MusicInterface Mix_MusicInterface_WAV;
+
+/* vi: set ts=4 sw=4 expandtab: */

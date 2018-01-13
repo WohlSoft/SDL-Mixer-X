@@ -19,15 +19,10 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef MUSIC_MIDI_TIMIDITY_H
-#define MUSIC_MIDI_TIMIDITY_H
+/* This file supports playing MP3 files with smpeg */
 
-#include "../audio_codec.h"
+#include "music.h"
 
-extern int Timidity_init2(Mix_MusicInterface *codec, SDL_AudioSpec *mixer);
+extern Mix_MusicInterface Mix_MusicInterface_SMPEG;
 
-extern void         Timidity_addToPathList(const char* path);
-extern const char   *Timidity_Error(void);
-extern void         Timidity_Close(void);
-
-#endif // MUSIC_MIDI_TIMIDITY_H
+/* vi: set ts=4 sw=4 expandtab: */
