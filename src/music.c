@@ -95,6 +95,84 @@ static char *music_args = NULL;
 static char *music_filename = NULL; /* Reference, not a pointer! */
 /*  ======== Music file arguments END ==== */
 
+
+/* Meta-Tags utiltiy */
+void meta_tags_init(Mix_MusicMetaTags *tags)
+{
+    SDL_memset(tags, 0, sizeof(Mix_MusicMetaTags));
+}
+
+void meta_tags_clear(Mix_MusicMetaTags *tags)
+{
+    if (tags->title) {
+        SDL_free(tags->title);
+    }
+    if (tags->artist) {
+        SDL_free(tags->artist);
+    }
+    if (tags->album) {
+        SDL_free(tags->album);
+    }
+    if (tags->copyright) {
+        SDL_free(tags->copyright);
+    }
+}
+
+void meta_tags_set(Mix_MusicMetaTags *tags, Mix_MusicMetaTag type, const char *value)
+{
+    char *out;
+    size_t len;
+    if (!value)
+        return;
+    len = SDL_strlen(value);
+    out = (char *)SDL_malloc(sizeof(char) * len + 1);
+    SDL_memset(out, 0, len + 1);
+    SDL_strlcpy(out, value, len +1);
+
+    switch (type) {
+    case MIX_META_TITLE:
+        if (tags->title) {
+            SDL_free(tags->title);
+        }
+        tags->title = out;
+        break;
+    case MIX_META_ARTIST:
+        if (tags->artist) {
+            SDL_free(tags->artist);
+        }
+        tags->artist = out;
+        break;
+    case MIX_META_ALBUM:
+        if (tags->album) {
+            SDL_free(tags->album);
+        }
+        tags->album = out;
+        break;
+    case MIX_META_COPYRIGHT:
+        if (tags->copyright) {
+            SDL_free(tags->copyright);
+        }
+        tags->copyright = out;
+        break;
+    }
+}
+
+const char *meta_tags_get(Mix_MusicMetaTags *tags, Mix_MusicMetaTag type)
+{
+    switch (type) {
+    case MIX_META_TITLE:
+        return tags->title ? tags->title : "";
+    case MIX_META_ARTIST:
+        return tags->artist ? tags->artist : "";
+    case MIX_META_ALBUM:
+        return tags->album ? tags->album : "";
+    case MIX_META_COPYRIGHT:
+        return tags->copyright ? tags->copyright : "";
+    }
+    return "";
+}
+
+
 /* Interfaces for the various music interfaces, ordered by priority */
 static Mix_MusicInterface *s_music_interfaces[] =
 {

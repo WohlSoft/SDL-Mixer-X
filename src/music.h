@@ -45,6 +45,7 @@ typedef enum
     MIX_MUSIC_LAST
 } Mix_MusicAPI;
 
+
 /* MIXER-X: Supported meta-tags */
 
 typedef enum
@@ -54,6 +55,23 @@ typedef enum
     MIX_META_ALBUM,
     MIX_META_COPYRIGHT,
 } Mix_MusicMetaTag;
+
+
+/* MIXER-X: Meta-tags utility structure */
+
+typedef struct {
+    char *title;
+    char *artist;
+    char *album;
+    char *copyright;
+} Mix_MusicMetaTags;
+
+
+extern void meta_tags_init(Mix_MusicMetaTags *tags);
+extern void meta_tags_clear(Mix_MusicMetaTags *tags);
+extern void meta_tags_set(Mix_MusicMetaTags *tags, Mix_MusicMetaTag type, const char *value);
+extern const char* meta_tags_get(Mix_MusicMetaTags *tags, Mix_MusicMetaTag type);
+
 
 /* Music API implementation */
 

@@ -156,11 +156,7 @@ typedef struct
     SDL_AudioStream *stream;
     void *buffer;
     size_t buffer_size;
-
-    char *mus_title;
-    char *mus_artist;
-    char *mus_album;
-    char *mus_copyright;
+    Mix_MusicMetaTags tags;
 } AdlMIDI_Music;
 
 /* Set the volume for a ADLMIDI stream */
@@ -172,19 +168,6 @@ static void ADLMIDI_setvolume(void *music_p, int volume)
 }
 
 static void ADLMIDI_delete(void *music_p);
-
-static char * copyMetaTag(const char *input)
-{
-    char *out;
-    size_t len;
-    if (!input)
-        return NULL;
-    len = SDL_strlen(input);
-    out = (char *)SDL_malloc(sizeof(char) * len + 1);
-    SDL_memset(out, 0, len + 1);
-    SDL_strlcpy(out, input, len +1);
-    return out;
-}
 
 static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src)
 {
@@ -272,10 +255,9 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src)
         }
 
         music->volume                 = MIX_MAX_VOLUME;
-        music->mus_title = copyMetaTag(adl_metaMusicTitle(music->adlmidi));
-        music->mus_artist = NULL;
-        music->mus_album = NULL;
-        music->mus_copyright = copyMetaTag(adl_metaMusicCopyright(music->adlmidi));
+        meta_tags_init(&music->tags);
+        meta_tags_set(&music->tags, MIX_META_TITLE, adl_metaMusicTitle(music->adlmidi));
+        meta_tags_set(&music->tags, MIX_META_COPYRIGHT, adl_metaMusicCopyright(music->adlmidi));
         return music;
     }
     return NULL;
@@ -366,17 +348,7 @@ static void ADLMIDI_delete(void *music_p)
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
     if(music)
     {
-        /* META-TAGS */
-        if (music->mus_title)
-            SDL_free(music->mus_title);
-        if (music->mus_artist)
-            SDL_free(music->mus_artist);
-        if (music->mus_album)
-            SDL_free(music->mus_album);
-        if (music->mus_copyright)
-            SDL_free(music->mus_copyright);
-        /* META-TAGS */
-
+        meta_tags_clear(&music->tags);
         if(music->adlmidi) {
             adl_close(music->adlmidi);
         }
@@ -393,17 +365,7 @@ static void ADLMIDI_delete(void *music_p)
 static const char* ADLMIDI_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)context;
-    switch (tag_type) {
-    case MIX_META_TITLE:
-        return music->mus_title ? music->mus_title : "";
-    case MIX_META_ARTIST:
-        return music->mus_artist ? music->mus_artist : "";
-    case MIX_META_ALBUM:
-        return music->mus_album ? music->mus_album : "";
-    case MIX_META_COPYRIGHT:
-        return music->mus_copyright ? music->mus_copyright : "";
-    }
-    return "";
+    return meta_tags_get(&music->tags, tag_type);
 }
 
 /* Jump (seek) to a given position (time is in seconds) */

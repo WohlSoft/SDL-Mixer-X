@@ -153,11 +153,7 @@ typedef struct {
     ogg_int64_t loop_len;
     ogg_int64_t channels;
     ogg_int64_t sample_rate;
-
-    char *mus_title;
-    char *mus_artist;
-    char *mus_album;
-    char *mus_copyright;
+    Mix_MusicMetaTags tags;
 } OGG_music;
 
 
@@ -243,19 +239,6 @@ static int OGG_UpdateSection(OGG_music *music)
     return 0;
 }
 
-static char * copyMetaTag(const char *input)
-{
-    char *out;
-    size_t len;
-    if (!input)
-        return NULL;
-    len = SDL_strlen(input);
-    out = (char *)SDL_malloc(sizeof(char) * len + 1);
-    SDL_memset(out, 0, len + 1);
-    SDL_strlcpy(out, input, len +1);
-    return out;
-}
-
 /* Load an OGG stream from an SDL_RWops object */
 static void *OGG_CreateFromRW(SDL_RWops *src, int freesrc)
 {
@@ -319,13 +302,13 @@ static void *OGG_CreateFromRW(SDL_RWops *src, int freesrc)
             isLoopLength = 0;
             music->loop_end = (ogg_int64_t)SDL_strtoull(value, NULL, 0);
         } else if (SDL_strcasecmp(argument, "TITLE") == 0) {
-            music->mus_title = copyMetaTag(value);
+            meta_tags_set(&music->tags, MIX_META_TITLE, value);
         } else if (SDL_strcasecmp(argument, "ARTIST") == 0) {
-            music->mus_artist = copyMetaTag(value);
+            meta_tags_set(&music->tags, MIX_META_ARTIST, value);
         } else if (SDL_strcasecmp(argument, "ALBUM") == 0) {
-            music->mus_album = copyMetaTag(value);
+            meta_tags_set(&music->tags, MIX_META_ALBUM, value);
         } else if (SDL_strcasecmp(argument, "COPYRIGHT") == 0) {
-            music->mus_copyright = copyMetaTag(value);
+            meta_tags_set(&music->tags, MIX_META_COPYRIGHT, value);
         }
         SDL_free(param);
     }
@@ -353,17 +336,7 @@ static void *OGG_CreateFromRW(SDL_RWops *src, int freesrc)
 static const char* OGG_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
 {
     OGG_music *music = (OGG_music *)context;
-    switch (tag_type) {
-    case MIX_META_TITLE:
-        return music->mus_title ? music->mus_title : "";
-    case MIX_META_ARTIST:
-        return music->mus_artist ? music->mus_artist : "";
-    case MIX_META_ALBUM:
-        return music->mus_album ? music->mus_album : "";
-    case MIX_META_COPYRIGHT:
-        return music->mus_copyright ? music->mus_copyright : "";
-    }
-    return "";
+    return meta_tags_get(&music->tags, tag_type);
 }
 
 /* Set the volume for an OGG stream */
@@ -529,18 +502,7 @@ static double   OGG_get_loop_length(void *music_p)
 static void OGG_Delete(void *context)
 {
     OGG_music *music = (OGG_music *)context;
-
-    /* META-TAGS */
-    if(music->mus_title)
-        SDL_free(music->mus_title);
-    if(music->mus_artist)
-        SDL_free(music->mus_artist);
-    if(music->mus_album)
-        SDL_free(music->mus_album);
-    if(music->mus_copyright)
-        SDL_free(music->mus_copyright);
-    /* META-TAGS */
-
+    meta_tags_clear(&music->tags);
     vorbis.ov_clear(&music->vf);
     if (music->stream) {
         SDL_FreeAudioStream(music->stream);

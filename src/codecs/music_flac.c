@@ -151,11 +151,7 @@ typedef struct {
     FLAC__uint64 total_samples;
     FLAC__uint64 sample_position;
     FLAC__uint64 sample_size;
-
-    char *mus_title;
-    char *mus_artist;
-    char *mus_album;
-    char *mus_copyright;
+    Mix_MusicMetaTags tags;
 } FLAC_Music;
 
 
@@ -340,19 +336,6 @@ static FLAC__StreamDecoderWriteStatus flac_write_music_cb(
     return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }
 
-static char * copyMetaTag(const char *input)
-{
-    char *out;
-    size_t len;
-    if (!input)
-        return NULL;
-    len = SDL_strlen(input);
-    out = (char *)SDL_malloc(sizeof(char) * len + 1);
-    SDL_memset(out, 0, len + 1);
-    SDL_strlcpy(out, input, len +1);
-    return out;
-}
-
 static void flac_metadata_music_cb(
                     const FLAC__StreamDecoder *decoder,
                     const FLAC__StreamMetadata *metadata,
@@ -389,13 +372,13 @@ static void flac_metadata_music_cb(
             }
 
             if (SDL_strcasecmp(argument, "TITLE") == 0) {
-                music->mus_title = copyMetaTag(value);
+                meta_tags_set(&music->tags, MIX_META_TITLE, value);
             } else if (SDL_strcasecmp(argument, "ARTIST") == 0) {
-                music->mus_artist = copyMetaTag(value);
+                meta_tags_set(&music->tags, MIX_META_ARTIST, value);
             } else if (SDL_strcasecmp(argument, "ALBUM") == 0) {
-                music->mus_album = copyMetaTag(value);
+                meta_tags_set(&music->tags, MIX_META_ALBUM, value);
             } else if (SDL_strcasecmp(argument, "COPYRIGHT") == 0) {
-                music->mus_copyright = copyMetaTag(value);
+                meta_tags_set(&music->tags, MIX_META_COPYRIGHT, value);
             }
 
             SDL_free(param);
@@ -509,17 +492,7 @@ static void *FLAC_CreateFromRW(SDL_RWops *src, int freesrc)
 static const char* FLAC_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
 {
     FLAC_Music *music = (FLAC_Music *)context;
-    switch (tag_type) {
-    case MIX_META_TITLE:
-        return music->mus_title ? music->mus_title : "";
-    case MIX_META_ARTIST:
-        return music->mus_artist ? music->mus_artist : "";
-    case MIX_META_ALBUM:
-        return music->mus_album ? music->mus_album : "";
-    case MIX_META_COPYRIGHT:
-        return music->mus_copyright ? music->mus_copyright : "";
-    }
-    return "";
+    return meta_tags_get(&music->tags, tag_type);
 }
 
 
@@ -640,17 +613,7 @@ static void FLAC_Delete(void *context)
 {
     FLAC_Music *music = (FLAC_Music *)context;
     if (music) {
-        /* META-TAGS */
-        if(music->mus_title)
-            SDL_free(music->mus_title);
-        if(music->mus_artist)
-            SDL_free(music->mus_artist);
-        if(music->mus_album)
-            SDL_free(music->mus_album);
-        if(music->mus_copyright)
-            SDL_free(music->mus_copyright);
-        /* META-TAGS */
-
+        meta_tags_clear(&music->tags);
         if (music->flac_decoder) {
             flac.FLAC__stream_decoder_finish(music->flac_decoder);
             flac.FLAC__stream_decoder_delete(music->flac_decoder);

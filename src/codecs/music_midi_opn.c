@@ -97,11 +97,7 @@ typedef struct
     SDL_AudioStream *stream;
     void *buffer;
     size_t buffer_size;
-
-    char *mus_title;
-    char *mus_artist;
-    char *mus_album;
-    char *mus_copyright;
+    Mix_MusicMetaTags tags;
 } OpnMIDI_Music;
 
 
@@ -116,19 +112,6 @@ static void OPNMIDI_setvolume(void *music_p, int volume)
 }
 
 static void OPNMIDI_delete(void *music_p);
-
-static char * copyMetaTag(const char *input)
-{
-    char *out;
-    size_t len;
-    if (!input)
-        return NULL;
-    len = SDL_strlen(input);
-    out = (char *)SDL_malloc(sizeof(char) * len + 1);
-    SDL_memset(out, 0, len + 1);
-    SDL_strlcpy(out, input, len +1);
-    return out;
-}
 
 static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src)
 {
@@ -210,10 +193,9 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src)
         }
 
         music->volume                 = MIX_MAX_VOLUME;
-        music->mus_title = copyMetaTag(opn2_metaMusicTitle(music->opnmidi));
-        music->mus_artist = NULL;
-        music->mus_album = NULL;
-        music->mus_copyright = copyMetaTag(opn2_metaMusicCopyright(music->opnmidi));
+        meta_tags_init(&music->tags);
+        meta_tags_set(&music->tags, MIX_META_TITLE, opn2_metaMusicTitle(music->opnmidi));
+        meta_tags_set(&music->tags, MIX_META_COPYRIGHT, opn2_metaMusicCopyright(music->opnmidi));
         return music;
     }
     return NULL;
@@ -304,17 +286,7 @@ static void OPNMIDI_delete(void *music_p)
     OpnMIDI_Music *music = (OpnMIDI_Music*)music_p;
     if(music)
     {
-        /* META-TAGS */
-        if(music->mus_title)
-            SDL_free(music->mus_title);
-        if(music->mus_artist)
-            SDL_free(music->mus_artist);
-        if(music->mus_album)
-            SDL_free(music->mus_album);
-        if(music->mus_copyright)
-            SDL_free(music->mus_copyright);
-        /* META-TAGS */
-
+        meta_tags_clear(&music->tags);
         if(music->opnmidi) {
             opn2_close( music->opnmidi );
         }
@@ -331,17 +303,7 @@ static void OPNMIDI_delete(void *music_p)
 static const char* OPNMIDI_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music *)context;
-    switch (tag_type) {
-    case MIX_META_TITLE:
-        return music->mus_title ? music->mus_title : "";
-    case MIX_META_ARTIST:
-        return music->mus_artist ? music->mus_artist : "";
-    case MIX_META_ALBUM:
-        return music->mus_album ? music->mus_album : "";
-    case MIX_META_COPYRIGHT:
-        return music->mus_copyright ? music->mus_copyright : "";
-    }
-    return "";
+    return meta_tags_get(&music->tags, tag_type);
 }
 
 /* Jump (seek) to a given position (time is in seconds) */
