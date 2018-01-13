@@ -105,10 +105,7 @@ typedef struct
 static void OPNMIDI_setvolume(void *music_p, int volume)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music*)music_p;
-    if(music)
-    {
-        music->volume = (int)round(128.0*sqrt(((double)volume)*(1.0/128.0) ));
-    }
+    music->volume = (int)(round(128.0*sqrt(((double)volume)*(1.0/128.0) )));
 }
 
 static void OPNMIDI_delete(void *music_p);
@@ -267,6 +264,7 @@ static int OPNMIDI_playSome(void *context, void *data, int bytes, SDL_bool *done
                 play_count = (music->play_count - 1);
             }
             opn2_positionRewind(music->opnmidi);
+            music->play_count = play_count;
         }
     }
 

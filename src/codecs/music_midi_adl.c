@@ -163,8 +163,7 @@ typedef struct
 static void ADLMIDI_setvolume(void *music_p, int volume)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
-    if(music)
-        music->volume = (int)round(128.0 * sqrt(((double)volume) * (1.0 / 128.0)));
+    music->volume = (int)(round(128.0 * sqrt(((double)volume) * (1.0 / 128.0))));
 }
 
 static void process_args(const char *args)
@@ -396,6 +395,7 @@ static int ADLMIDI_playSome(void *context, void *data, int bytes, SDL_bool *done
                 play_count = (music->play_count - 1);
             }
             adl_positionRewind(music->adlmidi);
+            music->play_count = play_count;
         }
     }
 
