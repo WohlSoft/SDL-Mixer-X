@@ -330,6 +330,10 @@ static FLAC__StreamDecoderWriteStatus flac_write_music_cb(
             }
         }
     }
+
+    /* Increase sample position */
+    music->sample_position += ((FLAC__uint64)frame->header.blocksize);
+
     SDL_AudioStreamPut(music->stream, data, (int)(frame->header.blocksize * channels * sizeof(*data)));
     SDL_stack_free(data);
 
@@ -520,8 +524,6 @@ static int FLAC_GetSome(void *context, void *data, int bytes, SDL_bool *done)
 
     filled = SDL_AudioStreamGet(music->stream, data, bytes);
     if (filled != 0) {
-        /* Increase sample position */
-        music->sample_position += ((FLAC__uint64)filled / music->sample_size);
         return filled;
     }
 
