@@ -24,5 +24,6 @@
 #include "music.h"
 
 extern Sint64 id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src);
+extern Sint64 id3tag_fetchTagsFromMemory(Mix_MusicMetaTags *out_tags, Uint8 *data, size_t length);
 
 /* vi: set ts=4 sw=4 expandtab: */
