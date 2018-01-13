@@ -85,8 +85,6 @@ static char* soundfont_paths = NULL;
 /*  ======== MIDI toggler ======== */
 /* MIDI device currently in use */
 static int mididevice_current = MIDI_ANY;
-/* Reset MIDI settings every file reopening (to allow right argument passing) */
-static int mididevice_need_Reset = 1;
 /* Denies MIDI arguments */
 static int mididevice_args_lock = 0;
 /*  ======== MIDI toggler END ==== */
@@ -1872,7 +1870,6 @@ int SDLCALLCC Mix_GetNextMidiDevice()
 int SDLCALLCC Mix_SetMidiDevice(int device)
 {
     switch (device) {
-        #ifdef MID_MUSIC
         #ifdef MUSIC_MID_ADLMIDI
     case MIDI_ADLMIDI:
         #endif
@@ -1889,9 +1886,7 @@ int SDLCALLCC Mix_SetMidiDevice(int device)
     case MIDI_Fluidsynth:
         #endif
         mididevice_current = device;
-        mididevice_need_Reset = 0;
         return 0;
-        #endif
     default:
         Mix_SetError("Unknown MIDI Device");
         return -1;

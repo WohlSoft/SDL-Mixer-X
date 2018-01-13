@@ -214,7 +214,6 @@ endif()
 
 option(USE_MIDI            "Build with MIDI support" ON)
 if(USE_MIDI)
-    add_definitions(-DMID_MUSIC)
 
     option(USE_MIDI_ADLMIDI    "Build with libADLMIDI OPL3 Emulator based MIDI sequencer support" ON)
     if(USE_MIDI_ADLMIDI)
@@ -245,7 +244,7 @@ if(USE_MIDI)
 
     option(USE_MIDI_FLUIDSYNTH "Build with FluidSynth wave table MIDI sequencer support" OFF)
     if(USE_MIDI_FLUIDSYNTH)
-        add_definitions(-DUSE_FLUIDSYNTH_MIDI)
+        add_definitions(-DMUSIC_MID_FLUIDSYNTH)
         include_directories(${AUDIO_CODECS_PATH}/FluidLite/include)
         list(APPEND SDLMixerX_LINK_LIBS fluidlite)
         list(APPEND SDLMixerX_SOURCES
@@ -284,6 +283,7 @@ if(USE_MIDI)
        NOT USE_MIDI_NATIVE)
         message_error("To have MIDI support you must enable at least one MIDI sequencer library")
     endif()
+
 endif()
 
 if(WIN32)
