@@ -41,7 +41,8 @@ typedef struct {
     void (*ModPlug_Seek)(ModPlugFile* file, int millisecond);
     void (*ModPlug_GetSettings)(ModPlug_Settings* settings);
     void (*ModPlug_SetSettings)(const ModPlug_Settings* settings);
-    void (*ModPlug_SetMasterVolume)(ModPlugFile* file,unsigned int cvol) ;
+    void (*ModPlug_SetMasterVolume)(ModPlugFile* file,unsigned int cvol);
+    const char* (*ModPlug_GetName)(ModPlugFile* file);
 } modplug_loader;
 
 static modplug_loader modplug = {
@@ -84,6 +85,7 @@ static int MODPLUG_Load(void)
         FUNCTION_LOADER(ModPlug_GetSettings, void (*)(ModPlug_Settings* settings))
         FUNCTION_LOADER(ModPlug_SetSettings, void (*)(const ModPlug_Settings* settings))
         FUNCTION_LOADER(ModPlug_SetMasterVolume, void (*)(ModPlugFile* file,unsigned int cvol))
+        FUNCTION_LOADER(ModPlug_GetName, const char* (*)(ModPlugFile* file));
     }
     ++modplug.loaded;
 
@@ -111,6 +113,7 @@ typedef struct
     SDL_AudioStream *stream;
     void *buffer;
     int buffer_size;
+    Mix_MusicMetaTags tags;
 } MODPLUG_Music;
 
 
@@ -192,6 +195,9 @@ void *MODPLUG_CreateFromRW(SDL_RWops *src, int freesrc)
         return NULL;
     }
 
+    meta_tags_init(&music->tags);
+    meta_tags_set(&music->tags, MIX_META_TITLE, modplug.ModPlug_GetName(music->file));
+
     if (freesrc) {
         SDL_RWclose(src);
     }
@@ -264,10 +270,17 @@ static int MODPLUG_Seek(void *context, double position)
     return 0;
 }
 
+static const char* MODPLUG_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
+{
+    MODPLUG_Music *music = (MODPLUG_Music *)context;
+    return meta_tags_get(&music->tags, tag_type);
+}
+
 /* Close the given modplug stream */
 static void MODPLUG_Delete(void *context)
 {
     MODPLUG_Music *music = (MODPLUG_Music *)context;
+    meta_tags_clear(&music->tags);
     if (music->file) {
         modplug.ModPlug_Unload(music->file);
     }
@@ -304,7 +317,7 @@ Mix_MusicInterface Mix_MusicInterface_MODPLUG =
     NULL,   /* LoopStart [MIXER-X]*/
     NULL,   /* LoopEnd [MIXER-X]*/
     NULL,   /* LoopLength [MIXER-X]*/
-    NULL,   /* GetMetaTag [MIXER-X]*/
+    MODPLUG_GetMetaTag, /* GetMetaTag [MIXER-X]*/
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */
