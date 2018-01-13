@@ -24,6 +24,7 @@
 #include "SDL_loadso.h"
 
 #include "music_smpeg.h"
+#include "music_id3tag.h"
 
 #if SDL_VERSION_ATLEAST(2, 0, 0)
 /* Forward declaration for SDL 2.0  because struct is not available there but
@@ -117,7 +118,11 @@ typedef struct
     SMPEG *mp3;
     SDL_RWops *src;
     int freesrc;
+    int play_count;
+    Mix_MusicMetaTags tags;
 } SMPEG_Music;
+
+static void SMPEG_Delete(void *context);
 
 static void *SMPEG_CreateFromRW(SDL_RWops *src, int freesrc)
 {
@@ -131,14 +136,17 @@ static void *SMPEG_CreateFromRW(SDL_RWops *src, int freesrc)
     }
     music->src = src;
 
+    meta_tags_init(&music->tags);
+    id3tag_fetchTags(&music->tags, src);
+
     music->mp3 = smpeg.SMPEG_new_rwops(src, &info, SDL_FALSE, 0);
     if (!info.has_audio) {
         Mix_SetError("MPEG file does not have any audio stream.");
         smpeg.SMPEG_delete(music->mp3);
-        SDL_free(music);
+        SMPEG_Delete(music);
         return NULL;
     }
-    smpeg.SMPEG_actualSpec(mp3, &music_spec);
+    smpeg.SMPEG_actualSpec(music->mp3, &music_spec);
 
     music->freesrc = freesrc;
     return music;
@@ -147,16 +155,17 @@ static void *SMPEG_CreateFromRW(SDL_RWops *src, int freesrc)
 static void SMPEG_SetVolume(void *context, int volume)
 {
     SMPEG_Music *music = (SMPEG_Music *)context;
-    smpeg.SMPEG_setvolume(music->mp3,(int)(((float)volume/(float)MIX_MAX_VOLUME)*100.0));
+    smpeg.SMPEG_setvolume(music->mp3,(int)(((double)volume / (double)MIX_MAX_VOLUME)*100.0));
 }
 
-static int SMPEG_Play(void *context)
+static int SMPEG_Play(void *context, int play_count)
 {
     SMPEG_Music *music = (SMPEG_Music *)context;
     smpeg.SMPEG_enableaudio(music->mp3, 1);
     smpeg.SMPEG_enablevideo(music->mp3, 0);
     smpeg.SMPEG_rewind(music->mp3);
     smpeg.SMPEG_play(music->mp3);
+    music->play_count = play_count;
     return 0;
 }
 
@@ -171,9 +180,20 @@ static int SMPEG_GetAudio(void *context, void *data, int bytes)
     SMPEG_Music *music = (SMPEG_Music *)context;
     Uint8 *stream = (Uint8 *)data;
     int len = bytes;
-    int left = (len - smpeg.SMPEG_playAudio(music->mp3, stream, len));
-    if (left > 0) {
-        stream += (len - left);
+    int left = 0;
+
+    left = (len - smpeg.SMPEG_playAudio(music->mp3, stream, len));
+
+    if (smpeg.SMPEG_status(music->mp3) != SMPEG_PLAYING) {
+        int play_count = -1;
+        if (music->play_count > 0) {
+            play_count = (music->play_count - 1);
+        }
+        if (SMPEG_Play(context, play_count) < 0) {
+            return 0;
+        }
+    }
+
     return left;
 }
 
@@ -194,11 +214,21 @@ static void SMPEG_Stop(void *context)
     smpeg.SMPEG_stop(music->mp3);
 }
 
+static const char* SMPEG_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
+{
+    SMPEG_Music *music = (SMPEG_Music *)context;
+    return meta_tags_get(&music->tags, tag_type);
+}
+
 static void SMPEG_Delete(void *context)
 {
     SMPEG_Music *music = (SMPEG_Music *)context;
 
-    smpeg.SMPEG_delete(music->mp3);
+    if (music->mp3) {
+        smpeg.SMPEG_delete(music->mp3);
+    }
+
+    meta_tags_clear(&music->tags);
 
     if (music->freesrc) {
         SDL_RWclose(music->src);
@@ -230,7 +260,7 @@ Mix_MusicInterface Mix_MusicInterface_SMPEG =
     NULL,   /* LoopStart [MIXER-X]*/
     NULL,   /* LoopEnd [MIXER-X]*/
     NULL,   /* LoopLength [MIXER-X]*/
-    NULL,   /* GetMetaTag [MIXER-X]*/
+    SMPEG_GetMetaTag, /* GetMetaTag [MIXER-X]*/
     NULL,   /* Pause */
     NULL,   /* Resume */
     SMPEG_Stop,
