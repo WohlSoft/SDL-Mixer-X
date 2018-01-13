@@ -54,16 +54,14 @@ typedef enum
     MIX_META_ARTIST,
     MIX_META_ALBUM,
     MIX_META_COPYRIGHT,
+    MIX_META_LAST
 } Mix_MusicMetaTag;
 
 
 /* MIXER-X: Meta-tags utility structure */
 
 typedef struct {
-    char *title;
-    char *artist;
-    char *album;
-    char *copyright;
+    char *tags[4];
 } Mix_MusicMetaTags;
 
 

@@ -100,17 +100,12 @@ void meta_tags_init(Mix_MusicMetaTags *tags)
 
 void meta_tags_clear(Mix_MusicMetaTags *tags)
 {
-    if (tags->title) {
-        SDL_free(tags->title);
-    }
-    if (tags->artist) {
-        SDL_free(tags->artist);
-    }
-    if (tags->album) {
-        SDL_free(tags->album);
-    }
-    if (tags->copyright) {
-        SDL_free(tags->copyright);
+    size_t i = 0;
+    for (i = 0; i < MIX_META_LAST; i++) {
+        if (tags->tags[i]) {
+            SDL_free(tags->tags[i]);
+            tags->tags[i] = NULL;
+        }
     }
 }
 
@@ -118,52 +113,37 @@ void meta_tags_set(Mix_MusicMetaTags *tags, Mix_MusicMetaTag type, const char *v
 {
     char *out;
     size_t len;
-    if (!value)
+
+    if (!value) {
         return;
+    }
+    if (type >= MIX_META_LAST) {
+        return;
+    }
+
     len = SDL_strlen(value);
     out = (char *)SDL_malloc(sizeof(char) * len + 1);
     SDL_memset(out, 0, len + 1);
     SDL_strlcpy(out, value, len +1);
 
-    switch (type) {
-    case MIX_META_TITLE:
-        if (tags->title) {
-            SDL_free(tags->title);
-        }
-        tags->title = out;
-        break;
-    case MIX_META_ARTIST:
-        if (tags->artist) {
-            SDL_free(tags->artist);
-        }
-        tags->artist = out;
-        break;
-    case MIX_META_ALBUM:
-        if (tags->album) {
-            SDL_free(tags->album);
-        }
-        tags->album = out;
-        break;
-    case MIX_META_COPYRIGHT:
-        if (tags->copyright) {
-            SDL_free(tags->copyright);
-        }
-        tags->copyright = out;
-        break;
+    if (tags->tags[type]) {
+        SDL_free(tags->tags[type]);
     }
+
+    tags->tags[type] = out;
 }
 
 const char *meta_tags_get(Mix_MusicMetaTags *tags, Mix_MusicMetaTag type)
 {
     switch (type) {
     case MIX_META_TITLE:
-        return tags->title ? tags->title : "";
     case MIX_META_ARTIST:
-        return tags->artist ? tags->artist : "";
     case MIX_META_ALBUM:
-        return tags->album ? tags->album : "";
     case MIX_META_COPYRIGHT:
-        return tags->copyright ? tags->copyright : "";
+        return tags->tags[type] ? tags->tags[type] : "";
+    case MIX_META_LAST:
+    default:
+        break;
     }
     return "";
 }
