@@ -1048,7 +1048,9 @@ Mix_Music *Mix_LoadMUS(const char *file)
         }
     }
     ret = Mix_LoadMUSType_RW_ARG(src, type, SDL_TRUE, music_args);
-    SDL_strlcpy(ret->music_filename, (SDL_strstr(music_file, "/")) ? (SDL_strrchr(music_file, '/') + 1) : music_file, 1024);
+    if (ret) {
+        SDL_strlcpy(ret->music_filename, (SDL_strstr(music_file, "/")) ? (SDL_strrchr(music_file, '/') + 1) : music_file, 1023);
+    }
     SDL_free(music_file);
     SDL_free(music_args);
     return ret;
