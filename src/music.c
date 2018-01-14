@@ -419,7 +419,7 @@ Mix_MusicAPI get_current_midi_api()
     SDL_bool use_native_midi = SDL_FALSE;
 
 #ifdef MUSIC_MID_NATIVE
-    if (type == MUS_MID && SDL_GetHintBoolean("SDL_NATIVE_MUSIC", SDL_FALSE) && native_midi_detect()) {
+    if (SDL_GetHintBoolean("SDL_NATIVE_MUSIC", SDL_FALSE) && native_midi_detect()) {
         use_native_midi = SDL_TRUE;
         target_midi_api = MIX_MUSIC_NATIVEMIDI;
         mididevice_current = MIDI_Native;
@@ -800,6 +800,10 @@ Mix_MusicType detect_music_type_from_magic(SDL_RWops *src)
     if (SDL_memcmp(magic, "MThd", 4) == 0) {
         return MUS_MID;
     }
+    /* RIFF MIDI files have the magic four bytes "RIFF" and then "RMID" */
+    if ((SDL_memcmp(magic, "RIFF", 4) == 0) && (SDL_memcmp(extramagic + 8, "RMID", 4) == 0)) {
+        return MUS_MID;
+    }
     #if defined(MUSIC_MID_ADLMIDI) || defined(MUSIC_MID_OPNMIDI)
     if (SDL_memcmp(magic, "MUS\x1A", 4) == 0) {
         return xmi_compatible_midi_player();
@@ -829,42 +833,83 @@ Mix_MusicType detect_music_type_from_magic(SDL_RWops *src)
     }
 
     /* GME Specific files */
-    if(SDL_memcmp(magic, "ZXAY", 4) == 0)
+    if (SDL_memcmp(magic, "ZXAY", 4) == 0)
         return MUS_GME;
-    if(SDL_memcmp(magic, "GBS\x01", 4) == 0)
+    if (SDL_memcmp(magic, "GBS\x01", 4) == 0)
         return MUS_GME;
-    if(SDL_memcmp(magic, "GYMX", 4) == 0)
+    if (SDL_memcmp(magic, "GYMX", 4) == 0)
         return MUS_GME;
-    if(SDL_memcmp(magic, "HESM", 4) == 0)
+    if (SDL_memcmp(magic, "HESM", 4) == 0)
         return MUS_GME;
-    if(SDL_memcmp(magic, "KSCC", 4) == 0)
+    if (SDL_memcmp(magic, "KSCC", 4) == 0)
         return MUS_GME;
-    if(SDL_memcmp(magic, "KSSX", 4) == 0)
+    if (SDL_memcmp(magic, "KSSX", 4) == 0)
         return MUS_GME;
-    if(SDL_memcmp(magic, "NESM", 4) == 0)
+    if (SDL_memcmp(magic, "NESM", 4) == 0)
         return MUS_GME;
-    if(SDL_memcmp(magic, "NSFE", 4) == 0)
+    if (SDL_memcmp(magic, "NSFE", 4) == 0)
         return MUS_GME;
-    if(SDL_memcmp(magic, "SAP\x0D", 4) == 0)
+    if (SDL_memcmp(magic, "SAP\x0D", 4) == 0)
         return MUS_GME;
-    if(SDL_memcmp(magic, "SNES", 4) == 0)
+    if (SDL_memcmp(magic, "SNES", 4) == 0)
         return MUS_GME;
-    if(SDL_memcmp(magic, "Vgm ", 4) == 0)
+    if (SDL_memcmp(magic, "Vgm ", 4) == 0)
         return MUS_GME;
-    if(SDL_memcmp(magic, "\x1f\x8b", 2) == 0)
+    if (SDL_memcmp(magic, "\x1f\x8b", 2) == 0)
         return MUS_GME;
+
+    /* Detect some module files */
+    if (SDL_memcmp(extramagic, "Extended Module", 15) == 0)
+        return MUS_MOD;
+    if (SDL_memcmp(extramagic, "ASYLUM Music Format V", 22) == 0)
+        return MUS_MOD;
+    if (SDL_memcmp(magic, "Extreme", 7) == 0)
+        return MUS_MOD;
+    if (SDL_memcmp(magic, "IMPM", 4) == 0)
+        return MUS_MOD;
+    if (SDL_memcmp(magic, "DBM0", 4) == 0)
+        return MUS_MOD;
+    if (SDL_memcmp(magic, "DDMF", 4) == 0)
+        return MUS_MOD;
+    /*  SMF files have the magic four bytes "RIFF" */
+    if ((SDL_memcmp(magic, "RIFF", 4) == 0) &&
+       (SDL_memcmp(extramagic + 8,  "DSMF", 4) == 0) &&
+       (SDL_memcmp(extramagic + 12, "SONG", 4) == 0))
+        return MUS_MOD;
+    if (SDL_memcmp(extramagic, "MAS_UTrack_V00", 14) == 0)
+        return MUS_MOD;
+    if (SDL_memcmp(extramagic, "GF1PATCH110", 11) == 0)
+        return MUS_MOD;
+    if (SDL_memcmp(magic, "FAR=", 4) == 0)
+        return MUS_MOD;
+    if (SDL_memcmp(magic, "MTM", 3) == 0)
+        return MUS_MOD;
+    if (SDL_memcmp(magic, "MMD", 3) == 0)
+        return MUS_MOD;
+    if (SDL_memcmp(magic, "PSM\x20", 4) == 0)
+        return MUS_MOD;
+    if (SDL_memcmp(magic, "PTMF", 4) == 0)
+        return MUS_MOD;
+    if (SDL_memcmp(magic, "MT20", 4) == 0)
+        return MUS_MOD;
+    if (SDL_memcmp(magic, "OKTA", 4) == 0)
+        return MUS_MOD;
+    if (SDL_memcmp(magic, "JN", 2) == 0)
+        return MUS_MOD;
+    if (SDL_memcmp(magic, "if", 2) == 0)
+        return MUS_MOD;
 
     #if defined(MUSIC_MP3_MAD) || defined(MUSIC_MP3_MPG123) || defined(MUSIC_MP3_SMPEG)
     /* Detect MP3 format [needs scanning of bigger part of the file] */
     if (detect_mp3(extramagic, src, start)) {
-          return MUS_MP3;
+        return MUS_MP3;
     }
     #endif
 
     #ifdef MUSIC_MID_ADLMIDI
     /* Detect id Software Music Format file */
     if (detect_imf(src, start)) {
-          return MUS_ADLMIDI;
+        return MUS_ADLMIDI;
     }
     #endif
 
@@ -1036,6 +1081,7 @@ Mix_Music * SDLCALLCC Mix_LoadMUS(const char *file)
             type = MUS_WAV;
         } else if (SDL_strcasecmp(ext, "MID") == 0 ||
                     SDL_strcasecmp(ext, "MIDI") == 0 ||
+                    SDL_strcasecmp(ext, "RMI") == 0 ||
                     SDL_strcasecmp(ext, "KAR") == 0) {
             type = MUS_MID;
         } else if (SDL_strcasecmp(ext, "OGG") == 0) {
