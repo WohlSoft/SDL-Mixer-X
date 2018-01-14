@@ -51,7 +51,7 @@ DEFAULT_CODECS += \
 
 COPY=cp
 win32:{
-    DEFAULT_CODECS += USE_NATIVE_MIDI
+    DEFAULT_CODECS += MUSIC_MID_NATIVE
     enable-stdcalls:{ #Useful for VB6 usage
         TARGET = SDL2MixerVB
         QMAKE_LFLAGS += -Wl,--add-stdcall-alias
