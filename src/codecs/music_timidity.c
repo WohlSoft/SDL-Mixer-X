@@ -53,6 +53,7 @@ static void TIMIDITY_Delete(void *context);
 
 static int TIMIDITY_Open(const SDL_AudioSpec *spec)
 {
+    MIX_UNUSED(spec);
     return Timidity_Init();
 }
 

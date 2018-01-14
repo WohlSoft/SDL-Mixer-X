@@ -90,6 +90,38 @@ static int mididevice_args_lock = 0;
 /*  ======== MIDI toggler END ==== */
 
 
+/*
+ * public domain strtok_r() by Charlie Gordon
+ *
+ *   from comp.lang.c  9/14/2007
+ *
+ *      http://groups.google.com/group/comp.lang.c/msg/2ab1ecbb86646684
+ *
+ *     (Declaration that it's public domain):
+ *      http://groups.google.com/group/comp.lang.c/msg/7c7b39328fefab9c
+ */
+char *Mix_strtok_safe(char *str, const char *delim, char **nextp)
+{
+    char *ret;
+    if (str == NULL) {
+        str = *nextp;
+    }
+
+    str += strspn(str, delim);
+    if (*str == '\0') {
+        return NULL;
+    }
+    ret = str;
+
+    str += strcspn(str, delim);
+    if (*str) {
+        *str++ = '\0';
+    }
+
+    *nextp = str;
+    return ret;
+}
+
 /* Meta-Tags utiltiy */
 void meta_tags_init(Mix_MusicMetaTags *tags)
 {
@@ -299,7 +331,7 @@ int music_pcm_getaudio(void *context, void *data, int bytes, int volume,
 /* Mixing function */
 void SDLCALL music_mixer(void *udata, Uint8 *stream, int len)
 {
-    (void)udata;
+    MIX_UNUSED(udata);
     while (music_playing && music_active && len > 0) {
         /* Handle fading */
         if (music_playing->fading != MIX_NO_FADING) {
@@ -1835,19 +1867,22 @@ int Mix_EachSoundFont(int (SDLCALL *function)(const char*, void*), void *data)
         return 0;
     }
 
-#if defined(__MINGW32__) || defined(__MINGW64__) || defined(__WATCOMC__)
-    for (path = strtok(paths, ";"); path; path = strtok(NULL, ";")) {
-#elif defined(_WIN32)
-    for (path = strtok_s(paths, ";", &context); path; path = strtok_s(NULL, ";", &context)) {
+#if defined(_WIN32)
+#define SEPARATOR ";"
 #else
-    for (path = strtok_r(paths, ":;", &context); path; path = strtok_r(NULL, ":;", &context)) {
+#define SEPARATOR ":;"
 #endif
+    for (path = Mix_strtok_safe(paths, SEPARATOR, &context);
+         path;
+         path = Mix_strtok_safe(NULL, SEPARATOR, &context))
+    {
         if (!function(path, data)) {
             continue;
         } else {
             soundfonts_found++;
         }
     }
+#undef SEPARATOR
 
     SDL_free(paths);
     if (soundfonts_found > 0)
