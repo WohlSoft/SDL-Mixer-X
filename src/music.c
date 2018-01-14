@@ -240,12 +240,12 @@ Mix_MusicInterface *get_music_interface(int index)
     return s_music_interfaces[index];
 }
 
-int Mix_GetNumMusicDecoders(void)
+int SDLCALLCC Mix_GetNumMusicDecoders(void)
 {
     return(num_decoders);
 }
 
-const char *Mix_GetMusicDecoder(int index)
+const char * SDLCALLCC Mix_GetMusicDecoder(int index)
 {
     if ((index < 0) || (index >= num_decoders)) {
         return NULL;
@@ -285,7 +285,7 @@ static void music_internal_halt(void);
 /* Support for hooking when the music has finished */
 static void (SDLCALL *music_finished_hook)(void) = NULL;
 
-void Mix_HookMusicFinished(void (SDLCALL *music_finished)(void))
+void SDLCALLCC Mix_HookMusicFinished(void (SDLCALL *music_finished)(void))
 {
     Mix_LockAudio();
     music_finished_hook = music_finished;
@@ -950,7 +950,7 @@ static int split_path_and_params(const char *path, char **file, char **args)
 }
 
 /* Load a music file */
-Mix_Music *Mix_LoadMUS(const char *file)
+Mix_Music * SDLCALLCC Mix_LoadMUS(const char *file)
 {
     size_t i;
     void *context;
@@ -1086,7 +1086,7 @@ Mix_Music *Mix_LoadMUS(const char *file)
     return ret;
 }
 
-Mix_Music *Mix_LoadMUS_RW(SDL_RWops *src, int freesrc)
+Mix_Music * SDLCALLCC Mix_LoadMUS_RW(SDL_RWops *src, int freesrc)
 {
     return Mix_LoadMUSType_RW(src, MUS_NONE, freesrc);
 }
@@ -1104,12 +1104,12 @@ Mix_Music *SDLCALLCC Mix_LoadMUS_RW_GME(SDL_RWops *src, int freesrc, int trackID
     return Mix_LoadMUSType_RW_ARG(src, MUS_NONE, freesrc, music_args);
 }
 
-Mix_Music *Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int freesrc)
+Mix_Music * SDLCALLCC Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int freesrc)
 {
     return Mix_LoadMUSType_RW_ARG(src, type, freesrc, "");
 }
 
-Mix_Music *Mix_LoadMUSType_RW_ARG(SDL_RWops *src, Mix_MusicType type, int freesrc, const char *args)
+Mix_Music * SDLCALLCC Mix_LoadMUSType_RW_ARG(SDL_RWops *src, Mix_MusicType type, int freesrc, const char *args)
 {
     size_t i;
     void *context;
@@ -1197,7 +1197,7 @@ Mix_Music *Mix_LoadMUSType_RW_ARG(SDL_RWops *src, Mix_MusicType type, int freesr
 }
 
 /* Free a music chunk previously loaded */
-void Mix_FreeMusic(Mix_Music *music)
+void SDLCALLCC Mix_FreeMusic(Mix_Music *music)
 {
     if (music) {
         /* Stop the music if it's currently playing */
@@ -1223,7 +1223,7 @@ void Mix_FreeMusic(Mix_Music *music)
 /* Find out the music format of a mixer music, or the currently playing
    music, if 'music' is NULL.
 */
-Mix_MusicType Mix_GetMusicType(const Mix_Music *music)
+Mix_MusicType SDLCALLCC Mix_GetMusicType(const Mix_Music *music)
 {
     Mix_MusicType type = MUS_NONE;
 
@@ -1341,7 +1341,7 @@ static int music_internal_play(Mix_Music *music, int play_count, double position
     return(retval);
 }
 
-int Mix_FadeInMusicPos(Mix_Music *music, int loops, int ms, double position)
+int SDLCALLCC Mix_FadeInMusicPos(Mix_Music *music, int loops, int ms, double position)
 {
     int retval;
 
@@ -1382,11 +1382,11 @@ int Mix_FadeInMusicPos(Mix_Music *music, int loops, int ms, double position)
 
     return(retval);
 }
-int Mix_FadeInMusic(Mix_Music *music, int loops, int ms)
+int SDLCALLCC Mix_FadeInMusic(Mix_Music *music, int loops, int ms)
 {
     return Mix_FadeInMusicPos(music, loops, ms, 0.0);
 }
-int Mix_PlayMusic(Mix_Music *music, int loops)
+int SDLCALLCC Mix_PlayMusic(Mix_Music *music, int loops)
 {
     return Mix_FadeInMusicPos(music, loops, 0, 0.0);
 }
@@ -1399,7 +1399,7 @@ int music_internal_position(double position)
     }
     return -1;
 }
-int Mix_SetMusicPosition(double position)
+int SDLCALLCC Mix_SetMusicPosition(double position)
 {
     int retval;
 
@@ -1426,7 +1426,7 @@ double music_internal_position_get()
     }
     return -1;
 }
-double Mix_GetMusicPosition(Mix_Music *music)
+double SDLCALLCC Mix_GetMusicPosition(Mix_Music *music)
 {
     (void)music;
     double retval;
@@ -1451,7 +1451,7 @@ double music_internal_position_total()
     }
     return -1;
 }
-double Mix_GetMusicTotalTime(Mix_Music *music)
+double SDLCALLCC Mix_GetMusicTotalTime(Mix_Music *music)
 {
     (void)music;
     double retval;
@@ -1476,7 +1476,7 @@ double music_internal_loop_start()
     }
     return -1;
 }
-double Mix_GetMusicLoopStartTime(Mix_Music *music)
+double SDLCALLCC Mix_GetMusicLoopStartTime(Mix_Music *music)
 {
     (void)music;
     double retval;
@@ -1501,7 +1501,7 @@ double music_internal_loop_end()
     }
     return -1;
 }
-double Mix_GetMusicLoopEndTime(Mix_Music *music)
+double SDLCALLCC Mix_GetMusicLoopEndTime(Mix_Music *music)
 {
     (void)music;
     double retval;
@@ -1526,7 +1526,7 @@ double music_internal_loop_length()
     }
     return -1;
 }
-double Mix_GetMusicLoopLengthTime(Mix_Music *music)
+double SDLCALLCC Mix_GetMusicLoopLengthTime(Mix_Music *music)
 {
     (void)music;
     double retval;
@@ -1562,7 +1562,7 @@ static void music_internal_volume(int volume)
         music_playing->interface->SetVolume(music_playing->context, volume);
     }
 }
-int Mix_VolumeMusic(int volume)
+int SDLCALLCC Mix_VolumeMusic(int volume)
 {
     int prev_volume;
 
@@ -1593,7 +1593,7 @@ static void music_internal_halt(void)
     music_playing->fading = MIX_NO_FADING;
     music_playing = NULL;
 }
-int Mix_HaltMusic(void)
+int SDLCALLCC Mix_HaltMusic(void)
 {
     Mix_LockAudio();
     if (music_playing) {
@@ -1608,7 +1608,7 @@ int Mix_HaltMusic(void)
 }
 
 /* Progressively stop the music */
-int Mix_FadeOutMusic(int ms)
+int SDLCALLCC Mix_FadeOutMusic(int ms)
 {
     int retval = 0;
 
@@ -1646,7 +1646,7 @@ int Mix_FadeOutMusic(int ms)
     return(retval);
 }
 
-Mix_Fading Mix_FadingMusic(void)
+Mix_Fading SDLCALLCC Mix_FadingMusic(void)
 {
     Mix_Fading fading = MIX_NO_FADING;
 
@@ -1660,7 +1660,7 @@ Mix_Fading Mix_FadingMusic(void)
 }
 
 /* Pause/Resume the music stream */
-void Mix_PauseMusic(void)
+void SDLCALLCC Mix_PauseMusic(void)
 {
     Mix_LockAudio();
     if (music_playing) {
@@ -1672,7 +1672,7 @@ void Mix_PauseMusic(void)
     Mix_UnlockAudio();
 }
 
-void Mix_ResumeMusic(void)
+void SDLCALLCC Mix_ResumeMusic(void)
 {
     Mix_LockAudio();
     if (music_playing) {
@@ -1684,12 +1684,12 @@ void Mix_ResumeMusic(void)
     Mix_UnlockAudio();
 }
 
-void Mix_RewindMusic(void)
+void SDLCALLCC Mix_RewindMusic(void)
 {
     Mix_SetMusicPosition(0.0);
 }
 
-int Mix_PausedMusic(void)
+int SDLCALLCC Mix_PausedMusic(void)
 {
     return (music_active == SDL_FALSE);
 }
@@ -1706,7 +1706,7 @@ static SDL_bool music_internal_playing(void)
     }
     return music_playing->playing;
 }
-int Mix_PlayingMusic(void)
+int SDLCALLCC Mix_PlayingMusic(void)
 {
     SDL_bool playing;
 
@@ -1718,7 +1718,7 @@ int Mix_PlayingMusic(void)
 }
 
 /* Set the external music playback command */
-int Mix_SetMusicCMD(const char *command)
+int SDLCALLCC Mix_SetMusicCMD(const char *command)
 {
     Mix_HaltMusic();
     if (music_cmd) {
@@ -1736,14 +1736,14 @@ int Mix_SetMusicCMD(const char *command)
     return 0;
 }
 
-int Mix_SetSynchroValue(int i)
+int SDLCALLCC Mix_SetSynchroValue(int i)
 {
     (void)i;
     /* Not supported by any players at this time */
     return(-1);
 }
 
-int Mix_GetSynchroValue(void)
+int SDLCALLCC Mix_GetSynchroValue(void)
 {
     /* Not supported by any players at this time */
     return(-1);
@@ -1801,7 +1801,7 @@ void unload_music(void)
     }
 }
 
-int Mix_SetSoundFonts(const char *paths)
+int SDLCALLCC Mix_SetSoundFonts(const char *paths)
 {
     if (soundfont_paths) {
         SDL_free(soundfont_paths);
@@ -1817,7 +1817,7 @@ int Mix_SetSoundFonts(const char *paths)
     return 1;
 }
 
-const char* Mix_GetSoundFonts(void)
+const char* SDLCALLCC Mix_GetSoundFonts(void)
 {
     const char *env_paths = SDL_getenv("SDL_SOUNDFONTS");
     SDL_bool force_env_paths = SDL_GetHintBoolean("SDL_FORCE_SOUNDFONTS", SDL_FALSE);
@@ -1851,7 +1851,7 @@ const char* Mix_GetSoundFonts(void)
     return NULL;
 }
 
-int Mix_EachSoundFont(int (SDLCALL *function)(const char*, void*), void *data)
+int SDLCALLCC Mix_EachSoundFont(int (SDLCALL *function)(const char*, void*), void *data)
 {
     char *context, *path, *paths;
     const char* cpaths = Mix_GetSoundFonts();

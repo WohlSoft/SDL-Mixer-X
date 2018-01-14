@@ -35,6 +35,8 @@
 /* Let applications recogonize which SDL Mixer edition is in use: Official or Extended fork by Wohlstand */
 #define SDL_MIXER_X 1
 
+#define MIXSDLCALL
+
 #if defined(FORCE_STDCALLS) && defined(_WIN32)
 #ifdef SDLCALL
 #undef SDLCALL
