@@ -179,7 +179,7 @@ endif()
 
 option(USE_MODPLUG         "Build with ModPlug library" ON)
 if(USE_MODPLUG)
-    add_definitions(-DMUSIC_MOD_MODPLUG -DMODPLUG_STATIC -DMODPLUG_HEADER=<modplug.h>)
+    add_definitions(-DMUSIC_MOD_MODPLUG -DMODPLUG_STATIC)
     include_directories(${AUDIO_CODECS_PATH}/libmodplug/include)
     list(APPEND SDLMixerX_LINK_LIBS modplug)
     list(APPEND SDLMixerX_SOURCES
