@@ -24,6 +24,11 @@
 
 #include "SDL_rwops.h"
 
+/* Prevent "Unused" warning on specified object */
+#ifndef MIX_UNUSED
+#define MIX_UNUSED(object) (void)object
+#endif
+
 typedef struct _NativeMidiSong NativeMidiSong;
 
 int native_midi_detect(void);
