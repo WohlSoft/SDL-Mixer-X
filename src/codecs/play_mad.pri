@@ -1,4 +1,4 @@
-LIBS += -lmad -lid3tag
+LIBS += -lmad
 
 HEADERS += \
     $$PWD/music_mad.h

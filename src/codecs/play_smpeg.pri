@@ -1,4 +1,4 @@
-LIBS += -lsmpeg -lid3tag
+LIBS += -lsmpeg
 
 HEADERS += \
     $$PWD/music_smpeg.h

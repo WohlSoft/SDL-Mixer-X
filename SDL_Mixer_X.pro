@@ -31,20 +31,22 @@ include($$PWD/../AudioCodecs/audio_codec_includes.pri)
 
 # Codecs
 DEFAULT_CODECS += \
-    WAV_MUSIC \
-    MID_MUSIC \
-    USE_TIMIDITY_MIDI \
-    #USE_FLUIDSYNTH_MIDI \
+    MUSIC_WAV \
+    MUSIC_MID_TIMIDITY \
+    #MUSIC_MID_FLUIDSYNTH \
     #USE_FLUIDLIGHT \
-    USE_ADL_MIDI \
-    USE_OPN2_MIDI \
-    OGG_MUSIC \
-    FLAC_MUSIC \
-    #MP3_MUSIC \
-    MP3_MAD_MUSIC \
-    GME_MUSIC \
-    #MOD_MUSIC \
-    MODPLUG_MUSIC \
+    MUSIC_MID_ADLMIDI \
+    MUSIC_MID_OPNMIDI \
+    MUSIC_OGG \
+    MUSIC_FLAC \
+    #MUSIC_MP3_SMPEG \
+    #MUSIC_MP3_MPG123 \
+    MUSIC_MP3_ID3TAG\
+    MUSIC_MP3_MAD \
+    MUSIC_MP3_MAD_GPL_DITHERING \
+    MUSIC_GME \
+    #MUSIC_MOD_MIKMOD \
+    MUSIC_MOD_MODPLUG \
     #CMD_MUSIC
 
 COPY=cp
@@ -58,6 +60,11 @@ win32:{
     RC_FILE = version.rc
     COPY=copy
 }
+
+INCLUDEPATH += $$PWD/include/SDL_mixer_ext
+INCLUDEPATH += $$PWD/include/
+INCLUDEPATH += $$PWD/src/
+INCLUDEPATH += $$PWD/src/codecs
 
 # Build properties
 exists($$PWD/../../_common/build_props.pri):{
@@ -90,10 +97,6 @@ exists($$PWD/../../_common/build_props.pri):{
     INCLUDEPATH += -L$$PWD/build/include/
     include($$PWD/_common/build_props.pri)
 }
-
-
-INCLUDEPATH += $$PWD/include/
-INCLUDEPATH += $$PWD/include/SDL_mixer_ext
 
 linux-g++||unix:!macx:!android:{
     DEFINES += HAVE_INTTYPES_H HAVE_SETENV HAVE_SINF HAVE_FORK
@@ -162,8 +165,17 @@ disable-midi-opnmidi: DEFAULT_CODECS -= MUSIC_MID_OPNMIDI
 enable-midi-fluidsynth:  DEFAULT_CODECS += MUSIC_MID_FLUIDSYNTH
 disable-midi-fluidsynth: DEFAULT_CODECS -= MUSIC_MID_FLUIDSYNTH
 
+enable-id3tag:  DEFAULT_CODECS += MUSIC_MP3_ID3TAG
+disable-id3tag: DEFAULT_CODECS -= MUSIC_MP3_ID3TAG
+
 enable-mp3:  DEFAULT_CODECS += MUSIC_MP3_MAD
 disable-mp3: DEFAULT_CODECS -= MUSIC_MP3_MAD
+
+enable-mp3-mad:  DEFAULT_CODECS += MUSIC_MP3_MAD
+disable-mp3-mad: DEFAULT_CODECS -= MUSIC_MP3_MAD
+
+enable-mp3-mpg123:  DEFAULT_CODECS += MUSIC_MP3_MPG123
+disable-mp3-mpg123: DEFAULT_CODECS -= MUSIC_MP3_MPG123
 
 enable-mp3-smpeg:  DEFAULT_CODECS += MUSIC_MP3_SMPEG
 disable-mp3-smpeg: DEFAULT_CODECS -= MUSIC_MP3_SMPEG
@@ -187,9 +199,9 @@ android: {
 DEFINES += \
     HAVE_STRCASECMP \
     HAVE_STRNCASECMP \
-    MID_MUSIC \
-    USE_ADL_MIDI \
-    GME_MUSIC \
+    MUSIC_MID_ADLMIDI \
+    MUSIC_MID_OPNMIDI \
+    MUSIC_CMD \
     NO_OLDNAMES \
     SPC_MORE_ACCURACY
     #OGG_USE_TREMOR
@@ -213,7 +225,9 @@ contains(DEFINES, MUSIC_OGG):           include($$PWD/src/codecs/play_ogg.pri)
 contains(DEFINES, MUSIC_FLAC):          include($$PWD/src/codecs/play_flac.pri)
 contains(DEFINES, MUSIC_MOD_MIKMOD):    include($$PWD/src/codecs/play_mikmod.pri)
 contains(DEFINES, MUSIC_MOD_MODPLUG):   include($$PWD/src/codecs/play_modplug.pri)
-contains(DEFINES, MUSIC_MP3_MAD):       include($$PWD/src/codecs/play_smpeg.pri)
+contains(DEFINES, MUSIC_MP3_ID3TAG):    include($$PWD/src/codecs/play_id3tag.pri)
+contains(DEFINES, MUSIC_MP3_MAD):       include($$PWD/src/codecs/play_mad.pri)
+contains(DEFINES, MUSIC_MP3_MPG123):    include($$PWD/src/codecs/play_mpg123.pri)
 contains(DEFINES, MUSIC_MP3_SMPEG):     include($$PWD/src/codecs/play_smpeg.pri)
 contains(DEFINES, MUSIC_GME):           include($$PWD/src/codecs/play_gme.pri)
 contains(DEFINES, MUSIC_CMD):           include($$PWD/src/codecs/play_cmdmusic.pri)
