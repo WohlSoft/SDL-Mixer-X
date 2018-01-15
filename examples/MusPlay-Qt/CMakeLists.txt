@@ -13,13 +13,25 @@ set(USE_SDL_MIXER_X_PREFIX "" CACHE STRING "Path to SDL Mixer X")
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Network REQUIRED)
 
+if(APPLE)
+    find_library(COREAUDIO_LIBRARY CoreAudio)
+    find_library(COREVIDEO_LIBRARY CoreVideo)
+    find_library(IOKIT_LIBRARY IOKit)
+    find_library(CARBON_LIBRARY Carbon)
+    find_library(COCOA_LIBRARY Cocoa)
+    find_library(FORCEFEEDBAK_LIBRARY ForceFeedback)
+    find_library(METAL_LIBRARY Metal)
+    find_library(COREFOUNDATION_LIBRARY CoreFoundation)
+    find_library(AUDIOTOOLBOX_LIBRARY AudioToolbox)
+    add_definitions(-DQ_OS_MACX) # Workaround for MOC
+endif()
+
 # The Qt5Widgets_INCLUDES also includes the include directories for
 # dependencies QtCore and QtGui
 include_directories(
     ${Qt5Widgets_INCLUDES}
     ${Qt5Network_INCLUDES}
     ${USE_SDL_MIXER_X_PREFIX}/include)
-
 
 link_directories(
     ${Qt5Widgets_LIBRARIES}
@@ -59,7 +71,11 @@ add_executable(sdlmixer_musplay
 if(WIN32)
     target_link_libraries(sdlmixer_musplay SDL2main version SDL2_mixer_ext SDL2 comctl32)
 elseif(APPLE)
-    target_link_libraries(sdlmixer_musplay SDL2 SDL2_mixer_ext)
+    target_link_libraries(sdlmixer_musplay SDL2 SDL2_mixer_ext iconv
+        ${COREAUDIO_LIBRARY} ${COREVIDEO_LIBRARY} ${COCOA_LIBRARY} ${CARBON_LIBRARY}
+        ${FORCEFEEDBAK_LIBRARY} ${IOKIT_LIBRARY} ${COREFOUNDATION_LIBRARY} ${AUDIOTOOLBOX_LIBRARY}
+        ${METAL_LIBRARY}
+    )
 else()
     target_link_libraries(sdlmixer_musplay SDL2 SDL2_mixer_ext)
 endif()
