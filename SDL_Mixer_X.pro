@@ -60,6 +60,9 @@ win32:{
     RC_FILE = version.rc
     COPY=copy
 }
+macx:{
+    DEFAULT_CODECS += MUSIC_MID_NATIVE
+}
 
 INCLUDEPATH += $$PWD/include/SDL_mixer_ext
 INCLUDEPATH += $$PWD/include/
