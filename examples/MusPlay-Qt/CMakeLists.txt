@@ -23,6 +23,7 @@ if(APPLE)
     find_library(METAL_LIBRARY Metal)
     find_library(COREFOUNDATION_LIBRARY CoreFoundation)
     find_library(AUDIOTOOLBOX_LIBRARY AudioToolbox)
+    find_library(AUDIOUNIT_LIBRARY AudioUnit)
     add_definitions(-DQ_OS_MACX) # Workaround for MOC
 endif()
 
@@ -37,6 +38,17 @@ link_directories(
     ${Qt5Widgets_LIBRARIES}
     ${Qt5Network_LIBRARIES}
     ${USE_SDL_MIXER_X_PREFIX}/lib)
+
+if(APPLE) # To use XCode-built SDL Mixer X
+    string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_lower)
+    if(CMAKE_BUILD_TYPE_lower STREQUAL "release")
+        link_directories(
+            ${USE_SDL_MIXER_X_PREFIX}/lib/Release)
+    else()
+        link_directories(
+            ${USE_SDL_MIXER_X_PREFIX}/lib/Debug)
+    endif()
+endif()
 
 # We need add -DQT_WIDGETS_LIB when using QtWidgets in Qt 5.
 add_definitions(${Qt5Widgets_DEFINITIONS} ${Qt5Network_DEFINITIONS})
@@ -73,7 +85,8 @@ if(WIN32)
 elseif(APPLE)
     target_link_libraries(sdlmixer_musplay SDL2 SDL2_mixer_ext iconv
         ${COREAUDIO_LIBRARY} ${COREVIDEO_LIBRARY} ${COCOA_LIBRARY} ${CARBON_LIBRARY}
-        ${FORCEFEEDBAK_LIBRARY} ${IOKIT_LIBRARY} ${COREFOUNDATION_LIBRARY} ${AUDIOTOOLBOX_LIBRARY}
+        ${FORCEFEEDBAK_LIBRARY} ${IOKIT_LIBRARY} ${COREFOUNDATION_LIBRARY}
+        ${AUDIOTOOLBOX_LIBRARY} ${AUDIOUNIT_LIBRARY}
         ${METAL_LIBRARY}
     )
 else()
