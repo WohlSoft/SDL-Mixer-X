@@ -152,7 +152,7 @@ int SDLCALLCC Mix_Init(int flags)
 
     if (flags & MIX_INIT_FLAC) {
         if (load_music_type(MUS_FLAC)) {
-            open_music_type(MUS_FLAC);
+            open_music_type(MUS_FLAC, -1);
             result |= MIX_INIT_FLAC;
         } else {
             Mix_SetError("FLAC support not available");
@@ -160,7 +160,7 @@ int SDLCALLCC Mix_Init(int flags)
     }
     if (flags & MIX_INIT_MOD) {
         if (load_music_type(MUS_MOD)) {
-            open_music_type(MUS_MOD);
+            open_music_type(MUS_MOD, -1);
             result |= MIX_INIT_MOD;
         } else {
             Mix_SetError("MOD support not available");
@@ -168,7 +168,7 @@ int SDLCALLCC Mix_Init(int flags)
     }
     if (flags & MIX_INIT_MP3) {
         if (load_music_type(MUS_MP3)) {
-            open_music_type(MUS_MP3);
+            open_music_type(MUS_MP3, -1);
             result |= MIX_INIT_MP3;
         } else {
             Mix_SetError("MP3 support not available");
@@ -176,7 +176,7 @@ int SDLCALLCC Mix_Init(int flags)
     }
     if (flags & MIX_INIT_OGG) {
         if (load_music_type(MUS_OGG)) {
-            open_music_type(MUS_OGG);
+            open_music_type(MUS_OGG, -1);
             result |= MIX_INIT_OGG;
         } else {
             Mix_SetError("OGG support not available");
@@ -184,7 +184,7 @@ int SDLCALLCC Mix_Init(int flags)
     }
     if (flags & MIX_INIT_MID) {
         if (load_music_type(MUS_MID)) {
-            open_music_type(MUS_MID);
+            open_music_type(MUS_MID, mididevice_current);
             result |= MIX_INIT_MID;
         } else {
             Mix_SetError("MIDI support not available");
@@ -531,7 +531,7 @@ static SDL_AudioSpec *Mix_LoadMusic_RW(Mix_MusicType music_type, SDL_RWops *src,
     int count = 0;
     int fragment_size;
 
-    if (!load_music_type(music_type) || !open_music_type(music_type)) {
+    if (!load_music_type(music_type) || !open_music_type(music_type, mididevice_current)) {
         return NULL;
     }
 

@@ -23,19 +23,41 @@
 
 #include "music_midi_adl.h"
 
-/* Global ADLMIDI flags which are applying on initializing of MIDI player with a file */
-static int adlmidi_bank         = 58;
-static int adlmidi_tremolo      = 1;
-static int adlmidi_vibrato      = 1;
-static int adlmidi_scalemod     = 0;
-static int adlmidi_adlibdrums   = 0;
-static int adlmidi_logVolumes   = 0;
-static int adlmidi_volumeModel  = 0;
-static char adlmidi_customBankPath[2048] = "";
-
 #ifdef MUSIC_MID_ADLMIDI
 #include <adlmidi.h>
 #include <stdio.h>
+
+/* Global ADLMIDI flags which are applying on initializing of MIDI player with a file */
+typedef struct {
+    int bank;
+    int tremolo;
+    int vibrato;
+    int scalemod;
+    int adlibdrums;
+    int log_volumes;
+    int volume_model;
+    int chips_count;
+    int four_op_channels;
+    char custom_bank_path[2048];
+} AdlMidi_Setup;
+
+static AdlMidi_Setup adlmidi_setup = {
+    58, -1, -1, -1, -1, 0, 0, 4, -1, ""
+};
+
+static void ADLMIDI_SetDefault(AdlMidi_Setup *setup)
+{
+    setup->bank        = 58;
+    setup->tremolo     = -1;
+    setup->vibrato     = -1;
+    setup->scalemod    = -1;
+    setup->adlibdrums  = -1;
+    setup->log_volumes  = 0;
+    setup->volume_model = 0;
+    setup->chips_count = 4;
+    setup->four_op_channels = -1;
+    setup->custom_bank_path[0] = '\0';
+}
 #endif//MUSIC_MID_ADLMIDI
 
 int SDLCALLCC Mix_ADLMIDI_getTotalBanks()
@@ -58,91 +80,145 @@ const char *const * SDLCALLCC Mix_ADLMIDI_getBankNames()
 
 int SDLCALLCC Mix_ADLMIDI_getBankID()
 {
-    return adlmidi_bank;
+    #ifdef MUSIC_MID_ADLMIDI
+    return adlmidi_setup.bank;
+    #else
+    return 0;
+    #endif
 }
 
 void SDLCALLCC Mix_ADLMIDI_setBankID(int bnk)
 {
-    adlmidi_bank = bnk;
+    #ifdef MUSIC_MID_ADLMIDI
+    adlmidi_setup.bank = bnk;
+    #else
+    MIX_UNUSED(bnk);
+    #endif
 }
 
 int SDLCALLCC Mix_ADLMIDI_getTremolo()
 {
-    return adlmidi_tremolo;
+    return adlmidi_setup.tremolo;
 }
 void SDLCALLCC Mix_ADLMIDI_setTremolo(int tr)
 {
-    adlmidi_tremolo = tr;
+    #ifdef MUSIC_MID_ADLMIDI
+    adlmidi_setup.tremolo = tr;
+    #else
+    MIX_UNUSED(tr);
+    #endif
 }
 
 int SDLCALLCC Mix_ADLMIDI_getVibrato()
 {
-    return adlmidi_vibrato;
+    #ifdef MUSIC_MID_ADLMIDI
+    return adlmidi_setup.vibrato;
+    #else
+    return -1;
+    #endif
 }
 
 void SDLCALLCC Mix_ADLMIDI_setVibrato(int vib)
 {
-    adlmidi_vibrato = vib;
+    #ifdef MUSIC_MID_ADLMIDI
+    adlmidi_setup.vibrato = vib;
+    #else
+    MIX_UNUSED(vib);
+    #endif
 }
 
 
 int SDLCALLCC Mix_ADLMIDI_getAdLibMode()
 {
-    return adlmidi_adlibdrums;
+    #ifdef MUSIC_MID_ADLMIDI
+    return adlmidi_setup.adlibdrums;
+    #else
+    return -1;
+    #endif
 }
 
 void SDLCALLCC Mix_ADLMIDI_setAdLibMode(int ald)
 {
-    adlmidi_adlibdrums = ald;
+    #ifdef MUSIC_MID_ADLMIDI
+    adlmidi_setup.adlibdrums = ald;
+    #else
+    MIX_UNUSED(ald);
+    #endif
 }
 
 int SDLCALLCC Mix_ADLMIDI_getScaleMod()
 {
-    return adlmidi_scalemod;
+    #ifdef MUSIC_MID_ADLMIDI
+    return adlmidi_setup.scalemod;
+    #else
+    return -1;
+    #endif
 }
 
 void SDLCALLCC Mix_ADLMIDI_setScaleMod(int sc)
 {
-    adlmidi_scalemod = sc;
+    #ifdef MUSIC_MID_ADLMIDI
+    adlmidi_setup.scalemod = sc;
+    #else
+    MIX_UNUSED(sc);
+    #endif
 }
 
 int SDLCALLCC Mix_ADLMIDI_getLogarithmicVolumes()
 {
-    return adlmidi_logVolumes;
+    #ifdef MUSIC_MID_ADLMIDI
+    return adlmidi_setup.log_volumes;
+    #else
+    return -1;
+    #endif
 }
 
 void SDLCALLCC Mix_ADLMIDI_setLogarithmicVolumes(int vm)
 {
-    adlmidi_logVolumes = vm;
+    #ifdef MUSIC_MID_ADLMIDI
+    adlmidi_setup.log_volumes = vm;
+    #else
+    MIX_UNUSED(vm);
+    #endif
 }
 
 int SDLCALLCC Mix_ADLMIDI_getVolumeModel()
 {
-    return adlmidi_volumeModel;
+    #ifdef MUSIC_MID_ADLMIDI
+    return adlmidi_setup.volume_model;
+    #else
+    return -1;
+    #endif
 }
 
 void SDLCALLCC Mix_ADLMIDI_setVolumeModel(int vm)
 {
-    adlmidi_volumeModel = vm;
+    #ifdef MUSIC_MID_ADLMIDI
+    adlmidi_setup.volume_model = vm;
     if(vm < 0)
-        adlmidi_volumeModel = 0;
+        adlmidi_setup.volume_model = 0;
+    #else
+    MIX_UNUSED(vm);
+    #endif
 }
 
 void SDLCALLCC Mix_ADLMIDI_setSetDefaults()
 {
-    adlmidi_tremolo     = 1;
-    adlmidi_vibrato     = 1;
-    adlmidi_scalemod    = 0;
-    adlmidi_adlibdrums  = 0;
-    adlmidi_bank        = 58;
+    #ifdef MUSIC_MID_ADLMIDI
+    ADLMIDI_SetDefault(&adlmidi_setup);
+    #endif
 }
 
 void SDLCALLCC Mix_ADLMIDI_setCustomBankFile(const char *bank_wonl_path)
 {
-    if(bank_wonl_path)
-        SDL_strlcpy(adlmidi_customBankPath, bank_wonl_path, 2048);
+    #ifdef MUSIC_MID_ADLMIDI
+    if (bank_wonl_path)
+        SDL_strlcpy(adlmidi_setup.custom_bank_path, bank_wonl_path, 2048);
     else
-        adlmidi_customBankPath[0] = '\0';
+        adlmidi_setup.custom_bank_path[0] = '\0';
+    #else
+    MIX_UNUSED(bank_wonl_path);
+    #endif
 }
 
 #ifdef MUSIC_MID_ADLMIDI
@@ -166,7 +242,7 @@ static void ADLMIDI_setvolume(void *music_p, int volume)
     music->volume = (int)(round(128.0 * sqrt(((double)volume) * (1.0 / 128.0))));
 }
 
-static void process_args(const char *args)
+static void process_args(const char *args, AdlMidi_Setup *setup)
 {
     char arg[1024];
     char type = 'x';
@@ -182,7 +258,7 @@ static void process_args(const char *args)
     }
 
     maxlen += 1;
-    Mix_ADLMIDI_setSetDefaults();
+    ADLMIDI_SetDefault(setup);
 
     for (i = 0; i < maxlen; i++) {
         char c = args[i];
@@ -193,23 +269,29 @@ static void process_args(const char *args)
                 value = atoi(arg);
                 switch(type)
                 {
+                case 'c':
+                    setup->chips_count = value;
+                    break;
+                case 'f':
+                    setup->four_op_channels = value;
+                    break;
                 case 'b':
-                    Mix_ADLMIDI_setBankID(value);
+                    setup->bank = value;
                     break;
                 case 't':
-                    Mix_ADLMIDI_setTremolo(value);
+                    setup->tremolo = value;
                     break;
                 case 'v':
-                    Mix_ADLMIDI_setVibrato(value);
+                    setup->vibrato = value;
                     break;
                 case 'a':
-                    Mix_ADLMIDI_setAdLibMode(value);
+                    setup->adlibdrums = value;
                     break;
                 case 'm':
-                    Mix_ADLMIDI_setScaleMod(value);
+                    setup->scalemod = value;
                     break;
                 case 'l':
-                    Mix_ADLMIDI_setVolumeModel(value);
+                    setup->volume_model = value;
                     break;
                 case '\0':
                     break;
@@ -243,8 +325,9 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
         size_t bytes_l;
         unsigned char byte[1];
         AdlMIDI_Music *music = NULL;
+        AdlMidi_Setup setup = adlmidi_setup;
 
-        process_args(args);
+        process_args(args, &setup);
 
         music = (AdlMIDI_Music *)SDL_calloc(1, sizeof(AdlMIDI_Music));
 
@@ -289,12 +372,12 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
 
         music->adlmidi = adl_init(music_spec.freq);
 
-        adl_setHVibrato(music->adlmidi, adlmidi_vibrato);
-        adl_setHTremolo(music->adlmidi, adlmidi_tremolo);
-        if(adlmidi_customBankPath[0] != '\0')
-            err = adl_openBankFile(music->adlmidi, (char*)adlmidi_customBankPath);
+        adl_setHVibrato(music->adlmidi, setup.vibrato);
+        adl_setHTremolo(music->adlmidi, setup.tremolo);
+        if(setup.custom_bank_path[0] != '\0')
+            err = adl_openBankFile(music->adlmidi, (char*)setup.custom_bank_path);
         else
-            err = adl_setBank(music->adlmidi, adlmidi_bank);
+            err = adl_setBank(music->adlmidi, setup.bank);
         if(err < 0)
         {
             Mix_SetError("ADL-MIDI: %s", adl_errorInfo(music->adlmidi));
@@ -303,11 +386,13 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
             return NULL;
         }
 
-        adl_setScaleModulators(music->adlmidi, adlmidi_scalemod);
-        adl_setPercMode(music->adlmidi, adlmidi_adlibdrums);
-        adl_setLogarithmicVolumes(music->adlmidi, adlmidi_logVolumes);
-        adl_setVolumeRangeModel(music->adlmidi, adlmidi_volumeModel);
-        adl_setNumCards(music->adlmidi, 4);
+        adl_setScaleModulators(music->adlmidi, setup.scalemod);
+        adl_setPercMode(music->adlmidi, setup.adlibdrums);
+        adl_setLogarithmicVolumes(music->adlmidi, setup.log_volumes);
+        adl_setVolumeRangeModel(music->adlmidi, setup.volume_model);
+        adl_setNumChips(music->adlmidi, setup.chips_count);
+        if (setup.four_op_channels >= 0)
+            adl_setNumFourOpsChn(music->adlmidi, setup.four_op_channels);
 
         err = adl_openData(music->adlmidi, bytes, (unsigned long)filesize);
         SDL_free(bytes);

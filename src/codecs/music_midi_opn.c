@@ -27,60 +27,46 @@
 #include <opnmidi.h>
 #include "OPNMIDI/gm_opn_bank.h"
 #include <stdio.h>
-#endif
 
 /* Global OPNMIDI flags which are applying on initializing of MIDI player with a file */
-/* static int opnmidi_scalemod     = 0; */
-static int opnmidi_logVolumes   = 0;
-static int opnmidi_volumeModel  = 0;
-static char opnmidi_customBankPath[2048] = "";
+typedef struct {
+    int log_volumes;
+    int volume_model;
+    int chips_count;
+    char custom_bank_path[2048];
+} OpnMidi_Setup;
 
-/*
-int SDLCALLCC OPNMIDI_getScaleMod()
+static OpnMidi_Setup opnmidi_setup = {
+    0, 0, 4, ""
+};
+
+static void OPNMIDI_SetDefault(OpnMidi_Setup *setup)
 {
-    return opnmidi_scalemod;
+    setup->log_volumes  = 0;
+    setup->volume_model = 0;
+    setup->chips_count = 4;
+    setup->custom_bank_path[0] = '\0';
 }
 
-void SDLCALLCC OPNMIDI_setScaleMod(int sc)
-{
-    opnmidi_scalemod = sc;
-}
+#endif
 
-int SDLCALLCC OPNMIDI_getLogarithmicVolumes()
+void SDLCALLCC Mix_OPNMIDI_setSetDefaults()
 {
-    return opnmidi_logVolumes;
+    #ifdef MUSIC_MID_OPNMIDI
+    OPNMIDI_SetDefault(&opnmidi_setup);
+    #endif
 }
-
-void SDLCALLCC OPNMIDI_setLogarithmicVolumes(int vm)
-{
-    opnmidi_logVolumes = vm;
-}
-
-int SDLCALLCC OPNMIDI_getVolumeModel()
-{
-    return opnmidi_volumeModel;
-}
-
-void SDLCALLCC OPNMIDI_setVolumeModel(int vm)
-{
-    opnmidi_volumeModel = vm;
-    if(vm < 0)
-        opnmidi_volumeModel = 0;
-}
-
-void SDLCALLCC OPNMIDI_setDefaults()
-{
-    opnmidi_scalemod    = 0;
-    opnmidi_logVolumes  = 0;
-}
-*/
 
 void SDLCALLCC Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path)
 {
+    #ifdef MUSIC_MID_OPNMIDI
     if(bank_wonp_path)
-        SDL_strlcpy(opnmidi_customBankPath, bank_wonp_path, 2048);
+        SDL_strlcpy(opnmidi_setup.custom_bank_path, bank_wonp_path, 2048);
     else
-        opnmidi_customBankPath[0] = '\0';
+        opnmidi_setup.custom_bank_path[0] = '\0';
+    #else
+    MIX_UNUSED(bank_wopn_path);
+    #endif
 }
 
 #ifdef MUSIC_MID_OPNMIDI
@@ -108,9 +94,64 @@ static void OPNMIDI_setvolume(void *music_p, int volume)
     music->volume = (int)(round(128.0*sqrt(((double)volume)*(1.0/128.0) )));
 }
 
+static void process_args(const char *args, OpnMidi_Setup *setup)
+{
+    char arg[1024];
+    char type = 'x';
+    size_t maxlen = 0;
+    size_t i, j = 0;
+    int value_opened = 0;
+    if (args == NULL) {
+        return;
+    }
+    maxlen = SDL_strlen(args);
+    if (maxlen == 0) {
+        return;
+    }
+
+    maxlen += 1;
+    OPNMIDI_SetDefault(setup);
+
+    for (i = 0; i < maxlen; i++) {
+        char c = args[i];
+        if(value_opened == 1) {
+            if ((c == ';') || (c == '\0')) {
+                int value;
+                arg[j] = '\0';
+                value = atoi(arg);
+                switch(type)
+                {
+                case 'c':
+                    setup->chips_count = value;
+                    break;
+                case 'v':
+                    setup->log_volumes = value;
+                    break;
+                case 'l':
+                    setup->volume_model = value;
+                    break;
+                case '\0':
+                    break;
+                default:
+                    break;
+                }
+                value_opened = 0;
+            }
+            arg[j++] = c;
+        } else {
+            if (c == '\0') {
+                return;
+            }
+            type = c;
+            value_opened = 1;
+            j = 0;
+        }
+    }
+}
+
 static void OPNMIDI_delete(void *music_p);
 
-static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src)
+static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
 {
     if(src != NULL)
     {
@@ -121,6 +162,9 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src)
         size_t bytes_l;
         unsigned char byte[1];
         OpnMIDI_Music *music = NULL;
+        OpnMidi_Setup setup = opnmidi_setup;
+
+        process_args(args, &setup);
 
         music = (OpnMIDI_Music *)SDL_calloc(1, sizeof(OpnMIDI_Music));
 
@@ -163,8 +207,8 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src)
         }
 
         music->opnmidi = opn2_init( music_spec.freq );
-        if(opnmidi_customBankPath[0] != '\0')
-            err = opn2_openBankFile(music->opnmidi, (char*)opnmidi_customBankPath);
+        if(setup.custom_bank_path[0] != '\0')
+            err = opn2_openBankFile(music->opnmidi, (char*)setup.custom_bank_path);
         else
             err = opn2_openBankData(music->opnmidi, g_gm_opn2_bank, sizeof(g_gm_opn2_bank));
         if( err < 0 )
@@ -175,9 +219,9 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src)
             return NULL;
         }
 
-        opn2_setLogarithmicVolumes( music->opnmidi, opnmidi_logVolumes );
-        opn2_setVolumeRangeModel( music->opnmidi, opnmidi_volumeModel );
-        opn2_setNumCards( music->opnmidi, 4 );
+        opn2_setLogarithmicVolumes( music->opnmidi, setup.log_volumes );
+        opn2_setVolumeRangeModel( music->opnmidi, setup.volume_model );
+        opn2_setNumChips(music->opnmidi, setup.chips_count );
 
         err = opn2_openData( music->opnmidi, bytes, (unsigned long)filesize);
         SDL_free(bytes);
@@ -199,17 +243,22 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src)
 }
 
 /* Load OPNMIDI stream from an SDL_RWops object */
-static void *OPNMIDI_new_RW(struct SDL_RWops *src, int freesrc)
+static void *OPNMIDI_new_RWex(struct SDL_RWops *src, int freesrc, const char *args)
 {
     OpnMIDI_Music *adlmidiMusic;
 
-    adlmidiMusic = OPNMIDI_LoadSongRW(src);
+    adlmidiMusic = OPNMIDI_LoadSongRW(src, args);
     if (!adlmidiMusic)
         return NULL;
     if( freesrc )
         SDL_RWclose(src);
 
     return adlmidiMusic;
+}
+
+static void *OPNMIDI_new_RW(struct SDL_RWops *src, int freesrc)
+{
+    return OPNMIDI_new_RWex(src, freesrc, NULL);
 }
 
 /* Start playback of a given Game Music Emulators stream */
@@ -362,7 +411,7 @@ Mix_MusicInterface Mix_MusicInterface_OPNMIDI =
     NULL,   /* Load */
     NULL,   /* Open */
     OPNMIDI_new_RW,
-    NULL,   /* CreateFromRWex [MIXER-X]*/
+    OPNMIDI_new_RWex,/* CreateFromRWex [MIXER-X]*/
     NULL,   /* CreateFromFile */
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     OPNMIDI_setvolume,
