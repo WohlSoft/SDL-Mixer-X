@@ -48,6 +48,8 @@ typedef struct {
     int numloops;
     WAVLoopPoint *loops;
     Mix_MusicMetaTags tags;
+    Uint16 encoding;
+    int (*decode)(void *music, int length);
 } WAV_Music;
 
 /*
@@ -71,6 +73,8 @@ typedef struct {
 #define PCM_CODE    1               /* WAVE_FORMAT_PCM */
 #define ADPCM_CODE  2               /* WAVE_FORMAT_ADPCM */
 #define FLOAT_CODE  3               /* WAVE_FORMAT_IEEE_FLOAT */
+#define ALAW_CODE   6               /* WAVE_FORMAT_ALAW */
+#define uLAW_CODE   7               /* WAVE_FORMAT_MULAW */
 #define EXT_CODE    0xFFFE          /* WAVE_FORMAT_EXTENSIBLE */
 #define WAVE_MONO   1
 #define WAVE_STEREO 2
@@ -196,6 +200,99 @@ static int WAV_Play(void *context, int play_count)
     return 0;
 }
 
+
+/*
+    G711 source: https://github.com/escrichov/G711/blob/master/g711.c
+*/
+
+#define	SIGN_BIT	(0x80)		/* Sign bit for a A-law byte. */
+#define	QUANT_MASK	(0xf)		/* Quantization field mask. */
+#define	SEG_SHIFT	(4)		/* Left shift for segment number. */
+#define	SEG_MASK	(0x70) /* Segment field mask. */
+
+static Sint16 ALAW_To_PCM16(Uint8 a_val)
+{
+   Sint16 t;
+   Sint16 seg;
+
+   a_val ^= 0x55;
+
+   t = (Sint16)((a_val & QUANT_MASK) << 4);
+   seg = ((unsigned)a_val & SEG_MASK) >> SEG_SHIFT;
+   switch (seg) {
+   case 0:
+      t += 8;
+      break;
+   case 1:
+      t += 0x108;
+      break;
+   default:
+      t += 0x108;
+      t <<= seg - 1;
+   }
+   return ((a_val & SIGN_BIT) ? t : -t);
+}
+
+#define BIAS (0x84)		/* Bias for linear code. */
+#define CLIP 8159
+
+/*
+ *
+ * ulaw2linear() - Convert a u-law value to 16-bit linear PCM
+ *
+ * First, a biased linear code is derived from the code word. An unbiased
+ * output can then be obtained by subtracting 33 from the biased code.
+ *
+ * Note that this function expects to be passed the complement of the
+ * original code word. This is in keeping with ISDN conventions.
+ */
+static Sint16 uLAW_To_PCM16(Uint8 u_val)
+{
+   Sint16 t;
+   /* Complement to obtain normal u-law value. */
+   u_val = ~u_val;
+   /*
+    * Extract and bias the quantization bits. Then
+    * shift up by the segment number and subtract out the bias.
+    */
+   t = (Sint16)((u_val & QUANT_MASK) << 3) + BIAS;
+   t <<= ((unsigned)u_val & SEG_MASK) >> SEG_SHIFT;
+
+   return ((u_val & SIGN_BIT) ? (BIAS - t) : (t - BIAS));
+}
+
+static int fetch_pcm(void *context, int length)
+{
+    WAV_Music *music = (WAV_Music *)context;
+    return (int)SDL_RWread(music->src, music->buffer, 1, (size_t)length);
+}
+
+static int fetch_xlaw(Sint16 (*decode_sample)(Uint8), void *context, int length)
+{
+    WAV_Music *music = (WAV_Music *)context;
+    int i = 0, o = 0;
+    length = (int)SDL_RWread(music->src, music->buffer, 1, (size_t)(length / 2));
+    if (length % music->samplesize != 0) {
+        length -= length % music->samplesize;
+    }
+    for (i = length - 1, o = (length - 1) * 2; i >= 0; i--, o -= 2) {
+        Uint16 decoded = (Uint16)decode_sample(music->buffer[i]);
+        music->buffer[o] = decoded & 0xFF;
+        music->buffer[o + 1] = (decoded >> 8) & 0xFF;
+    }
+    return length * 2;
+}
+
+static int fetch_ulaw(void *context, int length)
+{
+    return fetch_xlaw(uLAW_To_PCM16, context, length);
+}
+
+static int fetch_alaw(void *context, int length)
+{
+    return fetch_xlaw(ALAW_To_PCM16, context, length);
+}
+
 /* Play some of a stream previously started with WAV_Play() */
 static int WAV_GetSome(void *context, void *data, int bytes, SDL_bool *done)
 {
@@ -205,6 +302,7 @@ static int WAV_GetSome(void *context, void *data, int bytes, SDL_bool *done)
     Sint64 loop_start = music->start;
     Sint64 loop_stop = music->stop;
     SDL_bool looped = SDL_FALSE;
+    SDL_bool at_end = SDL_FALSE;
     int i;
     int filled, amount, result;
 
@@ -241,14 +339,18 @@ static int WAV_GetSome(void *context, void *data, int bytes, SDL_bool *done)
     if ((stop - pos) < amount) {
         amount = (int)(stop - pos);
     }
-    amount = (int)SDL_RWread(music->src, music->buffer, 1, (size_t)amount);
+
+    amount = music->decode(music, amount);
     if (amount > 0) {
         result = SDL_AudioStreamPut(music->stream, music->buffer, amount);
         if (result < 0) {
+            printf("WAAAT? %s [%d %% %d == %d]\n", Mix_GetError(), amount, (int)music->samplesize * 2, (amount % (int)(music->samplesize * 2)));
+            fflush(stdout);
             return -1;
         }
     } else {
         /* We might be looping, continue */
+        at_end = SDL_TRUE;
     }
 
     if (loop && SDL_RWtell(music->src) >= stop) {
@@ -263,7 +365,7 @@ static int WAV_GetSome(void *context, void *data, int bytes, SDL_bool *done)
         }
     }
 
-    if (!looped && SDL_RWtell(music->src) >= music->stop) {
+    if (!looped && (at_end || SDL_RWtell(music->src) >= music->stop)) {
         if (music->play_count == 1) {
             music->play_count = 0;
             SDL_AudioStreamFlush(music->stream);
@@ -344,7 +446,6 @@ static SDL_bool ParseFMT(WAV_Music *wave, Uint32 chunk_length)
     SDL_AudioSpec *spec = &wave->spec;
     WaveFMT *format;
     Uint8 *data;
-    Uint16 encoding;
     Uint16 bitsamplerate;
     SDL_bool loaded = SDL_FALSE;
 
@@ -364,14 +465,24 @@ static SDL_bool ParseFMT(WAV_Music *wave, Uint32 chunk_length)
     }
     format = (WaveFMT *)data;
 
-    encoding = SDL_SwapLE16(format->encoding);
+    wave->encoding = SDL_SwapLE16(format->encoding);
     /* Decode the audio data format */
-    switch (encoding) {
+    switch (wave->encoding) {
         case PCM_CODE:
         case FLOAT_CODE:
             /* We can understand this */
+            wave->decode = fetch_pcm;
+            break;
+        case uLAW_CODE:
+            /* , this */
+            wave->decode = fetch_ulaw;
+            break;
+        case ALAW_CODE:
+            /* , and this */
+            wave->decode = fetch_alaw;
             break;
         default:
+            /* but NOT this */
             Mix_SetError("Unknown WAVE data format");
             goto done;
     }
@@ -379,19 +490,21 @@ static SDL_bool ParseFMT(WAV_Music *wave, Uint32 chunk_length)
     bitsamplerate = SDL_SwapLE16(format->bitspersample);
     switch (bitsamplerate) {
         case 8:
-            switch(encoding) {
-            case PCM_CODE: spec->format = AUDIO_U8; break;
+            switch(wave->encoding) {
+            case PCM_CODE:  spec->format = AUDIO_U8; break;
+            case ALAW_CODE: spec->format = AUDIO_S16; break;
+            case uLAW_CODE: spec->format = AUDIO_S16; break;
             default: goto unknown_length;
             }
             break;
         case 16:
-            switch(encoding) {
+            switch(wave->encoding) {
             case PCM_CODE: spec->format = AUDIO_S16; break;
             default: goto unknown_length;
             }
             break;
         case 32:
-            switch(encoding) {
+            switch(wave->encoding) {
             case PCM_CODE:   spec->format = AUDIO_S32; break;
             case FLOAT_CODE: spec->format = AUDIO_F32; break;
             default: goto unknown_length;
@@ -404,7 +517,7 @@ static SDL_bool ParseFMT(WAV_Music *wave, Uint32 chunk_length)
     }
     spec->channels = (Uint8) SDL_SwapLE16(format->channels);
     spec->samples = 4096;       /* Good default buffer size */
-    wave->samplesize = spec->channels * (format->bitspersample / 8);
+    wave->samplesize = spec->channels * (bitsamplerate / 8);
     /* SDL_CalculateAudioSpec */
     spec->size = SDL_AUDIO_BITSIZE(spec->format) / 8;
     spec->size *= spec->channels;
