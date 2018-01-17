@@ -68,8 +68,10 @@ typedef struct {
 #define SMPL        0x6c706d73      /* "smpl" */
 #define LIST        0x5453494c      /* "LIST" */
 #define ID3_        0x20336469      /* "id3 " */
-#define PCM_CODE    1
-#define ADPCM_CODE  2
+#define PCM_CODE    1               /* WAVE_FORMAT_PCM */
+#define ADPCM_CODE  2               /* WAVE_FORMAT_ADPCM */
+#define FLOAT_CODE  3               /* WAVE_FORMAT_IEEE_FLOAT */
+#define EXT_CODE    0xFFFE          /* WAVE_FORMAT_EXTENSIBLE */
 #define WAVE_MONO   1
 #define WAVE_STEREO 2
 
@@ -342,6 +344,8 @@ static SDL_bool ParseFMT(WAV_Music *wave, Uint32 chunk_length)
     SDL_AudioSpec *spec = &wave->spec;
     WaveFMT *format;
     Uint8 *data;
+    Uint16 encoding;
+    Uint16 bitsamplerate;
     SDL_bool loaded = SDL_FALSE;
 
     if (chunk_length < sizeof(*format)) {
@@ -360,9 +364,11 @@ static SDL_bool ParseFMT(WAV_Music *wave, Uint32 chunk_length)
     }
     format = (WaveFMT *)data;
 
+    encoding = SDL_SwapLE16(format->encoding);
     /* Decode the audio data format */
-    switch (SDL_SwapLE16(format->encoding)) {
+    switch (encoding) {
         case PCM_CODE:
+        case FLOAT_CODE:
             /* We can understand this */
             break;
         default:
@@ -370,15 +376,30 @@ static SDL_bool ParseFMT(WAV_Music *wave, Uint32 chunk_length)
             goto done;
     }
     spec->freq = (int)SDL_SwapLE32(format->frequency);
-    switch (SDL_SwapLE16(format->bitspersample)) {
+    bitsamplerate = SDL_SwapLE16(format->bitspersample);
+    switch (bitsamplerate) {
         case 8:
-            spec->format = AUDIO_U8;
+            switch(encoding) {
+            case PCM_CODE: spec->format = AUDIO_U8; break;
+            default: goto unknown_length;
+            }
             break;
         case 16:
-            spec->format = AUDIO_S16;
+            switch(encoding) {
+            case PCM_CODE: spec->format = AUDIO_S16; break;
+            default: goto unknown_length;
+            }
+            break;
+        case 32:
+            switch(encoding) {
+            case PCM_CODE:   spec->format = AUDIO_S32; break;
+            case FLOAT_CODE: spec->format = AUDIO_F32; break;
+            default: goto unknown_length;
+            }
             break;
         default:
-            Mix_SetError("Unknown PCM data format");
+            unknown_length:
+            Mix_SetError("Unknown PCM data format of %d-bit length", (int)bitsamplerate);
             goto done;
     }
     spec->channels = (Uint8) SDL_SwapLE16(format->channels);
