@@ -123,9 +123,19 @@ typedef struct {
 /*********************************************/
 #define FORM        0x4d524f46      /* "FORM" */
 #define AIFF        0x46464941      /* "AIFF" */
+#define AIFC        0x43464941      /* "AIFС" */
+#define FVER        0x52455646      /* "FVER" */
 #define SSND        0x444e5353      /* "SSND" */
 #define COMM        0x4d4d4f43      /* "COMM" */
 
+/* Supported compression types */
+#define NONE        0x454E4F4E      /* "NONE" */
+#define sowt        0x74776F73      /* "sowt" */
+#define raw_        0x20776172      /* "raw " */
+#define ulaw        0x77616C75      /* "ulaw" */
+#define alaw        0x77616C61      /* "alaw" */
+#define fl32        0x32336C66      /* "fl32" */
+#define fl64        0x34366C66      /* "fl64" */
 
 /* Function to load the WAV/AIFF stream */
 static SDL_bool LoadWAVMusic(WAV_Music *wave);
@@ -270,6 +280,31 @@ static int fetch_pcm(void *context, int length)
 {
     WAV_Music *music = (WAV_Music *)context;
     return (int)SDL_RWread(music->src, music->buffer, 1, (size_t)length);
+}
+
+static Uint32 sign_extend_24_32(Uint32 x) {
+    const Uint32 bits = 24;
+    Uint32 m = 1u << (bits - 1);
+    x = (SDL_SwapLE32(x) >> 8) & 0x00FFFFFF;
+    return (x ^ m) - m;
+}
+
+static int fetch_pcm24be(void *context, int length)
+{
+    WAV_Music *music = (WAV_Music *)context;
+    int i = 0, o = 0;
+    length = (int)SDL_RWread(music->src, music->buffer, 1, (size_t)((length / 4) * 3));
+    if (length % music->samplesize != 0) {
+        length -= length % music->samplesize;
+    }
+    for (i = length - 1, o = ((length - 1) / 3) * 4; i >= 0; i -= 3, o -= 4) {
+        Uint32 decoded = sign_extend_24_32(*((Uint32*)(music->buffer + i)));
+        music->buffer[o + 0] = (decoded >> 0) & 0xFF;
+        music->buffer[o + 1] = (decoded >> 8) & 0xFF;
+        music->buffer[o + 2] = (decoded >> 16) & 0xFF;
+        music->buffer[o + 3] = (decoded >> 24) & 0xFF;
+    }
+    return ((length - music->samplesize)/ 3) * 4;
 }
 
 static int fetch_xlaw(Sint16 (*decode_sample)(Uint8), void *context, int length)
@@ -787,6 +822,8 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
     SDL_AudioSpec *spec = &wave->spec;
     SDL_bool found_SSND = SDL_FALSE;
     SDL_bool found_COMM = SDL_FALSE;
+    SDL_bool found_FVER = SDL_FALSE;
+    SDL_bool is_AIFC = SDL_FALSE;
 
     Uint32 chunk_type;
     Uint32 chunk_length;
@@ -803,15 +840,21 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
     Uint16 samplesize = 0;
     Uint8 sane_freq[10];
     Uint32 frequency = 0;
+    Uint32 AIFCVersion1 = 0;
+    Uint32 compressionType = 0;
 
     MIX_UNUSED(blocksize);
+    MIX_UNUSED(AIFCVersion1);
 
     /* Check the magic header */
     chunk_length = SDL_ReadBE32(src);
     AIFFmagic = SDL_ReadLE32(src);
-    if (AIFFmagic != AIFF) {
-        Mix_SetError("Unrecognized file type (not AIFF)");
+    if (AIFFmagic != AIFF && AIFFmagic != AIFC) {
+        Mix_SetError("Unrecognized file type (not AIFF or AIFC)");
         return SDL_FALSE;
+    }
+    if (AIFFmagic == AIFC) {
+        is_AIFC = SDL_TRUE;
     }
 
     /* From what I understand of the specification, chunks may appear in
@@ -836,6 +879,10 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
             blocksize = SDL_ReadBE32(src);
             wave->start = SDL_RWtell(src) + offset;
             break;
+        case FVER:
+            found_FVER = SDL_TRUE;
+            AIFCVersion1 = SDL_ReadBE32(src);
+            break;
 
         case COMM:
             found_COMM = SDL_TRUE;
@@ -846,12 +893,16 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
             samplesize = SDL_ReadBE16(src);
             SDL_RWread(src, sane_freq, sizeof(sane_freq), 1);
             frequency = SANE_to_Uint32(sane_freq);
+            if (is_AIFC) {
+                compressionType = SDL_ReadLE32(src);
+                /* here must be a "compressionName" which is a padded string */
+            }
             break;
 
         default:
             break;
         }
-    } while ((!found_SSND || !found_COMM)
+    } while ((!found_SSND || !found_COMM || (is_AIFC && !found_FVER))
          && SDL_RWseek(src, next_chunk, RW_SEEK_SET) != -1);
 
     if (!found_SSND) {
@@ -872,12 +923,56 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
     spec->freq = (int)frequency;
     switch (samplesize) {
         case 8:
-            spec->format = AUDIO_S8;
+            if (!is_AIFC)
+                spec->format = AUDIO_S8;
+            else switch (compressionType) {
+            case raw_: spec->format = AUDIO_U8; break;
+            case sowt: spec->format = AUDIO_S8; break;
+            case ulaw:
+                spec->format = AUDIO_S16LSB;
+                wave->encoding = uLAW_CODE;
+                wave->decode = fetch_ulaw;
+                break;
+            case alaw:
+                spec->format = AUDIO_S16LSB;
+                wave->encoding = ALAW_CODE;
+                wave->decode = fetch_alaw;
+                break;
+            default: goto unsupported_format;
+            }
             break;
         case 16:
-            spec->format = AUDIO_S16MSB;
+            if (!is_AIFC)
+                spec->format = AUDIO_S16MSB;
+            else switch (compressionType) {
+            case sowt: spec->format = AUDIO_S16LSB; break;
+            case NONE: spec->format = AUDIO_S16MSB; break;
+            default: goto unsupported_format;
+            }
+            break;
+        case 24:
+            wave->encoding = PCM_CODE;
+            wave->decode = fetch_pcm24be;
+            if (!is_AIFC)
+                spec->format = AUDIO_S32MSB;
+            else switch (compressionType) {
+            case sowt: spec->format = AUDIO_S32LSB; break;
+            case NONE: spec->format = AUDIO_S32MSB; break;
+            default: goto unsupported_format;
+            }
+            break;
+        case 32:
+            if (!is_AIFC)
+                spec->format = AUDIO_S32MSB;
+            else switch (compressionType) {
+            case sowt: spec->format = AUDIO_S32LSB; break;
+            case NONE: spec->format = AUDIO_S32MSB; break;
+            case fl32: spec->format = AUDIO_F32MSB; break;
+            default: goto unsupported_format;
+            }
             break;
         default:
+        unsupported_format:
             Mix_SetError("Unknown samplesize in data format");
             return SDL_FALSE;
     }
