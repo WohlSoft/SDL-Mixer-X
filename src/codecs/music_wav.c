@@ -133,6 +133,8 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave);
 
 static void WAV_Delete(void *context);
 
+static int fetch_pcm(void *context, int length);
+
 /* Load a WAV stream from the given RWops object */
 static void *WAV_CreateFromRW(SDL_RWops *src, int freesrc)
 {
@@ -147,6 +149,9 @@ static void *WAV_CreateFromRW(SDL_RWops *src, int freesrc)
     }
     music->src = src;
     music->volume = MIX_MAX_VOLUME;
+    /* Default decoder is PCM */
+    music->decode = fetch_pcm;
+    music->encoding = PCM_CODE;
 
     magic = SDL_ReadLE32(src);
     if (magic == RIFF || magic == WAVE) {
@@ -344,8 +349,6 @@ static int WAV_GetSome(void *context, void *data, int bytes, SDL_bool *done)
     if (amount > 0) {
         result = SDL_AudioStreamPut(music->stream, music->buffer, amount);
         if (result < 0) {
-            printf("WAAAT? %s [%d %% %d == %d]\n", Mix_GetError(), amount, (int)music->samplesize * 2, (amount % (int)(music->samplesize * 2)));
-            fflush(stdout);
             return -1;
         }
     } else {
@@ -880,6 +883,9 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
     }
     spec->channels = (Uint8) channels;
     spec->samples = 4096;       /* Good default buffer size */
+    spec->size = SDL_AUDIO_BITSIZE(spec->format) / 8;
+    spec->size *= spec->channels;
+    spec->size *= spec->samples;
 
     return SDL_TRUE;
 }
