@@ -1297,8 +1297,8 @@ Mix_MusicType SDLCALLCC Mix_GetMusicType(const Mix_Music *music)
 
 static const char * get_music_tag_internal(const Mix_Music *music, Mix_MusicMetaTag tag_type)
 {
-    (void)music;
     const char *tag = "";
+    MIX_UNUSED(music);
     Mix_LockAudio();
     if (music_playing) {
         if (music_playing->interface->GetMetaTag) {
@@ -1484,8 +1484,8 @@ double music_internal_position_get()
 }
 double SDLCALLCC Mix_GetMusicPosition(Mix_Music *music)
 {
-    (void)music;
     double retval;
+    MIX_UNUSED(music);
 
     Mix_LockAudio();
     if (music_playing) {
@@ -1509,8 +1509,8 @@ double music_internal_position_total()
 }
 double SDLCALLCC Mix_GetMusicTotalTime(Mix_Music *music)
 {
-    (void)music;
     double retval;
+    MIX_UNUSED(music);
 
     Mix_LockAudio();
     if (music_playing) {
@@ -1534,8 +1534,8 @@ double music_internal_loop_start()
 }
 double SDLCALLCC Mix_GetMusicLoopStartTime(Mix_Music *music)
 {
-    (void)music;
     double retval;
+    MIX_UNUSED(music);
 
     Mix_LockAudio();
     if (music_playing) {
@@ -1559,8 +1559,8 @@ double music_internal_loop_end()
 }
 double SDLCALLCC Mix_GetMusicLoopEndTime(Mix_Music *music)
 {
-    (void)music;
     double retval;
+    MIX_UNUSED(music);
 
     Mix_LockAudio();
     if (music_playing) {
@@ -1584,8 +1584,8 @@ double music_internal_loop_length()
 }
 double SDLCALLCC Mix_GetMusicLoopLengthTime(Mix_Music *music)
 {
-    (void)music;
     double retval;
+    MIX_UNUSED(music);
 
     Mix_LockAudio();
     if (music_playing) {

@@ -58,7 +58,7 @@ static void ADLMIDI_SetDefault(AdlMidi_Setup *setup)
     setup->four_op_channels = -1;
     setup->custom_bank_path[0] = '\0';
 }
-#endif//MUSIC_MID_ADLMIDI
+#endif /* MUSIC_MID_ADLMIDI */
 
 int SDLCALLCC Mix_ADLMIDI_getTotalBanks()
 {
@@ -646,6 +646,4 @@ Mix_MusicInterface Mix_MusicInterface_ADLIMF =
     NULL,   /* Unload */
 };
 
-#endif //MUSIC_MID_ADLMIDI
-
-
+#endif /* MUSIC_MID_ADLMIDI */

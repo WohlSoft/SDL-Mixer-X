@@ -1,9 +1,10 @@
 cmake_minimum_required (VERSION 2.8.11)
 project(SDLMixerX C)
 
+include(CheckIncludeFiles)
+include(CheckFunctionExists)
 #include(CheckCSourceRuns)
 #include(CheckCCompilerFlag)
-#include(CheckFunctionExists)
 #include(CheckLibraryExists)
 
 if(NOT CMAKE_VERSION VERSION_LESS 2.8.12)
@@ -25,9 +26,9 @@ option(DOWNLOAD_AUDIO_CODECS_DEPENDENCY "Downloads and compiles AudioCodecs depe
 set(AUDIO_CODECS_REPO_PATH "" CACHE PATH "Path to the AudioCodecs dependencies pack")
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-    # Update if necessary
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pedantic")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic")
+    # Turn on warnings and legacy C/C++ standards to support more compilers
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pedantic -std=c90")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -std=c++98")
 endif()
 
 #option(DOWNLOAD_SDL2_DEPENDENCY "Downloads and compiles SDL2 from official Mercurial directly" OFF)
@@ -207,7 +208,11 @@ endif()
 
 option(USE_CMD             "Build with CMD music player support" ON)
 if(USE_CMD)
-    add_definitions(-DMUSIC_CMD)
+    add_definitions(-DMUSIC_CMD -D_POSIX_C_SOURCE=1)
+    CHECK_FUNCTION_EXISTS(fork HAVE_FORK)
+    if(HAVE_FORK)
+        add_definitions(-DHAVE_FORK)
+    endif()
     list(APPEND SDLMixerX_SOURCES
         ${SDLMixerX_SOURCE_DIR}/src/codecs/music_cmd.c)
 endif()

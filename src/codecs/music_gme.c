@@ -317,4 +317,4 @@ Mix_MusicInterface Mix_MusicInterface_GME =
     NULL,   /* Unload */
 };
 
-#endif
+#endif /* MUSIC_GME */

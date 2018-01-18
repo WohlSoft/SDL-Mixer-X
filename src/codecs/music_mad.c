@@ -132,7 +132,7 @@ enum {
     MS_input_eof      = 0x0001,
     MS_input_error    = 0x0001,
     MS_decode_error   = 0x0002,
-    MS_error_flags    = 0x000f,
+    MS_error_flags    = 0x000f
 };
 
 typedef struct {

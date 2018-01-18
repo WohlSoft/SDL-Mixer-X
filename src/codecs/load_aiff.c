@@ -88,7 +88,6 @@ SDL_AudioSpec *Mix_LoadAIFF_RW (SDL_RWops *src, int freesrc,
     /* SSND chunk */
     Uint32 offset;
     Uint32 blocksize;
-    MIX_UNUSED(blocksize);
 
     /* COMM format chunk */
     Uint16 channels = 0;
@@ -96,6 +95,8 @@ SDL_AudioSpec *Mix_LoadAIFF_RW (SDL_RWops *src, int freesrc,
     Uint16 samplesize = 0;
     Uint8 sane_freq[10];
     Uint32 frequency = 0;
+
+    MIX_UNUSED(blocksize);
 
     /* Make sure we are passed a valid data source */
     was_error = 0;

@@ -433,5 +433,5 @@ Mix_MusicInterface Mix_MusicInterface_OPNMIDI =
     NULL,   /* Unload */
 };
 
-#endif /*USE_OPN2_MIDI*/
+#endif /* MUSIC_MID_OPNMIDI */
 
