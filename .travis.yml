@@ -21,4 +21,4 @@ script:
   - mkdir build; cd build;
     if [ $TRAVIS_OS_NAME == linux ]; then cmake -DDOWNLOAD_AUDIO_CODECS_DEPENDENCY=YES ..; fi;
     if [ $TRAVIS_OS_NAME == osx ]; then cmake -G XCode -DDOWNLOAD_AUDIO_CODECS_DEPENDENCY=YES ..; fi;
-  - cmake --build . --config Release
+  - cmake --build . --config Release -- -j 2
