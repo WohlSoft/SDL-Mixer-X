@@ -282,11 +282,13 @@ static int fetch_pcm(void *context, int length)
     return (int)SDL_RWread(music->src, music->buffer, 1, (size_t)length);
 }
 
-static Uint32 sign_extend_24_32(Uint32 x) {
+static Uint32 PCM_S24_to_S32(Uint8 *x) {
     const Uint32 bits = 24;
+    Uint32 in = (((Uint32)x[0] << 0)  & 0x0000FF) |
+                (((Uint32)x[1] << 8)  & 0x00FF00) |
+                (((Uint32)x[2] << 16) & 0xFF0000);
     Uint32 m = 1u << (bits - 1);
-    x = (SDL_SwapLE32(x) >> 8) & 0x00FFFFFF;
-    return (x ^ m) - m;
+    return (in ^ m) - m;
 }
 
 static int fetch_pcm24be(void *context, int length)
@@ -297,14 +299,14 @@ static int fetch_pcm24be(void *context, int length)
     if (length % music->samplesize != 0) {
         length -= length % music->samplesize;
     }
-    for (i = length - 1, o = ((length - 1) / 3) * 4; i >= 0; i -= 3, o -= 4) {
-        Uint32 decoded = sign_extend_24_32(*((Uint32*)(music->buffer + i)));
+    for (i = length - 3, o = ((length - 3) / 3) * 4; i >= 0; i -= 3, o -= 4) {
+        Uint32 decoded = PCM_S24_to_S32(music->buffer + i);
         music->buffer[o + 0] = (decoded >> 0) & 0xFF;
         music->buffer[o + 1] = (decoded >> 8) & 0xFF;
         music->buffer[o + 2] = (decoded >> 16) & 0xFF;
         music->buffer[o + 3] = (decoded >> 24) & 0xFF;
     }
-    return ((length - music->samplesize)/ 3) * 4;
+    return (length / 3) * 4;
 }
 
 static int fetch_xlaw(Sint16 (*decode_sample)(Uint8), void *context, int length)
