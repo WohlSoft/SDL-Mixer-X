@@ -127,6 +127,7 @@ typedef struct {
 #define FVER        0x52455646      /* "FVER" */
 #define SSND        0x444e5353      /* "SSND" */
 #define COMM        0x4d4d4f43      /* "COMM" */
+#define AIFF_ID3_   0x20334449      /* "ID3 " */
 
 /* Supported compression types */
 #define NONE        0x454E4F4E      /* "NONE" */
@@ -825,6 +826,7 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
     SDL_bool found_SSND = SDL_FALSE;
     SDL_bool found_COMM = SDL_FALSE;
     SDL_bool found_FVER = SDL_FALSE;
+    SDL_bool found_ID3 = SDL_FALSE;
     SDL_bool is_AIFC = SDL_FALSE;
 
     Uint32 chunk_type;
@@ -881,9 +883,16 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
             blocksize = SDL_ReadBE32(src);
             wave->start = SDL_RWtell(src) + offset;
             break;
+
         case FVER:
             found_FVER = SDL_TRUE;
             AIFCVersion1 = SDL_ReadBE32(src);
+            break;
+
+        case AIFF_ID3_:
+            found_ID3 = SDL_TRUE;
+            if (!ParseID3(wave, chunk_length))
+                return SDL_FALSE;
             break;
 
         case COMM:
@@ -904,7 +913,7 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
         default:
             break;
         }
-    } while ((!found_SSND || !found_COMM || (is_AIFC && !found_FVER))
+    } while ((!found_SSND || !found_COMM || !found_ID3 || (is_AIFC && !found_FVER))
          && SDL_RWseek(src, next_chunk, RW_SEEK_SET) != -1);
 
     if (!found_SSND) {
