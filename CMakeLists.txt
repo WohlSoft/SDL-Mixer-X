@@ -326,7 +326,9 @@ if(APPLE)
     list(APPEND SDLMixerX_LINK_LIBS objc)
 endif()
 
-list(APPEND SDLMixerX_LINK_LIBS stdc++)
+if(NOT MSVC)
+    list(APPEND SDLMixerX_LINK_LIBS stdc++)
+endif()
 
 list(APPEND SDLMixerX_SOURCES
         ${SDLMixerX_SOURCE_DIR}/src/effect_position.c
