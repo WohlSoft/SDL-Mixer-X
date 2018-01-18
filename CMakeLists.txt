@@ -276,6 +276,7 @@ if(USE_MIDI)
         if(WIN32)
             list(APPEND SDLMixerX_SOURCES
                 ${SDLMixerX_SOURCE_DIR}/src/codecs/native_midi/native_midi_win32.c)
+            list(APPEND SDLMixerX_LINK_LIBS winmm)
         endif()
         if(APPLE)
             list(APPEND SDLMixerX_SOURCES
