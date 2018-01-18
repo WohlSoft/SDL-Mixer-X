@@ -635,7 +635,7 @@ static Mix_MusicType xmi_compatible_midi_player()
     if((mididevice_current != MIDI_ADLMIDI) && (mididevice_current != MIDI_OPNMIDI))
         return MUS_ADLMIDI;
     else
-#elif defined defined(MUSIC_MID_ADLMIDI)
+#elif defined(MUSIC_MID_ADLMIDI)
     if (mididevice_next != MIDI_ADLMIDI)
         return MUS_ADLMIDI;
     else
