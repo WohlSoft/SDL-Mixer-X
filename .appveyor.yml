@@ -45,7 +45,7 @@ build_script:
   - if [%COMPILER%]==[MSVC15] cmake --build . --config %BUILD_TYPE% --target install
 
 on_success:
-  - 7z a -t7z -mx9 "SDL-Mixer-X-%COMPILER%-%BUILD_TYPE%-%PLATFORM%.7z" "SDL-Mixer-X"
+  - 7z a -t7z -mx9 "SDL-Mixer-X-%COMPILER%-%BUILD_TYPE%-%PLATFORM%.7z" "SDLMixerX"
   - appveyor PushArtifact "SDL-Mixer-X-%COMPILER%-%BUILD_TYPE%-%PLATFORM%.7z"
 
 deploy:
