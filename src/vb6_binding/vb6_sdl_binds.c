@@ -44,89 +44,89 @@ extern DECLSPEC int SDL_Init(Uint32 flags);
 extern DECLSPEC void SDL_Quit();
 extern DECLSPEC const char * SDL_GetError(void);
 
-__declspec(dllexport) int __stdcall SDL_InitAudio(void)
+__declspec(dllexport) int SDLCALLCC SDL_InitAudio(void)
 {
     return SDL_Init(SDL_INIT_AUDIO);
 }
 
-__declspec(dllexport) void __stdcall SDL_QuitVB6(void)
+__declspec(dllexport) void SDLCALLCC SDL_QuitVB6(void)
 {
     SDL_Quit();
 }
 
-__declspec(dllexport) int __stdcall Mix_InitVB6(void)
+__declspec(dllexport) int SDLCALLCC Mix_InitVB6(void)
 {
     return Mix_Init(0);
 }
 
-__declspec(dllexport) int __stdcall Mix_OpenAudioVB6(int frequency, int format, int channels, int chunksize)
+__declspec(dllexport) int SDLCALLCC Mix_OpenAudioVB6(int frequency, int format, int channels, int chunksize)
 {
     return Mix_OpenAudio(frequency, (Uint16)format, channels, chunksize);
 }
 
-__declspec(dllexport) Mix_Chunk * __stdcall Mix_LoadWAV_VB6(const char*file)
+__declspec(dllexport) Mix_Chunk * SDLCALLCC Mix_LoadWAV_VB6(const char*file)
 {
     return Mix_LoadWAV_RW(SDL_RWFromFile(file, "rb"), 1);
 }
 
-__declspec(dllexport) const char* __stdcall SDL_GetErrorVB6(void)
+__declspec(dllexport) const char* SDLCALLCC SDL_GetErrorVB6(void)
 {
     return SDL_GetError();
 }
 
 /* SDL RWops*/
 
-__declspec(dllexport) SDL_RWops * __stdcall SDL_RWFromFileVB6(const char *file, const char *mode)
+__declspec(dllexport) SDL_RWops * SDLCALLCC SDL_RWFromFileVB6(const char *file, const char *mode)
 {
     return SDL_RWFromFileVB6(file, mode);
 }
 
-__declspec(dllexport) SDL_RWops * __stdcall SDL_RWFromMemVB6(void *mem, int size)
+__declspec(dllexport) SDL_RWops * SDLCALLCC SDL_RWFromMemVB6(void *mem, int size)
 {
     return SDL_RWFromMem(mem, size);
 }
 
-__declspec(dllexport) SDL_RWops * __stdcall SDL_AllocRWVB6(void)
+__declspec(dllexport) SDL_RWops * SDL_AllocRWVB6(void)
 {
     return SDL_AllocRW();
 }
 
-__declspec(dllexport) void __stdcall SDL_FreeRWVB6(SDL_RWops * area)
+__declspec(dllexport) void SDLCALLCC SDL_FreeRWVB6(SDL_RWops * area)
 {
     SDL_FreeRW(area);
 }
 
-__declspec(dllexport) int __stdcall SDL_RWsizeVB6(SDL_RWops * ctx)
+__declspec(dllexport) int SDLCALLCC SDL_RWsizeVB6(SDL_RWops * ctx)
 {
     return (int)(ctx)->size(ctx);
 }
 
-__declspec(dllexport) int __stdcall SDL_RWseekVB6(SDL_RWops * ctx, int offset, int whence)
+__declspec(dllexport) int SDLCALLCC SDL_RWseekVB6(SDL_RWops * ctx, int offset, int whence)
 {
     return (int)(ctx)->seek(ctx, offset, whence);
 }
 
-__declspec(dllexport) int __stdcall SDL_RWtellVB6(SDL_RWops * ctx)
+__declspec(dllexport) int SDLCALLCC SDL_RWtellVB6(SDL_RWops * ctx)
 {
     return (int)(ctx)->seek(ctx, 0, RW_SEEK_CUR);
 }
 
-__declspec(dllexport) int __stdcall SDL_RWreadVB6(SDL_RWops * ctx, void*ptr, int size, int maxnum)
+__declspec(dllexport) int SDLCALLCC SDL_RWreadVB6(SDL_RWops * ctx, void*ptr, int size, int maxnum)
 {
     return (int)(ctx)->read(ctx, ptr, size, maxnum);
 }
 
-__declspec(dllexport) int __stdcall SDL_RWwriteVB6(SDL_RWops * ctx, void* ptr, int size, int maxnum)
+__declspec(dllexport) int SDLCALLCC SDL_RWwriteVB6(SDL_RWops * ctx, void* ptr, int size, int maxnum)
 {
     return (int)(ctx)->write(ctx, ptr, size, maxnum);
 }
 
-__declspec(dllexport) int __stdcall SDL_RWcloseVB6(SDL_RWops * ctx)
+__declspec(dllexport) int SDLCALLCC SDL_RWcloseVB6(SDL_RWops * ctx)
 {
     return (int)(ctx)->close(ctx);
 }
 
-__declspec(dllexport) const char* __stdcall MIX_ADLMIDI_getBankName(int bankID)
+__declspec(dllexport) const char* SDLCALLCC MIX_ADLMIDI_getBankName(int bankID)
 {
     return Mix_ADLMIDI_getBankNames()[bankID];
 }

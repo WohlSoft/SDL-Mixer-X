@@ -699,28 +699,28 @@ extern DECLSPEC int SDLCALL Mix_SetMusicPosition(double position);
     Get the time current position of music stream
     returns -1.0 if this feature is not supported for some codec
  */
-extern DECLSPEC double SDLCALLCC Mix_GetMusicPosition(Mix_Music *music);
+extern DECLSPEC double SDLCALL Mix_GetMusicPosition(Mix_Music *music);
 /*
     Get the total time length of music stream
     returns -1.0 if this feature is not supported for some codec
  */
-extern DECLSPEC double SDLCALLCC Mix_GetMusicTotalTime(Mix_Music *music);
+extern DECLSPEC double SDLCALL Mix_GetMusicTotalTime(Mix_Music *music);
 
 /*
     Get the loop start time position of music stream
     returns -1.0 if this feature is not used for this music or not supported for some codec
  */
-extern DECLSPEC double SDLCALLCC Mix_GetMusicLoopStartTime(Mix_Music *music);
+extern DECLSPEC double SDLCALL Mix_GetMusicLoopStartTime(Mix_Music *music);
 /*
     Get the loop end time position of music stream
     returns -1.0 if this feature is not used for this music or not supported for some codec
  */
-extern DECLSPEC double SDLCALLCC Mix_GetMusicLoopEndTime(Mix_Music *music);
+extern DECLSPEC double SDLCALL Mix_GetMusicLoopEndTime(Mix_Music *music);
 /*
     Get the loop time length of music stream
     returns -1.0 if this feature is not used for this music or not supported for some codec
  */
-extern DECLSPEC double SDLCALLCC Mix_GetMusicLoopLengthTime(Mix_Music *music);
+extern DECLSPEC double SDLCALL Mix_GetMusicLoopLengthTime(Mix_Music *music);
 
 
 /* Check the status of a specific channel.

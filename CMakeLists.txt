@@ -294,15 +294,23 @@ if(USE_MIDI)
 
 endif()
 
+list(APPEND SDLMixerX_LINK_LIBS SDL2)
+
 if(WIN32)
     option(BUILD_AS_VB6_BINDING "Compile library into solid module compatible with VisualBasic 6" OFF)
     if(BUILD_AS_VB6_BINDING)
+        message("== SDL Mixer X will be built as solid module that is ready for MS-VB6 binding! ==")
         add_definitions(-DFORCE_STDCALLS)
         list(APPEND SDLMixerX_SOURCES ${SDLMixerX_SOURCE_DIR}/src/vb6_binding/vb6_sdl_binds.c)
+        list(REMOVE_ITEM SDLMixerX_LINK_LIBS SDL2)
+        list(APPEND SDLMixerX_LINK_LIBS
+                    SDL2-static
+                    uuid winmm ole32 imm32 version oleaut32 user32 gdi32)
+        if(NOT MSVC)
+            list(APPEND SDLMixerX_LINK_LIBS stdc++ gcc pthread)
+        endif()
     endif()
 endif()
-
-list(APPEND SDLMixerX_LINK_LIBS SDL2)
 
 if(APPLE)
     find_library(APPLE_CORE_AUDIO CoreAudio)
@@ -344,7 +352,7 @@ file(GLOB SDLMixerX_SOURCES ${SDLMixerX_SOURCES})
 
 set(SDLMixerX_INSTALLS)
 
-if(SDL_MIXER_X_SHARED)
+if(SDL_MIXER_X_SHARED AND NOT BUILD_AS_VB6_BINDING)
     add_library(SDL2_mixer_ext SHARED ${SDLMixerX_SOURCES})
     target_link_libraries(SDL2_mixer_ext ${SDLMixerX_LINK_LIBS})
     target_include_directories(SDL2_mixer_ext PUBLIC ${SDLMixerX_SOURCE_DIR}/include)
@@ -372,7 +380,7 @@ if(SDL_MIXER_X_SHARED)
     list(APPEND SDLMixerX_INSTALLS SDL2_mixer_ext)
 endif()
 
-if(SDL_MIXER_X_STATIC)
+if(SDL_MIXER_X_STATIC AND NOT BUILD_AS_VB6_BINDING)
     add_library(SDL2_mixer_ext_Static STATIC ${SDLMixerX_SOURCES})
     set_target_properties(SDL2_mixer_ext_Static PROPERTIES OUTPUT_NAME SDL2_mixer_ext)
     target_include_directories(SDL2_mixer_ext_Static PUBLIC ${SDLMixerX_SOURCE_DIR}/include)
@@ -398,6 +406,34 @@ if(SDL_MIXER_X_STATIC)
                     ${AUDIO_CODECS_INSTALL_DIR}/include/SDL2)
     endif()
     list(APPEND SDLMixerX_INSTALLS SDL2_mixer_ext_Static)
+endif()
+
+if(BUILD_AS_VB6_BINDING)
+    add_library(SDL2_mixer_ext_VB6 SHARED ${SDLMixerX_SOURCES})
+    set_target_properties(SDL2_mixer_ext_VB6 PROPERTIES OUTPUT_NAME SDL2MixerVB)
+    set_target_properties(SDL2_mixer_ext_VB6 PROPERTIES PREFIX "")
+    target_link_libraries(SDL2_mixer_ext_VB6 ${SDLMixerX_LINK_LIBS})
+    target_include_directories(SDL2_mixer_ext_VB6 PUBLIC ${SDLMixerX_SOURCE_DIR}/include)
+    target_include_directories(SDL2_mixer_ext_VB6 PUBLIC
+        ${SDLMixerX_SOURCE_DIR}/include/SDL_mixer_ext
+        ${SDLMixerX_SOURCE_DIR}/src
+        ${SDLMixerX_SOURCE_DIR}/src/codecs
+        ${AUDIO_CODECS_INSTALL_DIR}/include/SDL2)
+    if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY AND AUDIO_CODECS_REPO_PATH)
+        add_dependencies(SDL2_mixer_ext_VB6 AudioCodecs)
+    endif()
+    set_target_properties(SDL2_mixer_ext_VB6
+        PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/sdl-mixer-vb6"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/sdl-mixer-vb6"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/sdl-mixer-vb6"
+    )
+    add_custom_command(
+        TARGET SDL2_mixer_ext_VB6 POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${CMAKE_SOURCE_DIR}/VB6_Wrapper/modSDL2_mixer_ext_vb6.bas
+                ${CMAKE_BINARY_DIR}/sdl-mixer-vb6)
+    list(APPEND SDLMixerX_INSTALLS SDL2_mixer_ext_VB6)
 endif()
 
 install(TARGETS ${SDLMixerX_INSTALLS}
