@@ -19,9 +19,9 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifdef MUSIC_MP3_ID3TAG
-
 #include "music_id3tag.h"
+
+#ifdef MUSIC_MP3_ID3TAG
 
 #include "id3tag.h"
 
