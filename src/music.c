@@ -759,30 +759,21 @@ readHeader:
 
 Mix_MusicType detect_music_type_from_magic(SDL_RWops *src)
 {
-    Uint8 magic[5];
-    Uint8 moremagic[9];
-    Uint8 extramagic[25];
-    Uint8 lessmagic[3];
+    Uint8 magic[25];
 
     Sint64 start = SDL_RWtell(src);
-    if (SDL_RWread(src, extramagic, 1, 24) != 24) {
+    if (SDL_RWread(src, magic, 1, 24) != 24) {
         Mix_SetError("Couldn't read from RWops");
         return MUS_NONE;
     }
     SDL_RWseek(src, start, RW_SEEK_SET);
-    SDL_memcpy(lessmagic, extramagic,   2);
-    SDL_memcpy(magic,     extramagic,   4);
-    SDL_memcpy(moremagic, extramagic + 4, 8);
-    lessmagic[2]   = '\0';
-    magic[4]       = '\0';
-    moremagic[8]   = '\0';
-    extramagic[24] = '\0';
+    magic[24]       = '\0';
 
     /* Drop out some known but not supported file types (Archives, etc.) */
     if (SDL_memcmp(magic, "PK\x03\x04", 3) == 0) {
         return MUS_NONE;
     }
-    if (SDL_memcmp(extramagic, "\x37\x7A\xBC\xAF\x27\x1C", 6) == 0) {
+    if (SDL_memcmp(magic, "\x37\x7A\xBC\xAF\x27\x1C", 6) == 0) {
         return MUS_NONE;
     }
 
@@ -801,22 +792,22 @@ Mix_MusicType detect_music_type_from_magic(SDL_RWops *src)
         return MUS_MID;
     }
     /* RIFF MIDI files have the magic four bytes "RIFF" and then "RMID" */
-    if ((SDL_memcmp(magic, "RIFF", 4) == 0) && (SDL_memcmp(extramagic + 8, "RMID", 4) == 0)) {
+    if ((SDL_memcmp(magic, "RIFF", 4) == 0) && (SDL_memcmp(magic + 8, "RMID", 4) == 0)) {
         return MUS_MID;
     }
     #if defined(MUSIC_MID_ADLMIDI) || defined(MUSIC_MID_OPNMIDI)
     if (SDL_memcmp(magic, "MUS\x1A", 4) == 0) {
         return xmi_compatible_midi_player();
     }
-    if ((SDL_memcmp(magic, "FORM", 4) == 0) && (SDL_memcmp(extramagic + 8, "XDIR", 4) == 0)) {
+    if ((SDL_memcmp(magic, "FORM", 4) == 0) && (SDL_memcmp(magic + 8, "XDIR", 4) == 0)) {
         return xmi_compatible_midi_player();
     }
     #endif
 
     /* WAVE files have the magic four bytes "RIFF"
            AIFF files have the magic 12 bytes "FORM" XXXX "AIFF" */
-    if (((SDL_memcmp(magic, "RIFF", 4) == 0) && (SDL_memcmp((moremagic + 4), "WAVE", 4) == 0)) ||
-       ((SDL_memcmp(magic, "FORM", 4) == 0) && (SDL_memcmp((moremagic + 4), "XDIR", 4) != 0))) {
+    if (((SDL_memcmp(magic, "RIFF", 4) == 0) && (SDL_memcmp((magic + 8), "WAVE", 4) == 0)) ||
+       ((SDL_memcmp(magic, "FORM", 4) == 0) && (SDL_memcmp((magic + 8), "XDIR", 4) != 0))) {
         return MUS_WAV;
     }
 
@@ -859,9 +850,9 @@ Mix_MusicType detect_music_type_from_magic(SDL_RWops *src)
         return MUS_GME;
 
     /* Detect some module files */
-    if (SDL_memcmp(extramagic, "Extended Module", 15) == 0)
+    if (SDL_memcmp(magic, "Extended Module", 15) == 0)
         return MUS_MOD;
-    if (SDL_memcmp(extramagic, "ASYLUM Music Format V", 22) == 0)
+    if (SDL_memcmp(magic, "ASYLUM Music Format V", 22) == 0)
         return MUS_MOD;
     if (SDL_memcmp(magic, "Extreme", 7) == 0)
         return MUS_MOD;
@@ -873,12 +864,12 @@ Mix_MusicType detect_music_type_from_magic(SDL_RWops *src)
         return MUS_MOD;
     /*  SMF files have the magic four bytes "RIFF" */
     if ((SDL_memcmp(magic, "RIFF", 4) == 0) &&
-       (SDL_memcmp(extramagic + 8,  "DSMF", 4) == 0) &&
-       (SDL_memcmp(extramagic + 12, "SONG", 4) == 0))
+       (SDL_memcmp(magic + 8,  "DSMF", 4) == 0) &&
+       (SDL_memcmp(magic + 12, "SONG", 4) == 0))
         return MUS_MOD;
-    if (SDL_memcmp(extramagic, "MAS_UTrack_V00", 14) == 0)
+    if (SDL_memcmp(magic, "MAS_UTrack_V00", 14) == 0)
         return MUS_MOD;
-    if (SDL_memcmp(extramagic, "GF1PATCH110", 11) == 0)
+    if (SDL_memcmp(magic, "GF1PATCH110", 11) == 0)
         return MUS_MOD;
     if (SDL_memcmp(magic, "FAR=", 4) == 0)
         return MUS_MOD;
@@ -901,7 +892,7 @@ Mix_MusicType detect_music_type_from_magic(SDL_RWops *src)
 
     #if defined(MUSIC_MP3_MAD) || defined(MUSIC_MP3_MPG123) || defined(MUSIC_MP3_SMPEG)
     /* Detect MP3 format [needs scanning of bigger part of the file] */
-    if (detect_mp3(extramagic, src, start)) {
+    if (detect_mp3(magic, src, start)) {
         return MUS_MP3;
     }
     #endif
