@@ -120,7 +120,7 @@ void SDLCALLCC MIX_OPNMIDI_setCustomBankFile(const char *bank_wonp_path)
 
 int SDLCALLCC MIX_SetMidiDevice(int device)
 {
-    return Mix_SetMidiDevice(device);
+    return Mix_SetMidiPlayer(device);
 }
 
 void SDLCALLCC MIX_SetLockMIDIArgs(int lock_midiargs)
@@ -128,3 +128,17 @@ void SDLCALLCC MIX_SetLockMIDIArgs(int lock_midiargs)
     Mix_SetLockMIDIArgs(lock_midiargs);
 }
 
+int SDLCALLCC Mix_GetMidiDevice()
+{
+    return Mix_GetMidiPlayer();
+}
+
+int SDLCALLCC Mix_GetNextMidiDevice()
+{
+    return Mix_GetNextMidiPlayer();
+}
+
+int SDLCALLCC Mix_SetMidiDevice(int player)
+{
+    return Mix_SetMidiPlayer(player);
+}

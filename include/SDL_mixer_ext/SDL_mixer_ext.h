@@ -793,14 +793,14 @@ extern DECLSPEC void SDLCALL Mix_ADLMIDI_setCustomBankFile(const char *bank_wonl
 /* Sets WOPN bank file for OPNMIDI playing device, affects on MIDI file reopen */
 extern DECLSPEC void SDLCALL Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path);
 
-/* Get type of MIDI device currently in use */
-extern DECLSPEC int  SDLCALL Mix_GetMidiDevice();
+/* Get type of MIDI player library currently in use */
+extern DECLSPEC int  SDLCALL Mix_GetMidiPlayer();
 
-/* Get type of MIDI device prepared for next opening of MIDI file */
-extern DECLSPEC int  SDLCALL Mix_GetNextMidiDevice();
+/* Get type of MIDI player library prepared for next opening of MIDI file */
+extern DECLSPEC int  SDLCALL Mix_GetNextMidiPlayer();
 
-/* Set the MIDI playing device (ADLMIDI, Timidity, Native MIDI (if available) and FluidSynth) */
-extern DECLSPEC int  SDLCALL Mix_SetMidiDevice(int device);
+/* Set the MIDI playing library (ADLMIDI, Timidity, Native MIDI (if available) and FluidSynth) */
+extern DECLSPEC int  SDLCALL Mix_SetMidiPlayer(int player);
 
 /* Disables support of MIDI file arguments */
 extern DECLSPEC void SDLCALL Mix_SetLockMIDIArgs(int lock_midiargs);
@@ -811,8 +811,9 @@ extern DECLSPEC void SDLCALL Mix_SetLockMIDIArgs(int lock_midiargs);
     because some applications are still use them, to don't break ABI we will keep those
     aliases until we will remove all usages of them from applications and libraries are used them
 */
-/* All deprecated functions has been nuked :3. So, No way you will use them again :-P
- * Just go to fix your software to use same functions with new names. */
+DEPRECATED(extern DECLSPEC int  SDLCALL Mix_GetMidiDevice());
+DEPRECATED(extern DECLSPEC int  SDLCALL Mix_GetNextMidiDevice());
+DEPRECATED(extern DECLSPEC int  SDLCALL Mix_SetMidiDevice(int player));
 
 /* We'll use SDL for reporting errors */
 #define Mix_SetError    SDL_SetError

@@ -1934,19 +1934,19 @@ int SDLCALLCC Mix_EachSoundFont(int (SDLCALL *function)(const char*, void*), voi
 }
 
 
-int SDLCALLCC Mix_GetMidiDevice()
+int SDLCALLCC Mix_GetMidiPlayer()
 {
     return mididevice_current;
 }
 
-int SDLCALLCC Mix_GetNextMidiDevice()
+int SDLCALLCC Mix_GetNextMidiPlayer()
 {
     return mididevice_current;
 }
 
-int SDLCALLCC Mix_SetMidiDevice(int device)
+int SDLCALLCC Mix_SetMidiPlayer(int player)
 {
-    switch (device) {
+    switch (player) {
         #ifdef MUSIC_MID_ADLMIDI
     case MIDI_ADLMIDI:
         #endif
@@ -1962,7 +1962,7 @@ int SDLCALLCC Mix_SetMidiDevice(int device)
         #ifdef MUSIC_MID_FLUIDSYNTH
     case MIDI_Fluidsynth:
         #endif
-        mididevice_current = device;
+        mididevice_current = player;
         return 0;
     default:
         Mix_SetError("Unknown MIDI Device");

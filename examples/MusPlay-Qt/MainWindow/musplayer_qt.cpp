@@ -161,28 +161,28 @@ MusPlayer_Qt::MusPlayer_Qt(QWidget *parent) : QMainWindow(parent),
     {
     #ifdef SDL_MIXER_X
     case 0:
-        Mix_SetMidiDevice(MIDI_ADLMIDI);
+        Mix_SetMidiPlayer(MIDI_ADLMIDI);
         break;
     #endif
     case 1:
-        Mix_SetMidiDevice(MIDI_Timidity);
+        Mix_SetMidiPlayer(MIDI_Timidity);
         break;
     case 2:
-        Mix_SetMidiDevice(MIDI_Native);
+        Mix_SetMidiPlayer(MIDI_Native);
         break;
     #ifdef SDL_MIXER_X
     case 3:
-        Mix_SetMidiDevice(MIDI_OPNMIDI);
+        Mix_SetMidiPlayer(MIDI_OPNMIDI);
         break;
     #endif
     case 4:
-        Mix_SetMidiDevice(MIDI_Fluidsynth);
+        Mix_SetMidiPlayer(MIDI_Fluidsynth);
         break;
     default:
         #ifdef SDL_MIXER_X
-        Mix_SetMidiDevice(MIDI_ADLMIDI);
+        Mix_SetMidiPlayer(MIDI_ADLMIDI);
         #else
-        Mix_SetMidiDevice(MIDI_Timidity);
+        Mix_SetMidiPlayer(MIDI_Timidity);
         #endif
         break;
     }
@@ -464,31 +464,31 @@ void MusPlayer_Qt::switchMidiDevice(int index)
     {
     #ifdef SDL_MIXER_X
     case 0:
-        Mix_SetMidiDevice(MIDI_ADLMIDI);
+        Mix_SetMidiPlayer(MIDI_ADLMIDI);
         ui->adlmidi_xtra->setVisible(true);
         break;
     #endif
     case 1:
-        Mix_SetMidiDevice(MIDI_Timidity);
+        Mix_SetMidiPlayer(MIDI_Timidity);
         break;
     case 2:
-        Mix_SetMidiDevice(MIDI_Native);
+        Mix_SetMidiPlayer(MIDI_Native);
         break;
     #ifdef SDL_MIXER_X
     case 3:
-        Mix_SetMidiDevice(MIDI_OPNMIDI);
+        Mix_SetMidiPlayer(MIDI_OPNMIDI);
         ui->opnmidi_extra->setVisible(true);
         break;
     #endif
     case 4:
-        Mix_SetMidiDevice(MIDI_Fluidsynth);
+        Mix_SetMidiPlayer(MIDI_Fluidsynth);
         break;
     default:
         #ifdef SDL_MIXER_X
-        Mix_SetMidiDevice(MIDI_ADLMIDI);
+        Mix_SetMidiPlayer(MIDI_ADLMIDI);
         ui->adlmidi_xtra->setVisible(true);
         #else
-        Mix_SetMidiDevice(MIDI_Timidity);
+        Mix_SetMidiPlayer(MIDI_Timidity);
         #endif
         break;
     }
