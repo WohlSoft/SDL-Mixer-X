@@ -47,7 +47,7 @@ build_script:
   - move SDL-Mixer-X-%COMPILER%-%BUILD_TYPE%-%PLATFORM%.7z ..
 
 artifacts:
-  - path: 'SDL-Mixer-X-*.7z'
+  - path: 'SDL-Mixer-X-$(COMPILER)-$(BUILD_TYPE)-$(PLATFORM).7z'
 
 deploy:
   - provider: Environment
