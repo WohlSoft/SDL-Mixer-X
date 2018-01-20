@@ -23,7 +23,7 @@
 
 #ifdef MUSIC_MP3_MPG123
 
-#include <stdio.h>      // For SEEK_SET
+#include <stdio.h>      /* For SEEK_SET */
 
 #include "SDL_assert.h"
 #include "SDL_loadso.h"
