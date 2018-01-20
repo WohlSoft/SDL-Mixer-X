@@ -310,6 +310,50 @@ static int fetch_pcm24be(void *context, int length)
     return (length / 3) * 4;
 }
 
+SDL_FORCE_INLINE double
+Mix_SwapDouble(double x)
+{
+    union
+    {
+        double f;
+        Uint64 ui64;
+    } swapper;
+    swapper.f = x;
+    swapper.ui64 = SDL_Swap64(swapper.ui64);
+    return swapper.f;
+}
+
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+#define Mix_SwapDoubleLE(X)  (X)
+#define Mix_SwapDoubleBE(X)  Mix_SwapDouble(X)
+#else
+#define Mix_SwapDoubleLE(X)  Mix_SwapDouble(X)
+#define Mix_SwapDoubleBE(X)  (X)
+#endif
+
+static int fetch_float64be(void *context, int length)
+{
+    WAV_Music *music = (WAV_Music *)context;
+    int i = 0, o = 0;
+    length = (int)SDL_RWread(music->src, music->buffer, 1, (size_t)(length));
+    if (length % music->samplesize != 0) {
+        length -= length % music->samplesize;
+    }
+    for (i = 0, o = 0; i <= length; i += 8, o += 4) {
+        union
+        {
+            float f;
+            Uint32 ui32;
+        } sample;
+        sample.f = (float)Mix_SwapDoubleBE(*(double*)(music->buffer + i));
+        music->buffer[o + 0] = (sample.ui32 >> 0) & 0xFF;
+        music->buffer[o + 1] = (sample.ui32 >> 8) & 0xFF;
+        music->buffer[o + 2] = (sample.ui32 >> 16) & 0xFF;
+        music->buffer[o + 3] = (sample.ui32 >> 24) & 0xFF;
+    }
+    return length / 2;
+}
+
 static int fetch_xlaw(Sint16 (*decode_sample)(Uint8), void *context, int length)
 {
     WAV_Music *music = (WAV_Music *)context;
@@ -979,6 +1023,18 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
             case sowt: spec->format = AUDIO_S32LSB; break;
             case NONE: spec->format = AUDIO_S32MSB; break;
             case fl32: spec->format = AUDIO_F32MSB; break;
+            default: goto unsupported_format;
+            }
+            break;
+        case 64:
+            wave->encoding = FLOAT_CODE;
+            wave->decode = fetch_float64be;
+            if (!is_AIFC)
+                spec->format = AUDIO_F32;
+            else switch (compressionType) {
+            case fl64:
+                spec->format = AUDIO_F32;
+                break;
             default: goto unsupported_format;
             }
             break;
