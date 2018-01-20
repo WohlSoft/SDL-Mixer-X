@@ -694,17 +694,14 @@ static int detect_imf(SDL_RWops *in, Sint64 start)
 #if defined(MUSIC_MP3_MAD) || defined(MUSIC_MP3_MPG123) || defined(MUSIC_MP3_SMPEG)
 static int detect_mp3(Uint8 *magic, SDL_RWops *src, Sint64 start)
 {
-    /* if first 4 bytes are zeros */
     Uint32 null = 0;
     Uint8  magic2[5];
     unsigned char byte = 0;
-    /* Sint64 end = 0; */
     Sint64 notNullPos = 0;
 
     SDL_memcpy(magic2, magic, 5);
 
-    if(SDL_strncmp((char *)magic2, "ID3", 3) == 0)
-    {
+    if (SDL_strncmp((char *)magic2, "ID3", 3) == 0) {
         SDL_RWseek(src, start, RW_SEEK_SET);
         return 1;
     }
@@ -712,16 +709,17 @@ static int detect_mp3(Uint8 *magic, SDL_RWops *src, Sint64 start)
     SDL_RWseek(src, start, RW_SEEK_SET);
 
     /* If first bytes are zero */
-    if(SDL_memcmp(magic2, &null, 4) != 0)
+    if (SDL_memcmp(magic2, &null, 4) != 0) {
         goto readHeader;
+    }
 
 digMoreBytes:
     {
         /* Find nearest non zero */
         /* Look for FF byte */
-        while((SDL_RWread(src, &byte, 1, 1) == 1) &&
-              (byte != 0xFF) &&
-              (SDL_RWtell(src) < (start + 10240)))
+        while ((SDL_RWread(src, &byte, 1, 1) == 1) &&
+               (byte != 0xFF) &&
+               (SDL_RWtell(src) < (start + 10240)))
         {}
 
         /* with offset -1 byte */
@@ -729,14 +727,12 @@ digMoreBytes:
         SDL_RWseek(src, notNullPos, RW_SEEK_SET);
 
         /* If file contains only null bytes */
-        if(byte != 0xFF)
-        {
+        if (byte != 0xFF) {
             /* printf("WRONG BYTE\n"); */
             SDL_RWseek(src, start, RW_SEEK_SET);
             return 0;
         }
-        if(SDL_RWread(src, magic2, 1, 4) != 4)
-        {
+        if (SDL_RWread(src, magic2, 1, 4) != 4) {
             /* printf("MAGIC WRONG\n"); */
             SDL_RWseek(src, start, RW_SEEK_SET);
             return 0;
@@ -744,18 +740,17 @@ digMoreBytes:
     }
 
 readHeader:
-    /* Detection code lifted from SMPEG */
-    if(
+    if (
         ((magic2[0] & 0xff) != 0xff) || ((magic2[1] & 0xf0) != 0xf0) || /*  No sync bits */
         ((magic2[2] & 0xf0) == 0x00) || /*  Bitrate is 0 */
         ((magic2[2] & 0xf0) == 0xf0) || /*  Bitrate is 15 */
         ((magic2[2] & 0x0c) == 0x0c) || /*  Frequency is 3 */
         ((magic2[1] & 0x06) == 0x00)   /*  Layer is 4 */
-    )
-    {
+    ) {
         /* printf("WRONG BITS\n"); */
         goto digMoreBytes;
     }
+
     SDL_RWseek(src, start, RW_SEEK_SET);
     return 1;
 }
