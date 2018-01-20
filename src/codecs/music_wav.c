@@ -93,6 +93,21 @@ typedef struct {
 } WaveFMT;
 
 typedef struct {
+    Uint16  cbSize;
+    union {
+        Uint16 validbitspersample; /* bits of precision */
+        Uint16 samplesperblock;   /* valid if wBitsPerSample==0 */
+        Uint16 reserved;         /* If neither applies, set to zero. */
+    } Samples;
+    Uint32 channelsmask;
+    /* GUID subFormat 16 bytes */
+    Uint32 subencoding;
+    Uint16 sub_data2;
+    Uint16 sub_data3;
+    Uint8  sub_data[8];
+} WaveFMTex;
+
+typedef struct {
     Uint32 identifier;
     Uint32 type;
     Uint32 start;
@@ -291,11 +306,20 @@ static int fetch_pcm(void *context, int length)
     return (int)SDL_RWread(music->src, music->buffer, 1, (size_t)length);
 }
 
-static Uint32 PCM_S24_to_S32(Uint8 *x) {
+static Uint32 PCM_S24_to_S32_BE(Uint8 *x) {
     const Uint32 bits = 24;
     Uint32 in = (((Uint32)x[0] << 0)  & 0x0000FF) |
                 (((Uint32)x[1] << 8)  & 0x00FF00) |
                 (((Uint32)x[2] << 16) & 0xFF0000);
+    Uint32 m = 1u << (bits - 1);
+    return (in ^ m) - m;
+}
+
+static Uint32 PCM_S24_to_S32_LE(Uint8 *x) {
+    const Uint32 bits = 24;
+    Uint32 in = (((Uint32)x[2] << 0)  & 0x0000FF) |
+                (((Uint32)x[1] << 8)  & 0x00FF00) |
+                (((Uint32)x[0] << 16) & 0xFF0000);
     Uint32 m = 1u << (bits - 1);
     return (in ^ m) - m;
 }
@@ -309,11 +333,29 @@ static int fetch_pcm24be(void *context, int length)
         length -= length % music->samplesize;
     }
     for (i = length - 3, o = ((length - 3) / 3) * 4; i >= 0; i -= 3, o -= 4) {
-        Uint32 decoded = PCM_S24_to_S32(music->buffer + i);
+        Uint32 decoded = PCM_S24_to_S32_BE(music->buffer + i);
         music->buffer[o + 0] = (decoded >> 0) & 0xFF;
         music->buffer[o + 1] = (decoded >> 8) & 0xFF;
         music->buffer[o + 2] = (decoded >> 16) & 0xFF;
         music->buffer[o + 3] = (decoded >> 24) & 0xFF;
+    }
+    return (length / 3) * 4;
+}
+
+static int fetch_pcm24le(void *context, int length)
+{
+    WAV_Music *music = (WAV_Music *)context;
+    int i = 0, o = 0;
+    length = (int)SDL_RWread(music->src, music->buffer, 1, (size_t)((length / 4) * 3));
+    if (length % music->samplesize != 0) {
+        length -= length % music->samplesize;
+    }
+    for (i = length - 3, o = ((length - 3) / 3) * 4; i >= 0; i -= 3, o -= 4) {
+        Uint32 decoded = PCM_S24_to_S32_LE(music->buffer + i);
+        music->buffer[o + 3] = (decoded >> 0) & 0xFF;
+        music->buffer[o + 2] = (decoded >> 8) & 0xFF;
+        music->buffer[o + 1] = (decoded >> 16) & 0xFF;
+        music->buffer[o + 0] = (decoded >> 24) & 0xFF;
     }
     return (length / 3) * 4;
 }
@@ -354,6 +396,29 @@ static int fetch_float64be(void *context, int length)
             Uint32 ui32;
         } sample;
         sample.f = (float)Mix_SwapDoubleBE(*(double*)(music->buffer + i));
+        music->buffer[o + 0] = (sample.ui32 >> 0) & 0xFF;
+        music->buffer[o + 1] = (sample.ui32 >> 8) & 0xFF;
+        music->buffer[o + 2] = (sample.ui32 >> 16) & 0xFF;
+        music->buffer[o + 3] = (sample.ui32 >> 24) & 0xFF;
+    }
+    return length / 2;
+}
+
+static int fetch_float64le(void *context, int length)
+{
+    WAV_Music *music = (WAV_Music *)context;
+    int i = 0, o = 0;
+    length = (int)SDL_RWread(music->src, music->buffer, 1, (size_t)(length));
+    if (length % music->samplesize != 0) {
+        length -= length % music->samplesize;
+    }
+    for (i = 0, o = 0; i <= length; i += 8, o += 4) {
+        union
+        {
+            float f;
+            Uint32 ui32;
+        } sample;
+        sample.f = (float)Mix_SwapDoubleLE(*(double*)(music->buffer + i));
         music->buffer[o + 0] = (sample.ui32 >> 0) & 0xFF;
         music->buffer[o + 1] = (sample.ui32 >> 8) & 0xFF;
         music->buffer[o + 2] = (sample.ui32 >> 16) & 0xFF;
@@ -538,6 +603,7 @@ static SDL_bool ParseFMT(WAV_Music *wave, Uint32 chunk_length)
 {
     SDL_AudioSpec *spec = &wave->spec;
     WaveFMT *format;
+    WaveFMTex *formatEx = NULL;
     Uint8 *data;
     Uint16 bitsamplerate;
     SDL_bool loaded = SDL_FALSE;
@@ -559,6 +625,12 @@ static SDL_bool ParseFMT(WAV_Music *wave, Uint32 chunk_length)
     format = (WaveFMT *)data;
 
     wave->encoding = SDL_SwapLE16(format->encoding);
+
+    if (wave->encoding == EXT_CODE) {
+        formatEx = (WaveFMTex*)(data + sizeof(WaveFMT));
+        wave->encoding = (Uint16)SDL_SwapLE32(formatEx->subencoding);
+    }
+
     /* Decode the audio data format */
     switch (wave->encoding) {
         case PCM_CODE:
@@ -596,10 +668,27 @@ static SDL_bool ParseFMT(WAV_Music *wave, Uint32 chunk_length)
             default: goto unknown_length;
             }
             break;
+        case 24:
+            switch(wave->encoding) {
+            case PCM_CODE:
+                wave->decode = fetch_pcm24le;
+                spec->format = AUDIO_S32;
+                break;
+            default: goto unknown_length;
+            }
         case 32:
             switch(wave->encoding) {
             case PCM_CODE:   spec->format = AUDIO_S32; break;
             case FLOAT_CODE: spec->format = AUDIO_F32; break;
+            default: goto unknown_length;
+            }
+            break;
+        case 64:
+            switch(wave->encoding) {
+            case FLOAT_CODE:
+                wave->decode = fetch_float64le;
+                spec->format = AUDIO_F32;
+                break;
             default: goto unknown_length;
             }
             break;
