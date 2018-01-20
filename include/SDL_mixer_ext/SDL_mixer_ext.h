@@ -165,8 +165,7 @@ typedef enum {
     MUS_FLAC,
     MUS_MODPLUG_UNUSED,
     MUS_GME,
-    MUS_ADLMIDI,/*Use ADLMIDI coded for super-special formats like IMF, MUS or XMI are can't be played without ADLMIDI*/
-    MUS_KnownCodecs     /* Count of codec types */
+    MUS_ADLMIDI/*Use ADLMIDI coded for super-special formats like IMF, MUS or XMI are can't be played without ADLMIDI*/
 } Mix_MusicType;
 
 typedef enum {
