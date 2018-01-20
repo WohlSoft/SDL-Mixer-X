@@ -128,6 +128,11 @@ typedef struct {
 #define SSND        0x444e5353      /* "SSND" */
 #define COMM        0x4d4d4f43      /* "COMM" */
 #define AIFF_ID3_   0x20334449      /* "ID3 " */
+#define MARK        0x4B52414D      /* "MARK" */
+#define INST        0x54534E49      /* "INST" */
+#define AUTH        0x48545541      /* "AUTH" */
+#define NAME        0x454D414E      /* "NAME" */
+#define _c__        0x20296328      /* "(c) " */
 
 /* Supported compression types */
 #define NONE        0x454E4F4E      /* "NONE" */
@@ -135,8 +140,11 @@ typedef struct {
 #define raw_        0x20776172      /* "raw " */
 #define ulaw        0x77616C75      /* "ulaw" */
 #define alaw        0x77616C61      /* "alaw" */
+#define ULAW        0x57414C55      /* "ULAW" */
+#define ALAW        0x57414C41      /* "ALAW" */
 #define fl32        0x32336C66      /* "fl32" */
 #define fl64        0x34366C66      /* "fl64" */
+#define FL32        0x32334C46      /* "FL32" */
 
 /* Function to load the WAV/AIFF stream */
 static SDL_bool LoadWAVMusic(WAV_Music *wave);
@@ -872,10 +880,12 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
     SDL_bool found_FVER = SDL_FALSE;
     SDL_bool found_ID3 = SDL_FALSE;
     SDL_bool is_AIFC = SDL_FALSE;
+    SDL_bool deep_scan = SDL_FALSE;
 
     Uint32 chunk_type;
     Uint32 chunk_length;
-    Sint64 next_chunk;
+    Sint64 prev_chunk = 0;
+    Sint64 next_chunk = 0;
 
     /* AIFF magic header */
     Uint32 AIFFmagic;
@@ -890,6 +900,7 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
     Uint32 frequency = 0;
     Uint32 AIFCVersion1 = 0;
     Uint32 compressionType = 0;
+    char *chunk_buffer;
 
     MIX_UNUSED(blocksize);
     MIX_UNUSED(AIFCVersion1);
@@ -915,10 +926,16 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
         chunk_type      = SDL_ReadLE32(src);
         chunk_length    = SDL_ReadBE32(src);
         next_chunk      = SDL_RWtell(src) + chunk_length;
+        deep_scan       = SDL_FALSE;
 
         /* Paranoia to avoid infinite loops */
-        if (chunk_length == 0)
+        if (chunk_type == 0 && chunk_length == 0)
             break;
+
+        /* Initialize this on first loop */
+        if (!prev_chunk) {
+            prev_chunk = next_chunk;
+        }
 
         switch (chunk_type) {
         case SSND:
@@ -939,6 +956,27 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
                 return SDL_FALSE;
             break;
 
+        case MARK:
+        case INST:
+            /* Just skip those chunks */
+            break;
+
+        case NAME:
+        case AUTH:
+        case _c__:
+            chunk_buffer = (char*)SDL_calloc(1, chunk_length + 1);
+            if (SDL_RWread(src, chunk_buffer, 1, chunk_length) != chunk_length) {
+                SDL_free(chunk_buffer);
+                return SDL_FALSE;
+            }
+            meta_tags_set(&wave->tags,
+                          chunk_type == NAME ? MIX_META_TITLE :
+                          chunk_type == AUTH ? MIX_META_ARTIST :
+                          chunk_type == _c__ ? MIX_META_COPYRIGHT : 0,
+                          chunk_buffer);
+            SDL_free(chunk_buffer);
+            break;
+
         case COMM:
             found_COMM = SDL_TRUE;
 
@@ -955,8 +993,20 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
             break;
 
         default:
+            /* For cases of inter-chunk junk bytes, deep scan is needed. For example,
+             * some AIFF files are have zero byte that follows end of NAME chunk. */
+            deep_scan = SDL_TRUE;
             break;
         }
+
+        if (deep_scan) {
+            /* Scan at every next byte for a well known chunk */
+            next_chunk = (++prev_chunk);
+        } else {
+            /* Jump to end of well known chunk */
+            prev_chunk = next_chunk;
+        }
+
     } while ((!found_SSND || !found_COMM || !found_ID3 || (is_AIFC && !found_FVER))
          && SDL_RWseek(src, next_chunk, RW_SEEK_SET) != -1);
 
@@ -1002,6 +1052,16 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
             else switch (compressionType) {
             case sowt: spec->format = AUDIO_S16LSB; break;
             case NONE: spec->format = AUDIO_S16MSB; break;
+            case ULAW:
+                spec->format = AUDIO_S16LSB;
+                wave->encoding = uLAW_CODE;
+                wave->decode = fetch_ulaw;
+                break;
+            case ALAW:
+                spec->format = AUDIO_S16LSB;
+                wave->encoding = ALAW_CODE;
+                wave->decode = fetch_alaw;
+                break;
             default: goto unsupported_format;
             }
             break;
@@ -1022,7 +1082,8 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
             else switch (compressionType) {
             case sowt: spec->format = AUDIO_S32LSB; break;
             case NONE: spec->format = AUDIO_S32MSB; break;
-            case fl32: spec->format = AUDIO_F32MSB; break;
+            case fl32:
+            case FL32: spec->format = AUDIO_F32MSB; break;
             default: goto unsupported_format;
             }
             break;
