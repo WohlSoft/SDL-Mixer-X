@@ -110,7 +110,6 @@ GME_Music *GME_LoadSongRW(SDL_RWops *src, int trackNum)
         }
 
         err = gme_open_data(bytes, spcsize, &music->game_emu, music_spec.freq);
-        /* spc_load_spc( snes_spc, bytes, spcsize ); */
         SDL_free(bytes);
         if(err != 0)
         {
@@ -232,15 +231,6 @@ static int GME_playAudio(void *music_p, void *data, int bytes)
     GME_Music *music = (GME_Music*)music_p;
     return music_pcm_getaudio(music_p, data, bytes, music->volume, GME_GetSome);
 }
-
-/* Stop playback of a stream previously started with GME_play() */
-/*
-static void GME_stop(void *music_p)
-{
-    GME_Music *music = (GME_Music*)music_p;
-    if(music)
-        music->playing = -1;
-}*/
 
 /* Close the given Game Music Emulators stream */
 static void GME_delete(void *context)
