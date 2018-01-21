@@ -21,7 +21,7 @@ ExternalProject_Add(
     AudioCodecs
     PREFIX ${CMAKE_BINARY_DIR}/external/AudioCodecs
     GIT_REPOSITORY https://github.com/WohlSoft/AudioCodecs.git
-    CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${AUDIO_CODECS_INSTALL_DIR}" "-DDOWNLOAD_SDL2_DEPENDENCY=ON"
+    CMAKE_ARGS "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}" "-DCMAKE_INSTALL_PREFIX=${AUDIO_CODECS_INSTALL_DIR}" "-DDOWNLOAD_SDL2_DEPENDENCY=ON"
 )
 
 message("AudioCodecs can see SDL2 is stored in ${SDL2_REPO_PATH}...")
