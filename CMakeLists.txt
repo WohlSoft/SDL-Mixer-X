@@ -423,7 +423,8 @@ if(BUILD_AS_VB6_BINDING)
         ${SDLMixerX_SOURCE_DIR}/src
         ${SDLMixerX_SOURCE_DIR}/src/codecs
         ${AUDIO_CODECS_INSTALL_DIR}/include/SDL2)
-    set_target_properties(SDL2_mixer_ext_VB6 PROPERTIES LINK_FLAGS "-Wl,--add-stdcall-alias")
+    set_target_properties(SDL2_mixer_ext_VB6 PROPERTIES LINK_FLAGS
+        "-Wl,--add-stdcall-alias -static-libgcc -static-libstdc++ -static -lpthread")
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY AND AUDIO_CODECS_REPO_PATH)
         add_dependencies(SDL2_mixer_ext_VB6 AudioCodecs)
     endif()
