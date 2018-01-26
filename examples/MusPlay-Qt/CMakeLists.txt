@@ -73,7 +73,9 @@ qt5_wrap_ui(UIS_HDRS
 set(RESOURCE ${CMAKE_SOURCE_DIR}/_resources/musicplayer.qrc)
 qt5_add_resources(RESOURCE_ADDED ${RESOURCE})
 
-add_executable(sdlmixer_musplay
+set(SDLMixer_MusPlay_SRC)
+
+list(APPEND SDLMixer_MusPlay_SRC
     AssocFiles/assoc_files.cpp
     Effects/reverb.cpp
     MainWindow/musplayer_base.cpp
@@ -86,6 +88,14 @@ add_executable(sdlmixer_musplay
     wave_writer.c
     ${UIS_HDRS}
     ${RESOURCE_ADDED}
+)
+
+if(WIN32)
+    list(APPEND SDLMixer_MusPlay_SRC _resources/musicplayer.rc)
+endif()
+
+add_executable(sdlmixer_musplay
+    ${SDLMixer_MusPlay_SRC}
 )
 
 if(WIN32)
