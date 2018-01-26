@@ -71,17 +71,30 @@ Public Enum Mix_MusicType
     MUS_MID
     MUS_OGG
     MUS_MP3
-    MUS_MP3_MAD
+    MUS_MP3_MAD_UNUSED
     MUS_FLAC
-    MUS_MODPLUG
-    MUS_SPC
+    MUS_MODPLUG_UNUSED
+    MUS_GME
+    MUS_ADLMIDI
 End Enum
 
 Public Enum Mix_MIDI_Device
     MIDI_ADLMIDI = 0
     MIDI_Native
     MIDI_Timidity
+    MIDI_OPNMIDI
     MIDI_Fluidsynth
+    MIDI_ANY
+    MIDI_KnuwnDevices
+End Enum
+
+Public Enum Mix_ADLMIDI_VolumeModel
+    ADLMIDI_VM_AUTO = 0
+    ADLMIDI_VM_GENERIC
+    ADLMIDI_VM_CMF
+    ADLMIDI_VM_DMX
+    ADLMIDI_VM_APOGEE
+    ADLMIDI_VM_9X
 End Enum
 
 'int Mix_Init(int flags);
@@ -156,6 +169,10 @@ Public Declare Function Mix_LoadMUS_RW_GME Lib "SDL2MixerVB.dll" _
 'extern DECLSPEC Mix_Music * SDLCALL Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int freesrc);
 Public Declare Function Mix_LoadMUSType_RW Lib "SDL2MixerVB.dll" _
                         (ByVal rwops As Long, ByVal mustype As Mix_MusicType, ByVal freesrc As Long) As Long
+
+'extern DECLSPEC Mix_Music * SDLCALL Mix_LoadMUSType_RW_ARG(SDL_RWops *src, Mix_MusicType type, int freesrc, const char *args);
+Public Declare Function Mix_LoadMUSType_RW_ARG Lib "SDL2MixerVB.dll" _
+                        (ByVal rwops As Long, ByVal mustype As Mix_MusicType, ByVal freesrc As Long, Optional ByVal args As String = "") As Long
 
 '/* Load a wave file of the mixer format from a memory buffer */
 'extern DECLSPEC Mix_Chunk * SDLCALL Mix_QuickLoad_WAV(Uint8 *mem);
@@ -293,6 +310,10 @@ Public Declare Function Mix_GroupNewer Lib "SDL2MixerVB.dll" (ByVal tag As Long)
 'int Mix_PlayChannelTimed(int channel, Mix_Chunk *chunk, int loops, int ticks);
 Public Declare Function Mix_PlayChannel Lib "SDL2MixerVB.dll" Alias "Mix_PlayChannelTimed" (ByVal channel As Long, ByVal chunk As Long, ByVal loops As Long, Optional ByVal ticks As Long = -1) As Long
 Public Declare Function Mix_PlayChannelTimed Lib "SDL2MixerVB.dll" (ByVal channel As Long, ByVal chunk As Long, ByVal loops As Long, ByVal ticks As Long) As Long
+'extern DECLSPEC int SDLCALL Mix_PlayChannelTimedVolume(int which, Mix_Chunk *chunk, int loops, int ticks, int volume);/*MIXER-X*/
+Public Declare Function Mix_PlayChannelTimedVolume Lib "SDL2MixerVB.dll" (ByVal channel As Long, ByVal chunk As Long, ByVal loops As Long, ByVal ticks As Long, ByVal Volume As Long) As Long
+'#define Mix_PlayChannelVol(channel,chunk,loops,vol) Mix_PlayChannelTimedVolume(channel,chunk,loops,-1,vol)/*MIXER-X*/
+'==== See Function Delcarison of 'Mix_PlayChannelVol' in bottom
 
 'int Mix_PlayMusic(Mix_Music *music, int loops);
 Public Declare Function Mix_PlayMusic Lib "SDL2MixerVB.dll" (ByVal music As Long, ByVal loops As Long) As Long
@@ -307,6 +328,8 @@ Public Declare Function Mix_FadeInMusicPos Lib "SDL2MixerVB.dll" (ByVal music As
 Public Declare Function Mix_FadeInChannel Lib "SDL2MixerVB.dll" Alias "Mix_FadeInChannelTimed" (ByVal channel As Long, ByVal chunk As Long, ByVal loops As Long, ByVal milliseconds As Long, Optional ByVal ticks As Long = -1) As Long
 'extern DECLSPEC int SDLCALL Mix_FadeInChannelTimed(int channel, Mix_Chunk *chunk, int loops, int ms, int ticks);
 Public Declare Function Mix_FadeInChannelTimed Lib "SDL2MixerVB.dll" (ByVal channel As Long, ByVal chunk As Long, ByVal loops As Long, ByVal milliseconds As Long, ByVal ticks As Long) As Long
+'extern DECLSPEC int SDLCALL Mix_FadeInChannelTimedVolume(int which, Mix_Chunk *chunk, int loops, int ms, int ticks, int volume);/*MIXER-X*/
+Public Declare Function Mix_FadeInChannelTimedVolume Lib "SDL2MixerVB.dll" (ByVal channel As Long, ByVal chunk As Long, ByVal loops As Long, ByVal milliseconds As Long, ByVal ticks As Long, ByVal Volume As Long) As Long
 
 '/* Set the volume in the range of 0-128 of a specific channel or chunk.
 '   If the specified channel is -1, set volume for all channels.
@@ -430,26 +453,49 @@ Public Declare Function MIX_ADLMIDI_getBankName Lib "SDL2MixerVB.dll" (ByVal ban
 'int  MIX_ADLMIDI_getBankID();
 Public Declare Function MIX_ADLMIDI_getBankID Lib "SDL2MixerVB.dll" () As Long
 'void MIX_ADLMIDI_setBankID(int bnk);
-Public Declare Function MIX_ADLMIDI_setBankID Lib "SDL2MixerVB.dll" (ByVal bankID As Long) As Long
+Public Declare Sub MIX_ADLMIDI_setBankID Lib "SDL2MixerVB.dll" (ByVal bankID As Long)
 
 'int  MIX_ADLMIDI_getTremolo();
 Public Declare Function MIX_ADLMIDI_getTremolo Lib "SDL2MixerVB.dll" () As Long
 'void MIX_ADLMIDI_setTremolo(int tr);
-Public Declare Function MIX_ADLMIDI_setTremolo Lib "SDL2MixerVB.dll" (ByVal tr As Long) As Long
+Public Declare Sub MIX_ADLMIDI_setTremolo Lib "SDL2MixerVB.dll" (ByVal tr As Long)
 
 'int  MIX_ADLMIDI_getVibrato();
 Public Declare Function MIX_ADLMIDI_getVibrato Lib "SDL2MixerVB.dll" () As Long
 'void MIX_ADLMIDI_setVibrato(int vib);
-Public Declare Function MIX_ADLMIDI_setVibrato Lib "SDL2MixerVB.dll" (ByVal vib As Long) As Long
+Public Declare Sub MIX_ADLMIDI_setVibrato Lib "SDL2MixerVB.dll" (ByVal vib As Long)
 
 'int  MIX_ADLMIDI_getScaleMod();
 Public Declare Function MIX_ADLMIDI_getScaleMod Lib "SDL2MixerVB.dll" () As Long
 'void MIX_ADLMIDI_setScaleMod(int sc);
-Public Declare Function MIX_ADLMIDI_setScaleMod Lib "SDL2MixerVB.dll" (ByVal sc As Long) As Long
+Public Declare Sub MIX_ADLMIDI_setScaleMod Lib "SDL2MixerVB.dll" (ByVal sc As Long)
+
+'int  Mix_ADLMIDI_getAdLibMode();
+Public Declare Function Mix_ADLMIDI_getAdLibMode Lib "SDL2MixerVB.dll" () As Long
+'void Mix_ADLMIDI_setAdLibMode(int al);
+Public Declare Sub Mix_ADLMIDI_setAdLibMode Lib "SDL2MixerVB.dll" (ByVal sc As Long)
+
+'int  Mix_ADLMIDI_getLogarithmicVolumes();
+Public Declare Function Mix_ADLMIDI_getLogarithmicVolumes Lib "SDL2MixerVB.dll" () As Long
+'void Mix_ADLMIDI_setLogarithmicVolumes(int lv);
+Public Declare Sub Mix_ADLMIDI_setLogarithmicVolumes Lib "SDL2MixerVB.dll" (ByVal sc As Long)
+
+'int  Mix_ADLMIDI_getVolumeModel();
+Public Declare Function Mix_ADLMIDI_getVolumeModel Lib "SDL2MixerVB.dll" () As Long
+'void Mix_ADLMIDI_setVolumeModel(int vm);
+Public Declare Sub Mix_ADLMIDI_setVolumeModel Lib "SDL2MixerVB.dll" (ByVal sc As Long)
 
 'extern DECLSPEC void SDLCALL MIX_ADLMIDI_setSetDefaults();
 'Sets all ADLMIDI preferences to default state
 Public Declare Sub MIX_ADLMIDI_setSetDefaults Lib "SDL2MixerVB.dll" ()
+
+'/* Sets WOPL bank file for ADLMIDI playing device, affects on MIDI file reopen */
+'extern DECLSPEC void SDLCALL Mix_ADLMIDI_setCustomBankFile(const char *bank_wonl_path);
+Public Declare Sub Mix_ADLMIDI_setCustomBankFile Lib "SDL2MixerVB.dll" (ByVal bank_wonl_path As String)
+
+'/* Sets WOPN bank file for OPNMIDI playing device, affects on MIDI file reopen */
+'extern DECLSPEC void SDLCALL Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path);
+Public Declare Sub Mix_OPNMIDI_setCustomBankFile Lib "SDL2MixerVB.dll" (ByVal bank_wonp_path As String)
 
 'int MIX_SetMidiDevice(int device);
 ' Allows you to toggle MIDI Device (change applying only on reopening of MIDI file)
@@ -501,6 +547,7 @@ Public Declare Function SDL_RWclose Lib "SDL2MixerVB.dll" Alias "SDL_RWcloseVB6"
                     (ByVal rwops As Long) As Long
 
 
-
-
+Public Function Mix_PlayChannelVol(ByVal channel As Long, ByVal chunk As Long, ByVal loops As Long, ByVal Volume As Long)
+    Mix_PlayChannelVol = Mix_PlayChannelTimedVolume(channel, chunk, loops, -1, Volume)
+End Function
 
