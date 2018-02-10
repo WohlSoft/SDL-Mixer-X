@@ -31,38 +31,6 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -std=c++98")
 endif()
 
-#option(DOWNLOAD_SDL2_DEPENDENCY "Downloads and compiles SDL2 from official Mercurial directly" OFF)
-#set(SDL2_REPO_PATH "" CACHE PATH "Path to the SDL2")
-
-#if(NOT SDL2_REPO_PATH)
-#    # Try to resolve sqlite dependency
-#    if(DOWNLOAD_SDL2_DEPENDENCY)
-        # Download and configure SDL2 dependency
-        #include(cmake/DownloadSdlHg.cmake)
-#        set(SDL2_INSTALL_DIR ${CMAKE_INSTALL_PREFIX})
-#        set(SDL2_REPOSITORY_PATH ${SDL2_INSTALL_DIR})
-#        set(SDL2_REPO_PATH ${SDL2_INSTALL_DIR})
-#    endif()
-#endif()
-
-# libSDL2
-#if(SDL2_REPO_PATH)
-#    list(APPEND SDLMixerX_LINK_LIBS SDL2)
-#    link_directories(${SDL2_INSTALL_DIR}/lib)
-#    include_directories(${SDL2_INSTALL_DIR}/include)
-#else()
-#    if(EXISTS "${AUDIO_CODECS_PATH}/libSDL2/include/")
-#        set(SDL2_REPO_PATH ${AUDIO_CODECS_PATH}/libSDL2)
-#        message("SDL2 found in ${AUDIO_CODECS_PATH}/libSDL2/include folder")
-#        include_directories(${AUDIO_CODECS_PATH}/libSDL2/include)
-#        list(APPEND SDLMixerX_LINK_LIBS SDL2)
-#    else()
-#        find_library(SDL2_LIBRARY SDL2)
-#        message("Found ${SDL2_LIBRARY}")
-#        set(SDL2_REPO_PATH ${SDL2_LIBRARY})
-#    endif()
-#endif()
-
 if(NOT AUDIO_CODECS_REPO_PATH)
     # Try to resolve sqlite dependency
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
@@ -75,11 +43,12 @@ endif()
 
 if(AUDIO_CODECS_REPO_PATH)
     set(AUDIO_CODECS_PATH ${AUDIO_CODECS_REPO_PATH})
+    set(AUDIO_CODECS_INSTALL_DIR ${AUDIO_CODECS_REPO_PATH})
+    set(SDL2_REPO_PATH ${AUDIO_CODECS_REPO_PATH})
     link_directories(${AUDIO_CODECS_INSTALL_DIR}/lib)
     include_directories(${AUDIO_CODECS_INSTALL_DIR}/include)
 else()
-    set(AUDIO_CODECS_PATH ${SDLMixerX_SOURCE_DIR}/../AudioCodecs)
-    link_directories(${AUDIO_CODECS_PATH}/build/lib)
+    message(FATAL_ERROR "AudioCodecs are not found! ")
 endif()
 
 add_definitions(-DHAVE_INTTYPES_H -DHAVE_SETENV -DHAVE_SINF)
