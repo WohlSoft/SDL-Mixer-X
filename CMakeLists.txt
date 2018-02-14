@@ -227,10 +227,8 @@ if(USE_MIDI)
             ${SDLMixerX_SOURCE_DIR}/src/codecs/music_fluidsynth.c)
     endif()
 
-     # Native MIDI correctly works on Windows only. Mac works,
-     # but it is useless without external synthesizer (which is not provided
-     # like MS GS on Windows)
-    if(WIN32)
+     # Native MIDI correctly works on Windows and macOS only.
+    if(WIN32 OR APPLE)
         set(NATIVE_MIDI_SUPPORTED ON)
     else()
         set(NATIVE_MIDI_SUPPORTED OFF)
