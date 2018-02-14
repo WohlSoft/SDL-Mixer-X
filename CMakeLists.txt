@@ -247,7 +247,6 @@ if(USE_MIDI)
         endif()
         if(APPLE)
             list(APPEND SDLMixerX_SOURCES
-                ${SDLMixerX_SOURCE_DIR}/src/codecs/native_midi/native_midi_mac.c
                 ${SDLMixerX_SOURCE_DIR}/src/codecs/native_midi/native_midi_macosx.c)
         endif()
     endif()
