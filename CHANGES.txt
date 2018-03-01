@@ -1,35 +1,18 @@
-=============================================================================
-SDL Mixer X:
------------------------------------------------------------------------------
-1.0.3:
- * Implemented own resampler to don't use buggy SDL Audio's resampler
- * Added support of path arguments to allow dynamic configuring of GME and MIDI playing per every file
- * ModPlug now is part of SDL Mixer X in same project
- * Link all dependent libraries (libOGG, libVorbis, libFLAC, libMAD) statically
+2.0.3:
+Sam Lantinga - Thu, Mar  1, 2018  9:06:58 AM
+ * Fixed regression where Mix_Init() would return 0 for available music formats
 
-1.0.2:
-Vitaly Novichkov - 2015
- * Added ADLMIDI MIDI sequencer which is completely independent MIDI sequencer which requires no extra bank files to play MIDI.
- * Added ability to dynamically switch MIDI device (ADLMIDI, Timidity, Native MIDI, FluidSynth)
- * Added meta-tag getting functions: Mix_GetMusicTitle, Mix_GetMusicTitleTag, Mix_GetMusicArtistTag, Mix_GetMusicAlbumTag, Mix_GetMusicCopyrightTag.
- * Added ability to build VB6-Compatible version to use it as standalone audio library
-
-1.0.1:
-Vitaly Novichkov - 2015
- * Added GME library to support many game music formats
- * Added support of loop tags for OGG Vorbis files (based on vorbis comments "LOOPSTART" and "LOOPEND" (also supported "LOOPLENGTH" for RPG-Maker compatibility))
- * Added MIX_Timidity_addToPathList(const char *path) to customize Timidity path
-
-1.0.0:
-Vitaly Novichkov - 2015
- * Added support of SPC playback
- * Attempt to fix resampling
- * Using QMake instead of autotools to build library
-
-=============================================================================
-Original SDL Mixer:
------------------------------------------------------------------------------
-2.0.1:
+2.0.2:
+Sam Lantinga - Fri Oct 20 22:04:50 PDT 2017
+ * Implemented 24-bit and surround sound support for FLAC audio files
+Sam Lantinga - Thu Oct 12 21:32:44 PDT 2017
+ * Updated external libraries flac-1.3.2, libmodplug-0.8.9.0, libogg-1.3.2 and libvorbis-1.3.5
+Ryan Gordon - Thu Oct 12 21:29:59 PDT 2017
+ * Updated for SDL 2.0.6 and newer
+Franc[e]sco - Thu Jul 20 22:03:19 2017 +0200
+ * Added support for MP3 playback using mpg123
+David Ludwig - Sun Apr 10 22:35:38 2016
+ * Added support for UWP / Windows 10 apps
 Juha Kuikka - Fri Jan 29 12:44:01 PST 2016
  * Added Mix_OpenAudioDevice() so you can specify the audio device to open
 
