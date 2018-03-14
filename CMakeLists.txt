@@ -260,7 +260,7 @@ if(USE_MIDI)
 
 endif()
 
-list(APPEND SDLMixerX_LINK_LIBS SDL2)
+list(APPEND SDLMixerX_LINK_LIBS SDL2$<$<CONFIG:Debug>:d>)
 
 if(WIN32)
     option(BUILD_AS_VB6_BINDING "Compile library into solid module compatible with VisualBasic 6" OFF)
@@ -268,6 +268,7 @@ if(WIN32)
         message("== SDL Mixer X will be built as solid module that is ready for MS-VB6 binding! ==")
         list(APPEND SDLMixerX_SOURCES ${SDLMixerX_SOURCE_DIR}/src/vb6_binding/vb6_sdl_binds.c)
         list(REMOVE_ITEM SDLMixerX_LINK_LIBS SDL2)
+        list(REMOVE_ITEM SDLMixerX_LINK_LIBS SDL2$<$<CONFIG:Debug>:d>)
         list(APPEND SDLMixerX_LINK_LIBS
                     SDL2-static
                     uuid winmm ole32 imm32 version oleaut32 user32 gdi32)
