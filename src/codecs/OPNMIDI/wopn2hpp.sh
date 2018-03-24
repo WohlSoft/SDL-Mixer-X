@@ -21,3 +21,5 @@ out "0x00\n"
 out "};\n"
 out "\n"
 
+sed -i "s/0x  /0x00/g" $output
+
