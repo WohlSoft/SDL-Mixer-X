@@ -98,17 +98,34 @@ add_executable(sdlmixer_musplay
     ${SDLMixer_MusPlay_SRC}
 )
 
+set(PGE_MUSPLAY_LINK_LIBS)
+list(APPEND PGE_MUSPLAY_LINK_LIBS
+    ${SDL_MIXER_X_LIB}
+    FLAC
+    vorbisfile
+    vorbis
+    ogg
+    mad
+    id3tag
+    modplug
+    ADLMIDI
+    OPNMIDI
+    timidity
+    gme
+    zlib
+)
+
 if(WIN32)
-    target_link_libraries(sdlmixer_musplay SDL2main version ${SDL_MIXER_X_LIB} SDL2 comctl32)
+    target_link_libraries(sdlmixer_musplay SDL2main version ${PGE_MUSPLAY_LINK_LIBS} SDL2 comctl32)
 elseif(APPLE)
-    target_link_libraries(sdlmixer_musplay SDL2 ${SDL_MIXER_X_LIB} iconv
+    target_link_libraries(sdlmixer_musplay ${PGE_MUSPLAY_LINK_LIBS} SDL2 iconv
         ${COREAUDIO_LIBRARY} ${COREVIDEO_LIBRARY} ${COCOA_LIBRARY} ${CARBON_LIBRARY}
         ${FORCEFEEDBAK_LIBRARY} ${IOKIT_LIBRARY} ${COREFOUNDATION_LIBRARY}
         ${AUDIOTOOLBOX_LIBRARY} ${AUDIOUNIT_LIBRARY}
         ${METAL_LIBRARY}
     )
 else()
-    target_link_libraries(sdlmixer_musplay SDL2 ${SDL_MIXER_X_LIB})
+    target_link_libraries(sdlmixer_musplay ${PGE_MUSPLAY_LINK_LIBS} SDL2)
 endif()
 
 qt5_use_modules(sdlmixer_musplay Widgets Network)
