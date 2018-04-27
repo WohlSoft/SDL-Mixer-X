@@ -84,6 +84,7 @@ typedef struct
     void *buffer;
     size_t buffer_size;
     Mix_MusicMetaTags tags;
+    struct OPNMIDI_AudioFormat sample_format;
 } OpnMIDI_Music;
 
 
@@ -163,19 +164,58 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
         unsigned char byte[1];
         OpnMIDI_Music *music = NULL;
         OpnMidi_Setup setup = opnmidi_setup;
+        unsigned short src_format = music_spec.format;
 
         process_args(args, &setup);
 
         music = (OpnMIDI_Music *)SDL_calloc(1, sizeof(OpnMIDI_Music));
 
-        music->stream = SDL_NewAudioStream(AUDIO_S16, 2, music_spec.freq,
+        switch (music_spec.format)
+        {
+        /* //Until will be fixed!
+        case AUDIO_U8:
+            music->sample_format.type = OPNMIDI_SampleType_S8;
+            music->sample_format.containerSize = sizeof(Sint8);
+            music->sample_format.sampleOffset = sizeof(Sint8) * 2;
+            break;
+        case AUDIO_S8:
+            music->sample_format.type = OPNMIDI_SampleType_U8;
+            music->sample_format.containerSize = sizeof(Uint8);
+            music->sample_format.sampleOffset = sizeof(Uint8) * 2;
+            break;
+        */
+        case AUDIO_S16:
+            music->sample_format.type = OPNMIDI_SampleType_S16;
+            music->sample_format.containerSize = sizeof(Sint16);
+            music->sample_format.sampleOffset = sizeof(Sint16) * 2;
+            break;
+        case AUDIO_U16:
+            music->sample_format.type = OPNMIDI_SampleType_U16;
+            music->sample_format.containerSize = sizeof(Uint16);
+            music->sample_format.sampleOffset = sizeof(Uint16) * 2;
+            break;
+        case AUDIO_S32:
+            music->sample_format.type = OPNMIDI_SampleType_S32;
+            music->sample_format.containerSize = sizeof(Sint32);
+            music->sample_format.sampleOffset = sizeof(Sint32) * 2;
+            break;
+        case AUDIO_F32:
+        default:
+            music->sample_format.type = OPNMIDI_SampleType_F32;
+            music->sample_format.containerSize = sizeof(float);
+            music->sample_format.sampleOffset = sizeof(float) * 2;
+            src_format = AUDIO_F32;
+        }
+
+        music->stream = SDL_NewAudioStream(src_format, 2, music_spec.freq,
                                            music_spec.format, music_spec.channels, music_spec.freq);
+
         if (!music->stream) {
             OPNMIDI_delete(music);
             return NULL;
         }
 
-        music->buffer_size = music_spec.samples * sizeof(Sint16) * 2/*channels*/ * music_spec.channels;
+        music->buffer_size = music_spec.samples * music->sample_format.containerSize * 2/*channels*/ * music_spec.channels;
         music->buffer = SDL_malloc(music->buffer_size);
         if (!music->buffer) {
             OPNMIDI_delete(music);
@@ -288,17 +328,21 @@ static int OPNMIDI_playSome(void *context, void *data, int bytes, SDL_bool *done
     }
 
     /* Align bytes length to correctly capture a stereo input */
-    if ((bytes % 4) != 0) {
-        bytes += (4 - (bytes % 4));
+    if ((bytes % (int)music->sample_format.sampleOffset) != 0) {
+        bytes += ((int)music->sample_format.sampleOffset - (bytes % (int)music->sample_format.sampleOffset));
     }
 
-    gottenLen = opn2_play(music->opnmidi, (bytes / 2), (short*)music->buffer);
+    gottenLen = opn2_playFormat(music->opnmidi, (bytes / (int)music->sample_format.containerSize),
+                               (OPN2_UInt8*)music->buffer,
+                               (OPN2_UInt8*)music->buffer + music->sample_format.containerSize,
+                               &music->sample_format);
+
     if (gottenLen <= 0) {
         *done = SDL_TRUE;
         return 0;
     }
 
-    amount = gottenLen * 2;
+    amount = gottenLen * (int)music->sample_format.containerSize;
     if (amount > 0) {
         if (SDL_AudioStreamPut(music->stream, music->buffer, amount) < 0) {
             return -1;
