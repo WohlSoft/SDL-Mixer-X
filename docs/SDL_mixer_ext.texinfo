@@ -2424,10 +2424,19 @@ Music is therefore manipulated separately, except in post-processing hooks.
 * Mix_ADLMIDI_setLogarithmicVolumes::       Set state of "logarithmic volumes" flag. Applying on MIDI file reopen. @b{[Mixer X]}
 * Mix_ADLMIDI_getVolumeModel::              Get ID of current volumes model @b{[Mixer X]}
 * Mix_ADLMIDI_setVolumeModel::              Change current volume model. Applying on MIDI file reopen. @b{[Mixer X]}
+* Mix_ADLMIDI_getFullRangeBrightness::      Get full range mode for CC74-Brightness controller
+* Mix_ADLMIDI_setFullRangeBrightness::      Set full range mode for CC74-Brightness controller
+* Mix_ADLMIDI_getEmulator::                 Get the OPL3 Emulator for ADLMIDI
+* Mix_ADLMIDI_setEmulator::                 Select the OPL3 Emulator for ADLMIDI
 * Mix_ADLMIDI_setSetDefaults::              Reset ADLMIDI settings to default state. Applying on MIDI file reopen. @b{[Mixer X]}
 * Mix_ADLMIDI_setCustomBankFile::           Path to custom WOPL bank file. Applying on MIDI file reopen. @b{[Mixer X]}
 
 @b{libOPNMIDI Extra Settings}
+* Mix_OPNMIDI_getFullRangeBrightness::      Get full range mode for CC74-Brightness controller
+* Mix_OPNMIDI_setFullRangeBrightness::      Set full range mode for CC74-Brightness controller
+* Mix_OPNMIDI_getEmulator::                 Get the OPN2 Emulator for OPNMIDI
+* Mix_OPNMIDI_setEmulator::                 Select the OPN2 Emulator for OPNMIDI
+* Mix_OPNMIDI_setSetDefaults::              Reset OPNMIDI settings to default state. Applying on MIDI file reopen. @b{[Mixer X]}
 * Mix_OPNMIDI_setCustomBankFile::           Path to custom WOPN bank file. Applying on MIDI file reopen. @b{[Mixer X]}
 
 @end menu
@@ -4344,12 +4353,79 @@ Change current volume model.
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
+@node Mix_ADLMIDI_getFullRangeBrightness
+@subsection Mix_ADLMIDI_getFullRangeBrightness
+@findex Mix_ADLMIDI_getFullRangeBrightness
+
+@noindent
+@code{int @b{Mix_ADLMIDI_getFullRangeBrightness}()}
+
+@noindent
+@b{Returns}: 0 when full-ranged CC74 is disabled, or 1 when full-ranged mode of CC74 is enabled
+
+@noindent
+Get full range mode for CC74-Brightness controller
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_ADLMIDI_setFullRangeBrightness
+@subsection Mix_ADLMIDI_setFullRangeBrightness
+@findex Mix_ADLMIDI_setFullRangeBrightness
+
+@noindent
+@code{void @b{Mix_ADLMIDI_setFullRangeBrightness}(int @var{frb})}
+
+@table @var
+@item frb
+0 to disable full-ranged CC74, or 1 to enable full-ranged mode of CC74
+@end table
+
+@noindent
+Set full range mode for CC74-Brightness controller
+@b{NOTE}: Applies on MIDI file reopen
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_ADLMIDI_getEmulator
+@subsection Mix_ADLMIDI_getEmulator
+@findex Mix_ADLMIDI_getEmulator
+
+@noindent
+@code{int @b{Mix_ADLMIDI_getEmulator}()}
+
+@noindent
+@b{Returns}: value of @b{Mix_ADLMIDI_Emulator} enum which a current OPL3 emulator.
+
+@noindent
+Get ID of current OPL3 emulator of ADLMIDI
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_ADLMIDI_setEmulator
+@subsection Mix_ADLMIDI_setEmulator
+@findex Mix_ADLMIDI_setEmulator
+
+@noindent
+@code{void @b{Mix_ADLMIDI_setVolumeModel}(int @var{emu})}
+
+@table @var
+@item emu
+Value of @b{Mix_ADLMIDI_Emulator} enum.
+@end table
+
+@noindent
+Select the OPL3 Emulator for ADLMIDI
+@b{NOTE}: Applies on MIDI file reopen
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
 @node Mix_ADLMIDI_setSetDefaults
 @subsection Mix_ADLMIDI_setSetDefaults
 @findex Mix_ADLMIDI_setSetDefaults
 
 @noindent
-@code{int @b{Mix_ADLMIDI_setSetDefaults}()}
+@code{void @b{Mix_ADLMIDI_setSetDefaults}()}
 
 @noindent
 Resets all settings of ADLMIDI into default state.
@@ -4380,6 +4456,84 @@ Mix_ADLMIDI_setCustomBankFile("./music/my-gm-bank.wonl");
 @end example
 @end cartouche
 
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_OPNMIDI_getFullRangeBrightness
+@subsection Mix_OPNMIDI_getFullRangeBrightness
+@findex Mix_OPNMIDI_getFullRangeBrightness
+
+@noindent
+@code{int @b{Mix_OPNMIDI_getFullRangeBrightness}()}
+
+@noindent
+@b{Returns}: 0 when full-ranged CC74 is disabled, or 1 when full-ranged mode of CC74 is enabled
+
+@noindent
+Get full range mode for CC74-Brightness controller
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_OPNMIDI_setFullRangeBrightness
+@subsection Mix_OPNMIDI_setFullRangeBrightness
+@findex Mix_OPNMIDI_setFullRangeBrightness
+
+@noindent
+@code{void @b{Mix_OPNMIDI_setFullRangeBrightness}(int @var{frb})}
+
+@table @var
+@item frb
+0 to disable full-ranged CC74, or 1 to enable full-ranged mode of CC74
+@end table
+
+@noindent
+Set full range mode for CC74-Brightness controller
+@b{NOTE}: Applies on MIDI file reopen
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_OPNMIDI_getEmulator
+@subsection Mix_OPNMIDI_getEmulator
+@findex Mix_OPNMIDI_getEmulator
+
+@noindent
+@code{int @b{Mix_OPNMIDI_getEmulator}()}
+
+@noindent
+@b{Returns}: value of @b{Mix_OPNMIDI_Emulator} enum which a current OPN2 emulator.
+
+@noindent
+Get ID of current OPN2 emulator of OPNMIDI
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_OPNMIDI_setEmulator
+@subsection Mix_OPNMIDI_setEmulator
+@findex Mix_OPNMIDI_setEmulator
+
+@noindent
+@code{void @b{Mix_OPNMIDI_setVolumeModel}(int @var{emu})}
+
+@table @var
+@item emu
+Value of @b{Mix_OPNMIDI_Emulator} enum.
+@end table
+
+@noindent
+Select the OPN2 Emulator for OPNMIDI
+@b{NOTE}: Applies on MIDI file reopen
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_OPNMIDI_setSetDefaults
+@subsection Mix_OPNMIDI_setSetDefaults
+@findex Mix_OPNMIDI_setSetDefaults
+
+@noindent
+@code{void @b{Mix_OPNMIDI_setSetDefaults}()}
+
+@noindent
+Resets all settings of OPNMIDI into default state.
+@b{NOTE}: Applies on MIDI file reopen
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
@@ -4800,6 +4954,8 @@ These types are defined and used by the SDL_mixer API.
 * Mix_MusicType::           Music type enumerations
 * Mix_MIDI_Device::         MIDI sequencer type enumerations @b{[Mixer X]}
 * Mix_ADLMIDI_VolumeModel:: Volume model of libADLMIDI MIDI sequencer @b{[Mixer X]}
+* Mix_ADLMIDI_Emulator::    OPL3 chip emulators used by ADLMIDI @b{[Mixer X]}
+* Mix_OPNMIDI_Emulator::    OPN2 chip emulators used by OPNMIDI @b{[Mixer X]}
 * Mix_Fading::              Fader effect type enumerations
 * Mix_EffectFunc_t::        Special effect callback function pointer
 * Mix_EffectDone_t::        Special effect done callback function pointer
@@ -4954,6 +5110,48 @@ typedef enum @{
 
 @b{ADLMIDI_VM_AUTO} is automatical choice of volume model in dependence from selected bank.@*
 Otherwise they are self explanatory.
+
+@c -----------------------------------------------------------------------------
+@page
+@node Mix_ADLMIDI_Emulator
+@section Mix_ADLMIDI_Emulator
+@tindex Mix_ADLMIDI_Emulator
+
+@cartouche
+@example
+typedef enum @{
+    ADLMIDI_OPL3_EMU_DEFAULT = -1,
+    ADLMIDI_OPL3_EMU_NUKED = 0,
+    ADLMIDI_OPL3_EMU_NUKED_1_7_4,
+    ADLMIDI_OPL3_EMU_DOSBOX,
+@} Mix_ADLMIDI_Emulator;
+@end example
+@end cartouche
+
+@b{ADLMIDI_OPL3_EMU_NUKED} is a Nuked OPL3 1.8 emulator which a very accurate, but needs a powerful CPU.@*
+@b{ADLMIDI_OPL3_EMU_NUKED_1_7_4} is an unofficial optimized Nuked OPL3 1.7.4. Needs a powerful CPU.@*
+@b{ADLMIDI_OPL3_EMU_DOSBOX} is a DosBox 0.74 emulator. Fast emulator.
+
+@c -----------------------------------------------------------------------------
+@page
+@node Mix_OPNMIDI_Emulator
+@section Mix_OPNMIDI_Emulator
+@tindex Mix_OPNMIDI_Emulator
+
+@cartouche
+@example
+typedef enum @{
+    OPNMIDI_OPN2_EMU_DEFAULT = -1,
+    OPNMIDI_OPN2_EMU_MIME = 0,
+    OPNMIDI_OPN2_EMU_NUKED,
+    OPNMIDI_OPN2_EMU_GENS,
+@} Mix_OPNMIDI_Emulator;
+@end example
+@end cartouche
+
+@b{OPNMIDI_OPN2_EMU_MIME} is a MIME YM2612 emulator, fast and well-accurate.@*
+@b{OPNMIDI_OPN2_EMU_NUKED} is a Nuked OPN2 is a very accurate, but needs a VERY powerful CPU. It's much stronger even than Nuked OPL3!@*
+@b{OPNMIDI_OPN2_EMU_GENS} is a GENS 2.10 emulator. Very outdated and inaccurate, but fastest.
 
 @c -----------------------------------------------------------------------------
 @page

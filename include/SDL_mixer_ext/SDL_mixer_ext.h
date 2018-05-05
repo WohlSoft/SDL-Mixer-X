@@ -67,7 +67,7 @@ extern "C" {
 */
 #define SDL_MIXER_MAJOR_VERSION 2
 #define SDL_MIXER_MINOR_VERSION 1
-#define SDL_MIXER_PATCHLEVEL    1
+#define SDL_MIXER_PATCHLEVEL    2
 
 /* This macro can be used to fill a version structure with the compile-time
  * version of the SDL_mixer library.
@@ -187,6 +187,22 @@ typedef enum {
     ADLMIDI_VM_APOGEE,
     ADLMIDI_VM_9X
 } Mix_ADLMIDI_VolumeModel;
+
+/* OPL3 chip emulators for ADLMIDI */
+typedef enum {
+    ADLMIDI_OPL3_EMU_DEFAULT = -1,
+    ADLMIDI_OPL3_EMU_NUKED = 0,
+    ADLMIDI_OPL3_EMU_NUKED_1_7_4,
+    ADLMIDI_OPL3_EMU_DOSBOX,
+} Mix_ADLMIDI_Emulator;
+
+/* OPN2 chip emulators for OPNMIDI */
+typedef enum {
+    OPNMIDI_OPN2_EMU_DEFAULT = -1,
+    OPNMIDI_OPN2_EMU_MIME = 0,
+    OPNMIDI_OPN2_EMU_NUKED,
+    OPNMIDI_OPN2_EMU_GENS,
+} Mix_OPNMIDI_Emulator;
 
 /* The internal format for a music chunk interpreted via mikmod */
 typedef struct _Mix_Music Mix_Music;
@@ -753,51 +769,69 @@ extern DECLSPEC void SDLCALL Mix_Timidity_addToPathList(const char *path);
 
 /* ADLMIDI Setup functions */
 /* Get count of available hardcoded banks */
-extern DECLSPEC int    SDLCALL Mix_ADLMIDI_getTotalBanks();
+extern DECLSPEC int    SDLCALL Mix_ADLMIDI_getTotalBanks(void);
 /* Get array of the bank names */
-extern DECLSPEC const char *const *SDLCALL Mix_ADLMIDI_getBankNames();
+extern DECLSPEC const char *const *SDLCALL Mix_ADLMIDI_getBankNames(void);
 /* Get bank ID */
-extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getBankID();
+extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getBankID(void);
 /* Set bank ID (Applying on stop/play) */
 extern DECLSPEC void SDLCALL Mix_ADLMIDI_setBankID(int bnk);
 /* Get state of deep vibrato */
-extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getTremolo();
+extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getTremolo(void);
 /* Set deep tremolo mode (0 off, 1 on) (Applying on stop/play) */
 extern DECLSPEC void SDLCALL Mix_ADLMIDI_setTremolo(int tr);
 /* Get state of deep vibrato */
-extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getVibrato();
+extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getVibrato(void);
 /* Set deep vibrato mode (0 off, 1 on) (Applying on stop/play) */
 extern DECLSPEC void SDLCALL Mix_ADLMIDI_setVibrato(int vib);
 /* Get state of scalable modulation mode */
-extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getScaleMod();
+extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getScaleMod(void);
 /* Set scalable modulation mode (0 off, 1 on) (Applying on stop/play) */
 extern DECLSPEC void SDLCALL Mix_ADLMIDI_setScaleMod(int sc);
 /* Get state of adlib drums mode */
-extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getAdLibMode();
+extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getAdLibMode(void);
 /* Set adlib drums mode mode (0 off, 1 on) (Applying on stop/play) */
 extern DECLSPEC void SDLCALL Mix_ADLMIDI_setAdLibMode(int tr);
 /* Get state of logarithmic mode */
-extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getLogarithmicVolumes();
+extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getLogarithmicVolumes(void);
 /* Set logarithmic volumes mode in the generic/CMF volume models (0 off, 1 on) (Applying on stop/play) */
 extern DECLSPEC void SDLCALL Mix_ADLMIDI_setLogarithmicVolumes(int lv);
 /* Get current volume model ID */
-extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getVolumeModel();
+extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getVolumeModel(void);
 /* Change current volumes model (Applying on stop/play) */
 extern DECLSPEC void SDLCALL Mix_ADLMIDI_setVolumeModel(int vm);
+/* Get full range mode for CC74-Brightness controller */
+extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getFullRangeBrightness(void);
+/* Set full range mode for CC74-Brightness controller */
+extern DECLSPEC void SDLCALL Mix_ADLMIDI_setFullRangeBrightness(int frb);
+/* Get the current OPL3 Emulator for ADLMIDI */
+extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getEmulator(void);
+/* Select the OPL3 Emulator for ADLMIDI */
+extern DECLSPEC void SDLCALL Mix_ADLMIDI_setEmulator(int emu);
 /* Reset all ADLMIDI properties to default state */
-extern DECLSPEC void SDLCALL Mix_ADLMIDI_setSetDefaults();
+extern DECLSPEC void SDLCALL Mix_ADLMIDI_setSetDefaults(void);
 
 /* Sets WOPL bank file for ADLMIDI playing device, affects on MIDI file reopen */
 extern DECLSPEC void SDLCALL Mix_ADLMIDI_setCustomBankFile(const char *bank_wonl_path);
 
+/* Reset all OPNMIDI properties to default state */
+extern DECLSPEC void SDLCALL Mix_OPNMIDI_setSetDefaults(void);
+/* Get full range mode for CC74-Brightness controller */
+extern DECLSPEC int  SDLCALL Mix_OPNMIDI_getFullRangeBrightness(void);
+/* Set full range mode for CC74-Brightness controller */
+extern DECLSPEC void SDLCALL Mix_OPNMIDI_setFullRangeBrightness(int frb);
+/* Get the OPN2 Emulator for OPNMIDI */
+extern DECLSPEC int  SDLCALL Mix_OPNMIDI_getEmulator(void);
+/* Select the OPN2 Emulator for OPNMIDI */
+extern DECLSPEC void SDLCALL Mix_OPNMIDI_setEmulator(int emu);
 /* Sets WOPN bank file for OPNMIDI playing device, affects on MIDI file reopen */
 extern DECLSPEC void SDLCALL Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path);
 
 /* Get type of MIDI player library currently in use */
-extern DECLSPEC int  SDLCALL Mix_GetMidiPlayer();
+extern DECLSPEC int  SDLCALL Mix_GetMidiPlayer(void);
 
 /* Get type of MIDI player library prepared for next opening of MIDI file */
-extern DECLSPEC int  SDLCALL Mix_GetNextMidiPlayer();
+extern DECLSPEC int  SDLCALL Mix_GetNextMidiPlayer(void);
 
 /* Set the MIDI playing library (ADLMIDI, Timidity, Native MIDI (if available) and FluidSynth) */
 extern DECLSPEC int  SDLCALL Mix_SetMidiPlayer(int player);
@@ -811,8 +845,8 @@ extern DECLSPEC void SDLCALL Mix_SetLockMIDIArgs(int lock_midiargs);
     because some applications are still use them, to don't break ABI we will keep those
     aliases until we will remove all usages of them from applications and libraries are used them
 */
-DEPRECATED(extern DECLSPEC int  SDLCALL Mix_GetMidiDevice());
-DEPRECATED(extern DECLSPEC int  SDLCALL Mix_GetNextMidiDevice());
+DEPRECATED(extern DECLSPEC int  SDLCALL Mix_GetMidiDevice(void));
+DEPRECATED(extern DECLSPEC int  SDLCALL Mix_GetNextMidiDevice(void));
 DEPRECATED(extern DECLSPEC int  SDLCALL Mix_SetMidiDevice(int player));
 
 /* We'll use SDL for reporting errors */

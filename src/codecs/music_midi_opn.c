@@ -33,22 +33,62 @@ typedef struct {
     int log_volumes;
     int volume_model;
     int chips_count;
+    int full_brightness_range;
+    int emulator;
     char custom_bank_path[2048];
 } OpnMidi_Setup;
 
 static OpnMidi_Setup opnmidi_setup = {
-    0, 0, 4, ""
+    0, 0, 4, 0, -1, ""
 };
 
 static void OPNMIDI_SetDefault(OpnMidi_Setup *setup)
 {
     setup->log_volumes  = 0;
     setup->volume_model = 0;
-    setup->chips_count = 4;
+    setup->chips_count = 6;
+    setup->full_brightness_range = 0;
+    setup->emulator = -1;
     setup->custom_bank_path[0] = '\0';
 }
 
 #endif
+
+int SDLCALLCC Mix_OPNMIDI_getFullRangeBrightness()
+{
+    #ifdef MUSIC_MID_ADLMIDI
+    return opnmidi_setup.full_brightness_range;
+    #else
+    return -1;
+    #endif
+}
+
+void SDLCALLCC Mix_OPNMIDI_setFullRangeBrightness(int frb)
+{
+    #ifdef MUSIC_MID_OPNMIDI
+    opnmidi_setup.full_brightness_range = frb;
+    #else
+    MIX_UNUSED(frb);
+    #endif
+}
+
+int SDLCALLCC Mix_OPNMIDI_getEmulator()
+{
+    #ifdef MUSIC_MID_ADLMIDI
+    return opnmidi_setup.emulator;
+    #else
+    return -1;
+    #endif
+}
+
+void SDLCALLCC Mix_OPNMIDI_setEmulator(int emu)
+{
+    #ifdef MUSIC_MID_OPNMIDI
+    opnmidi_setup.emulator = emu;
+    #else
+    MIX_UNUSED(emu);
+    #endif
+}
 
 void SDLCALLCC Mix_OPNMIDI_setSetDefaults()
 {
@@ -131,6 +171,12 @@ static void process_args(const char *args, OpnMidi_Setup *setup)
                 case 'l':
                     setup->volume_model = value;
                     break;
+                case 'r':
+                    setup->full_brightness_range = value;
+                    break;
+                case 'e':
+                    setup->emulator = value;
+                    break;
                 case '\0':
                     break;
                 default:
@@ -172,18 +218,16 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
 
         switch (music_spec.format)
         {
-        /* //Until will be fixed!
         case AUDIO_U8:
-            music->sample_format.type = OPNMIDI_SampleType_S8;
-            music->sample_format.containerSize = sizeof(Sint8);
-            music->sample_format.sampleOffset = sizeof(Sint8) * 2;
-            break;
-        case AUDIO_S8:
             music->sample_format.type = OPNMIDI_SampleType_U8;
             music->sample_format.containerSize = sizeof(Uint8);
             music->sample_format.sampleOffset = sizeof(Uint8) * 2;
             break;
-        */
+        case AUDIO_S8:
+            music->sample_format.type = OPNMIDI_SampleType_S8;
+            music->sample_format.containerSize = sizeof(Sint8);
+            music->sample_format.sampleOffset = sizeof(Sint8) * 2;
+            break;
         case AUDIO_S16:
             music->sample_format.type = OPNMIDI_SampleType_S16;
             music->sample_format.containerSize = sizeof(Sint16);
@@ -259,9 +303,12 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
             return NULL;
         }
 
+        if (setup.emulator >= 0)
+            opn2_switchEmulator( music->opnmidi, setup.emulator );
         opn2_setLogarithmicVolumes( music->opnmidi, setup.log_volumes );
         opn2_setVolumeRangeModel( music->opnmidi, setup.volume_model );
-        opn2_setNumChips(music->opnmidi, setup.chips_count );
+        opn2_setFullRangeBrightness( music->opnmidi, setup.full_brightness_range );
+        opn2_setNumChips( music->opnmidi, setup.chips_count );
 
         err = opn2_openData( music->opnmidi, bytes, (unsigned long)filesize);
         SDL_free(bytes);

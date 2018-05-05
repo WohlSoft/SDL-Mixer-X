@@ -38,11 +38,13 @@ typedef struct {
     int volume_model;
     int chips_count;
     int four_op_channels;
+    int full_brightness_range;
+    int emulator;
     char custom_bank_path[2048];
 } AdlMidi_Setup;
 
 static AdlMidi_Setup adlmidi_setup = {
-    58, -1, -1, -1, -1, 0, 0, 4, -1, ""
+    58, -1, -1, -1, -1, 0, 0, 4, -1, 0, -1, ""
 };
 
 static void ADLMIDI_SetDefault(AdlMidi_Setup *setup)
@@ -56,6 +58,8 @@ static void ADLMIDI_SetDefault(AdlMidi_Setup *setup)
     setup->volume_model = 0;
     setup->chips_count = 4;
     setup->four_op_channels = -1;
+    setup->full_brightness_range = 0;
+    setup->emulator = -1;
     setup->custom_bank_path[0] = '\0';
 }
 #endif /* MUSIC_MID_ADLMIDI */
@@ -202,6 +206,42 @@ void SDLCALLCC Mix_ADLMIDI_setVolumeModel(int vm)
     #endif
 }
 
+int SDLCALLCC Mix_ADLMIDI_getFullRangeBrightness()
+{
+    #ifdef MUSIC_MID_ADLMIDI
+    return adlmidi_setup.full_brightness_range;
+    #else
+    return -1;
+    #endif
+}
+
+void SDLCALLCC Mix_ADLMIDI_setFullRangeBrightness(int frb)
+{
+    #ifdef MUSIC_MID_ADLMIDI
+    adlmidi_setup.full_brightness_range = frb;
+    #else
+    MIX_UNUSED(frb);
+    #endif
+}
+
+int SDLCALLCC Mix_ADLMIDI_getEmulator()
+{
+    #ifdef MUSIC_MID_ADLMIDI
+    return adlmidi_setup.emulator;
+    #else
+    return -1;
+    #endif
+}
+
+void SDLCALLCC Mix_ADLMIDI_setEmulator(int emu)
+{
+    #ifdef MUSIC_MID_ADLMIDI
+    adlmidi_setup.emulator = emu;
+    #else
+    MIX_UNUSED(emu);
+    #endif
+}
+
 void SDLCALLCC Mix_ADLMIDI_setSetDefaults()
 {
     #ifdef MUSIC_MID_ADLMIDI
@@ -294,6 +334,12 @@ static void process_args(const char *args, AdlMidi_Setup *setup)
                 case 'l':
                     setup->volume_model = value;
                     break;
+                case 'r':
+                    setup->full_brightness_range = value;
+                    break;
+                case 'e':
+                    setup->emulator = value;
+                    break;
                 case '\0':
                     break;
                 default:
@@ -335,18 +381,16 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
 
         switch (music_spec.format)
         {
-        /* //Until will be fixed!
         case AUDIO_U8:
-            music->sample_format.type = ADLMIDI_SampleType_S8;
-            music->sample_format.containerSize = sizeof(Sint8);
-            music->sample_format.sampleOffset = sizeof(Sint8) * 2;
-            break;
-        case AUDIO_S8:
             music->sample_format.type = ADLMIDI_SampleType_U8;
             music->sample_format.containerSize = sizeof(Uint8);
             music->sample_format.sampleOffset = sizeof(Uint8) * 2;
             break;
-        */
+        case AUDIO_S8:
+            music->sample_format.type = ADLMIDI_SampleType_S8;
+            music->sample_format.containerSize = sizeof(Sint8);
+            music->sample_format.sampleOffset = sizeof(Sint8) * 2;
+            break;
         case AUDIO_S16:
             music->sample_format.type = ADLMIDI_SampleType_S16;
             music->sample_format.containerSize = sizeof(Sint16);
@@ -426,10 +470,13 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
             return NULL;
         }
 
+        if (setup.emulator >= 0)
+            adl_switchEmulator( music->adlmidi, setup.emulator );
         adl_setScaleModulators(music->adlmidi, setup.scalemod);
         adl_setPercMode(music->adlmidi, setup.adlibdrums);
         adl_setLogarithmicVolumes(music->adlmidi, setup.log_volumes);
         adl_setVolumeRangeModel(music->adlmidi, setup.volume_model);
+        adl_setFullRangeBrightness( music->adlmidi, setup.full_brightness_range );
         adl_setNumChips(music->adlmidi, setup.chips_count);
         if (setup.four_op_channels >= 0)
             adl_setNumFourOpsChn(music->adlmidi, setup.four_op_channels);
