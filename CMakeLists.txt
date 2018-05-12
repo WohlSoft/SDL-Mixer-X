@@ -320,7 +320,11 @@ set(SDLMixerX_INSTALLS)
 
 if(SDL_MIXER_X_STATIC AND NOT BUILD_AS_VB6_BINDING)
     add_library(SDL2_mixer_ext_Static STATIC ${SDLMixerX_SOURCES})
-    set_target_properties(SDL2_mixer_ext_Static PROPERTIES OUTPUT_NAME SDL2_mixer_ext)
+    if(WIN32)
+        set_target_properties(SDL2_mixer_ext_Static PROPERTIES OUTPUT_NAME SDL2_mixer_ext-static)
+    else()
+        set_target_properties(SDL2_mixer_ext_Static PROPERTIES OUTPUT_NAME SDL2_mixer_ext)
+    endif()
     target_include_directories(SDL2_mixer_ext_Static PUBLIC ${SDLMixerX_SOURCE_DIR}/include)
     target_include_directories(SDL2_mixer_ext_Static PRIVATE
         ${SDLMixerX_SOURCE_DIR}/include/SDL_mixer_ext
