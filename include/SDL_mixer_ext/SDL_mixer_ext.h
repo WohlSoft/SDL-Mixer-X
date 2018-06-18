@@ -66,8 +66,8 @@ extern "C" {
 /* Printable format: "%d.%d.%d", MAJOR, MINOR, PATCHLEVEL
 */
 #define SDL_MIXER_MAJOR_VERSION 2
-#define SDL_MIXER_MINOR_VERSION 1
-#define SDL_MIXER_PATCHLEVEL    2
+#define SDL_MIXER_MINOR_VERSION 2
+#define SDL_MIXER_PATCHLEVEL    0
 
 /* This macro can be used to fill a version structure with the compile-time
  * version of the SDL_mixer library.
@@ -109,7 +109,8 @@ typedef enum
     MIX_INIT_MOD    = 0x00000002,
     MIX_INIT_MP3    = 0x00000008,
     MIX_INIT_OGG    = 0x00000010,
-    MIX_INIT_MID    = 0x00000020
+    MIX_INIT_MID    = 0x00000020,
+    MIX_INIT_OPUS   = 0x00000040
 } MIX_InitFlags;
 
 /* Loads dynamic libraries and prepares them for use.  Flags should be
@@ -164,6 +165,7 @@ typedef enum {
     MUS_MP3_MAD_UNUSED,
     MUS_FLAC,
     MUS_MODPLUG_UNUSED,
+    MUS_OPUS,
     MUS_GME,
     MUS_ADLMIDI/*Use ADLMIDI coded for super-special formats like IMF, MUS or XMI are can't be played without ADLMIDI*/
 } Mix_MusicType;

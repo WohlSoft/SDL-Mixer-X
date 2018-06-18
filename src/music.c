@@ -36,6 +36,7 @@
 #include "music_fluidsynth.h"
 #include "music_timidity.h"
 #include "music_ogg.h"
+#include "music_opus.h"
 #include "music_mpg123.h"
 #include "music_mad.h"
 #include "music_smpeg.h"
@@ -193,6 +194,9 @@ static Mix_MusicInterface *s_music_interfaces[] =
 #endif
 #ifdef MUSIC_OGG
     &Mix_MusicInterface_OGG,
+#endif
+#ifdef MUSIC_OPUS
+    &Mix_MusicInterface_Opus,
 #endif
 #ifdef MUSIC_MP3_MPG123
     &Mix_MusicInterface_MPG123,
@@ -517,7 +521,13 @@ int parse_midi_args(const char *args)
 }
 
 /* Open the music interfaces for a given music type */
-SDL_bool open_music_type(Mix_MusicType type, int midi_device)
+SDL_bool open_music_type(Mix_MusicType type)
+{
+    return open_music_type_ex(type, -1);
+}
+
+/* Open the music interfaces for a given music type, also select a MIDI library */
+SDL_bool open_music_type_ex(Mix_MusicType type, int midi_device)
 {
     size_t i;
     int opened = 0;
@@ -574,6 +584,10 @@ SDL_bool open_music_type(Mix_MusicType type, int midi_device)
         add_music_decoder("OGG");
         add_chunk_decoder("OGG");
     }
+    if (has_music(MUS_OPUS)) {
+        add_music_decoder("OPUS");
+        add_chunk_decoder("OPUS");
+    }
     if (has_music(MUS_MP3)) {
         add_music_decoder("MP3");
         add_chunk_decoder("MP3");
@@ -601,7 +615,7 @@ void open_music(const SDL_AudioSpec *spec)
 
     /* Open all the interfaces that are loaded */
     music_spec = *spec;
-    open_music_type(MUS_NONE, -1);
+    open_music_type(MUS_NONE);
 
     Mix_VolumeMusic(MIX_MAX_VOLUME);
 
@@ -656,29 +670,24 @@ static int detect_imf(SDL_RWops *in, Sint64 start)
 
     SDL_RWseek(in, start, RW_SEEK_SET);
 
-    if(SDL_RWread(in, &word, 1, 2) != 2)
-    {
+    if (SDL_RWread(in, &word, 1, 2) != 2) {
         SDL_RWseek(in, start, RW_SEEK_SET);
         return 0;
     }
     chunksize = SDL_SwapLE16(word);
-    if((chunksize == 0) || (chunksize & 3))
-    {
+    if ((chunksize == 0) || (chunksize & 3)) {
         SDL_RWseek(in, start, RW_SEEK_SET);
         return 0;
     }
 
-    while(i > 0)
-    {
-        if(SDL_RWread(in, &word, 1, 2) != 2)
-        {
+    while (i > 0) {
+        if (SDL_RWread(in, &word, 1, 2) != 2) {
             SDL_RWseek(in, start, RW_SEEK_SET);
             break;
         }
         buff = SDL_SwapLE16(word);
         sum1 += buff;
-        if(SDL_RWread(in, &word, 1, 2) != 2)
-        {
+        if (SDL_RWread(in, &word, 1, 2) != 2) {
             SDL_RWseek(in, start, RW_SEEK_SET);
             break;
         }
@@ -688,6 +697,29 @@ static int detect_imf(SDL_RWops *in, Sint64 start)
     }
     SDL_RWseek(in, start, RW_SEEK_SET);
     return (sum1 > sum2);
+}
+
+static int detect_ea_rsxx(SDL_RWops *in, Sint64 start, Uint8 magic_byte)
+{
+    int res = SDL_FALSE;
+    Uint8 sub_magic[6];
+
+    if (magic_byte != 0x7D)
+        return res;
+
+    SDL_RWseek(in, start + 0x6D, RW_SEEK_SET);
+
+    if (SDL_RWread(in, &sub_magic, 1, 6) != 6) {
+        SDL_RWseek(in, start, RW_SEEK_SET);
+        return 0;
+    }
+
+    if (SDL_memcmp(sub_magic, "rsxx}u", 6) == 0)
+        res = SDL_TRUE;
+
+    SDL_RWseek(in, start, RW_SEEK_SET);
+
+    return res;
 }
 #endif
 
@@ -902,6 +934,10 @@ Mix_MusicType detect_music_type_from_magic(SDL_RWops *src)
     if (detect_imf(src, start)) {
         return MUS_ADLMIDI;
     }
+    /* Detect EA MUS (RSXX) format */
+    if (detect_ea_rsxx(src, start, magic[0])) {
+        return MUS_ADLMIDI;
+    }
     #endif
 
       /* Reset position to zero! */
@@ -918,6 +954,7 @@ Mix_MusicType detect_music_type_from_magic(SDL_RWops *src)
 static Mix_MusicType detect_music_type(SDL_RWops *src)
 {
     Uint8 magic[12];
+    Mix_MusicType t;
 
     if (SDL_RWread(src, magic, 1, 12) != 12) {
         Mix_SetError("Couldn't read first 12 bytes of audio data");
@@ -931,8 +968,17 @@ static Mix_MusicType detect_music_type(SDL_RWops *src)
        ((SDL_memcmp(magic, "FORM", 4) == 0) && (SDL_memcmp((magic+8), "XDIR", 4) != 0))) {
         return MUS_WAV;
     }
-
-    return detect_music_type_from_magic(src);
+    t = detect_music_type_from_magic(src);
+    if (t == MUS_OGG) {
+        Sint64 pos = SDL_RWtell(src);
+        SDL_RWseek(src, 28, RW_SEEK_CUR);
+        SDL_RWread(src, magic, 1, 8);
+        SDL_RWseek(src, pos, RW_SEEK_SET);
+        if (SDL_memcmp(magic, "OpusHead", 8) == 0) {
+            return MUS_OPUS;
+        }
+    }
+    return t;
 }
 
 /*
@@ -1079,6 +1125,8 @@ Mix_Music * SDLCALLCC Mix_LoadMUS(const char *file)
             type = MUS_MID;
         } else if (SDL_strcasecmp(ext, "OGG") == 0) {
             type = MUS_OGG;
+        } else if (SDL_strcasecmp(ext, "OPUS") == 0) {
+            type = MUS_OPUS;
         } else if (SDL_strcasecmp(ext, "FLAC") == 0) {
             type = MUS_FLAC;
         } else  if (SDL_strcasecmp(ext, "MPG") == 0 ||
@@ -1183,7 +1231,7 @@ Mix_Music * SDLCALLCC Mix_LoadMUSType_RW_ARG(SDL_RWops *src, Mix_MusicType type,
 
     Mix_ClearError();
 
-    if (load_music_type(type) && open_music_type(type, midi_device)) {
+    if (load_music_type(type) && open_music_type_ex(type, midi_device)) {
         Mix_MusicAPI target_midi_api = get_current_midi_api(&midi_device);
         SDL_bool use_any_midi = SDL_FALSE;
         if (midi_device == MIDI_ANY) {

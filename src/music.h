@@ -48,6 +48,7 @@ typedef enum
     MIX_MUSIC_MAD,
     MIX_MUSIC_SMPEG,
     MIX_MUSIC_FLAC,
+    MIX_MUSIC_OPUS,
     MIX_MUSIC_GME,/*MIXER-X*/
     MIX_MUSIC_ADLMIDI,/*MIXER-X*/
     MIX_MUSIC_OPNMIDI,/*MIXER-X*/
@@ -175,7 +176,8 @@ extern int get_num_music_interfaces(void);
 extern Mix_MusicInterface *get_music_interface(int index);
 extern Mix_MusicType detect_music_type_from_magic(SDL_RWops *src);
 extern SDL_bool load_music_type(Mix_MusicType type);
-extern SDL_bool open_music_type(Mix_MusicType type, int midi_device);
+extern SDL_bool open_music_type(Mix_MusicType type);
+extern SDL_bool open_music_type_ex(Mix_MusicType type, int midi_device);
 extern SDL_bool has_music(Mix_MusicType type);
 extern void open_music(const SDL_AudioSpec *spec);
 extern int music_pcm_getaudio(void *context, void *data, int bytes, int volume,

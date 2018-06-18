@@ -102,6 +102,8 @@ set(PGE_MUSPLAY_LINK_LIBS)
 list(APPEND PGE_MUSPLAY_LINK_LIBS
     ${SDL_MIXER_X_LIB}
     FLAC
+    opusfile
+    opus
     vorbisfile
     vorbis
     ogg
