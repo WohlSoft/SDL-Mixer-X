@@ -24,6 +24,7 @@ option(SDL_MIXER_X_SHARED   "Build shared library of SDL Mixer X" ON)
 
 option(DOWNLOAD_AUDIO_CODECS_DEPENDENCY "Downloads and compiles AudioCodecs dependencies pack directly" OFF)
 set(AUDIO_CODECS_REPO_PATH "" CACHE PATH "Path to the AudioCodecs dependencies pack")
+set(AUDIO_CODECS_INSTALL_PATH "" CACHE PATH "Path to installed AudioCodecs prefix")
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
     # Turn on warnings and legacy C/C++ standards to support more compilers
@@ -33,7 +34,7 @@ endif()
 
 set(SDL_MIXER_INCLUDE_PATHS)
 
-if(NOT AUDIO_CODECS_REPO_PATH)
+if(NOT AUDIO_CODECS_REPO_PATH AND NOT AUDIO_CODECS_INSTALL_PATH)
     # Try to resolve sqlite dependency
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
         # Download and configure AudioCodecs dependency
@@ -48,7 +49,7 @@ endif()
 
 if(AUDIO_CODECS_REPO_PATH)
     set(AUDIO_CODECS_PATH ${AUDIO_CODECS_REPO_PATH})
-    set(AUDIO_CODECS_INSTALL_DIR ${AUDIO_CODECS_INSTALL_DIR})
+    set(AUDIO_CODECS_INSTALL_DIR ${AUDIO_CODECS_INSTALL_PATH})
     set(SDL2_REPO_PATH ${AUDIO_CODECS_INSTALL_DIR})
     set(SDL2_INCLUDE_PATH ${AUDIO_CODECS_INSTALL_DIR}/include/SDL2)
     link_directories(${AUDIO_CODECS_INSTALL_DIR}/lib)
