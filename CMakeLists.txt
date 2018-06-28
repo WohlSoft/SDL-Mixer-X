@@ -425,7 +425,7 @@ if(USE_GME)
     else()
         set(FOUND_GME 1)
         if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
-            set(LIBMIKMOD_LIB gme)
+            set(LIBGME_LIB gme)
             set(LIBZLIB_LIB zlib)
         else()
             find_library(LIBGME_LIB NAMES gme
