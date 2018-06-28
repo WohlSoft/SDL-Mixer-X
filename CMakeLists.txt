@@ -263,8 +263,12 @@ if(USE_MP3_ID3TAG AND NOT USE_SYSTEM_AUDIO_LIBRARIES)
     if(AUDIO_CODECS_REPO_PATH)
         list(APPEND SDL_MIXER_INCLUDE_PATHS ${AUDIO_CODECS_PATH}/libid3tag/include)
     endif()
-    find_library(LIBID3TAG_LIB NAMES id3tag
-                 HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
+    if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
+        set(LIBID3TAG_LIB id3tag)
+    else()
+        find_library(LIBID3TAG_LIB NAMES id3tag
+                     HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
+    endif()
     list(APPEND SDLMixerX_LINK_LIBS ${LIBID3TAG_LIB})
 endif()
 
