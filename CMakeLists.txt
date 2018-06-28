@@ -59,6 +59,44 @@ if(NOT AUDIO_CODECS_REPO_PATH AND NOT AUDIO_CODECS_INSTALL_PATH)
     endif()
 endif()
 
+set(FIND_PREFER_STATIC
+    "-static${MIX_DEBUG_SUFFIX}.a"
+    "-static${MIX_DEBUG_SUFFIX}.lib"
+    "${MIX_DEBUG_SUFFIX}.a"
+    "${MIX_DEBUG_SUFFIX}.lib"
+    "-static.a"
+    "-static.lib"
+    ".a"
+    ".lib"
+    "${MIX_DEBUG_SUFFIX}.dll.a"
+    "${MIX_DEBUG_SUFFIX}.dll.lib"
+    ".dll.a"
+    ".dll.lib"
+    "${MIX_DEBUG_SUFFIX}.so"
+    "${MIX_DEBUG_SUFFIX}.dylib"
+    ".so"
+    ".dylib"
+)
+
+set(FIND_PREFER_SHARED
+    "${MIX_DEBUG_SUFFIX}.dll.a"
+    "${MIX_DEBUG_SUFFIX}.dll.lib"
+    ".dll.a"
+    ".dll.lib"
+    "${MIX_DEBUG_SUFFIX}.so"
+    "${MIX_DEBUG_SUFFIX}.dylib"
+    ".so"
+    ".dylib"
+    "-static${MIX_DEBUG_SUFFIX}.a"
+    "-static${MIX_DEBUG_SUFFIX}.lib"
+    "${MIX_DEBUG_SUFFIX}.a"
+    "${MIX_DEBUG_SUFFIX}.lib"
+    "-static.a"
+    "-static.lib"
+    ".a"
+    ".lib"
+)
+
 if(AUDIO_CODECS_REPO_PATH OR AUDIO_CODECS_INSTALL_PATH)
     set(AUDIO_CODECS_PATH ${AUDIO_CODECS_REPO_PATH})
     set(AUDIO_CODECS_INSTALL_DIR ${AUDIO_CODECS_INSTALL_PATH})
@@ -68,24 +106,7 @@ if(AUDIO_CODECS_REPO_PATH OR AUDIO_CODECS_INSTALL_PATH)
     list(APPEND SDL_MIXER_INCLUDE_PATHS ${AUDIO_CODECS_INSTALL_DIR}/include ${SDL2_INCLUDE_PATH})
     message("AudioCodecs will be used. No needed extra libraries installed in the system.")
     set(USE_SYSTEM_AUDIO_LIBRARIES 0)
-    set(CMAKE_FIND_LIBRARY_SUFFIXES
-        "-static${MIX_DEBUG_SUFFIX}.a"
-        "-static${MIX_DEBUG_SUFFIX}.lib"
-        "${MIX_DEBUG_SUFFIX}.a"
-        "${MIX_DEBUG_SUFFIX}.lib"
-        "-static.a"
-        "-static.lib"
-        ".a"
-        ".lib"
-        "${MIX_DEBUG_SUFFIX}.dll.a"
-        "${MIX_DEBUG_SUFFIX}.dll.lib"
-        ".dll.a"
-        ".dll.lib"
-        "${MIX_DEBUG_SUFFIX}.so"
-        "${MIX_DEBUG_SUFFIX}.dylib"
-        ".so"
-        ".dylib"
-    )
+    set(CMAKE_FIND_LIBRARY_SUFFIXES ${FIND_PREFER_STATIC})
 else()
     message("AudioCodecs will NOT be used. Libraries will be recognized in the system.")
     set(USE_SYSTEM_AUDIO_LIBRARIES 1)
@@ -580,6 +601,7 @@ else()
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
         set(LIBSDL2CUSTOM_LIB SDL2$<$<CONFIG:Debug>:d>)
     else()
+        set(CMAKE_FIND_LIBRARY_SUFFIXES ${FIND_PREFER_SHARED})
         find_library(LIBSDL2CUSTOM_LIB NAMES SDL2
                      HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
     endif()
