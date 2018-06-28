@@ -619,7 +619,7 @@ else()
 endif()
 list(APPEND SDLMixerX_LINK_LIBS ${LIBSDL2CUSTOM_LIB})
 
-if(LIBMATH_NEEDED)
+if(LIBMATH_NEEDED AND NOT MSVC)
     list(APPEND SDLMixerX_LINK_LIBS m)
 endif()
 
