@@ -508,7 +508,7 @@ if(USE_MIDI)
         else()
             set(FOUND_OPNMIDI 1)
             if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
-                set(LIBADLMIDI_LIB OPNMIDI)
+                set(LIBOPNMIDI_LIB OPNMIDI)
             else()
                 find_library(LIBOPNMIDI_LIB NAMES OPNMIDI
                              HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
