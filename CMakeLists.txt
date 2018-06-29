@@ -23,6 +23,14 @@ else()
     set(MIX_DEBUG_SUFFIX "")
 endif()
 
+if(WIN32)
+    set(CMAKE_SHARED_LIBRARY_PREFIX "")
+endif()
+
+if(POLICY CMP0058)
+    cmake_policy(SET CMP0058 NEW)
+endif()
+
 option(SSEMATH             "Allow GCC to use SSE floating point math" ${OPT_DEF_SSEMATH})
 option(MMX                 "Use MMX assembly routines" ${OPT_DEF_ASM})
 option(3DNOW               "Use 3Dnow! MMX assembly routines" ${OPT_DEF_ASM})
