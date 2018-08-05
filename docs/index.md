@@ -73,7 +73,7 @@ gcc playmus.c -o playmus -I/usr/local/include -L/usr/local/lib -lSDL2_mixer_ext 
 ### Statically
 To get it linked you must also link dependencies of SDL Mixer X library itself and also dependencies of SDL2 too
 ```
-gcc playmus.c -o playmus -I/usr/local/include -L/usr/local/lib -Wl,-Bstatic -lSDL2_mixer_ext -lFLAC -lvorbisfile -lvorbis -logg -lmad -lid3tag -lmodplug -lADLMIDI -lOPNMIDI -ltimidity -lgme -lzlib -lSDL2 -Wl,-Bdynamic -lpthread -lm -ldl -static-libgcc -lstdc++
+gcc playmus.c -o playmus -I/usr/local/include -L/usr/local/lib -Wl,-Bstatic -lSDL2_mixer_ext -lFLAC -lopusfile -lopus -lvorbisfile -lvorbis -logg -lmad -lid3tag -lmodplug -lADLMIDI -lOPNMIDI -ltimidity -lgme -lzlib -lSDL2 -Wl,-Bdynamic -lpthread -lm -ldl -static-libgcc -lstdc++
 ```
 
 # Documentation
