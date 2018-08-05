@@ -18,18 +18,18 @@ issues, providing more extended functionality than was originally,
 and providing support for more supported audio formats.
 
 ## New features of SDL Mixer X in comparison to original SDL_mixer
-* Added much more music formats (Such a game music emulators, XMI, MUS, and IMF playing via [ADLMIDI](https://github.com/Wohlstand/libADLMIDI) library)
-* Added support of the loop points in the OGG files (via <u>LOOPSTART</u> and <u>LOOPEND</u> (or <u>LOOPLENGHT</u>) meta-tags)
+* Added much more music formats (Such a game music emulators liks NSF, VGM, HES, GBM, etc. playing via GME library, also XMI, MUS, and IMF playing via [ADLMIDI](https://github.com/Wohlstand/libADLMIDI) library)
+* Added support of the loop points in the OGG files (via <u>LOOPSTART</u> and <u>LOOPEND</u> (or <u>LOOPLENGHT</u>) meta-tags) (Later was also added into original SDL_mixer).
 * In the Modplug module enabled internal loops (tracker musics with internal loops are will be looped rightly)
 * Better MIDI support:
   * Added ability to choose any of available MIDI backends in runtime
   * Added ability to append custom config path for Timidity synthesizer, then no more limit to default patches set
-  * Forked version now has [ADLMIDI](https://github.com/Wohlstand/libADLMIDI) midi sequences together with Native MIDI, Timidity and Fluidsynth. ADLMIDI is [OPL-Synth](http://wohlsoft.ru/pgewiki/FM_Synthesis) Emulation based MIDI player.
-  * Also the experimental [OPNMIDI](https://github.com/Wohlstand/libOPNMIDI) was added which an MIDI player through emulator of YM2612 chip which was widely used on Sega Megadrive/Genesis game console.
+  * Forked version now has [ADLMIDI](https://github.com/Wohlstand/libADLMIDI) midi sequences together with Native MIDI, Timidity and Fluidsynth. ADLMIDI is [OPL-Synth](http://wohlsoft.ru/pgewiki/FM_Synthesis) Emulation based MIDI player. Unlike to other MIDI synthesizers are using in SDL Mixer X (except of Native MIDI), ADLMIDI is completely standalone software synthesizer which never requires any external sound fonts or banks to work.
+  * Also the [OPNMIDI](https://github.com/Wohlstand/libOPNMIDI) was added which a MIDI player through emulator of YM2612 chip which was widely used on Sega Megadrive/Genesis game console. Also is fully standalone like ADLMIDI.
 * Added new API functions
   * Ability to redefine Timidity patches path. So, patches folders are can be stored in any place!
   * Added functions to retrieve some meta-tags: Title, Artist, Album, Copyright
-  * Added ADLMIDI Extra functions: Change bank ID, enable/disable high-level tremolo, enable/disable high-level vibrato, enable/disable scalable modulation
+  * Added ADLMIDI Extra functions: Change bank ID, enable/disable high-level tremolo, enable/disable high-level vibrato, enable/disable scalable modulation, Set path to custom bank file (You can use [this editor](https://github.com/Wohlstand/OPL3BankEditor) to create or edit them)
   * Added OPNMIDI Extra function: Set path to custom bank file (You can use [this editor](https://github.com/Wohlstand/OPN2BankEditor) to create or edit them)
 * Own re-sampling implementation which a workaround to glitches caused with inaccurate re-sampler implementation from SDL2 (anyway, recent versions of SDL2 now has much better resampler than was before).
 * Added support of [extra arguments](http://wohlsoft.ru/pgewiki/SDL_Mixer_X#Path_arguments) in the tail of the file path, passed into Mix_LoadMUS function.
