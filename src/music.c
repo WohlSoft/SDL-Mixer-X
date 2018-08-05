@@ -1332,12 +1332,12 @@ Mix_MusicType SDLCALLCC Mix_GetMusicType(const Mix_Music *music)
 static const char * get_music_tag_internal(const Mix_Music *music, Mix_MusicMetaTag tag_type)
 {
     const char *tag = "";
-    MIX_UNUSED(music);
+
     Mix_LockAudio();
-    if (music_playing) {
-        if (music_playing->interface->GetMetaTag) {
-            tag = music_playing->interface->GetMetaTag(music_playing->context, tag_type);
-        }
+    if (music && music->interface->GetMetaTag) {
+        tag = music->interface->GetMetaTag(music->context, tag_type);
+    } else if (music_playing && music_playing->interface->GetMetaTag) {
+        tag = music_playing->interface->GetMetaTag(music_playing->context, tag_type);
     } else {
         Mix_SetError("Music isn't playing");
     }
@@ -1511,21 +1511,22 @@ int SDLCALLCC Mix_SetMusicPosition(double position)
 }
 
 /* Set the playing music position */
-double music_internal_position_get()
+static double music_internal_position_get(Mix_Music *music)
 {
-    if (music_playing->interface->Tell) {
-        return music_playing->interface->Tell(music_playing->context);
+    if (music->interface->Tell) {
+        return music->interface->Tell(music->context);
     }
     return -1;
 }
 double SDLCALLCC Mix_GetMusicPosition(Mix_Music *music)
 {
     double retval;
-    MIX_UNUSED(music);
 
     Mix_LockAudio();
-    if (music_playing) {
-        retval = music_internal_position_get();
+    if (music) {
+        retval = music_internal_position_get(music);
+    } else if (music_playing) {
+        retval = music_internal_position_get(music_playing);
     } else {
         Mix_SetError("Music isn't playing");
         retval = -1.0;
@@ -1536,21 +1537,22 @@ double SDLCALLCC Mix_GetMusicPosition(Mix_Music *music)
 }
 
 /* Get total playing music position */
-double music_internal_position_total()
+static double music_internal_position_total(Mix_Music *music)
 {
-    if (music_playing->interface->FullLength) {
-        return music_playing->interface->FullLength(music_playing->context);
+    if (music->interface->FullLength) {
+        return music->interface->FullLength(music->context);
     }
     return -1;
 }
 double SDLCALLCC Mix_GetMusicTotalTime(Mix_Music *music)
 {
     double retval;
-    MIX_UNUSED(music);
 
     Mix_LockAudio();
-    if (music_playing) {
-        retval = music_internal_position_total();
+    if (music) {
+        retval = music_internal_position_total(music);
+    } else if (music_playing) {
+        retval = music_internal_position_total(music_playing);
     } else {
         Mix_SetError("Music isn't playing");
         retval = -1.0;
@@ -1561,21 +1563,22 @@ double SDLCALLCC Mix_GetMusicTotalTime(Mix_Music *music)
 }
 
 /* Get Loop start position */
-double music_internal_loop_start()
+static double music_internal_loop_start(Mix_Music *music)
 {
-    if (music_playing->interface->LoopStart) {
-        return music_playing->interface->LoopStart(music_playing->context);
+    if (music->interface->LoopStart) {
+        return music->interface->LoopStart(music->context);
     }
     return -1;
 }
 double SDLCALLCC Mix_GetMusicLoopStartTime(Mix_Music *music)
 {
     double retval;
-    MIX_UNUSED(music);
 
     Mix_LockAudio();
-    if (music_playing) {
-        retval = music_internal_loop_start();
+    if (music) {
+        retval = music_internal_loop_start(music);
+    } else if (music_playing) {
+        retval = music_internal_loop_start(music_playing);
     } else {
         Mix_SetError("Music isn't playing");
         retval = -1.0;
@@ -1586,21 +1589,22 @@ double SDLCALLCC Mix_GetMusicLoopStartTime(Mix_Music *music)
 }
 
 /* Get Loop end position */
-double music_internal_loop_end()
+static double music_internal_loop_end(Mix_Music *music)
 {
-    if (music_playing->interface->LoopEnd) {
-        return music_playing->interface->LoopEnd(music_playing->context);
+    if (music->interface->LoopEnd) {
+        return music->interface->LoopEnd(music->context);
     }
     return -1;
 }
 double SDLCALLCC Mix_GetMusicLoopEndTime(Mix_Music *music)
 {
     double retval;
-    MIX_UNUSED(music);
 
     Mix_LockAudio();
-    if (music_playing) {
-        retval = music_internal_loop_end();
+    if (music) {
+        retval = music_internal_loop_end(music);
+    } else if (music_playing) {
+        retval = music_internal_loop_end(music_playing);
     } else {
         Mix_SetError("Music isn't playing");
         retval = -1.0;
@@ -1611,21 +1615,22 @@ double SDLCALLCC Mix_GetMusicLoopEndTime(Mix_Music *music)
 }
 
 /* Get Loop end position */
-double music_internal_loop_length()
+static double music_internal_loop_length(Mix_Music *music)
 {
-    if (music_playing->interface->LoopLength) {
-        return music_playing->interface->LoopLength(music_playing->context);
+    if (music->interface->LoopLength) {
+        return music->interface->LoopLength(music->context);
     }
     return -1;
 }
 double SDLCALLCC Mix_GetMusicLoopLengthTime(Mix_Music *music)
 {
     double retval;
-    MIX_UNUSED(music);
 
     Mix_LockAudio();
-    if (music_playing) {
-        retval = music_internal_loop_length();
+    if (music) {
+        retval = music_internal_loop_length(music);
+    } else if (music_playing) {
+        retval = music_internal_loop_length(music_playing);
     } else {
         Mix_SetError("Music isn't playing");
         retval = -1.0;
