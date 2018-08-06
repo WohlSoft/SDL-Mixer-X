@@ -1469,7 +1469,7 @@ int SDLCALLCC Mix_FadeInMusicPos(Mix_Music *music, int loops, int ms, double pos
     }
     retval = music_internal_play(music, loops, position);
     /* Set music as active */
-    music_active = SDL_TRUE;
+    music_active = (retval == 0);
     Mix_UnlockAudio();
 
     return(retval);
