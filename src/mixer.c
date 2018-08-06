@@ -439,7 +439,7 @@ int SDLCALLCC Mix_OpenAudioDevice(int frequency, Uint16 format, int nchannels, i
         mix_channel[i].effects = NULL;
         mix_channel[i].paused = 0;
     }
-    Mix_VolumeMusic(SDL_MIX_MAXVOLUME);
+    Mix_VolumeMusicStream(NULL, SDL_MIX_MAXVOLUME);
 
     _Mix_InitEffects();
 

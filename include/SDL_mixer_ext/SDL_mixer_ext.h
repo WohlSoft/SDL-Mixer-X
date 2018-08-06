@@ -47,16 +47,30 @@
 #define SDLCALLCC
 #endif
 
-#ifndef DEPRECATED
-#ifdef __GNUC__
-#define DEPRECATED(func) func __attribute__ ((deprecated))
-#elif defined(_MSC_VER)
-#define DEPRECATED(func) __declspec(deprecated) func
-#else
-#pragma message("WARNING: You need to implement DEPRECATED for this compiler")
-#define DEPRECATED(func) func
+#ifndef MIXERX_DEPRECATED
+#   if defined(_MSC_VER) /* MSVC */
+#       if _MSC_VER >= 1500 /* MSVC 2008 */
+                            /*! Indicates that the following function is deprecated. */
+#           define MIXERX_DEPRECATED(message) __declspec(deprecated(message))
+#       endif
+#   endif /* defined(_MSC_VER) */
+
+#   ifdef __clang__
+#       if __has_extension(attribute_deprecated_with_message)
+#           define JSONCPP_DEPRECATED(message) __attribute__((deprecated(message)))
+#       endif
+#   elif defined __GNUC__ /* not clang (gcc comes later since clang emulates gcc) */
+#       if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5))
+#           define MIXERX_DEPRECATED(message) __attribute__((deprecated(message)))
+#      elif (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 1))
+#           define MIXERX_DEPRECATED(message) __attribute__((__deprecated__))
+#       endif /* GNUC version */
+#   endif /* __clang__ || __GNUC__ */
 #endif
-#endif
+
+#if !defined(MIXERX_DEPRECATED)
+#   define MIXERX_DEPRECATED(message)
+#endif /* if !defined(MIXERX_DEPRECATED) */
 
 /* Set up for C function definitions, even when using C++ */
 #ifdef __cplusplus
@@ -669,11 +683,15 @@ extern DECLSPEC int SDLCALL Mix_FadeInChannelTimedVolume(int which, Mix_Chunk *c
 */
 extern DECLSPEC int SDLCALL Mix_Volume(int channel, int volume);
 extern DECLSPEC int SDLCALL Mix_VolumeChunk(Mix_Chunk *chunk, int volume);
+extern DECLSPEC int SDLCALL Mix_VolumeMusicStream(Mix_Music *music, int volume);
+MIXERX_DEPRECATED("Use Mix_VolumeMusicStream(Mix_Music*,int) instead")
 extern DECLSPEC int SDLCALL Mix_VolumeMusic(int volume);
 
 /* Halt playing of a particular channel */
 extern DECLSPEC int SDLCALL Mix_HaltChannel(int channel);
 extern DECLSPEC int SDLCALL Mix_HaltGroup(int tag);
+extern DECLSPEC int SDLCALL Mix_HaltMusicStream(Mix_Music *music);
+MIXERX_DEPRECATED("Use Mix_HaltMusicStream(Mix_Music*) instead")
 extern DECLSPEC int SDLCALL Mix_HaltMusic(void);
 
 /* Change the expiration delay for a particular channel.
@@ -688,9 +706,13 @@ extern DECLSPEC int SDLCALL Mix_ExpireChannel(int channel, int ticks);
  */
 extern DECLSPEC int SDLCALL Mix_FadeOutChannel(int which, int ms);
 extern DECLSPEC int SDLCALL Mix_FadeOutGroup(int tag, int ms);
+extern DECLSPEC int SDLCALL Mix_FadeOutMusicStream(Mix_Music *music, int ms);
+MIXERX_DEPRECATED("Use Mix_FadeOutMusicStream(Mix_Music*,int) instead")
 extern DECLSPEC int SDLCALL Mix_FadeOutMusic(int ms);
 
 /* Query the fading status of a channel */
+extern DECLSPEC Mix_Fading SDLCALL Mix_FadingMusicStream(Mix_Music *music);
+MIXERX_DEPRECATED("Use Mix_FadingMusicStream(Mix_Music*) instead")
 extern DECLSPEC Mix_Fading SDLCALL Mix_FadingMusic(void);
 extern DECLSPEC Mix_Fading SDLCALL Mix_FadingChannel(int which);
 
@@ -700,9 +722,19 @@ extern DECLSPEC void SDLCALL Mix_Resume(int channel);
 extern DECLSPEC int SDLCALL Mix_Paused(int channel);
 
 /* Pause/Resume the music stream */
+extern DECLSPEC void SDLCALL Mix_PauseMusicStream(Mix_Music *music);
+extern DECLSPEC void SDLCALL Mix_ResumeMusicStream(Mix_Music *music);
+extern DECLSPEC void SDLCALL Mix_RewindMusicStream(Mix_Music *music);
+extern DECLSPEC int SDLCALL Mix_PausedMusicStream(Mix_Music *music);
+
+/* Pause/Resume the music stream (Deprecated calls) */
+MIXERX_DEPRECATED("Use Mix_PauseMusicStream(Mix_Music*) instead")
 extern DECLSPEC void SDLCALL Mix_PauseMusic(void);
+MIXERX_DEPRECATED("Use Mix_ResumeMusicStream(Mix_Music*) instead")
 extern DECLSPEC void SDLCALL Mix_ResumeMusic(void);
+MIXERX_DEPRECATED("Use Mix_RewindMusicStream(Mix_Music*) instead")
 extern DECLSPEC void SDLCALL Mix_RewindMusic(void);
+MIXERX_DEPRECATED("Use Mix_PausedMusicStream(Mix_Music*) instead")
 extern DECLSPEC int SDLCALL Mix_PausedMusic(void);
 
 /* Set the current position in the music stream.
@@ -711,6 +743,11 @@ extern DECLSPEC int SDLCALL Mix_PausedMusic(void);
    order number) and for WAV, OGG, FLAC, MP3_MAD, MP3_MPG, and MODPLUG music
    (set position in seconds), at the moment.
 */
+extern DECLSPEC int SDLCALL Mix_SetMusicStreamPosition(Mix_Music *music, double position);
+/*
+    Deprecated analogue of Mix_SetMusicStreamPosition() which lacks Mix_Music* argument
+*/
+MIXERX_DEPRECATED("Use Mix_SetMusicStreamPosition(Mix_Music*, double) instead")
 extern DECLSPEC int SDLCALL Mix_SetMusicPosition(double position);
 /*
     Get the time current position of music stream
@@ -744,6 +781,8 @@ extern DECLSPEC double SDLCALL Mix_GetMusicLoopLengthTime(Mix_Music *music);
    If the specified channel is -1, check all channels.
 */
 extern DECLSPEC int SDLCALL Mix_Playing(int channel);
+extern DECLSPEC int SDLCALL Mix_PlayingMusicStream(Mix_Music *music);
+MIXERX_DEPRECATED("Use Mix_PlayingMusicStream(Mix_Music*) instead")
 extern DECLSPEC int SDLCALL Mix_PlayingMusic(void);
 
 /* Stop music and set external music playback command */
@@ -847,9 +886,14 @@ extern DECLSPEC void SDLCALL Mix_SetLockMIDIArgs(int lock_midiargs);
     because some applications are still use them, to don't break ABI we will keep those
     aliases until we will remove all usages of them from applications and libraries are used them
 */
-DEPRECATED(extern DECLSPEC int  SDLCALL Mix_GetMidiDevice(void));
-DEPRECATED(extern DECLSPEC int  SDLCALL Mix_GetNextMidiDevice(void));
-DEPRECATED(extern DECLSPEC int  SDLCALL Mix_SetMidiDevice(int player));
+MIXERX_DEPRECATED("Use Mix_GetMidiPlayer() instead")
+extern DECLSPEC int  SDLCALL Mix_GetMidiDevice(void);
+
+MIXERX_DEPRECATED("Use Mix_GetNextMidiPlayer() instead")
+extern DECLSPEC int  SDLCALL Mix_GetNextMidiDevice(void);
+
+MIXERX_DEPRECATED("Use Mix_SetMidiPlayer() instead")
+extern DECLSPEC int  SDLCALL Mix_SetMidiDevice(int player);
 
 /* We'll use SDL for reporting errors */
 #define Mix_SetError    SDL_SetError
