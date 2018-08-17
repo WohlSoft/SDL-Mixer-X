@@ -379,6 +379,65 @@ static void PrintFormat(char *title, SDL_AudioSpec *fmt)
 }
 #endif
 
+/*
+	Initialize the Mixer internals (channels, chunk and music decoders)
+	with an existing AudioSpec, without taking over the callback.
+
+	Allows the calling to use their spec and audio callback.
+	The caller must manage AudioOpen and CloseAudio externally.
+*/
+int SDLCALLCC Mix_InitMixer(const SDL_AudioSpec spec)
+{
+    /* If the mixer is already initialized, increment open count */
+    if (audio_opened) {
+        if (spec.format == mixer.format && spec.channels == mixer.channels) {
+            ++audio_opened;
+            return(0);
+        }
+        while (audio_opened) {
+            Mix_FreeMixer();
+        }
+    }
+
+	mixer = spec;
+    mixer.callback = NULL;
+	mixer.userdata = NULL;
+#if 0
+    PrintFormat("Audio device", &mixer);
+#endif
+
+    num_channels = MIX_CHANNELS;
+    mix_channel = (struct _Mix_Channel *) SDL_malloc(num_channels * sizeof(struct _Mix_Channel));
+
+    /* Clear out the audio channels */
+	int i;
+    for (i=0; i<num_channels; ++i) {
+        mix_channel[i].chunk = NULL;
+        mix_channel[i].playing = 0;
+        mix_channel[i].looping = 0;
+        mix_channel[i].volume = SDL_MIX_MAXVOLUME;
+        mix_channel[i].fade_volume = SDL_MIX_MAXVOLUME;
+        mix_channel[i].fade_volume_reset = SDL_MIX_MAXVOLUME;
+        mix_channel[i].fading = MIX_NO_FADING;
+        mix_channel[i].tag = -1;
+        mix_channel[i].expire = 0;
+        mix_channel[i].effects = NULL;
+        mix_channel[i].paused = 0;
+    }
+    Mix_VolumeMusicStream(NULL, SDL_MIX_MAXVOLUME);
+
+    _Mix_InitEffects();
+
+    add_chunk_decoder("WAVE");
+    add_chunk_decoder("AIFF");
+    add_chunk_decoder("VOC");
+
+    /* Initialize the music players */
+    open_music(&mixer);
+    audio_opened = 1;
+    return(0);
+}
+
 /* Open the mixer with a certain desired audio format */
 int SDLCALLCC Mix_OpenAudioDevice(int frequency, Uint16 format, int nchannels, int chunksize,
                         const char* device, int allowed_changes)
@@ -876,6 +935,13 @@ void SDLCALLCC Mix_SetPostMix(void (SDLCALL *mix_func)
     Mix_UnlockAudio();
 }
 
+
+/* returns a pointer to the music mixer that can be used as a callback */
+common_mixer SDLCALLCC Mix_GetMusicMixer()
+{
+	return mix_music;
+}
+
 /* Add your own music player or mixer function.
    If 'mix_func' is NULL, the default music player is re-enabled.
  */
@@ -1253,6 +1319,37 @@ Mix_Chunk * SDLCALLCC Mix_GetChunk(int channel)
     }
 
     return(retval);
+}
+
+/*
+	Stops streams and music and frees all channels and decoders.
+	Doesn't call SDL_CloseAudioDevice, which is the responsbility
+	of the external application.
+*/
+void SDLCALLCC Mix_FreeMixer(void)
+{
+    int i;
+
+    if (audio_opened) {
+        if (audio_opened == 1) {
+            for (i = 0; i < num_channels; i++) {
+                Mix_UnregisterAllEffects(i);
+            }
+            Mix_UnregisterAllEffects(MIX_CHANNEL_POST);
+            close_music();
+            Mix_SetMusicCMD(NULL);
+            Mix_HaltChannel(-1);
+            _Mix_DeinitEffects();
+            SDL_free(mix_channel);
+            mix_channel = NULL;
+
+            /* rcg06042009 report available decoders at runtime. */
+            SDL_free((void *)chunk_decoders);
+            chunk_decoders = NULL;
+            num_decoders = 0;
+        }
+        --audio_opened;
+    }
 }
 
 /* Close the mixer, halting all playing audio */
