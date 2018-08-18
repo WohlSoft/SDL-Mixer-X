@@ -808,11 +808,10 @@ extern DECLSPEC int SDLCALL Mix_EachSoundFont(int (SDLCALL *function)(const char
 */
 extern DECLSPEC Mix_Chunk * SDLCALL Mix_GetChunk(int channel);
 
-/* Setup the mixer with an existing AudioSpec, and without taking over the callback.
+/* Setup the mixer without taking over the callback, using an existing spec.
    These Only initialize or free the Mixer internals */
-extern DECLSPEC int SDLCALL Mix_InitMixer(const SDL_AudioSpec spec);
+extern DECLSPEC int SDLCALL Mix_InitMixer(const SDL_AudioSpec spec, SDL_bool skip_init_check);
 extern DECLSPEC void SDLCALL Mix_FreeMixer(void);
-
 
 /* Close the mixer, halting all playing audio */
 extern DECLSPEC void SDLCALL Mix_CloseAudio(void);
