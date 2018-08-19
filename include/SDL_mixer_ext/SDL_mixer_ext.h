@@ -690,14 +690,14 @@ extern DECLSPEC int SDLCALL Mix_FadeInChannelTimedVolume(int which, Mix_Chunk *c
 extern DECLSPEC int SDLCALL Mix_Volume(int channel, int volume);
 extern DECLSPEC int SDLCALL Mix_VolumeChunk(Mix_Chunk *chunk, int volume);
 extern DECLSPEC int SDLCALL Mix_VolumeMusicStream(Mix_Music *music, int volume);
-MIXERX_DEPRECATED("Use Mix_VolumeMusicStream(Mix_Music*,int) instead")
+/* MIXERX_DEPRECATED("Use Mix_VolumeMusicStream(Mix_Music*,int) instead") */
 extern DECLSPEC int SDLCALL Mix_VolumeMusic(int volume);
 
 /* Halt playing of a particular channel */
 extern DECLSPEC int SDLCALL Mix_HaltChannel(int channel);
 extern DECLSPEC int SDLCALL Mix_HaltGroup(int tag);
 extern DECLSPEC int SDLCALL Mix_HaltMusicStream(Mix_Music *music);
-MIXERX_DEPRECATED("Use Mix_HaltMusicStream(Mix_Music*) instead")
+/* MIXERX_DEPRECATED("Use Mix_HaltMusicStream(Mix_Music*) instead") */
 extern DECLSPEC int SDLCALL Mix_HaltMusic(void);
 
 /* Change the expiration delay for a particular channel.
@@ -713,12 +713,12 @@ extern DECLSPEC int SDLCALL Mix_ExpireChannel(int channel, int ticks);
 extern DECLSPEC int SDLCALL Mix_FadeOutChannel(int which, int ms);
 extern DECLSPEC int SDLCALL Mix_FadeOutGroup(int tag, int ms);
 extern DECLSPEC int SDLCALL Mix_FadeOutMusicStream(Mix_Music *music, int ms);
-MIXERX_DEPRECATED("Use Mix_FadeOutMusicStream(Mix_Music*,int) instead")
+/* MIXERX_DEPRECATED("Use Mix_FadeOutMusicStream(Mix_Music*,int) instead") */
 extern DECLSPEC int SDLCALL Mix_FadeOutMusic(int ms);
 
 /* Query the fading status of a channel */
 extern DECLSPEC Mix_Fading SDLCALL Mix_FadingMusicStream(Mix_Music *music);
-MIXERX_DEPRECATED("Use Mix_FadingMusicStream(Mix_Music*) instead")
+/* MIXERX_DEPRECATED("Use Mix_FadingMusicStream(Mix_Music*) instead") */
 extern DECLSPEC Mix_Fading SDLCALL Mix_FadingMusic(void);
 extern DECLSPEC Mix_Fading SDLCALL Mix_FadingChannel(int which);
 
@@ -734,13 +734,13 @@ extern DECLSPEC void SDLCALL Mix_RewindMusicStream(Mix_Music *music);
 extern DECLSPEC int SDLCALL Mix_PausedMusicStream(Mix_Music *music);
 
 /* Pause/Resume the music stream (Deprecated calls) */
-MIXERX_DEPRECATED("Use Mix_PauseMusicStream(Mix_Music*) instead")
+/* MIXERX_DEPRECATED("Use Mix_PauseMusicStream(Mix_Music*) instead") */
 extern DECLSPEC void SDLCALL Mix_PauseMusic(void);
-MIXERX_DEPRECATED("Use Mix_ResumeMusicStream(Mix_Music*) instead")
+/* MIXERX_DEPRECATED("Use Mix_ResumeMusicStream(Mix_Music*) instead") */
 extern DECLSPEC void SDLCALL Mix_ResumeMusic(void);
-MIXERX_DEPRECATED("Use Mix_RewindMusicStream(Mix_Music*) instead")
+/* MIXERX_DEPRECATED("Use Mix_RewindMusicStream(Mix_Music*) instead") */
 extern DECLSPEC void SDLCALL Mix_RewindMusic(void);
-MIXERX_DEPRECATED("Use Mix_PausedMusicStream(Mix_Music*) instead")
+/* MIXERX_DEPRECATED("Use Mix_PausedMusicStream(Mix_Music*) instead") */
 extern DECLSPEC int SDLCALL Mix_PausedMusic(void);
 
 /* Set the current position in the music stream.
@@ -753,7 +753,7 @@ extern DECLSPEC int SDLCALL Mix_SetMusicStreamPosition(Mix_Music *music, double 
 /*
     Deprecated analogue of Mix_SetMusicStreamPosition() which lacks Mix_Music* argument
 */
-MIXERX_DEPRECATED("Use Mix_SetMusicStreamPosition(Mix_Music*, double) instead")
+/* MIXERX_DEPRECATED("Use Mix_SetMusicStreamPosition(Mix_Music*, double) instead") */
 extern DECLSPEC int SDLCALL Mix_SetMusicPosition(double position);
 /*
     Get the time current position of music stream
@@ -788,7 +788,7 @@ extern DECLSPEC double SDLCALL Mix_GetMusicLoopLengthTime(Mix_Music *music);
 */
 extern DECLSPEC int SDLCALL Mix_Playing(int channel);
 extern DECLSPEC int SDLCALL Mix_PlayingMusicStream(Mix_Music *music);
-MIXERX_DEPRECATED("Use Mix_PlayingMusicStream(Mix_Music*) instead")
+/* MIXERX_DEPRECATED("Use Mix_PlayingMusicStream(Mix_Music*) instead") */
 extern DECLSPEC int SDLCALL Mix_PlayingMusic(void);
 
 /* Stop music and set external music playback command */
