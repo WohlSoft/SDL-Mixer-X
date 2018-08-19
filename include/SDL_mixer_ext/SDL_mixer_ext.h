@@ -379,6 +379,9 @@ extern DECLSPEC void SDLCALL Mix_ChannelFinished(void (SDLCALL *channel_finished
  */
 typedef void (SDLCALL *Mix_EffectFunc_t)(int chan, void *stream, int len, void *udata);
 
+
+typedef void (SDLCALL *common_mixer)(void *udata, Uint8 *stream, int len);
+
 /*
  * This is a callback that signifies that a channel has finished all its
  *  loops and has completed playback. This gets called if the buffer
@@ -667,6 +670,9 @@ extern DECLSPEC int SDLCALL Mix_PlayMusic(Mix_Music *music, int loops);
 #define Mix_PlayChannelVol(channel,chunk,loops,vol) Mix_PlayChannelTimedVolume(channel,chunk,loops,-1,vol)/*MIXER-X*/
 extern DECLSPEC int SDLCALL Mix_PlayChannelTimedVolume(int which, Mix_Chunk *chunk, int loops, int ticks, int volume);/*MIXER-X*/
 
+/* returns a pointer to the music mixer that can be used as a callback */
+extern DECLSPEC common_mixer SDLCALL Mix_GetMusicMixer();
+
 /* Fade in music or a channel over "ms" milliseconds, same semantics as the "Play" functions */
 extern DECLSPEC int SDLCALL Mix_FadeInMusic(Mix_Music *music, int loops, int ms);
 extern DECLSPEC int SDLCALL Mix_FadeInMusicPos(Mix_Music *music, int loops, int ms, double position);
@@ -801,6 +807,11 @@ extern DECLSPEC int SDLCALL Mix_EachSoundFont(int (SDLCALL *function)(const char
     Returns NULL if it's an invalid channel, or there's no chunk associated.
 */
 extern DECLSPEC Mix_Chunk * SDLCALL Mix_GetChunk(int channel);
+
+/* Setup the mixer without taking over the callback, using an existing spec.
+   These Only initialize or free the Mixer internals */
+extern DECLSPEC int SDLCALL Mix_InitMixer(const SDL_AudioSpec spec, SDL_bool skip_init_check);
+extern DECLSPEC void SDLCALL Mix_FreeMixer(void);
 
 /* Close the mixer, halting all playing audio */
 extern DECLSPEC void SDLCALL Mix_CloseAudio(void);
