@@ -30,7 +30,6 @@
 
 /* Global OPNMIDI flags which are applying on initializing of MIDI player with a file */
 typedef struct {
-    int log_volumes;
     int volume_model;
     int chips_count;
     int full_brightness_range;
@@ -39,12 +38,11 @@ typedef struct {
 } OpnMidi_Setup;
 
 static OpnMidi_Setup opnmidi_setup = {
-    0, 0, 4, 0, -1, ""
+    0, 4, 0, -1, ""
 };
 
 static void OPNMIDI_SetDefault(OpnMidi_Setup *setup)
 {
-    setup->log_volumes  = 0;
     setup->volume_model = 0;
     setup->chips_count = 6;
     setup->full_brightness_range = 0;
@@ -166,7 +164,7 @@ static void process_args(const char *args, OpnMidi_Setup *setup)
                     setup->chips_count = value;
                     break;
                 case 'v':
-                    setup->log_volumes = value;
+                    setup->volume_model = value;
                     break;
                 case 'l':
                     setup->volume_model = value;
@@ -305,7 +303,6 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
 
         if (setup.emulator >= 0)
             opn2_switchEmulator( music->opnmidi, setup.emulator );
-        opn2_setLogarithmicVolumes( music->opnmidi, setup.log_volumes );
         opn2_setVolumeRangeModel( music->opnmidi, setup.volume_model );
         opn2_setFullRangeBrightness( music->opnmidi, setup.full_brightness_range );
         opn2_setNumChips( music->opnmidi, setup.chips_count );
