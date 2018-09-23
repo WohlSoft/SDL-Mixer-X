@@ -551,7 +551,10 @@ static int WAV_GetAudio(void *context, void *data, int bytes)
 static int WAV_Seek(void *context, double position)
 {
     WAV_Music *music = (WAV_Music *)context;
-    Sint64 destpos = music->start + (Sint64)(position * (double)music->spec.freq * music->samplesize);
+    Sint64 sample_size = music->spec.freq * music->samplesize;
+    Sint64 dest_offset = (Sint64)(position * (double)music->spec.freq * music->samplesize);
+    Sint64 destpos = music->start + dest_offset;
+    destpos -= dest_offset % sample_size;
     if (destpos > music->stop)
         return -1;
     SDL_RWseek(music->src, destpos, RW_SEEK_SET);
