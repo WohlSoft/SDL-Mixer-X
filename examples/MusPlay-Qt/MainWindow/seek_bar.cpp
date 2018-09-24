@@ -4,12 +4,12 @@
 #include <QPaintEvent>
 #include <QPainter>
 
-static int64_t fromDouble(double in)
+static inline int64_t fromDouble(double in)
 {
     return static_cast<int64_t>(in * 1000.0);
 }
 
-static double toDouble(int64_t in)
+static inline double toDouble(int64_t in)
 {
     return static_cast<double>(in) / 1000.0;
 }
@@ -68,7 +68,7 @@ void SeekBar::mousePressEvent(QMouseEvent * e)
     update();
     repaint();
 
-    emit positionSeeked(double(m_position) / 1000.0);
+    emit positionSeeked(toDouble(m_position));
 }
 
 void SeekBar::mouseMoveEvent(QMouseEvent * e)
@@ -84,7 +84,7 @@ void SeekBar::mouseMoveEvent(QMouseEvent * e)
         update();
         repaint();
 
-        emit positionSeeked(double(m_position) / 1000.0);
+        emit positionSeeked(toDouble(m_position));
     }
 }
 
