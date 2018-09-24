@@ -560,17 +560,6 @@ void MusPlayer_Qt::updatePositionSlider()
     m_positionWatcherLock = false;
 }
 
-//void MusPlayer_Qt::on_musicPosition_valueChanged(int value)
-//{
-//    if(m_positionWatcherLock)
-//        return;
-//    if(Mix_PlayingMusicStream(PGE_MusicPlayer::play_mus))
-//    {
-//        Mix_SetMusicStreamPosition(PGE_MusicPlayer::play_mus, (double)value);
-//        ui->playingTimeLabel->setText(QDateTime::fromTime_t((uint)value).toUTC().toString("hh:mm:ss"));
-//    }
-//}
-
 void MusPlayer_Qt::musicPosition_seeked(double value)
 {
     if(m_positionWatcherLock)
@@ -584,7 +573,6 @@ void MusPlayer_Qt::musicPosition_seeked(double value)
         ui->playingTimeLabel->setText(QDateTime::fromTime_t((uint)value).toUTC().toString("hh:mm:ss"));
     }
 }
-
 
 #endif
 

@@ -75,25 +75,16 @@ private slots:
     void _blink_red();
 
     void updatePositionSlider();
-    //void on_musicPosition_valueChanged(int value);
     void musicPosition_seeked(double value);
 
     void on_actionOpen_triggered();
-
     void on_actionQuit_triggered();
-
     void on_actionHelpLicense_triggered();
-
     void on_actionHelpAbout_triggered();
-
     void on_actionHelpGitHub_triggered();
-
     void on_actionMidiSetup_triggered();
-
     void on_actionSfxTesting_triggered();
-
     void on_actionEnableReverb_triggered(bool checked);
-
     void on_actionFileAssoc_triggered();
 
 private:
