@@ -61,6 +61,26 @@ int SDLCALLCC Mix_OPNMIDI_getFullRangeBrightness()
     #endif
 }
 
+int SDLCALLCC Mix_OPNMIDI_getVolumeModel()
+{
+    #ifdef MUSIC_MID_OPNMIDI
+    return opnmidi_setup.volume_model;
+    #else
+    return -1;
+    #endif
+}
+
+void SDLCALLCC Mix_OPNMIDI_setVolumeModel(int vm)
+{
+    #ifdef MUSIC_MID_OPNMIDI
+    opnmidi_setup.volume_model = vm;
+    if(vm < 0)
+        opnmidi_setup.volume_model = 0;
+    #else
+    MIX_UNUSED(vm);
+    #endif
+}
+
 void SDLCALLCC Mix_OPNMIDI_setFullRangeBrightness(int frb)
 {
     #ifdef MUSIC_MID_OPNMIDI

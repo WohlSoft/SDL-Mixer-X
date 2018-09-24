@@ -81,7 +81,7 @@ extern "C" {
 */
 #define SDL_MIXER_MAJOR_VERSION 2
 #define SDL_MIXER_MINOR_VERSION 2
-#define SDL_MIXER_PATCHLEVEL    0
+#define SDL_MIXER_PATCHLEVEL    1
 
 /* This macro can be used to fill a version structure with the compile-time
  * version of the SDL_mixer library.
@@ -868,6 +868,10 @@ extern DECLSPEC void SDLCALL Mix_ADLMIDI_setCustomBankFile(const char *bank_wonl
 
 /* Reset all OPNMIDI properties to default state */
 extern DECLSPEC void SDLCALL Mix_OPNMIDI_setSetDefaults(void);
+/* Get current volume model ID */
+extern DECLSPEC int  SDLCALL Mix_OPNMIDI_getVolumeModel(void);
+/* Change current volumes model (Applying on stop/play) */
+extern DECLSPEC void SDLCALL Mix_OPNMIDI_setVolumeModel(int vm);
 /* Get full range mode for CC74-Brightness controller */
 extern DECLSPEC int  SDLCALL Mix_OPNMIDI_getFullRangeBrightness(void);
 /* Set full range mode for CC74-Brightness controller */
