@@ -39,3 +39,4 @@ examples/*SDL_mixer_ext*
 examples/playmus*
 examples/playwave*
 
+.idea/
