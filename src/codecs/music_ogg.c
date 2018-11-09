@@ -27,6 +27,7 @@
 
 #include "music_ogg.h"
 
+#define OV_EXCLUDE_STATIC_CALLBACKS
 #if defined(OGG_HEADER)
 #include OGG_HEADER
 #elif defined(OGG_USE_TREMOR)
@@ -249,7 +250,7 @@ static int OGG_UpdateSection(OGG_music *music)
 static ogg_int64_t str_to_ogg_int64(char *param)
 {
     char *front = param;
-    char *back = param;
+    char *back = NULL;
 
     /* Find digit between of 1 and 9 at begin */
     while ( (*front != '\0') && ((*front < '1') || (*front > '9')) )

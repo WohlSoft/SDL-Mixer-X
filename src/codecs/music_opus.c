@@ -27,7 +27,11 @@
 
 #include "music_opus.h"
 
-#include <opusfile.h>
+#if defined(OPUS_HEADER)
+#include OPUS_HEADER
+#else
+#include <opus/opusfile.h>
+#endif
 
 typedef struct {
     int loaded;
@@ -68,7 +72,7 @@ static int OPUS_Load(void)
         extern OggOpusFile *op_open_callbacks(void *,const OpusFileCallbacks *,const unsigned char *,size_t,int *) __attribute__((weak_import));
         if (op_open_callbacks == NULL) {
             /* Missing weakly linked framework */
-            Mix_SetError("Missing Opus.framework");
+            Mix_SetError("Missing OpusFile.framework");
             return -1;
         }
 #endif
@@ -208,7 +212,7 @@ static int OPUS_UpdateSection(OPUS_music *music)
 static ogg_int64_t str_to_ogg_int64(char *param)
 {
     char *front = param;
-    char *back = param;
+    char *back = NULL;
 
     /* Find digit between of 1 and 9 at begin */
     while ( (*front != '\0') && ((*front < '1') || (*front > '9')) )
