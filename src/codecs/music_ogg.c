@@ -85,11 +85,6 @@ static vorbis_loader vorbis = {
 
 static int OGG_Load(void)
 {
-    MIX_UNUSED(OV_CALLBACKS_DEFAULT);
-    MIX_UNUSED(OV_CALLBACKS_NOCLOSE);
-    MIX_UNUSED(OV_CALLBACKS_STREAMONLY);
-    MIX_UNUSED(OV_CALLBACKS_STREAMONLY_NOCLOSE);
-
     if (vorbis.loaded == 0) {
 #ifdef OGG_DYNAMIC
         vorbis.handle = SDL_LoadObject(OGG_DYNAMIC);
