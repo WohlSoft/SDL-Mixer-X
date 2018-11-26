@@ -38,12 +38,13 @@ typedef struct {
     int chips_count;
     int four_op_channels;
     int full_brightness_range;
+    int soft_pan;
     int emulator;
     char custom_bank_path[2048];
 } AdlMidi_Setup;
 
 static AdlMidi_Setup adlmidi_setup = {
-    58, -1, -1, -1, -1, 0, 4, -1, 0, -1, ""
+    58, -1, -1, -1, -1, 0, 4, -1, 0, 1, -1, ""
 };
 
 static void ADLMIDI_SetDefault(AdlMidi_Setup *setup)
@@ -57,6 +58,7 @@ static void ADLMIDI_SetDefault(AdlMidi_Setup *setup)
     setup->chips_count = 4;
     setup->four_op_channels = -1;
     setup->full_brightness_range = 0;
+    setup->soft_pan = 1;
     setup->emulator = -1;
     setup->custom_bank_path[0] = '\0';
 }
@@ -222,6 +224,24 @@ void SDLCALLCC Mix_ADLMIDI_setFullRangeBrightness(int frb)
     #endif
 }
 
+int SDLCALLCC Mix_ADLMIDI_getFullPanStereo()
+{
+    #ifdef MUSIC_MID_ADLMIDI
+    return adlmidi_setup.soft_pan;
+    #else
+    return -1;
+    #endif
+}
+
+void SDLCALLCC Mix_ADLMIDI_setFullPanStereo(int fp)
+{
+    #ifdef MUSIC_MID_ADLMIDI
+    adlmidi_setup.soft_pan = fp;
+    #else
+    MIX_UNUSED(fp);
+    #endif
+}
+
 int SDLCALLCC Mix_ADLMIDI_getEmulator()
 {
     #ifdef MUSIC_MID_ADLMIDI
@@ -278,7 +298,8 @@ typedef struct
 static void ADLMIDI_setvolume(void *music_p, int volume)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
-    music->volume = (int)(round(128.0 * sqrt(((double)volume) * (1.0 / 128.0))));
+    music->volume = volume * 2;
+    /* (int)(round(128.0 * sqrt(((double)volume) * (1.0 / 128.0))));*/
 }
 
 static void process_args(const char *args, AdlMidi_Setup *setup)
@@ -334,6 +355,9 @@ static void process_args(const char *args, AdlMidi_Setup *setup)
                     break;
                 case 'r':
                     setup->full_brightness_range = value;
+                    break;
+                case 'p':
+                    setup->soft_pan = value;
                     break;
                 case 'e':
                     setup->emulator = value;
@@ -473,7 +497,8 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
         adl_setScaleModulators(music->adlmidi, setup.scalemod);
         adl_setPercMode(music->adlmidi, setup.adlibdrums);
         adl_setVolumeRangeModel(music->adlmidi, setup.volume_model);
-        adl_setFullRangeBrightness( music->adlmidi, setup.full_brightness_range );
+        adl_setFullRangeBrightness(music->adlmidi, setup.full_brightness_range);
+        adl_setSoftPanEnabled(music->adlmidi, setup.soft_pan);
         adl_setNumChips(music->adlmidi, setup.chips_count);
         if (setup.four_op_channels >= 0)
             adl_setNumFourOpsChn(music->adlmidi, setup.four_op_channels);

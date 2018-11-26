@@ -51,7 +51,8 @@ static void GME_delete(void *context);
 void GME_setvolume(void *music_p, int volume)
 {
     GME_Music *music = (GME_Music*)music_p;
-    music->volume = (int)(round(128.0 * sqrt(((double)volume) * (1.0 / 128.0))));
+    music->volume = (int)(round((double)volume * 1.3));
+    /* (int)(round(128.0 * sqrt(((double)volume) * (1.0 / 128.0)))); */
 }
 
 

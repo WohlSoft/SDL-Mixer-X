@@ -33,12 +33,13 @@ typedef struct {
     int volume_model;
     int chips_count;
     int full_brightness_range;
+    int soft_pan;
     int emulator;
     char custom_bank_path[2048];
 } OpnMidi_Setup;
 
 static OpnMidi_Setup opnmidi_setup = {
-    0, 4, 0, -1, ""
+    0, 4, 0, 1, -1, ""
 };
 
 static void OPNMIDI_SetDefault(OpnMidi_Setup *setup)
@@ -46,20 +47,13 @@ static void OPNMIDI_SetDefault(OpnMidi_Setup *setup)
     setup->volume_model = 0;
     setup->chips_count = 6;
     setup->full_brightness_range = 0;
+    setup->soft_pan = 1;
     setup->emulator = -1;
     setup->custom_bank_path[0] = '\0';
 }
 
 #endif
 
-int SDLCALLCC Mix_OPNMIDI_getFullRangeBrightness()
-{
-    #ifdef MUSIC_MID_ADLMIDI
-    return opnmidi_setup.full_brightness_range;
-    #else
-    return -1;
-    #endif
-}
 
 int SDLCALLCC Mix_OPNMIDI_getVolumeModel()
 {
@@ -81,12 +75,39 @@ void SDLCALLCC Mix_OPNMIDI_setVolumeModel(int vm)
     #endif
 }
 
+int SDLCALLCC Mix_OPNMIDI_getFullRangeBrightness()
+{
+    #ifdef MUSIC_MID_ADLMIDI
+    return opnmidi_setup.full_brightness_range;
+    #else
+    return -1;
+    #endif
+}
+
 void SDLCALLCC Mix_OPNMIDI_setFullRangeBrightness(int frb)
 {
     #ifdef MUSIC_MID_OPNMIDI
     opnmidi_setup.full_brightness_range = frb;
     #else
     MIX_UNUSED(frb);
+    #endif
+}
+
+int SDLCALLCC Mix_OPNMIDI_getFullPanStereo()
+{
+    #ifdef MUSIC_MID_ADLMIDI
+    return opnmidi_setup.soft_pan;
+    #else
+    return -1;
+    #endif
+}
+
+void SDLCALLCC Mix_OPNMIDI_setFullPanStereo(int fp)
+{
+    #ifdef MUSIC_MID_OPNMIDI
+    opnmidi_setup.soft_pan = fp;
+    #else
+    MIX_UNUSED(fp);
     #endif
 }
 
@@ -150,7 +171,8 @@ typedef struct
 static void OPNMIDI_setvolume(void *music_p, int volume)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music*)music_p;
-    music->volume = (int)(round(128.0*sqrt(((double)volume)*(1.0/128.0) )));
+    music->volume = volume * 2;
+    /* (int)(round(128.0*sqrt(((double)volume)*(1.0/128.0) ))); */
 }
 
 static void process_args(const char *args, OpnMidi_Setup *setup)
@@ -191,6 +213,9 @@ static void process_args(const char *args, OpnMidi_Setup *setup)
                     break;
                 case 'r':
                     setup->full_brightness_range = value;
+                    break;
+                case 'p':
+                    setup->soft_pan = value;
                     break;
                 case 'e':
                     setup->emulator = value;
@@ -322,10 +347,11 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
         }
 
         if (setup.emulator >= 0)
-            opn2_switchEmulator( music->opnmidi, setup.emulator );
-        opn2_setVolumeRangeModel( music->opnmidi, setup.volume_model );
-        opn2_setFullRangeBrightness( music->opnmidi, setup.full_brightness_range );
-        opn2_setNumChips( music->opnmidi, setup.chips_count );
+            opn2_switchEmulator(music->opnmidi, setup.emulator);
+        opn2_setVolumeRangeModel(music->opnmidi, setup.volume_model);
+        opn2_setFullRangeBrightness(music->opnmidi, setup.full_brightness_range);
+        opn2_setSoftPanEnabled(music->opnmidi, setup.soft_pan);
+        opn2_setNumChips(music->opnmidi, setup.chips_count);
 
         err = opn2_openData( music->opnmidi, bytes, (unsigned long)filesize);
         SDL_free(bytes);

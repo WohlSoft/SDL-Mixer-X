@@ -2426,6 +2426,8 @@ Music is therefore manipulated separately, except in post-processing hooks.
 * Mix_ADLMIDI_setVolumeModel::              Change current volume model. Applying on MIDI file reopen. @b{[Mixer X]}
 * Mix_ADLMIDI_getFullRangeBrightness::      Get full range mode for CC74-Brightness controller
 * Mix_ADLMIDI_setFullRangeBrightness::      Set full range mode for CC74-Brightness controller
+* Mix_ADLMIDI_getFullPanStereo::            Get full panning stereo mode
+* Mix_ADLMIDI_setFullPanStereo::            Set full panning stereo mode
 * Mix_ADLMIDI_getEmulator::                 Get the OPL3 Emulator for ADLMIDI
 * Mix_ADLMIDI_setEmulator::                 Select the OPL3 Emulator for ADLMIDI
 * Mix_ADLMIDI_setSetDefaults::              Reset ADLMIDI settings to default state. Applying on MIDI file reopen. @b{[Mixer X]}
@@ -2434,6 +2436,8 @@ Music is therefore manipulated separately, except in post-processing hooks.
 @b{libOPNMIDI Extra Settings}
 * Mix_OPNMIDI_getFullRangeBrightness::      Get full range mode for CC74-Brightness controller
 * Mix_OPNMIDI_setFullRangeBrightness::      Set full range mode for CC74-Brightness controller
+* Mix_OPNMIDI_getFullPanStereo::            Get full panning stereo mode
+* Mix_OPNMIDI_setFullPanStereo::            Set full panning stereo mode
 * Mix_OPNMIDI_getEmulator::                 Get the OPN2 Emulator for OPNMIDI
 * Mix_OPNMIDI_setEmulator::                 Select the OPN2 Emulator for OPNMIDI
 * Mix_OPNMIDI_setSetDefaults::              Reset OPNMIDI settings to default state. Applying on MIDI file reopen. @b{[Mixer X]}
@@ -4386,6 +4390,39 @@ Set full range mode for CC74-Brightness controller
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
+@node Mix_ADLMIDI_getFullPanStereo
+@subsection Mix_ADLMIDI_getFullPanStereo
+@findex Mix_ADLMIDI_getFullPanStereo
+
+@noindent
+@code{int @b{Mix_ADLMIDI_getFullPanStereo}()}
+
+@noindent
+@b{Returns}: 0 when full panning stereo is disabled, or 1 when full panning stereo is enabled
+
+@noindent
+Get full panning stereo mode
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_ADLMIDI_setFullPanStereo
+@subsection Mix_ADLMIDI_setFullPanStereo
+@findex Mix_ADLMIDI_setFullPanStereo
+
+@noindent
+@code{void @b{Mix_ADLMIDI_setFullPanStereo}(int @var{fp})}
+
+@table @var
+@item fp
+0 to disable full panning stereo, or 1 to enable full panning stereo
+@end table
+
+@noindent
+Set full panning stereo mode
+@b{NOTE}: Applies on MIDI file reopen
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
 @node Mix_ADLMIDI_getEmulator
 @subsection Mix_ADLMIDI_getEmulator
 @findex Mix_ADLMIDI_getEmulator
@@ -4487,6 +4524,39 @@ Get full range mode for CC74-Brightness controller
 
 @noindent
 Set full range mode for CC74-Brightness controller
+@b{NOTE}: Applies on MIDI file reopen
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_OPNMIDI_getFullPanStereo
+@subsection Mix_OPNMIDI_getFullPanStereo
+@findex Mix_OPNMIDI_getFullPanStereo
+
+@noindent
+@code{int @b{Mix_OPNMIDI_getFullPanStereo}()}
+
+@noindent
+@b{Returns}: 0 when full panning stereo is disabled, or 1 when full panning stereo is enabled
+
+@noindent
+Get full panning stereo mode
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_OPNMIDI_setFullPanStereo
+@subsection Mix_OPNMIDI_setFullPanStereo
+@findex Mix_OPNMIDI_setFullPanStereo
+
+@noindent
+@code{void @b{Mix_OPNMIDI_setFullPanStereo}(int @var{fp})}
+
+@table @var
+@item fp
+0 to disable full panning stereo, or 1 to enable full panning stereo
+@end table
+
+@noindent
+Set full panning stereo mode
 @b{NOTE}: Applies on MIDI file reopen
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

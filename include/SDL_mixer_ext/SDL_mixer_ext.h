@@ -80,8 +80,8 @@ extern "C" {
 /* Printable format: "%d.%d.%d", MAJOR, MINOR, PATCHLEVEL
 */
 #define SDL_MIXER_MAJOR_VERSION 2
-#define SDL_MIXER_MINOR_VERSION 2
-#define SDL_MIXER_PATCHLEVEL    2
+#define SDL_MIXER_MINOR_VERSION 3
+#define SDL_MIXER_PATCHLEVEL    0
 
 /* This macro can be used to fill a version structure with the compile-time
  * version of the SDL_mixer library.
@@ -218,6 +218,8 @@ typedef enum {
     OPNMIDI_OPN2_EMU_MIME = 0,
     OPNMIDI_OPN2_EMU_NUKED,
     OPNMIDI_OPN2_EMU_GENS,
+    /* OPNMIDI_OPN2_EMU_GX, [THIS emulator is inavailable by default] */
+    OPNMIDI_OPN2_EMU_NP2 = 5,
 } Mix_OPNMIDI_Emulator;
 
 /* The internal format for a music chunk interpreted via mikmod */
@@ -856,6 +858,10 @@ extern DECLSPEC void SDLCALL Mix_ADLMIDI_setVolumeModel(int vm);
 extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getFullRangeBrightness(void);
 /* Set full range mode for CC74-Brightness controller */
 extern DECLSPEC void SDLCALL Mix_ADLMIDI_setFullRangeBrightness(int frb);
+/* Get full panning stereo mode */
+extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getFullPanStereo(void);
+/* Set full panning stereo mode */
+extern DECLSPEC void SDLCALL Mix_ADLMIDI_setFullPanStereo(int fp);
 /* Get the current OPL3 Emulator for ADLMIDI */
 extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getEmulator(void);
 /* Select the OPL3 Emulator for ADLMIDI */
@@ -876,6 +882,10 @@ extern DECLSPEC void SDLCALL Mix_OPNMIDI_setVolumeModel(int vm);
 extern DECLSPEC int  SDLCALL Mix_OPNMIDI_getFullRangeBrightness(void);
 /* Set full range mode for CC74-Brightness controller */
 extern DECLSPEC void SDLCALL Mix_OPNMIDI_setFullRangeBrightness(int frb);
+/* Get full panning stereo mode */
+extern DECLSPEC int  SDLCALL Mix_OPNMIDI_getFullPanStereo(void);
+/* Set full panning stereo mode */
+extern DECLSPEC void SDLCALL Mix_OPNMIDI_setFullPanStereo(int fp);
 /* Get the OPN2 Emulator for OPNMIDI */
 extern DECLSPEC int  SDLCALL Mix_OPNMIDI_getEmulator(void);
 /* Select the OPN2 Emulator for OPNMIDI */
