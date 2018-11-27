@@ -130,6 +130,9 @@ GME_Music *GME_LoadSongRW(SDL_RWops *src, int trackNum)
             return NULL;
         }
 
+        /* Set infinite playback */
+        gme_set_fade(music->game_emu, -1);
+
         music->volume = MIX_MAX_VOLUME;
         meta_tags_init(&music->tags);
 
@@ -162,7 +165,7 @@ GME_Music *GME_LoadSongRW(SDL_RWops *src, int trackNum)
 static void *GME_new_RWEx(struct SDL_RWops *src, int freesrc, const char *extraSettings)
 {
     GME_Music *gmeMusic;
-    int trackNumber = extraSettings ? atoi(extraSettings) : 0;
+    int trackNumber = extraSettings ? SDL_atoi(extraSettings) : 0;
     gmeMusic = GME_LoadSongRW(src, trackNumber);
     if(!gmeMusic)
     {
