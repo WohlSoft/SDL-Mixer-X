@@ -44,7 +44,7 @@ typedef struct {
 } AdlMidi_Setup;
 
 static AdlMidi_Setup adlmidi_setup = {
-    58, -1, -1, -1, -1, 0, 4, -1, 0, 1, -1, ""
+    58, -1, -1, -1, -1, 0, 4, -1, 0, 1, ADLMIDI_EMU_DOSBOX, ""
 };
 
 static void ADLMIDI_SetDefault(AdlMidi_Setup *setup)
