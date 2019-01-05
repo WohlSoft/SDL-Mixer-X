@@ -1,6 +1,6 @@
 /*
   SDL_mixer:  An audio mixer library based on the SDL library
-  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -150,7 +150,7 @@ static int TIMIDITY_GetSome(void *context, void *data, int bytes, SDL_bool *done
         expected = bytes;
         amount = Timidity_PlaySome(music->song, data, bytes);
     }
-        
+
     if (amount < expected) {
         if (music->play_count == 1) {
             /* We didn't consume anything and we're done */
