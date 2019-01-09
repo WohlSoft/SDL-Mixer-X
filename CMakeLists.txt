@@ -454,6 +454,8 @@ endif()
 option(USE_MIDI            "Build with MIDI support" ON)
 if(USE_MIDI)
 
+    add_definitions(-DMUSIC_USE_MIDI)
+
     option(USE_MIDI_ADLMIDI    "Build with libADLMIDI OPL3 Emulator based MIDI sequencer support" ON)
     if(USE_MIDI_ADLMIDI)
         if(USE_SYSTEM_AUDIO_LIBRARIES)
@@ -480,8 +482,6 @@ if(USE_MIDI)
             list(APPEND SDLMixerX_LINK_LIBS ${LIBADLMIDI_LIB})
         endif()
     endif()
-    # Keep in build list even not used (to link necessary calls)
-    list(APPEND SDLMixerX_SOURCES ${SDLMixerX_SOURCE_DIR}/src/codecs/music_midi_adl.c)
 
     option(USE_MIDI_OPNMIDI    "Build with libOPNMIDI OPN2 Emulator based MIDI sequencer support" ON)
     if(USE_MIDI_OPNMIDI)
@@ -509,8 +509,6 @@ if(USE_MIDI)
             list(APPEND SDLMixerX_LINK_LIBS ${LIBOPNMIDI_LIB})
         endif()
     endif()
-    # Keep in build list even not used (to link necessary calls)
-    list(APPEND SDLMixerX_SOURCES ${SDLMixerX_SOURCE_DIR}/src/codecs/music_midi_opn.c)
 
     option(USE_MIDI_TIMIDITY   "Build with Timidity wave table MIDI sequencer support" ON)
     if(USE_MIDI_TIMIDITY AND NOT USE_SYSTEM_AUDIO_LIBRARIES)
@@ -527,8 +525,6 @@ if(USE_MIDI)
         endif()
         list(APPEND SDLMixerX_LINK_LIBS ${LIBTIMIDITY_LIB})
     endif()
-    # Keep in build list even not used (to link necessary calls)
-    list(APPEND SDLMixerX_SOURCES ${SDLMixerX_SOURCE_DIR}/src/codecs/music_timidity.c)
 
     option(USE_MIDI_FLUIDSYNTH "Build with FluidSynth wave table MIDI sequencer support" OFF)
     if(USE_MIDI_FLUIDSYNTH)
@@ -590,6 +586,14 @@ if(USE_MIDI)
     endif()
 
 endif()
+
+# Keep those files in build list even those libraries are not used
+# (they are contains public calls are dummied when referred libraries are disabled from the use)
+list(APPEND SDLMixerX_SOURCES
+    ${SDLMixerX_SOURCE_DIR}/src/codecs/music_midi_adl.c
+    ${SDLMixerX_SOURCE_DIR}/src/codecs/music_midi_opn.c
+    ${SDLMixerX_SOURCE_DIR}/src/codecs/music_timidity.c
+)
 
 if(USE_SYSTEM_AUDIO_LIBRARIES)
     find_library(LIBSDL2CUSTOM_LIB NAMES SDL2)

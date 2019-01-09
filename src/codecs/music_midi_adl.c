@@ -102,7 +102,11 @@ void SDLCALLCC Mix_ADLMIDI_setBankID(int bnk)
 
 int SDLCALLCC Mix_ADLMIDI_getTremolo()
 {
+    #ifdef MUSIC_MID_ADLMIDI
     return adlmidi_setup.tremolo;
+    #else
+    return -1;
+    #endif
 }
 void SDLCALLCC Mix_ADLMIDI_setTremolo(int tr)
 {

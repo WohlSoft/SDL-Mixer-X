@@ -2090,6 +2090,7 @@ int SDLCALLCC Mix_GetNextMidiPlayer()
 
 int SDLCALLCC Mix_SetMidiPlayer(int player)
 {
+#ifdef MUSIC_USE_MIDI
     switch (player) {
         #ifdef MUSIC_MID_ADLMIDI
     case MIDI_ADLMIDI:
@@ -2112,6 +2113,11 @@ int SDLCALLCC Mix_SetMidiPlayer(int player)
         Mix_SetError("Unknown MIDI Device");
         return -1;
     }
+#else
+    MIX_UNUSED(player);
+    Mix_SetError("MIDI support is disabled in this build");
+    return -1;
+#endif
 }
 
 void SDLCALLCC Mix_SetLockMIDIArgs(int lock_midiargs)

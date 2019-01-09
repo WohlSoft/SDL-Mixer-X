@@ -144,7 +144,7 @@ void SDLCALLCC Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path)
     else
         opnmidi_setup.custom_bank_path[0] = '\0';
     #else
-    MIX_UNUSED(bank_wopn_path);
+    MIX_UNUSED(bank_wonp_path);
     #endif
 }
 
