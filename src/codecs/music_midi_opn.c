@@ -77,7 +77,7 @@ void SDLCALLCC Mix_OPNMIDI_setVolumeModel(int vm)
 
 int SDLCALLCC Mix_OPNMIDI_getFullRangeBrightness()
 {
-    #ifdef MUSIC_MID_ADLMIDI
+    #ifdef MUSIC_MID_OPNMIDI
     return opnmidi_setup.full_brightness_range;
     #else
     return -1;
@@ -95,7 +95,7 @@ void SDLCALLCC Mix_OPNMIDI_setFullRangeBrightness(int frb)
 
 int SDLCALLCC Mix_OPNMIDI_getFullPanStereo()
 {
-    #ifdef MUSIC_MID_ADLMIDI
+    #ifdef MUSIC_MID_OPNMIDI
     return opnmidi_setup.soft_pan;
     #else
     return -1;
@@ -113,7 +113,7 @@ void SDLCALLCC Mix_OPNMIDI_setFullPanStereo(int fp)
 
 int SDLCALLCC Mix_OPNMIDI_getEmulator()
 {
-    #ifdef MUSIC_MID_ADLMIDI
+    #ifdef MUSIC_MID_OPNMIDI
     return opnmidi_setup.emulator;
     #else
     return -1;
