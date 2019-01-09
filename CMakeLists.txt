@@ -191,6 +191,11 @@ if(USE_OPUS)
         find_library(LIBOPUSFILE_LIB NAMES opusfile)
         find_library(LIBOPUS_LIB NAMES opusfile)
         message("Opus: ${LIBOPUS_INCLUDE_DIR} ${LIBOPUSFILE_LIB} ${LIBOPUS_LIB}")
+        if(FOUND_OPUS)
+            list(APPEND SDL_MIXER_INCLUDE_PATHS
+                ${LIBOPUS_INCLUDE_DIR}/opus
+            )
+        endif()
     else()
         set(FOUND_OPUS 1)
         if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
