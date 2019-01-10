@@ -32,14 +32,19 @@
 
 #include <fluidsynth.h>
 
+#if FLUIDSYNTH_VERSION_MAJOR >= 2
+    #define FLUID_DELETE_RETURNTYPE void
+#else
+    #define FLUID_DELETE_RETURNTYPE int
+#endif
 
 typedef struct {
     int loaded;
     void *handle;
 
-    int (*delete_fluid_player)(fluid_player_t*);
+    FLUID_DELETE_RETURNTYPE (*delete_fluid_player)(fluid_player_t*);
     void (*delete_fluid_settings)(fluid_settings_t*);
-    int (*delete_fluid_synth)(fluid_synth_t*);
+    FLUID_DELETE_RETURNTYPE (*delete_fluid_synth)(fluid_synth_t*);
     int (*fluid_player_add)(fluid_player_t*, const char*);
     int (*fluid_player_add_mem)(fluid_player_t*, const void*, size_t);
     int (*fluid_player_get_status)(fluid_player_t*);
@@ -78,9 +83,9 @@ static int FLUIDSYNTH_Load()
             return -1;
         }
 #endif
-        FUNCTION_LOADER(delete_fluid_player, int (*)(fluid_player_t*))
+        FUNCTION_LOADER(delete_fluid_player, FLUID_DELETE_RETURNTYPE (*)(fluid_player_t*))
         FUNCTION_LOADER(delete_fluid_settings, void (*)(fluid_settings_t*))
-        FUNCTION_LOADER(delete_fluid_synth, int (*)(fluid_synth_t*))
+        FUNCTION_LOADER(delete_fluid_synth, FLUID_DELETE_RETURNTYPE (*)(fluid_synth_t*))
         FUNCTION_LOADER(fluid_player_add, int (*)(fluid_player_t*, const char*))
         FUNCTION_LOADER(fluid_player_add_mem, int (*)(fluid_player_t*, const void*, size_t))
         FUNCTION_LOADER(fluid_player_get_status, int (*)(fluid_player_t*))
