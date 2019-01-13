@@ -970,14 +970,14 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
     SDL_bool found_SSND = SDL_FALSE;
     SDL_bool found_COMM = SDL_FALSE;
     SDL_bool found_FVER = SDL_FALSE;
-    SDL_bool found_ID3 = SDL_FALSE;
     SDL_bool is_AIFC = SDL_FALSE;
-    SDL_bool deep_scan = SDL_FALSE;
 
     Uint32 chunk_type;
     Uint32 chunk_length;
-    Sint64 prev_chunk = 0;
     Sint64 next_chunk = 0;
+    Sint64 file_length;
+
+    file_length = SDL_RWsize(src);
 
     /* AIFF magic header */
     Uint32 AIFFmagic;
@@ -1018,15 +1018,9 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
         chunk_type      = SDL_ReadLE32(src);
         chunk_length    = SDL_ReadBE32(src);
         next_chunk      = SDL_RWtell(src) + chunk_length;
-        deep_scan       = SDL_FALSE;
 
-        /* Paranoia to avoid infinite loops */
-        if (chunk_type == 0 && chunk_length == 0)
-            break;
-
-        /* Initialize this on first loop */
-        if (!prev_chunk) {
-            prev_chunk = next_chunk;
+        if (chunk_length % 2) {
+            next_chunk++;
         }
 
         switch (chunk_type) {
@@ -1043,7 +1037,6 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
             break;
 
         case AIFF_ID3_:
-            found_ID3 = SDL_TRUE;
             if (!ParseID3(wave, chunk_length))
                 return SDL_FALSE;
             break;
@@ -1085,32 +1078,26 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
             break;
 
         default:
-            /* For cases of inter-chunk junk bytes, deep scan is needed. For example,
-             * some AIFF files are have zero byte that follows end of NAME chunk. */
-            deep_scan = SDL_TRUE;
+            /* Unknown/unsupported chunk: we just skip over */
             break;
         }
-
-        if (deep_scan) {
-            /* Scan at every next byte for a well known chunk */
-            next_chunk = (++prev_chunk);
-        } else {
-            /* Jump to end of well known chunk */
-            prev_chunk = next_chunk;
-        }
-
-    } while ((!found_SSND || !found_COMM || !found_ID3 || (is_AIFC && !found_FVER))
-         && SDL_RWseek(src, next_chunk, RW_SEEK_SET) != -1);
+    } while (next_chunk < file_length && SDL_RWseek(src, next_chunk, RW_SEEK_SET) != -1);
 
     if (!found_SSND) {
-        Mix_SetError("Bad AIFF file (no SSND chunk)");
+        Mix_SetError("Bad AIFF/AIFF-C file (no SSND chunk)");
         return SDL_FALSE;
     }
 
     if (!found_COMM) {
-        Mix_SetError("Bad AIFF file (no COMM chunk)");
+        Mix_SetError("Bad AIFF/AIFF-C file (no COMM chunk)");
         return SDL_FALSE;
     }
+
+    if (is_AIFC && !found_FVER) {
+        Mix_SetError("Bad AIFF-C file (no FVER chunk)");
+        return SDL_FALSE;
+    }
+
 
     wave->samplesize = channels * (samplesize / 8);
     wave->stop = wave->start + channels * numsamples * (samplesize / 8);
