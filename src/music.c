@@ -788,7 +788,6 @@ readHeader:
 }
 #endif
 
-
 Mix_MusicType detect_music_type_from_magic(SDL_RWops *src)
 {
     Uint8 magic[25];
@@ -1117,16 +1116,14 @@ Mix_Music * SDLCALLCC Mix_LoadMUS(const char *file)
     if (ext) {
         ++ext; /* skip the dot in the extension */
         if (SDL_strcasecmp(ext, "WAV") == 0) {
-            type = MUS_WAV;
+            type = MUS_NONE; /* Force detection by magic */
         } else if (SDL_strcasecmp(ext, "MID") == 0 ||
                     SDL_strcasecmp(ext, "MIDI") == 0 ||
                     SDL_strcasecmp(ext, "RMI") == 0 ||
                     SDL_strcasecmp(ext, "KAR") == 0) {
-            type = MUS_MID;
-        } else if (SDL_strcasecmp(ext, "OGG") == 0) {
-            type = MUS_OGG;
-        } else if (SDL_strcasecmp(ext, "OPUS") == 0) {
-            type = MUS_OPUS;
+            type = MUS_NONE; /* Force detection by magic */
+        } else if (SDL_strcasecmp(ext, "OGG") == 0 || SDL_strcasecmp(ext, "OPUS") == 0) {
+            type = MUS_NONE; /* Force detection by magic */
         } else if (SDL_strcasecmp(ext, "FLAC") == 0) {
             type = MUS_FLAC;
         } else  if (SDL_strcasecmp(ext, "MPG") == 0 ||
