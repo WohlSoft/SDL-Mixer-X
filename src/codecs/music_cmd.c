@@ -281,6 +281,8 @@ Mix_MusicInterface Mix_MusicInterface_CMD =
     MusicCMD_IsPlaying,
     NULL,   /* GetAudio */
     NULL,   /* Seek */
+    NULL,   /* SeekSec [MIXER-X]*/
+    NULL,   /* SkipSec [MIXER-X]*/
     NULL,   /* Tell [MIXER-X]*/
     NULL,   /* FullLength [MIXER-X]*/
     NULL,   /* LoopStart [MIXER-X]*/

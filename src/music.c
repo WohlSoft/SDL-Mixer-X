@@ -303,6 +303,7 @@ int music_pcm_getaudio(void *context, void *data, int bytes, int volume,
     int len = bytes;
     SDL_bool done = SDL_FALSE;
 
+
     if (volume == MIX_MAX_VOLUME) {
         dst = snd;
     } else {
@@ -1509,6 +1510,48 @@ int SDLCALLCC Mix_SetMusicStreamPosition(Mix_Music *music, double position)
     }
     Mix_UnlockAudio();
 
+    return(retval);
+}
+
+int music_internal_seeksec(Mix_Music *music, double position)
+{
+    if (music->interface->SeekSec) {
+        return music->interface->SeekSec(music->context, position);
+    }
+    return -1;
+}
+
+int SDLCALLCC Mix_SeekMusicStreamSeconds(Mix_Music *music, double position)
+{
+    int retval = -1;
+
+    Mix_LockAudio();
+    if (music) {
+        retval = music_internal_seeksec(music, position);
+    } else if (music_playing) {
+        retval = music_internal_seeksec(music_playing, position);
+    } else {
+        Mix_SetError("No music in which to seek.");
+    }
+    Mix_UnlockAudio();
+    return(retval);
+}
+
+int SDLCALLCC Mix_SkipMusicStreamSeconds(Mix_Music *music, double position)
+{
+    int retval = -1;
+
+    if (music->interface->SkipSec) {
+        Mix_LockAudio();
+        if (music) {
+            retval = music->interface->SkipSec(music->context, position);
+        } else if (music_playing) {
+                retval = music->interface->SkipSec(NULL, position);
+        } else {
+            Mix_SetError("No music in which to seek.");
+        }
+        Mix_UnlockAudio();
+    }
     return(retval);
 }
 

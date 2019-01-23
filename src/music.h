@@ -134,6 +134,19 @@ typedef struct
     /* Seek to a play position (in seconds) */
     int (*Seek)(void *music, double position);
 
+    /* MIXER-X: Seek to a play position (in seconds), but this time for real */
+    int (*SeekSec)(void *music, double position_s);
+    /* Other possible prototypes :
+     *     double (*SeekSec)(void *music, double position_s);
+     * it would seek whatever the position_s is, saturating to start and end of song,
+     * and returning the actual resulting position
+     *     int (*SeekSec)(void *music, double position_s, enum seek_bounds mode);
+     * saturation and errors configured via 'mode'
+     */
+
+    /* MIXER-X: Skips delay_s seconds) */
+    int (*SkipSec)(void *music, double delay_s);
+
     /* MIXER-X: Tell a play position (in seconds) */
     double (*Tell)(void *music);
 

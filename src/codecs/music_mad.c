@@ -138,7 +138,7 @@ enum {
 typedef struct {
     int play_count;
     SDL_RWops *src;
-    Sint64 position_begin;
+    Sint64 position_begin, current_buffer_start_offset;
     int freesrc;
     struct mad_stream stream;
     struct mad_frame frame;
@@ -148,9 +148,15 @@ typedef struct {
     int status;
     SDL_AudioStream *audiostream;
 
+    SDL_bool is_VBR;
+    SDL_bool is_Frankenstein; /* Is a file which has frames with different characteristics like sample rate */
+    size_t frames_nb;
+    double *frame_timestamps_ms;
+    long *frame_start_offsets;
     double total_length;
     int sample_rate;
     int sample_position;
+    int frame_position;
     Mix_MusicMetaTags tags;
 
     unsigned char input_buffer[MAD_INPUT_BUFFER_SIZE + MAD_BUFFER_GUARD];
@@ -162,15 +168,29 @@ static void read_update_buffer(struct mad_stream *stream, MAD_Music *music);
 static void calculate_total_time(MAD_Music *music)
 {
     mad_timer_t time = mad_timer_zero;
+    long bitrate = -1;
+    long samplerate = -1;
     struct mad_header header;
     struct mad_stream stream;
     mad_header_init(&header);
     mad_stream_init(&stream);
+    size_t frame_infos_allocated = 1024;
 
+    music->is_VBR = SDL_FALSE;
+    music->is_Frankenstein = SDL_FALSE;
+    music->total_length = 0;
+    music->frames_nb = 0;
+
+    music->frame_start_offsets = NULL;
+    music->frame_timestamps_ms = SDL_malloc(frame_infos_allocated * sizeof(mad_timer_t));
+    if (!music->frame_timestamps_ms) goto cleanerr;
+    music->frame_start_offsets = SDL_malloc(frame_infos_allocated * sizeof(long));
+    if (!music->frame_start_offsets) goto cleanerr;
+
+    music->current_buffer_start_offset = 0;
     SDL_RWseek(music->src, music->position_begin, RW_SEEK_SET);
 
-    while (1)
-    {
+    while (1) {
         read_update_buffer(&stream, music);
 
         if (mad_header_decode(&header, &stream) == -1) {
@@ -191,8 +211,39 @@ static void calculate_total_time(MAD_Music *music)
             }
         }
 
+        /* check if we have enough room or if we need to allocate some more
+         * for the storage of time information on frames.
+         */
+        if (music->frames_nb >= frame_infos_allocated) {
+            frame_infos_allocated *= 2;
+            music->frame_timestamps_ms = SDL_realloc(music->frame_timestamps_ms, frame_infos_allocated * sizeof(mad_timer_t));
+            if (!music->frame_timestamps_ms) goto cleanerr;
+            music->frame_start_offsets = SDL_realloc(music->frame_start_offsets, frame_infos_allocated * sizeof(long));
+            if (!music->frame_start_offsets) goto cleanerr;
+        }
+        /* memorise the time of the start of each frame */
+        music->frame_timestamps_ms[music->frames_nb] = mad_timer_count(time, MAD_UNITS_MILLISECONDS);
+        /* memorise the position of the start of each frame in the source buffer */
+        music->frame_start_offsets[music->frames_nb++] = music->current_buffer_start_offset + (stream.this_frame - stream.buffer);
         music->sample_rate = (int)header.samplerate;
         mad_timer_add(&time, header.duration);
+
+        /* Detect VBR and Frankenstein streams */
+        if (bitrate >= 0) { /* if any frame has a different bitrate, it is a VBR MP3 */
+            if(bitrate != header.bitrate) {
+                music->is_VBR = SDL_TRUE;
+            }
+        } else {
+            bitrate = header.bitrate;
+        }
+        /* if any frame has a different sample rate, it is a Frankenstein MP3, normally not legal */
+        if (samplerate >= 0) {
+            if (samplerate != header.samplerate) {
+                music->is_Frankenstein = SDL_TRUE;
+            }
+        } else {
+            samplerate = header.samplerate;
+        }
     }
 
     music->total_length = (double)(mad_timer_count(time, (enum mad_units)music->sample_rate)) / (double)music->sample_rate;
@@ -203,6 +254,23 @@ static void calculate_total_time(MAD_Music *music)
     music->status = 0;
 
     SDL_RWseek(music->src, music->position_begin, RW_SEEK_SET);
+    music->current_buffer_start_offset = 0;
+
+    return;
+
+cleanerr: /* cleaning allocated stuff in case of error */
+    SDL_OutOfMemory();
+    if (music->frame_timestamps_ms) {
+        SDL_free(music->frame_timestamps_ms);
+        music->frame_timestamps_ms = NULL;
+    }
+    if (music->frame_start_offsets) {
+        SDL_free(music->frame_start_offsets);
+        music->frame_start_offsets = NULL;
+    }
+    music->frames_nb = 0;
+    mad_stream_finish(&stream);
+    mad_header_finish(&header);
 }
 
 static int MAD_Seek(void *context, double position);
@@ -346,16 +414,16 @@ static int consume_tag(struct mad_stream *stream)
  */
 static void read_update_buffer(struct mad_stream *stream, MAD_Music *music)
 {
-    if (stream->buffer == NULL ||
-        stream->error == MAD_ERROR_BUFLEN) {
+    if (stream->buffer == NULL || stream->error == MAD_ERROR_BUFLEN) {
         size_t read_size;
-        size_t remaining;
+        size_t remaining, used;
         unsigned char *read_start;
 
         /* There might be some bytes in the buffer left over from last
            time.    If so, move them down and read more bytes following
            them. */
         if (stream->next_frame != NULL) {
+            used = stream->next_frame - stream->buffer;
             remaining = stream->bufend - stream->next_frame;
             memmove(music->input_buffer, stream->next_frame, remaining);
             read_start = music->input_buffer + remaining;
@@ -365,6 +433,7 @@ static void read_update_buffer(struct mad_stream *stream, MAD_Music *music)
             read_size = MAD_INPUT_BUFFER_SIZE;
             read_start = music->input_buffer;
             remaining = 0;
+            used = 0;
         }
 
         /* Now read additional bytes from the input file. */
@@ -383,9 +452,9 @@ static void read_update_buffer(struct mad_stream *stream, MAD_Music *music)
         }
 
         /* Now feed those bytes into the libmad stream. */
-        mad_stream_buffer(stream, music->input_buffer,
-                                            read_size + remaining);
+        mad_stream_buffer(stream, music->input_buffer, read_size + remaining);
         stream->error = MAD_ERROR_NONE;
+        music->current_buffer_start_offset += used;
     }
 }
 
@@ -483,6 +552,7 @@ static SDL_bool decode_frame(MAD_Music *music)
     }
 
     music->sample_position += nsamples;
+    music->frame_position += 1;
 
     result = SDL_AudioStreamPut(music->audiostream, buffer, (nsamples * nchannels * sizeof(Sint16)));
     SDL_stack_free(buffer);
@@ -544,6 +614,7 @@ static int MAD_Seek(void *context, double position)
     mad_timer_set(&target, (unsigned long)int_part, (unsigned long)((position - int_part) * 1000000), 1000000);
 
     music->sample_position = (int)(position * music->sample_rate);
+    music->frame_position = music->frames_nb * (position / music->total_length);
 
     if (mad_timer_compare(music->next_frame_start, target) > 0) {
         /* In order to seek backwards in a VBR file, we have to rewind and
@@ -578,10 +649,89 @@ static int MAD_Seek(void *context, double position)
     return 0;
 }
 
+static int MAD_SeekSec(void *context, double position)
+{
+    MAD_Music *music = (MAD_Music *)context;
+    long goal_frame_i;
+
+    if (music->frames_nb == 0) {
+        Mix_SetError("Won't seek in an empty file");
+        return -1;
+    }
+
+    if (position < 0 || position >= music->total_length) {
+        Mix_SetError("Seek position out of range");
+        return -1;
+    }
+
+    goal_frame_i = music->frames_nb * (position / music->total_length);
+
+    /* protection against unlikely float rounding fantasies */
+    if (goal_frame_i >= music->frames_nb) goal_frame_i = music->frames_nb - 1;
+
+    if (music->is_Frankenstein) {
+        /* In a frankenstein MP3, frames may have a different duration
+           (this is normally not allowed) so the frame index is only
+           an approximation supposing an average duration. */
+        /* From there we move, if needed, forward or backward to
+           find the right frame. Well, *around* the right frame... */
+        if (music->frame_timestamps_ms[goal_frame_i] > position * 1000) {
+            do {
+                goal_frame_i--;
+                if (goal_frame_i <= 0) break;
+            } while(music->frame_timestamps_ms[goal_frame_i] > position * 1000);
+        } else {
+            while (music->frame_timestamps_ms[goal_frame_i] < position * 1000) {
+                goal_frame_i++;
+                if (goal_frame_i >= music->frames_nb-1) break;
+            }
+        }
+    }
+
+    /* Position the source file buffer */
+    SDL_RWseek(music->src, music->position_begin + music->frame_start_offsets[goal_frame_i], RW_SEEK_SET);
+
+    /* Clean various audio buffers from previous data */
+    SDL_AudioStreamClear(music->audiostream);
+    SDL_memset(music->input_buffer, 0, sizeof(music->input_buffer));
+    music->stream.next_frame = NULL;
+    music->stream.buffer = NULL;
+    mad_frame_mute(&music->frame);
+    mad_synth_mute(&music->synth);
+
+    /* Position the indicators */
+    /* warning: for now, assuming this is no frankenstein MP3,
+     * otherwise we're in trouble, since sample_rate may vary */
+    music->sample_position = (music->frame_timestamps_ms[goal_frame_i] * music->sample_rate) / 1000;
+    music->frame_position = goal_frame_i;
+
+    /* Proceed with next frame */
+    read_next_frame(music);
+
+    return 0;
+}
+
+static int MAD_SkipSec(void *context, double delay_s)
+{
+    MAD_Music *music = (MAD_Music *)context;
+    double target_position_ms;
+
+    if (music->frames_nb == 0) {
+        Mix_SetError("Won't skip in an empty file");
+        return -1;
+    }
+    target_position_ms = music->frame_timestamps_ms[music->frame_position] + delay_s*1000;
+    return MAD_SeekSec(music, target_position_ms/1000);
+}
+
+
 static double MAD_tell(void *context)
 {
     MAD_Music *music = (MAD_Music *)context;
+    return music->frame_timestamps_ms[music->frame_position] / 1000.0;
+/*
     return (double)music->sample_position / (double)music->sample_rate;
+*/
 }
 
 static double MAD_total(void *context)
@@ -603,6 +753,13 @@ static void MAD_Delete(void *context)
     mad_frame_finish(&music->frame);
     mad_synth_finish(&music->synth);
     meta_tags_clear(&music->tags);
+
+    if(music->frame_timestamps_ms) {
+        SDL_free(music->frame_timestamps_ms);
+    }
+    if(music->frame_start_offsets) {
+        SDL_free(music->frame_start_offsets);
+    }
 
     if (music->audiostream) {
         SDL_FreeAudioStream(music->audiostream);
@@ -632,6 +789,8 @@ Mix_MusicInterface Mix_MusicInterface_MAD =
     NULL,   /* IsPlaying */
     MAD_GetAudio,
     MAD_Seek,
+    MAD_SeekSec, /* SeekSec [MIXER-X]*/
+    MAD_SkipSec, /* SkipSec [MIXER-X]*/
     MAD_tell, /* Tell [MIXER-X]*/
     MAD_total,/* FullLength [MIXER-X]*/
     NULL,   /* LoopStart [MIXER-X]*/

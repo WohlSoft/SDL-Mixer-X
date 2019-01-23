@@ -659,6 +659,8 @@ Mix_MusicInterface Mix_MusicInterface_FLAC =
     NULL,   /* IsPlaying */
     FLAC_GetAudio,
     FLAC_Seek,
+    NULL,   /* SeekSec [MIXER-X]*/
+    NULL,   /* SkipSec [MIXER-X]*/
     FLAC_get_time,/* Tell [MIXER-X]*/
     FLAC_get_time_length,/* FullLength [MIXER-X]*/
     NULL,   /* LoopStart [MIXER-X]*/

@@ -297,6 +297,8 @@ Mix_MusicInterface Mix_MusicInterface_GME =
     NULL,   /* IsPlaying */
     GME_playAudio,
     GME_jump_to_time,   /* Seek */
+    NULL,   /* SeekSec [MIXER-X]*/
+    NULL,   /* SkipSec [MIXER-X]*/
     GME_get_cur_time,   /* Tell [MIXER-X]*/
     NULL,   /* FullLength [MIXER-X]*/
     NULL,   /* LoopStart [MIXER-X]*/

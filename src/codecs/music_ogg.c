@@ -559,6 +559,8 @@ Mix_MusicInterface Mix_MusicInterface_OGG =
     NULL,   /* IsPlaying */
     OGG_GetAudio,
     OGG_Seek,
+    NULL,   /* SeekSec [MIXER-X]*/
+    NULL,   /* SkipSec [MIXER-X]*/
     OGG_Tell,   /* Tell [MIXER-X]*/
     OGG_Total,   /* FullLength [MIXER-X]*/
     OGG_get_loop_start,   /* LoopStart [MIXER-X]*/

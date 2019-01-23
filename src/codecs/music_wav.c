@@ -1211,6 +1211,8 @@ Mix_MusicInterface Mix_MusicInterface_WAV =
     NULL,   /* IsPlaying */
     WAV_GetAudio,
     WAV_Seek,   /* Seek */
+    NULL,   /* SeekSec [MIXER-X]*/
+    NULL,   /* SkipSec [MIXER-X]*/
     WAV_Tell,   /* Tell [MIXER-X]*/
     WAV_Length, /* FullLength [MIXER-X]*/
     NULL,   /* LoopStart [MIXER-X]*/

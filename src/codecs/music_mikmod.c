@@ -493,6 +493,8 @@ Mix_MusicInterface Mix_MusicInterface_MIKMOD =
     MIKMOD_IsPlaying,
     MIKMOD_GetAudio,
     MIKMOD_Seek,
+    NULL,   /* SeekSec [MIXER-X]*/
+    NULL,   /* SkipSec [MIXER-X]*/
     NULL,   /* Tell [MIXER-X]*/
     NULL,   /* FullLength [MIXER-X]*/
     NULL,   /* LoopStart [MIXER-X]*/

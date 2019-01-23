@@ -715,6 +715,8 @@ Mix_MusicInterface Mix_MusicInterface_ADLMIDI =
     NULL,   /* IsPlaying */
     ADLMIDI_playAudio,
     ADLMIDI_jump_to_time,
+    NULL,   /* SeekSec [MIXER-X]*/
+    NULL,   /* SkipSec [MIXER-X]*/
     ADLMIDI_currentPosition,   /* Tell [MIXER-X]*/
     ADLMIDI_songLength,   /* FullLength [MIXER-X]*/
     ADLMIDI_loopStart,   /* LoopStart [MIXER-X]*/
@@ -749,6 +751,8 @@ Mix_MusicInterface Mix_MusicInterface_ADLIMF =
     NULL,   /* IsPlaying */
     ADLMIDI_playAudio,
     ADLMIDI_jump_to_time,
+    NULL,   /* SeekSec [MIXER-X]*/
+    NULL,   /* SkipSec [MIXER-X]*/
     ADLMIDI_currentPosition,   /* Tell [MIXER-X]*/
     ADLMIDI_songLength,   /* FullLength [MIXER-X]*/
     ADLMIDI_loopStart,   /* LoopStart [MIXER-X]*/

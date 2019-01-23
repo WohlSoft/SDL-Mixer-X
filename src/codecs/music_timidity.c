@@ -220,6 +220,8 @@ Mix_MusicInterface Mix_MusicInterface_TIMIDITY =
     NULL,   /* IsPlaying */
     TIMIDITY_GetAudio,
     TIMIDITY_Seek,
+    NULL,   /* SeekSec [MIXER-X]*/
+    NULL,   /* SkipSec [MIXER-X]*/
     NULL,   /* Tell [MIXER-X]*/
     NULL,   /* FullLength [MIXER-X]*/
     NULL,   /* LoopStart [MIXER-X]*/

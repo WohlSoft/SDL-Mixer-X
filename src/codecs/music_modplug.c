@@ -351,6 +351,8 @@ Mix_MusicInterface Mix_MusicInterface_MODPLUG =
     NULL,   /* IsPlaying */
     MODPLUG_GetAudio,
     MODPLUG_Seek,
+    NULL,   /* SeekSec [MIXER-X]*/
+    NULL,   /* SkipSec [MIXER-X]*/
     MODPLUG_Tell, /* Tell [MIXER-X]*/
     MODPLUG_Length, /* FullLength [MIXER-X]*/
     NULL,   /* LoopStart [MIXER-X]*/

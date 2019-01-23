@@ -752,6 +752,9 @@ extern DECLSPEC int SDLCALL Mix_PausedMusic(void);
    (set position in seconds), at the moment.
 */
 extern DECLSPEC int SDLCALL Mix_SetMusicStreamPosition(Mix_Music *music, double position);
+extern DECLSPEC int SDLCALL Mix_SeekMusicStreamSeconds(Mix_Music *music, double position);
+extern DECLSPEC int SDLCALL Mix_SkipMusicStreamSeconds(Mix_Music *music, double position);
+
 /*
     Deprecated analogue of Mix_SetMusicStreamPosition() which lacks Mix_Music* argument
 */

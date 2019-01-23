@@ -512,6 +512,8 @@ Mix_MusicInterface Mix_MusicInterface_Opus =
     NULL,   /* IsPlaying */
     OPUS_GetAudio,
     OPUS_Seek,
+    NULL,   /* SeekSec [MIXER-X]*/
+    NULL,   /* SkipSec [MIXER-X]*/
     OPUS_Tell, /* Tell [MIXER-X]*/
     OPUS_Total, /* FullLength [MIXER-X]*/
     OPUS_get_loop_start, /* LoopStart [MIXER-X]*/

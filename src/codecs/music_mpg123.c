@@ -490,6 +490,8 @@ Mix_MusicInterface Mix_MusicInterface_MPG123 =
     NULL,   /* IsPlaying */
     MPG123_GetAudio,
     MPG123_Seek,
+    NULL,   /* SeekSec [MIXER-X]*/
+    NULL,   /* SkipSec [MIXER-X]*/
     MPG123_Tell, /* Tell [MIXER-X]*/
     MPG123_Length, /* FullLength [MIXER-X]*/
     NULL,   /* LoopStart [MIXER-X]*/
