@@ -120,7 +120,8 @@ typedef struct
     /* Set the volume */
     void (*SetVolume)(void *music, int volume);
 
-    /*TODO: Implement "GetVolume" call*/
+    /* Get the volume */
+    int (*GetVolume)(void *music);
 
     /* Start playing music from the beginning with an optional loop count */
     int (*Play)(void *music, int play_count);

@@ -126,6 +126,7 @@ typedef struct {
     SDL_AudioStream *stream;
     void *buffer;
     int buffer_size;
+    int volume;
 } FLUIDSYNTH_Music;
 
 
@@ -165,6 +166,7 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusic(void *data)
 
     if ((music = SDL_calloc(1, sizeof(FLUIDSYNTH_Music)))) {
         int channels = 2;
+        music->volume = MIX_MAX_VOLUME;
         if ((music->stream = SDL_NewAudioStream(AUDIO_S16SYS, channels, music_spec.freq, music_spec.format, music_spec.channels, music_spec.freq))) {
             music->buffer_size = music_spec.samples * sizeof(Sint16) * channels;
             if ((music->buffer = SDL_malloc(music->buffer_size))) {
@@ -228,7 +230,14 @@ static void FLUIDSYNTH_SetVolume(void *context, int volume)
 {
     FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
     /* FluidSynth's default is 0.2. Make 1.2 the maximum. */
+    music->volume = volume;
     fluidsynth.fluid_synth_set_gain(music->synth, (float) (volume * 1.2 / MIX_MAX_VOLUME));
+}
+
+static int FLUIDSYNTH_GetVolume(void *context)
+{
+    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
+    return music->volume;
 }
 
 static int FLUIDSYNTH_Play(void *context, int play_count)
@@ -299,6 +308,7 @@ Mix_MusicInterface Mix_MusicInterface_FLUIDSYNTH =
     NULL,   /* CreateFromFile */
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     FLUIDSYNTH_SetVolume,
+    FLUIDSYNTH_GetVolume,   /* GetVolume [MIXER-X]*/
     FLUIDSYNTH_Play,
     FLUIDSYNTH_IsPlaying,
     FLUIDSYNTH_GetAudio,

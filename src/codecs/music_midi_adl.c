@@ -306,6 +306,13 @@ static void ADLMIDI_setvolume(void *music_p, int volume)
     /* (int)(round(128.0 * sqrt(((double)volume) * (1.0 / 128.0))));*/
 }
 
+/* Get the volume for a ADLMIDI stream */
+static int ADLMIDI_getvolume(void *music_p)
+{
+    AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
+    return music->volume / 2;
+}
+
 static void process_args(const char *args, AdlMidi_Setup *setup)
 {
     char arg[1024];
@@ -711,6 +718,7 @@ Mix_MusicInterface Mix_MusicInterface_ADLMIDI =
     NULL,   /* CreateFromFile */
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     ADLMIDI_setvolume,
+    NULL,   /* GetVolume [MIXER-X]*/
     ADLMIDI_play,
     NULL,   /* IsPlaying */
     ADLMIDI_playAudio,
@@ -745,6 +753,7 @@ Mix_MusicInterface Mix_MusicInterface_ADLIMF =
     NULL,   /* CreateFromFile */
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     ADLMIDI_setvolume,
+    ADLMIDI_getvolume, /* GetVolume [MIXER-X]*/
     ADLMIDI_play,
     NULL,   /* IsPlaying */
     ADLMIDI_playAudio,

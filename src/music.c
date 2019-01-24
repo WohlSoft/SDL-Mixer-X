@@ -1671,14 +1671,15 @@ int SDLCALLCC Mix_VolumeMusicStream(Mix_Music *music, int volume)
 {
     int prev_volume;
 
-    /*TODO: put here "music->interface->GetVolume(music->context)" when implement*/
-    prev_volume = music_volume;
+    prev_volume = Mix_GetVolumeMusicStream(music);
+
     if (volume < 0) {
         return prev_volume;
     }
     if (volume > SDL_MIX_MAXVOLUME) {
         volume = SDL_MIX_MAXVOLUME;
     }
+
     music_volume = volume;
     Mix_LockAudio();
     if (music) {
@@ -1692,6 +1693,21 @@ int SDLCALLCC Mix_VolumeMusicStream(Mix_Music *music, int volume)
 int SDLCALLCC Mix_VolumeMusic(int volume)
 {
     return Mix_VolumeMusicStream(NULL, volume);
+}
+
+int SDLCALLCC Mix_GetVolumeMusicStream(Mix_Music *music)
+{
+    int prev_volume;
+
+    if (music && music->interface->GetVolume)
+        prev_volume = music->interface->GetVolume(music->context);
+    else if (music_playing && music_playing->interface->GetVolume) {
+        prev_volume = music_playing->interface->GetVolume(music->context);
+    } else {
+        prev_volume = music_volume;
+    }
+
+    return prev_volume;
 }
 
 /* Halt playing of music */

@@ -369,6 +369,13 @@ static void OGG_SetVolume(void *context, int volume)
     music->volume = volume;
 }
 
+/* Get the volume for an OGG stream */
+static int OGG_GetVolume(void *context)
+{
+    OGG_music *music = (OGG_music *)context;
+    return music->volume;
+}
+
 /* Start playback of a given OGG stream */
 static int OGG_Play(void *context, int play_count)
 {
@@ -555,6 +562,7 @@ Mix_MusicInterface Mix_MusicInterface_OGG =
     NULL,   /* CreateFromFile */
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     OGG_SetVolume,
+    OGG_GetVolume,   /* GetVolume [MIXER-X]*/
     OGG_Play,
     NULL,   /* IsPlaying */
     OGG_GetAudio,
