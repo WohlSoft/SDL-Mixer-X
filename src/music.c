@@ -1702,7 +1702,7 @@ int SDLCALLCC Mix_GetVolumeMusicStream(Mix_Music *music)
     if (music && music->interface->GetVolume)
         prev_volume = music->interface->GetVolume(music->context);
     else if (music_playing && music_playing->interface->GetVolume) {
-        prev_volume = music_playing->interface->GetVolume(music->context);
+        prev_volume = music_playing->interface->GetVolume(music_playing->context);
     } else {
         prev_volume = music_volume;
     }
