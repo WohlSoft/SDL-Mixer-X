@@ -517,6 +517,13 @@ static void FLAC_SetVolume(void *context, int volume)
     music->volume = volume;
 }
 
+/* Get the volume for an FLAC stream */
+static int FLAC_GetVolume(void *context)
+{
+    FLAC_Music *music = (FLAC_Music *)context;
+    return music->volume;
+}
+
 /* Start playback of a given FLAC stream */
 static int FLAC_Play(void *context, int play_count)
 {
@@ -655,6 +662,7 @@ Mix_MusicInterface Mix_MusicInterface_FLAC =
     NULL,   /* CreateFromFile */
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     FLAC_SetVolume,
+    FLAC_GetVolume,   /* GetVolume [MIXER-X]*/
     FLAC_Play,
     NULL,   /* IsPlaying */
     FLAC_GetAudio,

@@ -175,6 +175,13 @@ static void OPNMIDI_setvolume(void *music_p, int volume)
     /* (int)(round(128.0*sqrt(((double)volume)*(1.0/128.0) ))); */
 }
 
+/* Get the volume for a OPNMIDI stream */
+static int OPNMIDI_getvolume(void *music_p)
+{
+    OpnMIDI_Music *music = (OpnMIDI_Music*)music_p;
+    return music->volume / 2;
+}
+
 static void process_args(const char *args, OpnMidi_Setup *setup)
 {
     char arg[1024];
@@ -549,6 +556,7 @@ Mix_MusicInterface Mix_MusicInterface_OPNMIDI =
     NULL,   /* CreateFromFile */
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     OPNMIDI_setvolume,
+    OPNMIDI_getvolume,   /* GetVolume [MIXER-X]*/
     OPNMIDI_play,
     NULL,   /* IsPlaying */
     OPNMIDI_playAudio,

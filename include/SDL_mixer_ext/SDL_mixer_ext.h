@@ -80,7 +80,7 @@ extern "C" {
 /* Printable format: "%d.%d.%d", MAJOR, MINOR, PATCHLEVEL
 */
 #define SDL_MIXER_MAJOR_VERSION 2
-#define SDL_MIXER_MINOR_VERSION 3
+#define SDL_MIXER_MINOR_VERSION 4
 #define SDL_MIXER_PATCHLEVEL    0
 
 /* This macro can be used to fill a version structure with the compile-time
@@ -694,6 +694,8 @@ extern DECLSPEC int SDLCALL Mix_VolumeChunk(Mix_Chunk *chunk, int volume);
 extern DECLSPEC int SDLCALL Mix_VolumeMusicStream(Mix_Music *music, int volume);
 /* MIXERX_DEPRECATED("Use Mix_VolumeMusicStream(Mix_Music*,int) instead") */
 extern DECLSPEC int SDLCALL Mix_VolumeMusic(int volume);
+/* Get the current volume value in the range of 0-128 of a music stream */
+extern DECLSPEC int SDLCALL Mix_GetVolumeMusicStream(Mix_Music *music);
 
 /* Halt playing of a particular channel */
 extern DECLSPEC int SDLCALL Mix_HaltChannel(int channel);

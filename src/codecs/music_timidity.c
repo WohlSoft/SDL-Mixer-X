@@ -45,6 +45,7 @@ typedef struct
     SDL_AudioStream *stream;
     void *buffer;
     Sint32 buffer_size;
+    int volume;
 } TIMIDITY_Music;
 
 
@@ -73,6 +74,8 @@ void *TIMIDITY_CreateFromRW(SDL_RWops *src, int freesrc)
         SDL_OutOfMemory();
         return NULL;
     }
+
+    music->volume = MIX_MAX_VOLUME;
 
     SDL_memcpy(&spec, &music_spec, sizeof(spec));
     if (spec.channels > 2) {
@@ -111,7 +114,14 @@ void *TIMIDITY_CreateFromRW(SDL_RWops *src, int freesrc)
 static void TIMIDITY_SetVolume(void *context, int volume)
 {
     TIMIDITY_Music *music = (TIMIDITY_Music *)context;
+    music->volume = volume;
     Timidity_SetVolume(music->song, volume);
+}
+
+static int TIMIDITY_GetVolume(void *context)
+{
+    TIMIDITY_Music *music = (TIMIDITY_Music *)context;
+    return music->volume;
 }
 
 static int TIMIDITY_Play(void *context, int play_count)
@@ -216,6 +226,7 @@ Mix_MusicInterface Mix_MusicInterface_TIMIDITY =
     NULL,   /* CreateFromFile */
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     TIMIDITY_SetVolume,
+    TIMIDITY_GetVolume,   /* GetVolume [MIXER-X]*/
     TIMIDITY_Play,
     NULL,   /* IsPlaying */
     TIMIDITY_GetAudio,

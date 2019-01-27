@@ -47,14 +47,19 @@ typedef struct
 
 static void GME_delete(void *context);
 
-/* Set the volume for a MOD stream */
+/* Set the volume for a GME stream */
 void GME_setvolume(void *music_p, int volume)
 {
     GME_Music *music = (GME_Music*)music_p;
     music->volume = (int)(round((double)volume * 1.3));
-    /* (int)(round(128.0 * sqrt(((double)volume) * (1.0 / 128.0)))); */
 }
 
+/* Get the volume for a GME stream */
+int GME_getvolume(void *music_p)
+{
+    GME_Music *music = (GME_Music*)music_p;
+    return (int)(round((double)music->volume / 1.3));
+}
 
 GME_Music *GME_LoadSongRW(SDL_RWops *src, int trackNum)
 {
@@ -293,6 +298,7 @@ Mix_MusicInterface Mix_MusicInterface_GME =
     NULL,   /* CreateFromFile */
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     GME_setvolume,
+    GME_getvolume,   /* GetVolume [MIXER-X]*/
     GME_play,
     NULL,   /* IsPlaying */
     GME_playAudio,
