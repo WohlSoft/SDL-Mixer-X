@@ -78,12 +78,12 @@ void SDLCALLCC MIX_ADLMIDI_setScaleMod(int sc)
 
 int SDLCALLCC MIX_ADLMIDI_getAdLibMode()
 {
-    return Mix_ADLMIDI_getAdLibMode();
+    return -1;
 }
 
 void SDLCALLCC MIX_ADLMIDI_setAdLibMode(int sc)
 {
-    Mix_ADLMIDI_setAdLibMode(sc);
+    (void)sc;
 }
 
 void SDLCALLCC MIX_ADLMIDI_setSetDefaults()
