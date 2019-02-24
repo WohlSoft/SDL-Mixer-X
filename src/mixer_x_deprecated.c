@@ -142,3 +142,13 @@ int SDLCALLCC Mix_SetMidiDevice(int player)
 {
     return Mix_SetMidiPlayer(player);
 }
+
+int SDLCALLCC Mix_ADLMIDI_getAdLibMode()
+{
+    return -1;
+}
+
+void SDLCALLCC Mix_ADLMIDI_setAdLibMode(int ald)
+{
+    (void)ald;
+}

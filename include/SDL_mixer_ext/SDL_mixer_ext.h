@@ -845,8 +845,10 @@ extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getScaleMod(void);
 /* Set scalable modulation mode (0 off, 1 on) (Applying on stop/play) */
 extern DECLSPEC void SDLCALL Mix_ADLMIDI_setScaleMod(int sc);
 /* Get state of adlib drums mode */
+MIXERX_DEPRECATED("This function is no more useful, rhythm-mode is now fully automated")
 extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getAdLibMode(void);
 /* Set adlib drums mode mode (0 off, 1 on) (Applying on stop/play) */
+MIXERX_DEPRECATED("This function is no more useful, rhythm-mode is now fully automated")
 extern DECLSPEC void SDLCALL Mix_ADLMIDI_setAdLibMode(int tr);
 /* Get state of logarithmic mode */
 extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getLogarithmicVolumes(void);

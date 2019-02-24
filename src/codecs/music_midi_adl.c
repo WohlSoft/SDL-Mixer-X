@@ -33,7 +33,6 @@ typedef struct {
     int tremolo;
     int vibrato;
     int scalemod;
-    int adlibdrums;
     int volume_model;
     int chips_count;
     int four_op_channels;
@@ -44,7 +43,7 @@ typedef struct {
 } AdlMidi_Setup;
 
 static AdlMidi_Setup adlmidi_setup = {
-    58, -1, -1, -1, -1, 0, 4, -1, 0, 1, ADLMIDI_EMU_DOSBOX, ""
+    58, -1, -1, -1, 0, 4, -1, 0, 1, ADLMIDI_EMU_DOSBOX, ""
 };
 
 static void ADLMIDI_SetDefault(AdlMidi_Setup *setup)
@@ -53,7 +52,6 @@ static void ADLMIDI_SetDefault(AdlMidi_Setup *setup)
     setup->tremolo     = -1;
     setup->vibrato     = -1;
     setup->scalemod    = -1;
-    setup->adlibdrums  = -1;
     setup->volume_model = 0;
     setup->chips_count = 4;
     setup->four_op_channels = -1;
@@ -132,25 +130,6 @@ void SDLCALLCC Mix_ADLMIDI_setVibrato(int vib)
     adlmidi_setup.vibrato = vib;
     #else
     MIX_UNUSED(vib);
-    #endif
-}
-
-
-int SDLCALLCC Mix_ADLMIDI_getAdLibMode()
-{
-    #ifdef MUSIC_MID_ADLMIDI
-    return adlmidi_setup.adlibdrums;
-    #else
-    return -1;
-    #endif
-}
-
-void SDLCALLCC Mix_ADLMIDI_setAdLibMode(int ald)
-{
-    #ifdef MUSIC_MID_ADLMIDI
-    adlmidi_setup.adlibdrums = ald;
-    #else
-    MIX_UNUSED(ald);
     #endif
 }
 
@@ -356,7 +335,7 @@ static void process_args(const char *args, AdlMidi_Setup *setup)
                     setup->vibrato = value;
                     break;
                 case 'a':
-                    setup->adlibdrums = value;
+                    /* Deprecated and useless */
                     break;
                 case 'm':
                     setup->scalemod = value;
@@ -506,7 +485,6 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
         if (setup.emulator >= 0)
             adl_switchEmulator( music->adlmidi, setup.emulator );
         adl_setScaleModulators(music->adlmidi, setup.scalemod);
-        adl_setPercMode(music->adlmidi, setup.adlibdrums);
         adl_setVolumeRangeModel(music->adlmidi, setup.volume_model);
         adl_setFullRangeBrightness(music->adlmidi, setup.full_brightness_range);
         adl_setSoftPanEnabled(music->adlmidi, setup.soft_pan);
