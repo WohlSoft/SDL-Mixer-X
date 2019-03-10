@@ -231,9 +231,7 @@ namespace PGE_MusicPlayer
     void MUS_changeVolume(int volume)
     {
         Mix_VolumeMusicStream(PGE_MusicPlayer::play_mus, volume);
-        DebugLog(QString("Mix_VolumeMusic: %1 (wanted %2)\n")
-                 .arg(Mix_GetVolumeMusicStream(PGE_MusicPlayer::play_mus))
-                 .arg(volume));
+        DebugLog(QString("Mix_VolumeMusic: %1\n").arg(volume));
     }
 
     /*!
