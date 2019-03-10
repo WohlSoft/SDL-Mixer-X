@@ -32,6 +32,7 @@
 #include "music_wav.h"
 #include "music_mikmod.h"
 #include "music_modplug.h"
+#include "music_xmp.h"
 #include "music_nativemidi.h"
 #include "music_fluidsynth.h"
 #include "music_timidity.h"
@@ -218,6 +219,9 @@ static Mix_MusicInterface *s_music_interfaces[] =
 #endif
 #ifdef MUSIC_MOD_MIKMOD
     &Mix_MusicInterface_MIKMOD,
+#endif
+#ifdef MUSIC_MOD_XMP
+    &Mix_MusicInterface_LIBXMP,
 #endif
 #ifdef MUSIC_MID_FLUIDSYNTH
     &Mix_MusicInterface_FLUIDSYNTH,

@@ -230,7 +230,7 @@ static void MODPLUG_SetVolume(void *context, int volume)
 {
     MODPLUG_Music *music = (MODPLUG_Music *)context;
     music->volume = volume;
-    modplug.ModPlug_SetMasterVolume(music->file, (unsigned int)volume * 4);
+    modplug.ModPlug_SetMasterVolume(music->file, (unsigned int)volume * 2); /* 0-512, reduced to 0-256 to prevent clipping */
 }
 
 /* Get the volume for a modplug stream */
