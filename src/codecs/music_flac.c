@@ -376,7 +376,7 @@ static void flac_metadata_music_cb(
 
             SDL_memset(param, 0, (size_t)paramLen);
             SDL_memcpy(param, ent, len);
-            value = strchr(param, '=');
+            value = SDL_strchr(param, '=');
             if (value == NULL) {
                 value = param + paramLen - 1; /* set null */
             } else {
