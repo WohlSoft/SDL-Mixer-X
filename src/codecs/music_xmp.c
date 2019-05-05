@@ -149,7 +149,7 @@ static int XMP_GetSome(void *context, void *data, int bytes, SDL_bool *done)
         return 0;
     }
 
-    ret = xmp_play_buffer(music->ctx, music->buffer, music->buffer_size, 0);
+    ret = xmp_play_buffer(music->ctx, music->buffer, music->buffer_size, music->play_count < 0 ? -1 : 0);
     amount = music->buffer_size;
 
     if (ret == 0) {

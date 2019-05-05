@@ -168,7 +168,7 @@ static int MODPLUG_Open(const SDL_AudioSpec *spec)
     settings.mBassRange = 50;
     settings.mSurroundDepth = 0;
     settings.mSurroundDelay = 10;
-    settings.mLoopCount = 0;
+    settings.mLoopCount = -1;
     modplug.ModPlug_SetSettings(&settings);
     return 0;
 }
