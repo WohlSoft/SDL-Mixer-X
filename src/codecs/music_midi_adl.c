@@ -482,8 +482,7 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
             return NULL;
         }
 
-        if (setup.emulator >= 0)
-            adl_switchEmulator( music->adlmidi, setup.emulator );
+        adl_switchEmulator( music->adlmidi, (setup.emulator >= 0) ? setup.emulator : ADLMIDI_EMU_DOSBOX );
         adl_setScaleModulators(music->adlmidi, setup.scalemod);
         adl_setVolumeRangeModel(music->adlmidi, setup.volume_model);
         adl_setFullRangeBrightness(music->adlmidi, setup.full_brightness_range);
