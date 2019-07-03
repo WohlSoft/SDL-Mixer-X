@@ -51,6 +51,7 @@ void *XMP_CreateFromRW(SDL_RWops *src, int freesrc)
     XMP_Music *music;
     void *buffer;
     size_t size;
+    int error;
 
     music = (XMP_Music *)SDL_calloc(1, sizeof(*music));
     if (!music) {
@@ -85,8 +86,22 @@ void *XMP_CreateFromRW(SDL_RWops *src, int freesrc)
 
     buffer = SDL_LoadFile_RW(src, &size, SDL_FALSE);
     if (buffer) {
-        if (xmp_load_module_from_memory(music->ctx, buffer, (long)size) < 0) {
-            Mix_SetError("xmp_load_module failed");
+        error = xmp_load_module_from_memory(music->ctx, buffer, (long)size);
+        if (error < 0) {
+            switch(error) {
+            case -XMP_ERROR_FORMAT:
+                Mix_SetError("xmp_load_module failed: Unsupported file format");
+                break;
+            case -XMP_ERROR_LOAD:
+                Mix_SetError("xmp_load_module failed: Error loading file");
+                break;
+            case -XMP_ERROR_SYSTEM:
+                Mix_SetError("xmp_load_module failed: System error has occured");
+                break;
+            default:
+                Mix_SetError("xmp_load_module failed: Can't load file");
+                break;
+            }
         }
         SDL_free(buffer);
     }
