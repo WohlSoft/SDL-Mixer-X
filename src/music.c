@@ -495,9 +495,9 @@ int parse_midi_args(const char *args)
             if ((c == ';') || (c == '\0')) {
                 int value;
                 arg[j] = '\0';
-                value = atoi(arg);
                 switch(type) {
                 case 's':
+                    value = SDL_atoi(arg);
                     if ((value >= 0) && value < MIDI_KnuwnDevices)
                         selected_midi_device = value;
                     break;

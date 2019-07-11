@@ -204,8 +204,9 @@ static int OPNMIDI_getvolume(void *music_p)
 
 static void process_args(const char *args, OpnMidi_Setup *setup)
 {
-    char arg[1024];
-    char type = 'x';
+#define ARG_BUFFER_SIZE    1024
+    char arg[ARG_BUFFER_SIZE];
+    char type = '-';
     size_t maxlen = 0;
     size_t i, j = 0;
     int value_opened = 0;
@@ -226,7 +227,9 @@ static void process_args(const char *args, OpnMidi_Setup *setup)
             if ((c == ';') || (c == '\0')) {
                 int value;
                 arg[j] = '\0';
-                value = atoi(arg);
+                if (type != 'x') {
+                    value = SDL_atoi(arg);
+                }
                 switch(type)
                 {
                 case 'c':
@@ -247,6 +250,11 @@ static void process_args(const char *args, OpnMidi_Setup *setup)
                 case 'e':
                     setup->emulator = value;
                     break;
+                case 'x':
+                    if (arg[0] == '=') {
+                        SDL_strlcpy(setup->custom_bank_path, arg + 1, (ARG_BUFFER_SIZE - 1));
+                    }
+                    break;
                 case '\0':
                     break;
                 default:
@@ -264,6 +272,7 @@ static void process_args(const char *args, OpnMidi_Setup *setup)
             j = 0;
         }
     }
+#undef ARG_BUFFER_SIZE
 }
 
 static void OPNMIDI_delete(void *music_p);
