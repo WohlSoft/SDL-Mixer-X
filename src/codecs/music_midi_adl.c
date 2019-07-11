@@ -42,8 +42,10 @@ typedef struct {
     char custom_bank_path[2048];
 } AdlMidi_Setup;
 
+#define ADLMIDI_DEFAULT_CHIPS_COUNT     4
+
 static AdlMidi_Setup adlmidi_setup = {
-    58, -1, -1, -1, 0, 4, -1, 0, 1, ADLMIDI_EMU_DOSBOX, ""
+    58, -1, -1, -1, 0, -1, -1, 0, 1, ADLMIDI_EMU_DOSBOX, ""
 };
 
 static void ADLMIDI_SetDefault(AdlMidi_Setup *setup)
@@ -53,7 +55,7 @@ static void ADLMIDI_SetDefault(AdlMidi_Setup *setup)
     setup->vibrato     = -1;
     setup->scalemod    = -1;
     setup->volume_model = 0;
-    setup->chips_count = 4;
+    setup->chips_count = -1;
     setup->four_op_channels = -1;
     setup->full_brightness_range = 0;
     setup->soft_pan = 1;
@@ -487,7 +489,7 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
         adl_setVolumeRangeModel(music->adlmidi, setup.volume_model);
         adl_setFullRangeBrightness(music->adlmidi, setup.full_brightness_range);
         adl_setSoftPanEnabled(music->adlmidi, setup.soft_pan);
-        adl_setNumChips(music->adlmidi, setup.chips_count);
+        adl_setNumChips(music->adlmidi, (setup.chips_count >= 0) ? setup.chips_count : ADLMIDI_DEFAULT_CHIPS_COUNT);
         if (setup.four_op_channels >= 0)
             adl_setNumFourOpsChn(music->adlmidi, setup.four_op_channels);
 

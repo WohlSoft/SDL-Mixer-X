@@ -38,14 +38,16 @@ typedef struct {
     char custom_bank_path[2048];
 } OpnMidi_Setup;
 
+#define OPNMIDI_DEFAULT_CHIPS_COUNT     6
+
 static OpnMidi_Setup opnmidi_setup = {
-    0, 4, 0, 1, -1, ""
+    0, -1, 0, 1, -1, ""
 };
 
 static void OPNMIDI_SetDefault(OpnMidi_Setup *setup)
 {
     setup->volume_model = 0;
-    setup->chips_count = 6;
+    setup->chips_count = -1;
     setup->full_brightness_range = 0;
     setup->soft_pan = 1;
     setup->emulator = -1;
@@ -358,7 +360,7 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
         opn2_setVolumeRangeModel(music->opnmidi, setup.volume_model);
         opn2_setFullRangeBrightness(music->opnmidi, setup.full_brightness_range);
         opn2_setSoftPanEnabled(music->opnmidi, setup.soft_pan);
-        opn2_setNumChips(music->opnmidi, setup.chips_count);
+        opn2_setNumChips(music->opnmidi, (setup.chips_count >= 0) ? setup.chips_count : OPNMIDI_DEFAULT_CHIPS_COUNT);
 
         err = opn2_openData( music->opnmidi, bytes, (unsigned long)filesize);
         SDL_free(bytes);
