@@ -874,6 +874,10 @@ extern DECLSPEC void SDLCALL Mix_ADLMIDI_setFullPanStereo(int fp);
 extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getEmulator(void);
 /* Select the OPL3 Emulator for ADLMIDI */
 extern DECLSPEC void SDLCALL Mix_ADLMIDI_setEmulator(int emu);
+/* Get the setup of count of virtual chips */
+extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getChipsCount(void);
+/* Set count of virtual chips (integer between 1 and 100, or -1 to restore default setup) */
+extern DECLSPEC void SDLCALL Mix_ADLMIDI_setChipsCount(int chips);
 /* Reset all ADLMIDI properties to default state */
 extern DECLSPEC void SDLCALL Mix_ADLMIDI_setSetDefaults(void);
 
@@ -898,6 +902,10 @@ extern DECLSPEC void SDLCALL Mix_OPNMIDI_setFullPanStereo(int fp);
 extern DECLSPEC int  SDLCALL Mix_OPNMIDI_getEmulator(void);
 /* Select the OPN2 Emulator for OPNMIDI */
 extern DECLSPEC void SDLCALL Mix_OPNMIDI_setEmulator(int emu);
+/* Get the setup of count of virtual chips */
+extern DECLSPEC int  SDLCALL Mix_OPNMIDI_getChipsCount(void);
+/* Set count of virtual chips (integer between 1 and 100, or -1 to restore default setup) */
+extern DECLSPEC void SDLCALL Mix_OPNMIDI_setChipsCount(int chips);
 /* Sets WOPN bank file for OPNMIDI playing device, affects on MIDI file reopen */
 extern DECLSPEC void SDLCALL Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path);
 

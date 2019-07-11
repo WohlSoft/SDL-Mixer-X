@@ -245,6 +245,24 @@ void SDLCALLCC Mix_ADLMIDI_setEmulator(int emu)
     #endif
 }
 
+int SDLCALLCC Mix_ADLMIDI_getChipsCount()
+{
+    #ifdef MUSIC_MID_ADLMIDI
+    return adlmidi_setup.chips_count;
+    #else
+    return -1;
+    #endif
+}
+
+void SDLCALLCC Mix_ADLMIDI_setChipsCount(int chips)
+{
+    #ifdef MUSIC_MID_ADLMIDI
+    adlmidi_setup.chips_count = chips;
+    #else
+    MIX_UNUSED(emu);
+    #endif
+}
+
 void SDLCALLCC Mix_ADLMIDI_setSetDefaults()
 {
     #ifdef MUSIC_MID_ADLMIDI

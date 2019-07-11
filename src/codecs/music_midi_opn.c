@@ -131,6 +131,24 @@ void SDLCALLCC Mix_OPNMIDI_setEmulator(int emu)
     #endif
 }
 
+int SDLCALLCC Mix_OPNMIDI_getChipsCount()
+{
+    #ifdef MUSIC_MID_OPNMIDI
+    return opnmidi_setup.chips_count;
+    #else
+    return -1;
+    #endif
+}
+
+void SDLCALLCC Mix_OPNMIDI_setChipsCount(int chips)
+{
+    #ifdef MUSIC_MID_OPNMIDI
+    opnmidi_setup.chips_count = chips;
+    #else
+    MIX_UNUSED(frb);
+    #endif
+}
+
 void SDLCALLCC Mix_OPNMIDI_setSetDefaults()
 {
     #ifdef MUSIC_MID_OPNMIDI
