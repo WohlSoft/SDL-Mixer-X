@@ -666,6 +666,7 @@ if(LIBMATH_NEEDED AND NOT MSVC)
 endif()
 
 if(WIN32)
+    list(APPEND SDLMixerX_LINK_LIBS SetupAPI)
     option(BUILD_AS_VB6_BINDING "Compile library into solid module compatible with VisualBasic 6" OFF)
     if(BUILD_AS_VB6_BINDING)
         message("== SDL Mixer X will be built as solid module that is ready for MS-VB6 binding! ==")
@@ -674,7 +675,7 @@ if(WIN32)
         list(REMOVE_ITEM SDLMixerX_LINK_LIBS SDL2$<$<CONFIG:Debug>:d>)
         list(APPEND SDLMixerX_LINK_LIBS
                     SDL2-static
-                    uuid winmm ole32 imm32 version oleaut32 user32 gdi32)
+                    uuid winmm ole32 imm32 version oleaut32 user32 gdi32 SetupAPI)
         if(NOT MSVC)
             list(APPEND SDLMixerX_LINK_LIBS stdc++ gcc pthread)
         endif()
