@@ -17,11 +17,20 @@ find_package(Git REQUIRED)
 set(AUDIO_CODECS_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR})
 set(AUDIO_CODECS_REPOSITORY_PATH ${CMAKE_BINARY_DIR}/external/AudioCodecs)
 
+option(WITH_SDL2_WASAPI "Enable WASAPI audio output support for Windows build of SDL2" ON)
+if(WIN32)
+    set(SDL2_WASAPI_FLAG "-DSDL2_WASAPI_FLAG=${WITH_SDL2_WASAPI}")
+endif()
+
 ExternalProject_Add(
     AudioCodecs
     PREFIX ${CMAKE_BINARY_DIR}/external/AudioCodecs
     GIT_REPOSITORY https://github.com/WohlSoft/AudioCodecs.git
-    CMAKE_ARGS "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}" "-DCMAKE_INSTALL_PREFIX=${AUDIO_CODECS_INSTALL_DIR}" "-DDOWNLOAD_SDL2_DEPENDENCY=ON"
+    CMAKE_ARGS
+        "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+        "-DCMAKE_INSTALL_PREFIX=${AUDIO_CODECS_INSTALL_DIR}"
+        "-DDOWNLOAD_SDL2_DEPENDENCY=ON"
+        ${SDL2_WASAPI_FLAG}
 )
 
 message("AudioCodecs can see SDL2 is stored in ${SDL2_REPO_PATH}...")
