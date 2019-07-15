@@ -10,6 +10,7 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QMoveEvent>
+#include <QToolTip>
 #include <cmath>
 
 #include "ui_mainwindow.h"
@@ -80,6 +81,7 @@ MusPlayer_Qt::MusPlayer_Qt(QWidget *parent) : QMainWindow(parent),
     connect(ui->volume, &QSlider::valueChanged, [this](int x)
     {
         on_volume_valueChanged(x);
+        QToolTip::showText(QCursor::pos(), QString("%1").arg(x), this);
     });
 
     connect(m_seekBar, &SeekBar::positionSeeked, this, &MusPlayer_Qt::musicPosition_seeked);
@@ -187,6 +189,8 @@ void MusPlayer_Qt::contextMenu(const QPoint &pos)
     QAction *stop        = x.addAction("Stop");
     x.addSeparator();
     QAction *reverb       = x.addAction("Reverb");
+    QAction *resetTempo   = x.addAction("Reset tempo");
+    resetTempo->setEnabled(ui->tempoFrame->isEnabled());
     reverb->setCheckable(true);
     reverb->setChecked(PGE_MusicPlayer::reverbEnabled);
     QAction *assoc_files = x.addAction("Associate files");
@@ -220,6 +224,8 @@ void MusPlayer_Qt::contextMenu(const QPoint &pos)
         ui->actionEnableReverb->setChecked(reverb->isChecked());
         on_actionEnableReverb_triggered(reverb->isChecked());
     }
+    else if(resetTempo == ret)
+        ui->tempo->setValue(0);
     else if(assoc_files == ret)
         on_actionFileAssoc_triggered();
     //    else if(ret == play_list)
@@ -518,6 +524,7 @@ void MusPlayer_Qt::on_tempo_valueChanged(int tempo)
         double tempoFactor = 1.0 + 0.01 * double(tempo);
         Mix_SetMusicTempo(PGE_MusicPlayer::play_mus, tempoFactor);
         qDebug() << "Changed tempo factor: " << tempoFactor;
+        QToolTip::showText(QCursor::pos(), QString("%1").arg(tempoFactor), this);
     }
 }
 
