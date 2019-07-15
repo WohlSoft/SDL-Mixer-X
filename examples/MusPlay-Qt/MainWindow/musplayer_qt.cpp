@@ -103,6 +103,7 @@ MusPlayer_Qt::MusPlayer_Qt(QWidget *parent) : QMainWindow(parent),
     ui->volume->setValue(setup.value("Volume", 128).toInt());
     m_prevTrackID = ui->trackID->value();    
     ui->gme_setup->setEnabled(false);
+    ui->tempoFrame->setEnabled(false);
 
     currentMusic = setup.value("RecentMusic", "").toString();
     restoreGeometry(setup.value("Window-Geometry").toByteArray());
@@ -414,6 +415,10 @@ void MusPlayer_Qt::on_play_clicked()
 
     if(PGE_MusicPlayer::MUS_openFile(musicPath))
     {
+        ui->tempo->blockSignals(true);
+        ui->tempo->setValue(0);
+        ui->tempo->blockSignals(false);
+        ui->tempoFrame->setEnabled((Mix_GetMusicTempo(PGE_MusicPlayer::play_mus) >= 0.0));
         PGE_MusicPlayer::MUS_changeVolume(ui->volume->value());
         playSuccess = PGE_MusicPlayer::MUS_playMusic();
         ui->play->setToolTip(tr("Pause"));
@@ -504,6 +509,16 @@ void MusPlayer_Qt::on_trackID_editingFinished()
         }
     }
 #endif
+}
+
+void MusPlayer_Qt::on_tempo_valueChanged(int tempo)
+{
+    if(Mix_PlayingMusicStream(PGE_MusicPlayer::play_mus))
+    {
+        double tempoFactor = 1.0 + 0.01 * double(tempo);
+        Mix_SetMusicTempo(PGE_MusicPlayer::play_mus, tempoFactor);
+        qDebug() << "Changed tempo factor: " << tempoFactor;
+    }
 }
 
 void MusPlayer_Qt::on_recordWav_clicked(bool checked)
