@@ -223,7 +223,7 @@ static int XMP_setTempo(void *music_p, double tempo)
 {
     XMP_Music *music = (XMP_Music *)music_p;
     if (music && (tempo > 0.0)) {
-        xmp_set_tempo_factor(music->ctx, tempo);
+        xmp_set_tempo_factor(music->ctx, (1.0 / tempo));
         music->tempo = tempo;
         return 0;
     }
