@@ -30,6 +30,7 @@
 typedef struct
 {
     int volume;
+    double tempo;
     int play_count;
     struct xmp_module_info mi;
     struct xmp_frame_info fi;
@@ -63,6 +64,7 @@ void *XMP_CreateFromRW(SDL_RWops *src, int freesrc)
     music->has_module = SDL_FALSE;
 
     music->volume = MIX_MAX_VOLUME;
+    music->tempo = 1.0;
 
     music->stream = SDL_NewAudioStream(AUDIO_S16, 2, music_spec.freq,
                                        music_spec.format, music_spec.channels, music_spec.freq);
@@ -217,6 +219,26 @@ static double XMP_Length(void *context)
     return ((double)music->fi.total_time) / 1000.0;
 }
 
+static int XMP_setTempo(void *music_p, double tempo)
+{
+    XMP_Music *music = (XMP_Music *)music_p;
+    if (music && (tempo > 0.0)) {
+        xmp_set_tempo_factor(music->ctx, tempo);
+        music->tempo = tempo;
+        return 0;
+    }
+    return -1;
+}
+
+static double XMP_getTempo(void *music_p)
+{
+    XMP_Music *music = (XMP_Music *)music_p;
+    if (music) {
+        return music->tempo;
+    }
+    return -1.0;
+}
+
 static const char* XMP_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
 {
     XMP_Music *music = (XMP_Music *)context;
@@ -266,8 +288,10 @@ Mix_MusicInterface Mix_MusicInterface_LIBXMP =
     XMP_Seek,
     XMP_Tell, /* Tell [MIXER-X]*/
     XMP_Length, /* FullLength [MIXER-X]*/
-    NULL,   /* LoopStart [MIXER-X]*/
-    NULL,   /* LoopEnd [MIXER-X]*/
+    XMP_setTempo,   /* Set Tempo multiplier [MIXER-X] */
+    XMP_getTempo,   /* Get Tempo multiplier [MIXER-X] */
+    NULL,   /* LoopStart [MIXER-X] */
+    NULL,   /* LoopEnd [MIXER-X] */
     NULL,   /* LoopLength [MIXER-X]*/
     XMP_GetMetaTag, /* GetMetaTag [MIXER-X]*/
     NULL,   /* Pause */

@@ -641,6 +641,8 @@ Mix_MusicInterface Mix_MusicInterface_MAD =
     MAD_Seek,
     MAD_tell, /* Tell [MIXER-X]*/
     MAD_total,/* FullLength [MIXER-X]*/
+    NULL,   /* Set Tempo multiplier [MIXER-X] */
+    NULL,   /* Get Tempo multiplier [MIXER-X] */
     NULL,   /* LoopStart [MIXER-X]*/
     NULL,   /* LoopEnd [MIXER-X]*/
     NULL,   /* LoopLength [MIXER-X]*/

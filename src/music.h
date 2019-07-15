@@ -142,6 +142,12 @@ typedef struct
     /* MIXER-X: Tell a total length of a track (in seconds) */
     double (*FullLength)(void *music);
 
+    /* MIXER-X: Set a tempo multiplier */
+    int (*SetTempo)(void *music, double tempo);
+
+    /* MIXER-X: Get a current tempo multiplier */
+    double (*GetTempo)(void *music);
+
     /* MIXER-X: Tell a loop start position (in seconds) */
     double (*LoopStart)(void *music);
 

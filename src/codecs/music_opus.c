@@ -522,6 +522,8 @@ Mix_MusicInterface Mix_MusicInterface_Opus =
     OPUS_Seek,
     OPUS_Tell, /* Tell [MIXER-X]*/
     OPUS_Total, /* FullLength [MIXER-X]*/
+    NULL,   /* Set Tempo multiplier [MIXER-X] */
+    NULL,   /* Get Tempo multiplier [MIXER-X] */
     OPUS_get_loop_start, /* LoopStart [MIXER-X]*/
     OPUS_get_loop_end, /* LoopEnd [MIXER-X]*/
     OPUS_get_loop_length, /* LoopLength [MIXER-X]*/

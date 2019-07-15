@@ -1572,6 +1572,64 @@ double SDLCALLCC Mix_GetMusicTotalTime(Mix_Music *music)
     return(retval);
 }
 
+/* Set the playing music tempo */
+int music_internal_set_tempo(Mix_Music *music, double tempo)
+{
+    if (music->interface->SetTempo) {
+        return music->interface->SetTempo(music->context, tempo);
+    }
+    return -1;
+}
+int SDLCALLCC Mix_SetMusicTempo(Mix_Music *music, double tempo)
+{
+    int retval;
+
+    Mix_LockAudio();
+    if (music) {
+        retval = music_internal_set_tempo(music, tempo);
+        if (retval < 0) {
+            Mix_SetError("Tempo not implemented for music type");
+        }
+    } else if (music_playing) {
+        retval = music_internal_set_tempo(music_playing, tempo);
+        if (retval < 0) {
+            Mix_SetError("Tempo not implemented for music type");
+        }
+    } else {
+        Mix_SetError("Music isn't playing");
+        retval = -1;
+    }
+    Mix_UnlockAudio();
+
+    return(retval);
+}
+
+/* Get total playing music tempo */
+static double music_internal_tempo(Mix_Music *music)
+{
+    if (music->interface->GetTempo) {
+        return music->interface->GetTempo(music->context);
+    }
+    return -1.0;
+}
+double SDLCALLCC Mix_GetMusicTempo(Mix_Music *music)
+{
+    double retval;
+
+    Mix_LockAudio();
+    if (music) {
+        retval = music_internal_tempo(music);
+    } else if (music_playing) {
+        retval = music_internal_tempo(music_playing);
+    } else {
+        Mix_SetError("Music isn't playing");
+        retval = -1.0;
+    }
+    Mix_UnlockAudio();
+
+    return(retval);
+}
+
 /* Get Loop start position */
 static double music_internal_loop_start(Mix_Music *music)
 {

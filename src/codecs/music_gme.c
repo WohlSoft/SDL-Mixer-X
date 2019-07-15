@@ -39,6 +39,7 @@ typedef struct
     int play_count;
     Music_Emu* game_emu;
     int volume;
+    double tempo;
     SDL_AudioStream *stream;
     void *buffer;
     size_t buffer_size;
@@ -139,6 +140,7 @@ GME_Music *GME_LoadSongRW(SDL_RWops *src, int trackNum)
         gme_set_fade(music->game_emu, -1);
 
         music->volume = MIX_MAX_VOLUME;
+        music->tempo = 1.0;
         meta_tags_init(&music->tags);
 
         err = gme_track_info(music->game_emu, &musInfo, trackNum);
@@ -283,6 +285,26 @@ static double GME_get_cur_time(void *music_p)
     return (double)(gme_tell(music->game_emu)) / 1000.0;
 }
 
+static int GME_setTempo(void *music_p, double tempo)
+{
+    GME_Music *music = (GME_Music *)music_p;
+    if (music && (tempo > 0.0)) {
+        gme_set_tempo(music->game_emu, tempo);
+        music->tempo = tempo;
+        return 0;
+    }
+    return -1;
+}
+
+static double GME_getTempo(void *music_p)
+{
+    GME_Music *music = (GME_Music *)music_p;
+    if (music) {
+        return music->tempo;
+    }
+    return -1.0;
+}
+
 Mix_MusicInterface Mix_MusicInterface_GME =
 {
     "GME",
@@ -305,6 +327,8 @@ Mix_MusicInterface Mix_MusicInterface_GME =
     GME_jump_to_time,   /* Seek */
     GME_get_cur_time,   /* Tell [MIXER-X]*/
     NULL,   /* FullLength [MIXER-X]*/
+    GME_setTempo,   /* Set Tempo multiplier [MIXER-X] */
+    GME_getTempo,   /* Get Tempo multiplier [MIXER-X] */
     NULL,   /* LoopStart [MIXER-X]*/
     NULL,   /* LoopEnd [MIXER-X]*/
     NULL,   /* LoopLength [MIXER-X]*/

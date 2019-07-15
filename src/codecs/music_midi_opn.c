@@ -36,12 +36,13 @@ typedef struct {
     int soft_pan;
     int emulator;
     char custom_bank_path[2048];
+    double tempo;
 } OpnMidi_Setup;
 
 #define OPNMIDI_DEFAULT_CHIPS_COUNT     6
 
 static OpnMidi_Setup opnmidi_setup = {
-    0, -1, 0, 1, -1, ""
+    0, -1, 0, 1, -1, "", 1.0
 };
 
 static void OPNMIDI_SetDefault(OpnMidi_Setup *setup)
@@ -52,6 +53,7 @@ static void OPNMIDI_SetDefault(OpnMidi_Setup *setup)
     setup->soft_pan = 1;
     setup->emulator = -1;
     setup->custom_bank_path[0] = '\0';
+    setup->tempo = 1.0;
 }
 
 #endif
@@ -177,7 +179,7 @@ typedef struct
     struct OPN2_MIDIPlayer *opnmidi;
     int playing;
     int volume;
-    int gme_t_sample_rate;
+    double tempo;
 
     SDL_AudioStream *stream;
     void *buffer;
@@ -295,6 +297,8 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
 
         music = (OpnMIDI_Music *)SDL_calloc(1, sizeof(OpnMIDI_Music));
 
+        music->tempo = setup.tempo;
+
         switch (music_spec.format)
         {
         case AUDIO_U8:
@@ -388,6 +392,7 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
         opn2_setFullRangeBrightness(music->opnmidi, setup.full_brightness_range);
         opn2_setSoftPanEnabled(music->opnmidi, setup.soft_pan);
         opn2_setNumChips(music->opnmidi, (setup.chips_count >= 0) ? setup.chips_count : OPNMIDI_DEFAULT_CHIPS_COUNT);
+        opn2_setTempo(music->opnmidi, music->tempo);
 
         err = opn2_openData( music->opnmidi, bytes, (unsigned long)filesize);
         SDL_free(bytes);
@@ -544,6 +549,26 @@ static double OPNMIDI_songLength(void* music_p)
     return opn2_totalTimeLength(music->opnmidi);
 }
 
+static int OPNMIDI_setTempo(void *music_p, double tempo)
+{
+    OpnMIDI_Music *music = (OpnMIDI_Music *)music_p;
+    if (music && (tempo > 0.0)) {
+        opn2_setTempo(music->opnmidi, tempo);
+        music->tempo = tempo;
+        return 0;
+    }
+    return -1;
+}
+
+static double OPNMIDI_getTempo(void *music_p)
+{
+    OpnMIDI_Music *music = (OpnMIDI_Music *)music_p;
+    if (music) {
+        return music->tempo;
+    }
+    return -1.0;
+}
+
 static double OPNMIDI_loopStart(void* music_p)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music *)music_p;
@@ -592,6 +617,8 @@ Mix_MusicInterface Mix_MusicInterface_OPNMIDI =
     OPNMIDI_jump_to_time,
     OPNMIDI_currentPosition,   /* Tell [MIXER-X]*/
     OPNMIDI_songLength,   /* FullLength [MIXER-X]*/
+    OPNMIDI_setTempo,   /* Set Tempo multiplier [MIXER-X] */
+    OPNMIDI_getTempo,   /* Get Tempo multiplier [MIXER-X] */
     OPNMIDI_loopStart,   /* LoopStart [MIXER-X]*/
     OPNMIDI_loopEnd,   /* LoopEnd [MIXER-X]*/
     OPNMIDI_loopLength,   /* LoopLength [MIXER-X]*/

@@ -40,12 +40,13 @@ typedef struct {
     int soft_pan;
     int emulator;
     char custom_bank_path[2048];
+    double tempo;
 } AdlMidi_Setup;
 
 #define ADLMIDI_DEFAULT_CHIPS_COUNT     4
 
 static AdlMidi_Setup adlmidi_setup = {
-    58, -1, -1, -1, 0, -1, -1, 0, 1, ADLMIDI_EMU_DOSBOX, ""
+    58, -1, -1, -1, 0, -1, -1, 0, 1, ADLMIDI_EMU_DOSBOX, "", 1.0
 };
 
 static void ADLMIDI_SetDefault(AdlMidi_Setup *setup)
@@ -61,6 +62,7 @@ static void ADLMIDI_SetDefault(AdlMidi_Setup *setup)
     setup->soft_pan = 1;
     setup->emulator = -1;
     setup->custom_bank_path[0] = '\0';
+    setup->tempo = 1.0;
 }
 #endif /* MUSIC_MID_ADLMIDI */
 
@@ -289,6 +291,7 @@ typedef struct
     int play_count;
     struct ADL_MIDIPlayer *adlmidi;
     int volume;
+    double tempo;
 
     SDL_AudioStream *stream;
     void *buffer;
@@ -420,6 +423,8 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
 
         music = (AdlMIDI_Music *)SDL_calloc(1, sizeof(AdlMIDI_Music));
 
+        music->tempo = setup.tempo;
+
         switch (music_spec.format)
         {
         case AUDIO_U8:
@@ -519,6 +524,7 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
         adl_setNumChips(music->adlmidi, (setup.chips_count >= 0) ? setup.chips_count : ADLMIDI_DEFAULT_CHIPS_COUNT);
         if (setup.four_op_channels >= 0)
             adl_setNumFourOpsChn(music->adlmidi, setup.four_op_channels);
+        adl_setTempo(music->adlmidi, music->tempo);
 
         err = adl_openData(music->adlmidi, bytes, (unsigned long)filesize);
         SDL_free(bytes);
@@ -679,6 +685,26 @@ static double ADLMIDI_songLength(void *music_p)
     return -1;
 }
 
+static int ADLMIDI_setTempo(void *music_p, double tempo)
+{
+    AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
+    if (music && (tempo > 0.0)) {
+        adl_setTempo(music->adlmidi, tempo);
+        music->tempo = tempo;
+        return 0;
+    }
+    return -1;
+}
+
+static double ADLMIDI_getTempo(void *music_p)
+{
+    AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
+    if (music) {
+        return music->tempo;
+    }
+    return -1.0;
+}
+
 static double ADLMIDI_loopStart(void *music_p)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
@@ -731,6 +757,8 @@ Mix_MusicInterface Mix_MusicInterface_ADLMIDI =
     ADLMIDI_jump_to_time,
     ADLMIDI_currentPosition,   /* Tell [MIXER-X]*/
     ADLMIDI_songLength,   /* FullLength [MIXER-X]*/
+    ADLMIDI_setTempo,   /* Set Tempo multiplier [MIXER-X] */
+    ADLMIDI_getTempo,   /* Get Tempo multiplier [MIXER-X] */
     ADLMIDI_loopStart,   /* LoopStart [MIXER-X]*/
     ADLMIDI_loopEnd,   /* LoopEnd [MIXER-X]*/
     ADLMIDI_loopLength,   /* LoopLength [MIXER-X]*/
@@ -766,6 +794,8 @@ Mix_MusicInterface Mix_MusicInterface_ADLIMF =
     ADLMIDI_jump_to_time,
     ADLMIDI_currentPosition,   /* Tell [MIXER-X]*/
     ADLMIDI_songLength,   /* FullLength [MIXER-X]*/
+    ADLMIDI_setTempo,   /* Set Tempo multiplier [MIXER-X] */
+    ADLMIDI_getTempo,   /* Get Tempo multiplier [MIXER-X] */
     ADLMIDI_loopStart,   /* LoopStart [MIXER-X]*/
     ADLMIDI_loopEnd,   /* LoopEnd [MIXER-X]*/
     ADLMIDI_loopLength,   /* LoopLength [MIXER-X]*/

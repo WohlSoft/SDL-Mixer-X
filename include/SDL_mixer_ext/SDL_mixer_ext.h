@@ -775,6 +775,19 @@ extern DECLSPEC double SDLCALL Mix_GetMusicPosition(Mix_Music *music);
 extern DECLSPEC double SDLCALL Mix_GetMusicTotalTime(Mix_Music *music);
 
 /*
+    Set the current tempo multiplier in the music stream.
+    This returns 0 if successful, or -1 if failed or isn't implemented.
+    This function is only implemented for ADLMIDI, OPNMIDI MIDI synthesizers,
+    GME chiptune formats, and for XMP library
+ */
+extern DECLSPEC int SDLCALL Mix_SetMusicTempo(Mix_Music *music, double position);
+
+/*
+    Get the current tempo multiplier of the music stream
+ */
+extern DECLSPEC double SDLCALL Mix_GetMusicTempo(Mix_Music *music);
+
+/*
     Get the loop start time position of music stream
     returns -1.0 if this feature is not used for this music or not supported for some codec
  */
