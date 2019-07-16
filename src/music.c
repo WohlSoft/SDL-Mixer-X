@@ -214,14 +214,14 @@ static Mix_MusicInterface *s_music_interfaces[] =
 #ifdef MUSIC_MP3_MAD
     &Mix_MusicInterface_MAD,
 #endif
+#ifdef MUSIC_MOD_XMP
+    &Mix_MusicInterface_LIBXMP,
+#endif
 #ifdef MUSIC_MOD_MODPLUG
     &Mix_MusicInterface_MODPLUG,
 #endif
 #ifdef MUSIC_MOD_MIKMOD
     &Mix_MusicInterface_MIKMOD,
-#endif
-#ifdef MUSIC_MOD_XMP
-    &Mix_MusicInterface_LIBXMP,
 #endif
 #ifdef MUSIC_MID_FLUIDSYNTH
     &Mix_MusicInterface_FLUIDSYNTH,
