@@ -1,3 +1,19 @@
+2.5.0:
+Vitaly Novichkov - 2019-02-24
+ * Added more OPL/OPN emulators enum fields for libADLMIDI and libOPNMIDI
+Vitaly Novichkov - 2019-03-10
+ * Added support for libXMP tracker module music player library
+Vitaly Novichkov - 2019-05-10
+ * Use DosBox emulator by default in ADLMIDI
+Vitaly Novichkov - 2019-05-28
+ * Fixed MP3 file detection by raw data to don't rely on filename extensions
+ Vitaly Novichkov - 2019-07-11
+ * Added new path arguments to load custom external banks for libADLMIDI and libOPNMIDI
+Vitaly Novichkov - 2019-07-11
+ * Added API to change ADLMIDI and OPNMIDI's chips count to control performance and polyphony
+Vitaly Novichkov - 2019-07-16
+ * Added music tempo change API (initially works with MIDI, GME, and XMP)
+
 2.4.0:
 Vitaly Novichkov - 2019
  * DosBox OPL3 emulator will be used by default on libADLMIDI for performance

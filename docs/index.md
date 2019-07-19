@@ -4,8 +4,8 @@ A fork of [SDL_mixer](http://www.libsdl.org/projects/SDL_mixer/) library
 # Description
 SDL_Mixer is a sample multi-channel audio mixer library.
 It supports any number of simultaneously playing channels of 16 bit stereo audio,
-plus a single channel of music, mixed by the popular FLAC, MikMod MOD, ModPlug,
-Timidity MIDI, FluidSynth, Ogg Vorbis, libMAD, and SMPEG MP3 libraries.
+plus a single channel of music, mixed by the popular FLAC, OPUS, XMP, ModPlug,
+MikMod MOD, Timidity MIDI, FluidSynth, Ogg Vorbis, FLAC, libMAD, and MPG123 MP3 libraries.
 
 SDL Mixer X - is an extended fork made by Vitaly Novichkov "Wohlstand" in
 13 January 2015. SDL_mixer is a quick and stable high-quality audio library,
@@ -19,7 +19,7 @@ and providing support for more supported audio formats.
 
 ## New features of SDL Mixer X in comparison to original SDL_mixer
 * Added much more music formats (Such a game music emulators liks NSF, VGM, HES, GBM, etc. playing via GME library, also XMI, MUS, and IMF playing via [ADLMIDI](https://github.com/Wohlstand/libADLMIDI) library)
-* Added support of the loop points in the OGG files (via <u>LOOPSTART</u> and <u>LOOPEND</u> (or <u>LOOPLENGHT</u>) meta-tags) (Later was also added into original SDL_mixer).
+* Added support of the loop points in the OGG and OPUS files (via <u>LOOPSTART</u> and <u>LOOPEND</u> (or <u>LOOPLENGHT</u>) meta-tags) (Later was also added into original SDL_mixer).
 * In the Modplug module enabled internal loops (tracker musics with internal loops are will be looped rightly)
 * Better MIDI support:
   * Added ability to choose any of available MIDI backends in runtime
@@ -31,17 +31,41 @@ and providing support for more supported audio formats.
   * Added functions to retrieve some meta-tags: Title, Artist, Album, Copyright
   * Added ADLMIDI Extra functions: Change bank ID, enable/disable high-level tremolo, enable/disable high-level vibrato, enable/disable scalable modulation, Set path to custom bank file (You can use [this editor](https://github.com/Wohlstand/OPL3BankEditor) to create or edit them)
   * Added OPNMIDI Extra function: Set path to custom bank file (You can use [this editor](https://github.com/Wohlstand/OPN2BankEditor) to create or edit them)
+  * Music tempo change function: you can change speed of playing music by giving the factor value while music is playing. Works for MIDI (libADLMIDI and libOPNMIDI), GME, and XMP.
 * Own re-sampling implementation which a workaround to glitches caused with inaccurate re-sampler implementation from SDL2 (anyway, recent versions of SDL2 now has much better resampler than was before).
 * Added support of [extra arguments](http://wohlsoft.ru/pgewiki/SDL_Mixer_X#Path_arguments) in the tail of the file path, passed into Mix_LoadMUS function.
 * Added ability to build shared library in the <u>stdcall</u> mode with static linking of libSDL on Windows to use it as independent audio library with other languages like VB6 or .NET.
-* QMake and CMake building systems in use
+* CMake building systems in use
+  * Can be used with libraries currently installed in the system.
+  * Optionally, you can set the `-DDOWNLOAD_AUDIO_CODECS_DEPENDENCY=ON` option to automatically download sources of all dependencies and build them in a place.
 
 ## Requirements
 * Fresh [SDL2 library](https://hg.libsdl.org/SDL/)
-* Complete set of audio codecs from [this repository](https://github.com/WohlSoft/AudioCodecs)
-* Building system on your taste:
-  * QMake from Qt 5.x
-  * CMake >= 2.8
+* Optionally, complete set of audio codecs from [this repository](https://github.com/WohlSoft/AudioCodecs) can be built in one run with a small effort.
+  * OGG Vorbis:
+    * [libogg, libvorbis, libvorbisfile](https://www.xiph.org/downloads/)
+  * OPUS
+    * [liboups, libopusfle](http://opus-codec.org/downloads/)
+  * [FLAC](https://www.xiph.org/flac/)
+  * one of these MP3 libraries on your choice:
+    * [libmpg123](https://www.mpg123.de/)
+    * libmad (working build with using of CMake is [here](https://github.com/WohlSoft/AudioCodecs/tree/master/libmad), original automake build is too old broken and unmodified since 2004'th year)
+    * Optionally, modified [ID3Tag-SDL](https://github.com/WohlSoft/AudioCodecs/tree/master/libid3tag-sdl) library for complete ID3 meta-tags support (for all formats, not only for MP3: some WAV files also using ID3 tags inside their chunks)
+  * Tracker music modules
+    * [XMP](https://github.com/cmatsuoka/libxmp)
+    * [ModPlug](https://github.com/WohlSoft/AudioCodecs/tree/master/libmodplug)
+    * [MikMod](https://github.com/WohlSoft/AudioCodecs/tree/master/libmikmod)
+  * MIDI on your choice
+    * modified [Timidity-SDL library](https://github.com/WohlSoft/AudioCodecs/tree/master/libtimidity-sdl) (in original SDL Mixer it's source code is an embedded part)
+    * FluidSynth (supported both 1.x and 2.x, will be identified on a compile time, dynamically will not work)
+    * [libADLMIDI](https://github.com/Wohlstand/libADLMIDI)
+    * [libOPNMIDI](https://github.com/Wohlstand/libOPNMIDI)
+
+* [CMake >= 2.8](https://cmake.org/download/) building system
+* Compiler, compatible with C90 (C99 is required when building with OPUS library) or higher and C++98 (to build C++-written parts and libraries) or higher. Build tested and works on next compilers:
+  * GCC 4.8 and higher
+  * CLang 3.x and higher
+  * MSVC 2013, 2015, 2017
 
 # How to build
 
@@ -58,7 +82,7 @@ make install
 # How to use library
 
 ## Include
-The API is fully compatible with original SDL Mixer with exception of new added functions and different header name
+The API is fully compatible with original SDL Mixer and can be used as a drop-in replacement of original SDL Mixer with exception of a different header name
 ```cpp
 #include <SDL2/SDL_mixer_ext.h>
 ```

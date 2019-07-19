@@ -32,7 +32,7 @@ The latest copy of original document can be found at @url{http://www.jonatkins.o
 @page
 @vskip 0pt plus 1filll
 Copyright @copyright{} 2009 Jonathan Atkins (original documentation)
-Copyright @copyright{} 2017 Vitaliy Novichkov (SDL Mixer X specific updates)
+Copyright @copyright{} 2017-2019 Vitaliy Novichkov (SDL Mixer X specific updates)
 
 Permission is granted to distribute freely, or in a distribution of any kind.
 All distributions of this file must be in an unaltered state, except for corrections.
@@ -105,26 +105,36 @@ The latest version of this library is available from:@*
 
 Due to popular demand, here is a simple multi-channel audio mixer.
 It supports 8 or more channels of 16 bit stereo audio, plus a single channel
-of music, mixed by the popular MikMod MOD, Timidity MIDI and SMPEG MP3
-libraries.
+of music, mixed by the popular XMP/ModPlug/MikMod MOD, Timidity/FluidSynth MIDI
+(also, libADLMIDI and libOPNMIDI), OGG Vorbis, FLAC, Opus, and MPG123 MP3 libraries.
 
 See the header file SDL_mixer_ext.h and the examples playwave.c and playmus.c
 for documentation on this mixer library.
 
 The mixer can currently load Microsoft WAVE files and Creative Labs VOC
 files as audio samples, and can load MIDI files via Timidity and the
-following music formats via MikMod:  .MOD .S3M .IT .XM. It can load
-Ogg Vorbis streams as music if built with the Ogg Vorbis libraries,
-and finally it can load MP3 music using the SMPEG library.
+following music formats via XMP, ModPlug, or MikMod: .MOD .S3M .IT .XM. etc.
+It can load Ogg Vorbis streams as music if built with the Ogg Vorbis libraries,
+and finally it can load MP3 music using the libMPG123 or libMAD library.
 
-The process of mixing MIDI files to wave output is very CPU intensive,
-so if playing regular WAVE files sound great, but playing MIDI files
-sound choppy, try using 8-bit audio, mono audio, or lower frequencies.
+The process of mixing MIDI files to wave output in dependence on a synthesizer
+is very CPU intensive, so if playing regular WAVE files sound great, but
+playing MIDI files sound choppy, try using 8-bit audio, mono audio, or lower
+frequencies.
 
-To play MIDI files, you'll need to get a complete set of GUS patches
-from:
+To play MIDI files with use of Timidity synthesizer, you'll need to get
+a complete set of GUS patches from:
 @uref{http://www.libsdl.org/projects/mixer/timidity/timidity.tar.gz,Timidity GUS Patches}
 and unpack them in /usr/local/lib under UNIX, and C:\ under Win32.
+Since SDL_mixer 2.x MIDI files can be played through native MIDI API of
+operating system (supported Windows, macOS and Haiku) or through FluidSynth.
+With SDL Mixer X fork you can use libADLMIDI and libOPNMIDI synthesizers are
+working always and doesn't requiring any external sound fonts or banks.
+libADLMIDI and libOPNMIDI are FM synthesizers using emulators of YMF232 by
+libADLMIDI (OPL3), and YM2612 (OPN2) or YM2608 (OPNA) by libOPNMIDI.
+With SDL Mixer X it's possible to switch MIDI synthesizer in real time while
+with original SDL Mixer it's only possible to set MIDI synthesizer by
+environment variable only in a moment of library loading.
 
 The SDL_mixer 1.x library is available under the GNU Library General Public License,
 see the file "COPYING" for details.
@@ -156,12 +166,12 @@ created for SDL_mixer 1.2. Some functions would be marked by @b{[Mixer X]} label
 which means those functions are not available in SDL_mixer 1.x, but available in
 SDL_mixer 2.0 and SDL Mixer X fork.
 
-@b{IMPORTANT}: The licenses for libADLMIDI, libOPNMIDI, and libGME  are LGPL2+
-and GPL2+. Using of those modules makes this library licensed under LGPL2+ and
-you must use it dynamically, or your application must also be GPL!
+@b{IMPORTANT}: The licenses for libGME is LGPL2+. Using of those modules makes
+this library licensed under LGPL2+ and you must use it dynamically, or your
+application must also be GPL!
 
-@b{IMPORTANT}: The license for libMAD is GPL which means that in order to use
-it your application must also be GPL!
+@b{IMPORTANT}: The license for libADLMIDI, libOPNMIDI, libMAD is GPL which means
+that in order to use it your application must also be GPL!
 
 @c =============================================================================
 @page
@@ -190,10 +200,11 @@ SDL Mixer X supports playing music and sound samples from the following formats:
 - AIFF (.aiff)@*
 - VOC (.voc)@*
 - MOD (.mod .xm .s3m .669 .it .med and more) requiring libmikmod or libmodplug @b{[Mixer 2.0]} built in package@*
-- MIDI (.mid) using timidity, FluidSynth @b{[Mixer 2.0]}, ADLMIDI @b{[Mixer X]}, OPNMIDI @b{[Mixer X]} or native midi hardware@*
+- MIDI (.mid) using timidity, FluidSynth @b{[Mixer 2.0]}, libADLMIDI @b{[Mixer X]}, libOPNMIDI @b{[Mixer X]} or native midi hardware@*
 - OggVorbis (.ogg) requiring ogg/vorbis libraries built in package@*
-- MP3 (.mp3) requiring MAD or SMPEG libraries built in package@*
+- MP3 (.mp3) requiring MPG123 or MAD libraries built in package@*
 - FLAC (.flac) requiring the FLAC library built in package@*
+- Opus (.opus) requiring the Opus/OpusFile library built in package@*
 - GME (.spc .nsf .hes .vgm and more) emulated chiptunes from various console games @b{[Mixer X]} @*
 - also any command-line player, which is not mixed by SDL Mixer X...@*
 
@@ -3142,15 +3153,21 @@ Set the position of the currently playing music.  The @var{position} takes diffe
 @item WAV
 Jumps to @var{position} seconds from the beginning of the song.
 @item MOD
-ModPlug: Jumps to @var{position} seconds from the beginning of the song.
-Mikmod: The double is cast to Uint16 and used for a pattern number in the module.@*
+@b{ModPlug or XMP}: Jumps to @var{position} seconds from the beginning of the song.
+@b{Mikmod}: The double is cast to Uint16 and used for a pattern number in the module.@*
 Passing zero is similar to rewinding the song.
 @item OGG
 Jumps to @var{position} seconds from the beginning of the song.
+@item OPUS
+Jumps to @var{position} seconds from the beginning of the song.
+@item FLAC
+Jumps to @var{position} seconds from the beginning of the song.
 @item MP3
 Jumps to @var{position} seconds from the current position in the stream.@*
-So you may want to call @code{Mix_RewindMusic} before this.@*
 Does not go in reverse...negative values do nothing.
+@item MIDI
+Works for @b{libADLMIDI} and @b{libOPNMIDI}. Doesn't works for @b{Timidity}, @b{FluidSynth}, and @b{NativeMIDI}.
+Jumps to @var{position} seconds from the beginning of the song.
 @end table
 
 @noindent
@@ -3643,10 +3660,7 @@ switch(Mix_GetMusicType(NULL))
         printf("WAVE/RIFF music is playing.\n");
         break;
     MUS_MOD:
-        printf("MOD (MikMod) music is playing.\n");
-        break;
-    MUS_MODPLUG: // [Mixer 2.0]
-        printf("MOD (ModPlug) music is playing.\n");
+        printf("MOD (XMP/ModPlug/MikMod) music is playing.\n");
         break;
     MUS_MID:
         printf("MIDI music is playing.\n");
@@ -3655,13 +3669,16 @@ switch(Mix_GetMusicType(NULL))
         printf("OGG music is playing.\n");
         break;
     MUS_MP3:
-        printf("MP3 (SMPEG) music is playing.\n");
+        printf("MP3 music is playing.\n");
         break;
-    MUS_MP3_MAD: // [Mixer 2.0]
-        printf("MP3 (libMAD) music is playing.\n");
+    MUS_OPUS: // [Mixer 2.0]
+        printf("OPUS music is playing.\n");
         break;
     MUS_GME: // [Mixer X]
         printf("Game Music Emulators music is playing.\n");
+        break;
+    MUS_ADLMIDI: // [Mixer X]
+        printf("IMF/CMF/XMI music is playing\n");
         break;
     default:
         printf("Unknown music is playing.\n");
@@ -5112,14 +5129,13 @@ typedef enum @{
     MUS_MOD,
     MUS_MID,
     MUS_OGG,
-    MUS_MP3, /* using SMPEG */
-    MUS_MP3_MAD,
+    MUS_MP3,
+    MUS_MP3_MAD_UNUSED,
     MUS_FLAC,
-    MUS_MODPLUG,
-    MUS_SPC,/* Mixer X */
-    MUS_GME = MUS_SPC,/* Mixer X */
-    MUS_ADLMIDI,/* Mixer X */
-    MUS_KnownCodecs/* Mixer X */
+    MUS_MODPLUG_UNUSED,
+    MUS_OPUS,
+    MUS_GME, /* Mixer X */
+    MUS_ADLMIDI /*Use ADLMIDI coded for super-special formats like IMF, MUS or XMI are can't be played without ADLMIDI*/
 @} Mix_MusicType;
 @end example
 @end cartouche

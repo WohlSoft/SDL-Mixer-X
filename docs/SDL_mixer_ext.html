@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html401/loose.dtd">
 <html>
-<!-- Created on November 26, 2018 by texi2html 1.82
+<!-- Created on July 19, 2019 by texi2html 1.82
 texi2html was written by: 
             Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -127,26 +127,36 @@ to use them with SDL_mixer.
 </p>
 <p>Due to popular demand, here is a simple multi-channel audio mixer.
 It supports 8 or more channels of 16 bit stereo audio, plus a single channel
-of music, mixed by the popular MikMod MOD, Timidity MIDI and SMPEG MP3
-libraries.
+of music, mixed by the popular XMP/ModPlug/MikMod MOD, Timidity/FluidSynth MIDI
+(also, libADLMIDI and libOPNMIDI), OGG Vorbis, FLAC, Opus, and MPG123 MP3 libraries.
 </p>
 <p>See the header file SDL_mixer_ext.h and the examples playwave.c and playmus.c
 for documentation on this mixer library.
 </p>
 <p>The mixer can currently load Microsoft WAVE files and Creative Labs VOC
 files as audio samples, and can load MIDI files via Timidity and the
-following music formats via MikMod:  .MOD .S3M .IT .XM. It can load
-Ogg Vorbis streams as music if built with the Ogg Vorbis libraries,
-and finally it can load MP3 music using the SMPEG library.
+following music formats via XMP, ModPlug, or MikMod: .MOD .S3M .IT .XM. etc.
+It can load Ogg Vorbis streams as music if built with the Ogg Vorbis libraries,
+and finally it can load MP3 music using the libMPG123 or libMAD library.
 </p>
-<p>The process of mixing MIDI files to wave output is very CPU intensive,
-so if playing regular WAVE files sound great, but playing MIDI files
-sound choppy, try using 8-bit audio, mono audio, or lower frequencies.
+<p>The process of mixing MIDI files to wave output in dependence on a synthesizer
+is very CPU intensive, so if playing regular WAVE files sound great, but
+playing MIDI files sound choppy, try using 8-bit audio, mono audio, or lower
+frequencies.
 </p>
-<p>To play MIDI files, you&rsquo;ll need to get a complete set of GUS patches
-from:
+<p>To play MIDI files with use of Timidity synthesizer, you&rsquo;ll need to get
+a complete set of GUS patches from:
 <a href="http://www.libsdl.org/projects/mixer/timidity/timidity.tar.gz">Timidity GUS Patches</a>
 and unpack them in /usr/local/lib under UNIX, and C:\ under Win32.
+Since SDL_mixer 2.x MIDI files can be played through native MIDI API of
+operating system (supported Windows, macOS and Haiku) or through FluidSynth.
+With SDL Mixer X fork you can use libADLMIDI and libOPNMIDI synthesizers are
+working always and doesn&rsquo;t requiring any external sound fonts or banks.
+libADLMIDI and libOPNMIDI are FM synthesizers using emulators of YMF232 by
+libADLMIDI (OPL3), and YM2612 (OPN2) or YM2608 (OPNA) by libOPNMIDI.
+With SDL Mixer X it&rsquo;s possible to switch MIDI synthesizer in real time while
+with original SDL Mixer it&rsquo;s only possible to set MIDI synthesizer by
+environment variable only in a moment of library loading.
 </p>
 <p>The SDL_mixer 1.x library is available under the GNU Library General Public License,
 see the file &quot;COPYING&quot; for details.
@@ -195,12 +205,12 @@ created for SDL_mixer 1.2. Some functions would be marked by <b>[Mixer X]</b> la
 which means those functions are not available in SDL_mixer 1.x, but available in
 SDL_mixer 2.0 and SDL Mixer X fork.
 </p>
-<p><b>IMPORTANT</b>: The licenses for libADLMIDI, libOPNMIDI, and libGME  are LGPL2+
-and GPL2+. Using of those modules makes this library licensed under LGPL2+ and
-you must use it dynamically, or your application must also be GPL!
+<p><b>IMPORTANT</b>: The licenses for libGME is LGPL2+. Using of those modules makes
+this library licensed under LGPL2+ and you must use it dynamically, or your
+application must also be GPL!
 </p>
-<p><b>IMPORTANT</b>: The license for libMAD is GPL which means that in order to use
-it your application must also be GPL!
+<p><b>IMPORTANT</b>: The license for libADLMIDI, libOPNMIDI, libMAD is GPL which means
+that in order to use it your application must also be GPL!
 </p>
 
 <hr size="6">
@@ -243,10 +253,11 @@ make
 - AIFF (.aiff)<br>
 - VOC (.voc)<br>
 - MOD (.mod .xm .s3m .669 .it .med and more) requiring libmikmod or libmodplug <b>[Mixer 2.0]</b> built in package<br>
-- MIDI (.mid) using timidity, FluidSynth <b>[Mixer 2.0]</b>, ADLMIDI <b>[Mixer X]</b>, OPNMIDI <b>[Mixer X]</b> or native midi hardware<br>
+- MIDI (.mid) using timidity, FluidSynth <b>[Mixer 2.0]</b>, libADLMIDI <b>[Mixer X]</b>, libOPNMIDI <b>[Mixer X]</b> or native midi hardware<br>
 - OggVorbis (.ogg) requiring ogg/vorbis libraries built in package<br>
-- MP3 (.mp3) requiring MAD or SMPEG libraries built in package<br>
+- MP3 (.mp3) requiring MPG123 or MAD libraries built in package<br>
 - FLAC (.flac) requiring the FLAC library built in package<br>
+- Opus (.opus) requiring the Opus/OpusFile library built in package<br>
 - GME (.spc .nsf .hes .vgm and more) emulated chiptunes from various console games <b>[Mixer X]</b> <br>
 - also any command-line player, which is not mixed by SDL Mixer X...<br>
 </p>
@@ -4380,17 +4391,26 @@ Mix_RewindMusic();
 <dd><p>Jumps to <var>position</var> seconds from the beginning of the song.
 </p></dd>
 <dt> <b>MOD</b></dt>
-<dd><p>ModPlug: Jumps to <var>position</var> seconds from the beginning of the song.
-Mikmod: The double is cast to Uint16 and used for a pattern number in the module.<br>
+<dd><p><b>ModPlug or XMP</b>: Jumps to <var>position</var> seconds from the beginning of the song.
+<b>Mikmod</b>: The double is cast to Uint16 and used for a pattern number in the module.<br>
 Passing zero is similar to rewinding the song.
 </p></dd>
 <dt> <b>OGG</b></dt>
 <dd><p>Jumps to <var>position</var> seconds from the beginning of the song.
 </p></dd>
+<dt> <b>OPUS</b></dt>
+<dd><p>Jumps to <var>position</var> seconds from the beginning of the song.
+</p></dd>
+<dt> <b>FLAC</b></dt>
+<dd><p>Jumps to <var>position</var> seconds from the beginning of the song.
+</p></dd>
 <dt> <b>MP3</b></dt>
 <dd><p>Jumps to <var>position</var> seconds from the current position in the stream.<br>
-So you may want to call <code>Mix_RewindMusic</code> before this.<br>
 Does not go in reverse...negative values do nothing.
+</p></dd>
+<dt> <b>MIDI</b></dt>
+<dd><p>Works for <b>libADLMIDI</b> and <b>libOPNMIDI</b>. Doesn&rsquo;t works for <b>Timidity</b>, <b>FluidSynth</b>, and <b>NativeMIDI</b>.
+Jumps to <var>position</var> seconds from the beginning of the song.
 </p></dd>
 </dl>
 
@@ -5068,10 +5088,7 @@ switch(Mix_GetMusicType(NULL))
         printf(&quot;WAVE/RIFF music is playing.\n&quot;);
         break;
     MUS_MOD:
-        printf(&quot;MOD (MikMod) music is playing.\n&quot;);
-        break;
-    MUS_MODPLUG: // [Mixer 2.0]
-        printf(&quot;MOD (ModPlug) music is playing.\n&quot;);
+        printf(&quot;MOD (XMP/ModPlug/MikMod) music is playing.\n&quot;);
         break;
     MUS_MID:
         printf(&quot;MIDI music is playing.\n&quot;);
@@ -5080,13 +5097,16 @@ switch(Mix_GetMusicType(NULL))
         printf(&quot;OGG music is playing.\n&quot;);
         break;
     MUS_MP3:
-        printf(&quot;MP3 (SMPEG) music is playing.\n&quot;);
+        printf(&quot;MP3 music is playing.\n&quot;);
         break;
-    MUS_MP3_MAD: // [Mixer 2.0]
-        printf(&quot;MP3 (libMAD) music is playing.\n&quot;);
+    MUS_OPUS: // [Mixer 2.0]
+        printf(&quot;OPUS music is playing.\n&quot;);
         break;
     MUS_GME: // [Mixer X]
         printf(&quot;Game Music Emulators music is playing.\n&quot;);
+        break;
+    MUS_ADLMIDI: // [Mixer X]
+        printf(&quot;IMF/CMF/XMI music is playing\n&quot;);
         break;
     default:
         printf(&quot;Unknown music is playing.\n&quot;);
@@ -7376,14 +7396,13 @@ Who knows why it isn&rsquo;t a pointer in this typedef...
     MUS_MOD,
     MUS_MID,
     MUS_OGG,
-    MUS_MP3, /* using SMPEG */
-    MUS_MP3_MAD,
+    MUS_MP3,
+    MUS_MP3_MAD_UNUSED,
     MUS_FLAC,
-    MUS_MODPLUG,
-    MUS_SPC,/* Mixer X */
-    MUS_GME = MUS_SPC,/* Mixer X */
-    MUS_ADLMIDI,/* Mixer X */
-    MUS_KnownCodecs/* Mixer X */
+    MUS_MODPLUG_UNUSED,
+    MUS_OPUS,
+    MUS_GME, /* Mixer X */
+    MUS_ADLMIDI /*Use ADLMIDI coded for super-special formats like IMF, MUS or XMI are can't be played without ADLMIDI*/
 } Mix_MusicType;
 </pre></td></tr></table>
 </td></tr></table>
@@ -8272,7 +8291,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 </tr></table>
 <h1>About This Document</h1>
 <p>
-  This document was generated by <em>vitaly</em> on <em>November 26, 2018</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
+  This document was generated by <em>WohlstandFox</em> on <em>July 19, 2019</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
 </p>
 <p>
   The buttons in the navigation panels have the following meaning:
@@ -8374,7 +8393,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <hr size="1">
 <p>
  <font size="-1">
-  This document was generated by <em>vitaly</em> on <em>November 26, 2018</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
+  This document was generated by <em>WohlstandFox</em> on <em>July 19, 2019</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
  </font>
  <br>
 
