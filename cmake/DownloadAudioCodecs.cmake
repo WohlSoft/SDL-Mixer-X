@@ -19,8 +19,8 @@ set(AUDIO_CODECS_REPOSITORY_PATH ${CMAKE_BINARY_DIR}/external/AudioCodecs)
 
 #set(AUDIO_CODECS_REPO_PATH "" CACHE PATH "Path to the AudioCodecs dependencies pack")
 
-set(AUDIO_CODECS_SDL2_HG_BRANCH "" CACHE PATH "HG branch for SDL2 (official Mercurial mainstream repo)")
-set(AUDIO_CODECS_SDL2_GIT_BRANCH "" CACHE PATH "GIT branch for SDL2 (unofficial Git mirror)")
+set(AUDIO_CODECS_SDL2_HG_BRANCH "" CACHE STRING "HG branch for SDL2 (official Mercurial mainstream repo)")
+set(AUDIO_CODECS_SDL2_GIT_BRANCH "" CACHE STRING "GIT branch for SDL2 (unofficial Git mirror)")
 
 option(WITH_SDL2_WASAPI "Enable WASAPI audio output support for Windows build of SDL2" ON)
 if(WIN32)
