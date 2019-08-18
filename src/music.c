@@ -665,8 +665,8 @@ static Mix_MusicType xmi_compatible_midi_player()
 #ifdef MUSIC_MID_ADLMIDI
 static int detect_imf(SDL_RWops *in, Sint64 start)
 {
-    Uint16 chunksize, buff, i = 42;
-    Uint32 sum1 = 0,  sum2 = 0;
+    Uint16 chunksize, buff;
+    Uint32 sum1 = 0,  sum2 = 0, passed_length = 0;
     Uint16 word;
 
     if(!in)
@@ -684,22 +684,27 @@ static int detect_imf(SDL_RWops *in, Sint64 start)
         return 0;
     }
 
-    while (i > 0) {
+    while (passed_length < chunksize) {
         if (SDL_RWread(in, &word, 1, 2) != 2) {
             SDL_RWseek(in, start, RW_SEEK_SET);
             break;
         }
+        passed_length += 2;
         buff = SDL_SwapLE16(word);
         sum1 += buff;
         if (SDL_RWread(in, &word, 1, 2) != 2) {
             SDL_RWseek(in, start, RW_SEEK_SET);
             break;
         }
+        passed_length += 2;
         buff = SDL_SwapLE16(word);
         sum2 += buff;
-        i--;
     }
     SDL_RWseek(in, start, RW_SEEK_SET);
+
+    if (passed_length != chunksize)
+        return 0;
+
     return (sum1 > sum2);
 }
 
