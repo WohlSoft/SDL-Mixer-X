@@ -138,6 +138,8 @@ GME_Music *GME_LoadSongRW(SDL_RWops *src, int trackNum)
 
         /* Set infinite playback */
         gme_set_fade(music->game_emu, -1);
+        /* For old versions, for newer the next call is supported: */
+        /* gme_set_autoload_playback_limit(music->game_emu, 0); */
 
         music->volume = MIX_MAX_VOLUME;
         music->tempo = 1.0;
