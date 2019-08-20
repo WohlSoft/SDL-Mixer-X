@@ -25,7 +25,7 @@ set(AUDIO_CODECS_SDL2_GIT_BRANCH "" CACHE STRING "GIT branch for SDL2 (unofficia
 option(WITH_SDL2_WASAPI "Enable WASAPI audio output support for Windows build of SDL2" ON)
 if(WIN32)
     message("== SDL Mixer X: WITH_SDL2_WASAPI = ${WITH_SDL2_WASAPI}")
-    set(SDL2_WASAPI_FLAG "-DSDL2_WASAPI_FLAG=${WITH_SDL2_WASAPI}")
+    set(SDL2_WASAPI_FLAG "-DWITH_SDL2_WASAPI=${WITH_SDL2_WASAPI}")
 endif()
 
 set(SDL2_TAGS)
