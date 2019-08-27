@@ -334,21 +334,33 @@ option(USE_MP3_MPG123     "[WIP, DON'T USE IT] Build with MPG123 MP3 codec" OFF)
 if(USE_MP3_MPG123)
     add_definitions(-DMUSIC_MP3_MPG123)
 
-    message(WARNING "MPG123 SUPPORT IS WIP, DON'T USE IT IN PRODUCTION!!!")
-    # ======= Until AudioCodecs will receive buildable mpg123, detect it externally =======
-    include(cmake/FindMpg123.cmake)
+    if(USE_SYSTEM_AUDIO_LIBRARIES)
+        message(WARNING "MPG123 SUPPORT IS WIP, DON'T USE IT IN PRODUCTION!!!")
+        # ======= Until AudioCodecs will receive buildable mpg123, detect it externally =======
+        include(cmake/FindMpg123.cmake)
 
-    if(NOT MPG123_FOUND)
-        message(FATAL_ERROR "MPG123 is not found!")
+        if(NOT MPG123_FOUND)
+            message(FATAL_ERROR "MPG123 is not found!")
+        else()
+            message("MPG123 found in ${MPG123_INCLUDE_DIR} folder")
+        endif()
     else()
-        message("MPG123 found in ${MPG123_INCLUDE_DIR} folder")
+        set(MPG123_FOUND 1)
+        if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
+            set(LIBMPG123_LIB mpg123)
+        else()
+            find_library(LIBMPG123_LIB NAMES mpg123
+                         HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
+        endif()
     endif()
-
-    list(APPEND SDL_MIXER_INCLUDE_PATHS ${MPG123_INCLUDE_DIRS})
-    set(LIBS ${LIBS} ${MPG123_LIBRARIES})
-    list(APPEND SDLMixerX_LINK_LIBS mpg123)
-    list(APPEND SDLMixerX_SOURCES
-        ${SDLMixerX_SOURCE_DIR}/src/codecs/music_mpg123.c)
+    if(MPG123_FOUND)
+        message("== using MPG123 ==")
+        list(APPEND SDL_MIXER_INCLUDE_PATHS ${MPG123_INCLUDE_DIRS})
+        set(LIBS ${LIBS} ${MPG123_LIBRARIES})
+        list(APPEND SDLMixerX_LINK_LIBS mpg123)
+        list(APPEND SDLMixerX_SOURCES
+            ${SDLMixerX_SOURCE_DIR}/src/codecs/music_mpg123.c)
+    endif()
 endif()
 
 if(USE_MP3_MAD OR USE_MP3_MPG123)
