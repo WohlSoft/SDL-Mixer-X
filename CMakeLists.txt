@@ -46,6 +46,8 @@ option(DOWNLOAD_AUDIO_CODECS_DEPENDENCY "Downloads and compiles AudioCodecs depe
 set(AUDIO_CODECS_REPO_PATH "" CACHE PATH "Path to the AudioCodecs dependencies pack")
 set(AUDIO_CODECS_INSTALL_PATH "" CACHE PATH "Path to installed AudioCodecs prefix")
 
+option(USE_SYSTEM_SDL2   "Use SDL2 from system" OFF)
+
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
     # Turn on warnings and legacy C/C++ standards to support more compilers
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -std=c90")
@@ -132,7 +134,7 @@ set(SDLMixerX_SOURCES)
 set(SDLMixerX_LINK_LIBS)
 
 # Recognize SDL2 library from the system
-if(USE_SYSTEM_AUDIO_LIBRARIES)
+if(USE_SYSTEM_AUDIO_LIBRARIES OR USE_SYSTEM_SDL2)
     find_package(PkgConfig)
     pkg_check_modules(SDL2 REQUIRED sdl2)
     list(APPEND SDL_MIXER_INCLUDE_PATHS ${SDL2_INCLUDE_DIRS})
