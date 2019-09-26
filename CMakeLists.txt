@@ -12,6 +12,10 @@ if(NOT CMAKE_VERSION VERSION_LESS 2.8.12)
     set(CMAKE_MACOSX_RPATH 0)
 endif()
 
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
+    set(EMSCRIPTEN 1 BOOLEAN)
+endif()
+
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
     message("== Using default build configuration which is a Release!")
@@ -23,7 +27,7 @@ else()
     set(MIX_DEBUG_SUFFIX "")
 endif()
 
-if(WIN32)
+if(WIN32 AND NOT EMSCRIPTEN)
     set(CMAKE_SHARED_LIBRARY_PREFIX "")
 endif()
 
@@ -38,9 +42,10 @@ option(SSE                 "Use SSE assembly routines" ${OPT_DEF_ASM})
 option(SSE2                "Use SSE2 assembly routines" ${OPT_DEF_SSEMATH})
 option(SSE3                "Use SSE3 assembly routines" ${OPT_DEF_SSEMATH})
 
-set(SDL_MIXER_X_SHARED_DEFAULT_ON ON)
 if(EMSCRIPTEN)
     set(SDL_MIXER_X_SHARED_DEFAULT_ON OFF)
+else()
+    set(SDL_MIXER_X_SHARED_DEFAULT_ON ON)
 endif()
 
 # Settings
@@ -491,7 +496,7 @@ if(USE_GME)
     endif()
 endif()
 
-if(NOT WIN32) # CMD Music is not supported on Windows
+if(NOT WIN32 AND NOT EMSCRIPTEN) # CMD Music is not supported on Windows
     option(USE_CMD             "Build with CMD music player support" ON)
     if(USE_CMD)
         message("== using CMD Music ==")
@@ -615,7 +620,7 @@ if(USE_MIDI)
     endif()
 
      # Native MIDI correctly works on Windows and macOS only.
-    if(WIN32 OR APPLE)
+    if((WIN32 AND NOT EMSCRIPTEN) OR APPLE)
         set(NATIVE_MIDI_SUPPORTED ON)
     else()
         set(NATIVE_MIDI_SUPPORTED OFF)
@@ -672,7 +677,7 @@ if(LIBMATH_NEEDED AND NOT MSVC)
     list(APPEND SDLMixerX_LINK_LIBS m)
 endif()
 
-if(WIN32)
+if(WIN32 AND NOT EMSCRIPTEN)
     option(BUILD_AS_VB6_BINDING "Compile library into solid module compatible with VisualBasic 6" OFF)
     if(BUILD_AS_VB6_BINDING)
         message("== SDL Mixer X will be built as solid module that is ready for MS-VB6 binding! ==")
