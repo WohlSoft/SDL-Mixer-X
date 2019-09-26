@@ -38,9 +38,14 @@ option(SSE                 "Use SSE assembly routines" ${OPT_DEF_ASM})
 option(SSE2                "Use SSE2 assembly routines" ${OPT_DEF_SSEMATH})
 option(SSE3                "Use SSE3 assembly routines" ${OPT_DEF_SSEMATH})
 
+set(SDL_MIXER_X_SHARED_DEFAULT_ON ON)
+if(EMSCRIPTEN)
+    set(SDL_MIXER_X_SHARED_DEFAULT_ON OFF)
+endif()
+
 # Settings
 option(SDL_MIXER_X_STATIC   "Build static library of SDL Mixer X" ON)
-option(SDL_MIXER_X_SHARED   "Build shared library of SDL Mixer X" ON)
+option(SDL_MIXER_X_SHARED   "Build shared library of SDL Mixer X" ${SDL_MIXER_X_SHARED_DEFAULT_ON})
 
 option(DOWNLOAD_AUDIO_CODECS_DEPENDENCY "Downloads and compiles AudioCodecs dependencies pack directly" OFF)
 set(AUDIO_CODECS_REPO_PATH "" CACHE PATH "Path to the AudioCodecs dependencies pack")
