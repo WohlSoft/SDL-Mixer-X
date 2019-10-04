@@ -1900,7 +1900,7 @@ void SDLCALLCC Mix_PauseMusicStream(Mix_Music *music)
 }
 void SDLCALLCC Mix_PauseMusic(void)
 {
-    return Mix_PauseMusicStream(NULL);
+    Mix_PauseMusicStream(NULL);
 }
 
 void SDLCALLCC Mix_ResumeMusicStream(Mix_Music *music)
@@ -1922,7 +1922,7 @@ void SDLCALLCC Mix_ResumeMusicStream(Mix_Music *music)
 }
 void SDLCALLCC Mix_ResumeMusic(void)
 {
-    return Mix_ResumeMusicStream(NULL);
+    Mix_ResumeMusicStream(NULL);
 }
 
 
