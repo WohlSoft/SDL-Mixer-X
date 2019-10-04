@@ -24,13 +24,8 @@
 #define MUSIC_H_
 
 /* Prevent "Unused" warning on specified object */
+
 #define MIX_UNUSED(object) (void)object
-
-/* math.h doesn't defines round() in C90 standard */
-#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 199901L)
-extern double round(double __x);
-#endif
-
 
 /* Supported music APIs, in order of preference */
 
