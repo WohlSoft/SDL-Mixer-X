@@ -94,9 +94,9 @@ set(FIND_PREFER_STATIC
     ".a"
     ".lib"
     "${MIX_DEBUG_SUFFIX}.dll.a"
-    "${MIX_DEBUG_SUFFIX}.dll.lib"
+    "${MIX_DEBUG_SUFFIX}.lib"
     ".dll.a"
-    ".dll.lib"
+    ".lib"
     "${MIX_DEBUG_SUFFIX}.so"
     "${MIX_DEBUG_SUFFIX}.dylib"
     ".so"
@@ -105,9 +105,9 @@ set(FIND_PREFER_STATIC
 
 set(FIND_PREFER_SHARED
     "${MIX_DEBUG_SUFFIX}.dll.a"
-    "${MIX_DEBUG_SUFFIX}.dll.lib"
+    "${MIX_DEBUG_SUFFIX}.lib"
     ".dll.a"
-    ".dll.lib"
+    ".lib"
     "${MIX_DEBUG_SUFFIX}.so"
     "${MIX_DEBUG_SUFFIX}.dylib"
     ".so"
