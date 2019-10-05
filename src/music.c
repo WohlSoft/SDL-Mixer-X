@@ -814,15 +814,14 @@ readHeader:
 }
 #endif
 
-Mix_MusicType detect_music_type_from_magic(SDL_RWops *src)
+Mix_MusicType detect_music_type(SDL_RWops *src)
 {
     Uint8 magic[25];
-
     Sint64 start = SDL_RWtell(src);
 
     SDL_memset(magic, 0, 25);
     if (SDL_RWread(src, magic, 1, 24) != 24) {
-        Mix_SetError("Couldn't read from RWops");
+        Mix_SetError("Couldn't read first 24 bytes of audio data");
         return MUS_NONE;
     }
     SDL_RWseek(src, start, RW_SEEK_SET);
@@ -838,6 +837,13 @@ Mix_MusicType detect_music_type_from_magic(SDL_RWops *src)
 
     /* Ogg Vorbis files have the magic four bytes "OggS" */
     if (SDL_memcmp(magic, "OggS", 4) == 0) {
+        Sint64 pos = SDL_RWtell(src);
+        SDL_RWseek(src, 28, RW_SEEK_CUR);
+        SDL_RWread(src, magic, 1, 8);
+        SDL_RWseek(src, pos, RW_SEEK_SET);
+        if (SDL_memcmp(magic, "OpusHead", 8) == 0) {
+            return MUS_OPUS;
+        }
         return MUS_OGG;
     }
 
@@ -854,14 +860,14 @@ Mix_MusicType detect_music_type_from_magic(SDL_RWops *src)
     if ((SDL_memcmp(magic, "RIFF", 4) == 0) && (SDL_memcmp(magic + 8, "RMID", 4) == 0)) {
         return MUS_MID;
     }
-    #if defined(MUSIC_MID_ADLMIDI) || defined(MUSIC_MID_OPNMIDI)
+#if defined(MUSIC_MID_ADLMIDI) || defined(MUSIC_MID_OPNMIDI)
     if (SDL_memcmp(magic, "MUS\x1A", 4) == 0) {
         return xmi_compatible_midi_player();
     }
     if ((SDL_memcmp(magic, "FORM", 4) == 0) && (SDL_memcmp(magic + 8, "XDIR", 4) == 0)) {
         return xmi_compatible_midi_player();
     }
-    #endif
+#endif
 
     /* WAVE files have the magic four bytes "RIFF"
            AIFF files have the magic 12 bytes "FORM" XXXX "AIFF" */
@@ -949,14 +955,14 @@ Mix_MusicType detect_music_type_from_magic(SDL_RWops *src)
     if (SDL_memcmp(magic, "if", 2) == 0)
         return MUS_MOD;
 
-    #if defined(MUSIC_MP3_MAD) || defined(MUSIC_MP3_MPG123) || defined(MUSIC_MP3_SMPEG)
+#if defined(MUSIC_MP3_MAD) || defined(MUSIC_MP3_MPG123) || defined(MUSIC_MP3_SMPEG)
     /* Detect MP3 format [needs scanning of bigger part of the file] */
     if (detect_mp3(magic, src, start)) {
         return MUS_MP3;
     }
-    #endif
+#endif
 
-    #ifdef MUSIC_MID_ADLMIDI
+#ifdef MUSIC_MID_ADLMIDI
     /* Detect id Software Music Format file */
     if (detect_imf(src, start)) {
         return MUS_ADLMIDI;
@@ -965,7 +971,7 @@ Mix_MusicType detect_music_type_from_magic(SDL_RWops *src)
     if (detect_ea_rsxx(src, start, magic[0])) {
         return MUS_ADLMIDI;
     }
-    #endif
+#endif
 
       /* Reset position to zero! */
     SDL_RWseek(src, start, RW_SEEK_SET);
@@ -976,37 +982,6 @@ Mix_MusicType detect_music_type_from_magic(SDL_RWops *src)
      * or there are too many formats supported by MikMod/ModPlug, or
      * MikMod/ModPlug does this check by itself. */
     return MUS_MOD;
-}
-
-static Mix_MusicType detect_music_type(SDL_RWops *src)
-{
-    Uint8 magic[12];
-    Mix_MusicType t;
-
-    SDL_memset(magic, 0, 12);
-    if (SDL_RWread(src, magic, 1, 12) != 12) {
-        Mix_SetError("Couldn't read first 12 bytes of audio data");
-        return MUS_NONE;
-    }
-    SDL_RWseek(src, -12, RW_SEEK_CUR);
-
-    /* WAVE files have the magic four bytes "RIFF"
-       AIFF files have the magic 12 bytes "FORM" XXXX "AIFF" */
-    if (((SDL_memcmp(magic, "RIFF", 4) == 0) && (SDL_memcmp((magic+8), "WAVE", 4) == 0)) ||
-       ((SDL_memcmp(magic, "FORM", 4) == 0) && (SDL_memcmp((magic+8), "XDIR", 4) != 0))) {
-        return MUS_WAV;
-    }
-    t = detect_music_type_from_magic(src);
-    if (t == MUS_OGG) {
-        Sint64 pos = SDL_RWtell(src);
-        SDL_RWseek(src, 28, RW_SEEK_CUR);
-        SDL_RWread(src, magic, 1, 8);
-        SDL_RWseek(src, pos, RW_SEEK_SET);
-        if (SDL_memcmp(magic, "OpusHead", 8) == 0) {
-            return MUS_OPUS;
-        }
-    }
-    return t;
 }
 
 /*

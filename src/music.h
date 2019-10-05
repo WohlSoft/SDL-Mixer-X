@@ -183,7 +183,7 @@ typedef struct
 
 extern int get_num_music_interfaces(void);
 extern Mix_MusicInterface *get_music_interface(int index);
-extern Mix_MusicType detect_music_type_from_magic(SDL_RWops *src);
+extern Mix_MusicType detect_music_type(SDL_RWops *src);
 extern SDL_bool load_music_type(Mix_MusicType type);
 extern SDL_bool open_music_type(Mix_MusicType type);
 extern SDL_bool open_music_type_ex(Mix_MusicType type, int midi_device);
