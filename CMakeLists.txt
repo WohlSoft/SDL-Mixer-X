@@ -12,6 +12,10 @@ if(NOT CMAKE_VERSION VERSION_LESS 2.8.12)
     set(CMAKE_MACOSX_RPATH 0)
 endif()
 
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
+    set(EMSCRIPTEN 1 BOOLEAN)
+endif()
+
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
     message("== Using default build configuration which is a Release!")
@@ -23,7 +27,7 @@ else()
     set(MIX_DEBUG_SUFFIX "")
 endif()
 
-if(WIN32)
+if(WIN32 AND NOT EMSCRIPTEN)
     set(CMAKE_SHARED_LIBRARY_PREFIX "")
 endif()
 
@@ -38,13 +42,21 @@ option(SSE                 "Use SSE assembly routines" ${OPT_DEF_ASM})
 option(SSE2                "Use SSE2 assembly routines" ${OPT_DEF_SSEMATH})
 option(SSE3                "Use SSE3 assembly routines" ${OPT_DEF_SSEMATH})
 
+if(EMSCRIPTEN)
+    set(SDL_MIXER_X_SHARED_DEFAULT_ON OFF)
+else()
+    set(SDL_MIXER_X_SHARED_DEFAULT_ON ON)
+endif()
+
 # Settings
 option(SDL_MIXER_X_STATIC   "Build static library of SDL Mixer X" ON)
-option(SDL_MIXER_X_SHARED   "Build shared library of SDL Mixer X" ON)
+option(SDL_MIXER_X_SHARED   "Build shared library of SDL Mixer X" ${SDL_MIXER_X_SHARED_DEFAULT_ON})
 
 option(DOWNLOAD_AUDIO_CODECS_DEPENDENCY "Downloads and compiles AudioCodecs dependencies pack directly" OFF)
 set(AUDIO_CODECS_REPO_PATH "" CACHE PATH "Path to the AudioCodecs dependencies pack")
 set(AUDIO_CODECS_INSTALL_PATH "" CACHE PATH "Path to installed AudioCodecs prefix")
+
+option(USE_SYSTEM_SDL2   "Use SDL2 from system" OFF)
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
     # Turn on warnings and legacy C/C++ standards to support more compilers
@@ -82,9 +94,9 @@ set(FIND_PREFER_STATIC
     ".a"
     ".lib"
     "${MIX_DEBUG_SUFFIX}.dll.a"
-    "${MIX_DEBUG_SUFFIX}.dll.lib"
+    "${MIX_DEBUG_SUFFIX}.lib"
     ".dll.a"
-    ".dll.lib"
+    ".lib"
     "${MIX_DEBUG_SUFFIX}.so"
     "${MIX_DEBUG_SUFFIX}.dylib"
     ".so"
@@ -93,9 +105,9 @@ set(FIND_PREFER_STATIC
 
 set(FIND_PREFER_SHARED
     "${MIX_DEBUG_SUFFIX}.dll.a"
-    "${MIX_DEBUG_SUFFIX}.dll.lib"
+    "${MIX_DEBUG_SUFFIX}.lib"
     ".dll.a"
-    ".dll.lib"
+    ".lib"
     "${MIX_DEBUG_SUFFIX}.so"
     "${MIX_DEBUG_SUFFIX}.dylib"
     ".so"
@@ -132,7 +144,7 @@ set(SDLMixerX_SOURCES)
 set(SDLMixerX_LINK_LIBS)
 
 # Recognize SDL2 library from the system
-if(USE_SYSTEM_AUDIO_LIBRARIES)
+if(USE_SYSTEM_AUDIO_LIBRARIES OR USE_SYSTEM_SDL2)
     find_package(PkgConfig)
     pkg_check_modules(SDL2 REQUIRED sdl2)
     list(APPEND SDL_MIXER_INCLUDE_PATHS ${SDL2_INCLUDE_DIRS})
@@ -484,7 +496,7 @@ if(USE_GME)
     endif()
 endif()
 
-if(NOT WIN32) # CMD Music is not supported on Windows
+if(NOT WIN32 AND NOT EMSCRIPTEN) # CMD Music is not supported on Windows
     option(USE_CMD             "Build with CMD music player support" ON)
     if(USE_CMD)
         message("== using CMD Music ==")
@@ -608,7 +620,7 @@ if(USE_MIDI)
     endif()
 
      # Native MIDI correctly works on Windows and macOS only.
-    if(WIN32 OR APPLE)
+    if((WIN32 AND NOT EMSCRIPTEN) OR APPLE)
         set(NATIVE_MIDI_SUPPORTED ON)
     else()
         set(NATIVE_MIDI_SUPPORTED OFF)
@@ -665,7 +677,7 @@ if(LIBMATH_NEEDED AND NOT MSVC)
     list(APPEND SDLMixerX_LINK_LIBS m)
 endif()
 
-if(WIN32)
+if(WIN32 AND NOT EMSCRIPTEN)
     option(BUILD_AS_VB6_BINDING "Compile library into solid module compatible with VisualBasic 6" OFF)
     if(BUILD_AS_VB6_BINDING)
         message("== SDL Mixer X will be built as solid module that is ready for MS-VB6 binding! ==")

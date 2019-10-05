@@ -52,14 +52,14 @@ static void GME_delete(void *context);
 void GME_setvolume(void *music_p, int volume)
 {
     GME_Music *music = (GME_Music*)music_p;
-    music->volume = (int)(round((double)volume * 1.3));
+    music->volume = (int)(SDL_floor(((double)volume * 1.3) + 0.5));
 }
 
 /* Get the volume for a GME stream */
 int GME_getvolume(void *music_p)
 {
     GME_Music *music = (GME_Music*)music_p;
-    return (int)(round((double)music->volume / 1.3));
+    return (int)(SDL_floor(((double)music->volume / 1.3) + 0.5));
 }
 
 GME_Music *GME_LoadSongRW(SDL_RWops *src, int trackNum)
@@ -277,7 +277,7 @@ static const char* GME_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
 static int GME_jump_to_time(void *music_p, double time)
 {
     GME_Music *music = (GME_Music*)music_p;
-    gme_seek(music->game_emu, (int)(round(time * 1000.0)));
+    gme_seek(music->game_emu, (int)(SDL_floor((time * 1000.0) + 0.5)));
     return 0;
 }
 
