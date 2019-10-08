@@ -837,10 +837,9 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
 
     /* Ogg Vorbis files have the magic four bytes "OggS" */
     if (SDL_memcmp(magic, "OggS", 4) == 0) {
-        Sint64 pos = SDL_RWtell(src);
         SDL_RWseek(src, 28, RW_SEEK_CUR);
         SDL_RWread(src, magic, 1, 8);
-        SDL_RWseek(src, pos, RW_SEEK_SET);
+        SDL_RWseek(src,-36, RW_SEEK_CUR);
         if (SDL_memcmp(magic, "OpusHead", 8) == 0) {
             return MUS_OPUS;
         }
