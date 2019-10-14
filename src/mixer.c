@@ -1018,7 +1018,7 @@ int SDLCALLCC Mix_PlayChannelTimedVolume(int which, Mix_Chunk *chunk, int loops,
             mix_channel[which].paused = 0;
             mix_channel[which].fading = MIX_NO_FADING;
             mix_channel[which].start_time = sdl_ticks;
-            mix_channel[which].expire = (ticks>0) ? (sdl_ticks + (Uint32)ticks) : 0;
+            mix_channel[which].expire = (ticks > 0) ? (sdl_ticks + (Uint32)ticks) : 0;
             if (volume >= 0) {
                 mix_channel[which].volume = (volume > MIX_MAX_VOLUME) ? MIX_MAX_VOLUME : volume;
             }
@@ -1100,13 +1100,13 @@ int SDLCALLCC Mix_FadeInChannelTimedVolume(int which, Mix_Chunk *chunk, int loop
             mix_channel[which].looping = loops;
             mix_channel[which].chunk = chunk;
             mix_channel[which].paused = 0;
+            if (volume >= 0) {
+                mix_channel[which].volume = (volume > MIX_MAX_VOLUME) ? MIX_MAX_VOLUME : volume;
+            }
             if (mix_channel[which].fading == MIX_NO_FADING) {
                 mix_channel[which].fade_volume_reset = mix_channel[which].volume;
             }
             mix_channel[which].fading = MIX_FADING_IN;
-            if (volume >= 0) {
-                mix_channel[which].volume = (volume > MIX_MAX_VOLUME) ? MIX_MAX_VOLUME : volume;
-            }
             mix_channel[which].fade_volume = mix_channel[which].volume;
             mix_channel[which].volume = 0;
             mix_channel[which].fade_length = (Uint32)ms;
