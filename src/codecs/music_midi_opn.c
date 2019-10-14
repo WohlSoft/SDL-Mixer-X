@@ -61,113 +61,113 @@ static void OPNMIDI_SetDefault(OpnMidi_Setup *setup)
 
 int SDLCALLCC Mix_OPNMIDI_getVolumeModel()
 {
-    #ifdef MUSIC_MID_OPNMIDI
+#ifdef MUSIC_MID_OPNMIDI
     return opnmidi_setup.volume_model;
-    #else
+#else
     return -1;
-    #endif
+#endif
 }
 
 void SDLCALLCC Mix_OPNMIDI_setVolumeModel(int vm)
 {
-    #ifdef MUSIC_MID_OPNMIDI
+#ifdef MUSIC_MID_OPNMIDI
     opnmidi_setup.volume_model = vm;
     if(vm < 0)
         opnmidi_setup.volume_model = 0;
-    #else
+#else
     MIX_UNUSED(vm);
-    #endif
+#endif
 }
 
 int SDLCALLCC Mix_OPNMIDI_getFullRangeBrightness()
 {
-    #ifdef MUSIC_MID_OPNMIDI
+#ifdef MUSIC_MID_OPNMIDI
     return opnmidi_setup.full_brightness_range;
-    #else
+#else
     return -1;
-    #endif
+#endif
 }
 
 void SDLCALLCC Mix_OPNMIDI_setFullRangeBrightness(int frb)
 {
-    #ifdef MUSIC_MID_OPNMIDI
+#ifdef MUSIC_MID_OPNMIDI
     opnmidi_setup.full_brightness_range = frb;
-    #else
+#else
     MIX_UNUSED(frb);
-    #endif
+#endif
 }
 
 int SDLCALLCC Mix_OPNMIDI_getFullPanStereo()
 {
-    #ifdef MUSIC_MID_OPNMIDI
+#ifdef MUSIC_MID_OPNMIDI
     return opnmidi_setup.soft_pan;
-    #else
+#else
     return -1;
-    #endif
+#endif
 }
 
 void SDLCALLCC Mix_OPNMIDI_setFullPanStereo(int fp)
 {
-    #ifdef MUSIC_MID_OPNMIDI
+#ifdef MUSIC_MID_OPNMIDI
     opnmidi_setup.soft_pan = fp;
-    #else
+#else
     MIX_UNUSED(fp);
-    #endif
+#endif
 }
 
 int SDLCALLCC Mix_OPNMIDI_getEmulator()
 {
-    #ifdef MUSIC_MID_OPNMIDI
+#ifdef MUSIC_MID_OPNMIDI
     return opnmidi_setup.emulator;
-    #else
+#else
     return -1;
-    #endif
+#endif
 }
 
 void SDLCALLCC Mix_OPNMIDI_setEmulator(int emu)
 {
-    #ifdef MUSIC_MID_OPNMIDI
+#ifdef MUSIC_MID_OPNMIDI
     opnmidi_setup.emulator = emu;
-    #else
+#else
     MIX_UNUSED(emu);
-    #endif
+#endif
 }
 
 int SDLCALLCC Mix_OPNMIDI_getChipsCount()
 {
-    #ifdef MUSIC_MID_OPNMIDI
+#ifdef MUSIC_MID_OPNMIDI
     return opnmidi_setup.chips_count;
-    #else
+#else
     return -1;
-    #endif
+#endif
 }
 
 void SDLCALLCC Mix_OPNMIDI_setChipsCount(int chips)
 {
-    #ifdef MUSIC_MID_OPNMIDI
+#ifdef MUSIC_MID_OPNMIDI
     opnmidi_setup.chips_count = chips;
-    #else
+#else
     MIX_UNUSED(frb);
-    #endif
+#endif
 }
 
 void SDLCALLCC Mix_OPNMIDI_setSetDefaults()
 {
-    #ifdef MUSIC_MID_OPNMIDI
+#ifdef MUSIC_MID_OPNMIDI
     OPNMIDI_SetDefault(&opnmidi_setup);
-    #endif
+#endif
 }
 
 void SDLCALLCC Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path)
 {
-    #ifdef MUSIC_MID_OPNMIDI
+#ifdef MUSIC_MID_OPNMIDI
     if(bank_wonp_path)
         SDL_strlcpy(opnmidi_setup.custom_bank_path, bank_wonp_path, 2048);
     else
         opnmidi_setup.custom_bank_path[0] = '\0';
-    #else
+#else
     MIX_UNUSED(bank_wonp_path);
-    #endif
+#endif
 }
 
 #ifdef MUSIC_MID_OPNMIDI
