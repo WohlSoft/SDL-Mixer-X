@@ -37,12 +37,13 @@ typedef struct {
     int emulator;
     char custom_bank_path[2048];
     double tempo;
+    double gain;
 } OpnMidi_Setup;
 
 #define OPNMIDI_DEFAULT_CHIPS_COUNT     6
 
 static OpnMidi_Setup opnmidi_setup = {
-    0, -1, 0, 1, -1, "", 1.0
+    0, -1, 0, 1, -1, "", 1.0, 2.0
 };
 
 static void OPNMIDI_SetDefault(OpnMidi_Setup *setup)
@@ -54,6 +55,7 @@ static void OPNMIDI_SetDefault(OpnMidi_Setup *setup)
     setup->emulator = -1;
     setup->custom_bank_path[0] = '\0';
     setup->tempo = 1.0;
+    setup->gain = 2.0;
 }
 
 #endif
@@ -180,6 +182,7 @@ typedef struct
     int playing;
     int volume;
     double tempo;
+    double gain;
 
     SDL_AudioStream *stream;
     void *buffer;
@@ -193,15 +196,14 @@ typedef struct
 static void OPNMIDI_setvolume(void *music_p, int volume)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music*)music_p;
-    music->volume = volume * 2;
-    /* (int)(round(128.0*sqrt(((double)volume)*(1.0/128.0) ))); */
+    music->volume = (int)SDL_floor(((double)(volume) * music->gain) + 0.5);
 }
 
 /* Get the volume for a OPNMIDI stream */
 static int OPNMIDI_getvolume(void *music_p)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music*)music_p;
-    return music->volume / 2;
+    return (int)SDL_floor(((double)(music->volume) / music->gain) + 0.5);
 }
 
 static double str_to_float(const char *str)
@@ -239,7 +241,7 @@ static void process_args(const char *args, OpnMidi_Setup *setup)
 
     for (i = 0; i < maxlen; i++) {
         char c = args[i];
-        if(value_opened == 1) {
+        if (value_opened == 1) {
             if ((c == ';') || (c == '\0')) {
                 int value;
                 arg[j] = '\0';
@@ -274,6 +276,14 @@ static void process_args(const char *args, OpnMidi_Setup *setup)
                         }
                     }
                     break;
+                case 'g':
+                    if (arg[0] == '=') {
+                        setup->gain = str_to_float(arg + 1);
+                        if (setup->gain < 0.0) {
+                            setup->gain = 1.0;
+                        }
+                    }
+                    break;
                 case 'x':
                     if (arg[0] == '=') {
                         SDL_strlcpy(setup->custom_bank_path, arg + 1, (ARG_BUFFER_SIZE - 1));
@@ -303,136 +313,137 @@ static void OPNMIDI_delete(void *music_p);
 
 static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
 {
-    if(src != NULL)
-    {
-        void *bytes=0;
-        long filesize = 0;
-        int err = 0;
-        Sint64 length=0;
-        size_t bytes_l;
-        unsigned char byte[1];
-        OpnMIDI_Music *music = NULL;
-        OpnMidi_Setup setup = opnmidi_setup;
-        unsigned short src_format = music_spec.format;
+    void *bytes = 0;
+    long filesize = 0;
+    int err = 0;
+    Sint64 length = 0;
+    size_t bytes_l;
+    unsigned char byte[1];
+    OpnMIDI_Music *music = NULL;
+    OpnMidi_Setup setup = opnmidi_setup;
+    unsigned short src_format = music_spec.format;
 
-        process_args(args, &setup);
-
-        music = (OpnMIDI_Music *)SDL_calloc(1, sizeof(OpnMIDI_Music));
-
-        music->tempo = setup.tempo;
-
-        switch (music_spec.format)
-        {
-        case AUDIO_U8:
-            music->sample_format.type = OPNMIDI_SampleType_U8;
-            music->sample_format.containerSize = sizeof(Uint8);
-            music->sample_format.sampleOffset = sizeof(Uint8) * 2;
-            break;
-        case AUDIO_S8:
-            music->sample_format.type = OPNMIDI_SampleType_S8;
-            music->sample_format.containerSize = sizeof(Sint8);
-            music->sample_format.sampleOffset = sizeof(Sint8) * 2;
-            break;
-        case AUDIO_S16:
-            music->sample_format.type = OPNMIDI_SampleType_S16;
-            music->sample_format.containerSize = sizeof(Sint16);
-            music->sample_format.sampleOffset = sizeof(Sint16) * 2;
-            break;
-        case AUDIO_U16:
-            music->sample_format.type = OPNMIDI_SampleType_U16;
-            music->sample_format.containerSize = sizeof(Uint16);
-            music->sample_format.sampleOffset = sizeof(Uint16) * 2;
-            break;
-        case AUDIO_S32:
-            music->sample_format.type = OPNMIDI_SampleType_S32;
-            music->sample_format.containerSize = sizeof(Sint32);
-            music->sample_format.sampleOffset = sizeof(Sint32) * 2;
-            break;
-        case AUDIO_F32:
-        default:
-            music->sample_format.type = OPNMIDI_SampleType_F32;
-            music->sample_format.containerSize = sizeof(float);
-            music->sample_format.sampleOffset = sizeof(float) * 2;
-            src_format = AUDIO_F32;
-        }
-
-        music->stream = SDL_NewAudioStream(src_format, 2, music_spec.freq,
-                                           music_spec.format, music_spec.channels, music_spec.freq);
-
-        if (!music->stream) {
-            OPNMIDI_delete(music);
-            return NULL;
-        }
-
-        music->buffer_size = music_spec.samples * music->sample_format.containerSize * 2/*channels*/ * music_spec.channels;
-        music->buffer = SDL_malloc(music->buffer_size);
-        if (!music->buffer) {
-            OPNMIDI_delete(music);
-            return NULL;
-        }
-
-        length = SDL_RWseek(src, 0, RW_SEEK_END);
-        if (length < 0)
-        {
-            Mix_SetError("OPN2-MIDI: wrong file\n");
-            return NULL;
-        }
-
-        SDL_RWseek(src, 0, RW_SEEK_SET);
-        bytes = SDL_malloc((size_t)length);
-
-        filesize = 0;
-        while( (bytes_l = SDL_RWread(src, &byte, sizeof(Uint8), 1)) != 0)
-        {
-            ((unsigned char*)bytes)[filesize] = byte[0];
-            filesize++;
-        }
-
-        if (filesize == 0)
-        {
-            Mix_SetError("OPN2-MIDI: wrong file\n");
-            SDL_free(bytes);
-            return NULL;
-        }
-
-        music->opnmidi = opn2_init( music_spec.freq );
-        if(setup.custom_bank_path[0] != '\0')
-            err = opn2_openBankFile(music->opnmidi, (char*)setup.custom_bank_path);
-        else
-            err = opn2_openBankData(music->opnmidi, g_gm_opn2_bank, sizeof(g_gm_opn2_bank));
-        if( err < 0 )
-        {
-            Mix_SetError("OPN2-MIDI: %s", opn2_errorInfo(music->opnmidi));
-            SDL_free(bytes);
-            OPNMIDI_delete(music);
-            return NULL;
-        }
-
-        if (setup.emulator >= 0)
-            opn2_switchEmulator(music->opnmidi, setup.emulator);
-        opn2_setVolumeRangeModel(music->opnmidi, setup.volume_model);
-        opn2_setFullRangeBrightness(music->opnmidi, setup.full_brightness_range);
-        opn2_setSoftPanEnabled(music->opnmidi, setup.soft_pan);
-        opn2_setNumChips(music->opnmidi, (setup.chips_count >= 0) ? setup.chips_count : OPNMIDI_DEFAULT_CHIPS_COUNT);
-        opn2_setTempo(music->opnmidi, music->tempo);
-
-        err = opn2_openData( music->opnmidi, bytes, (unsigned long)filesize);
-        SDL_free(bytes);
-
-        if(err != 0)
-        {
-            Mix_SetError("OPN2-MIDI: %s", opn2_errorInfo(music->opnmidi));
-            OPNMIDI_delete(music);
-            return NULL;
-        }
-
-        music->volume                 = MIX_MAX_VOLUME;
-        meta_tags_init(&music->tags);
-        meta_tags_set(&music->tags, MIX_META_TITLE, opn2_metaMusicTitle(music->opnmidi));
-        meta_tags_set(&music->tags, MIX_META_COPYRIGHT, opn2_metaMusicCopyright(music->opnmidi));
-        return music;
+    if (src == NULL) {
+        return NULL;
     }
-    return NULL;
+
+    process_args(args, &setup);
+
+    music = (OpnMIDI_Music *)SDL_calloc(1, sizeof(OpnMIDI_Music));
+
+    music->tempo = setup.tempo;
+    music->gain = setup.gain;
+
+    switch (music_spec.format)
+    {
+    case AUDIO_U8:
+        music->sample_format.type = OPNMIDI_SampleType_U8;
+        music->sample_format.containerSize = sizeof(Uint8);
+        music->sample_format.sampleOffset = sizeof(Uint8) * 2;
+        break;
+    case AUDIO_S8:
+        music->sample_format.type = OPNMIDI_SampleType_S8;
+        music->sample_format.containerSize = sizeof(Sint8);
+        music->sample_format.sampleOffset = sizeof(Sint8) * 2;
+        break;
+    case AUDIO_S16:
+        music->sample_format.type = OPNMIDI_SampleType_S16;
+        music->sample_format.containerSize = sizeof(Sint16);
+        music->sample_format.sampleOffset = sizeof(Sint16) * 2;
+        break;
+    case AUDIO_U16:
+        music->sample_format.type = OPNMIDI_SampleType_U16;
+        music->sample_format.containerSize = sizeof(Uint16);
+        music->sample_format.sampleOffset = sizeof(Uint16) * 2;
+        break;
+    case AUDIO_S32:
+        music->sample_format.type = OPNMIDI_SampleType_S32;
+        music->sample_format.containerSize = sizeof(Sint32);
+        music->sample_format.sampleOffset = sizeof(Sint32) * 2;
+        break;
+    case AUDIO_F32:
+    default:
+        music->sample_format.type = OPNMIDI_SampleType_F32;
+        music->sample_format.containerSize = sizeof(float);
+        music->sample_format.sampleOffset = sizeof(float) * 2;
+        src_format = AUDIO_F32;
+    }
+
+    music->stream = SDL_NewAudioStream(src_format, 2, music_spec.freq,
+                                       music_spec.format, music_spec.channels, music_spec.freq);
+
+    if (!music->stream) {
+        OPNMIDI_delete(music);
+        return NULL;
+    }
+
+    music->buffer_size = music_spec.samples * music->sample_format.containerSize * 2/*channels*/ * music_spec.channels;
+    music->buffer = SDL_malloc(music->buffer_size);
+    if (!music->buffer) {
+        OPNMIDI_delete(music);
+        return NULL;
+    }
+
+    length = SDL_RWseek(src, 0, RW_SEEK_END);
+    if (length < 0)
+    {
+        Mix_SetError("OPN2-MIDI: wrong file\n");
+        return NULL;
+    }
+
+    SDL_RWseek(src, 0, RW_SEEK_SET);
+    bytes = SDL_malloc((size_t)length);
+
+    filesize = 0;
+    while( (bytes_l = SDL_RWread(src, &byte, sizeof(Uint8), 1)) != 0)
+    {
+        ((unsigned char*)bytes)[filesize] = byte[0];
+        filesize++;
+    }
+
+    if (filesize == 0)
+    {
+        Mix_SetError("OPN2-MIDI: wrong file\n");
+        SDL_free(bytes);
+        return NULL;
+    }
+
+    music->opnmidi = opn2_init( music_spec.freq );
+    if(setup.custom_bank_path[0] != '\0')
+        err = opn2_openBankFile(music->opnmidi, (char*)setup.custom_bank_path);
+    else
+        err = opn2_openBankData(music->opnmidi, g_gm_opn2_bank, sizeof(g_gm_opn2_bank));
+    if( err < 0 )
+    {
+        Mix_SetError("OPN2-MIDI: %s", opn2_errorInfo(music->opnmidi));
+        SDL_free(bytes);
+        OPNMIDI_delete(music);
+        return NULL;
+    }
+
+    if (setup.emulator >= 0)
+        opn2_switchEmulator(music->opnmidi, setup.emulator);
+    opn2_setVolumeRangeModel(music->opnmidi, setup.volume_model);
+    opn2_setFullRangeBrightness(music->opnmidi, setup.full_brightness_range);
+    opn2_setSoftPanEnabled(music->opnmidi, setup.soft_pan);
+    opn2_setNumChips(music->opnmidi, (setup.chips_count >= 0) ? setup.chips_count : OPNMIDI_DEFAULT_CHIPS_COUNT);
+    opn2_setTempo(music->opnmidi, music->tempo);
+
+    err = opn2_openData( music->opnmidi, bytes, (unsigned long)filesize);
+    SDL_free(bytes);
+
+    if(err != 0)
+    {
+        Mix_SetError("OPN2-MIDI: %s", opn2_errorInfo(music->opnmidi));
+        OPNMIDI_delete(music);
+        return NULL;
+    }
+
+    music->volume                 = MIX_MAX_VOLUME;
+    meta_tags_init(&music->tags);
+    meta_tags_set(&music->tags, MIX_META_TITLE, opn2_metaMusicTitle(music->opnmidi));
+    meta_tags_set(&music->tags, MIX_META_COPYRIGHT, opn2_metaMusicCopyright(music->opnmidi));
+    return music;
 }
 
 /* Load OPNMIDI stream from an SDL_RWops object */
@@ -441,10 +452,12 @@ static void *OPNMIDI_new_RWex(struct SDL_RWops *src, int freesrc, const char *ar
     OpnMIDI_Music *adlmidiMusic;
 
     adlmidiMusic = OPNMIDI_LoadSongRW(src, args);
-    if (!adlmidiMusic)
+    if (!adlmidiMusic) {
         return NULL;
-    if( freesrc )
+    }
+    if (freesrc) {
         SDL_RWclose(src);
+    }
 
     return adlmidiMusic;
 }

@@ -41,12 +41,13 @@ typedef struct {
     int emulator;
     char custom_bank_path[2048];
     double tempo;
+    double gain;
 } AdlMidi_Setup;
 
 #define ADLMIDI_DEFAULT_CHIPS_COUNT     4
 
 static AdlMidi_Setup adlmidi_setup = {
-    58, -1, -1, -1, 0, -1, -1, 0, 1, ADLMIDI_EMU_DOSBOX, "", 1.0
+    58, -1, -1, -1, 0, -1, -1, 0, 1, ADLMIDI_EMU_DOSBOX, "", 1.0, 2.0
 };
 
 static void ADLMIDI_SetDefault(AdlMidi_Setup *setup)
@@ -63,6 +64,7 @@ static void ADLMIDI_SetDefault(AdlMidi_Setup *setup)
     setup->emulator = -1;
     setup->custom_bank_path[0] = '\0';
     setup->tempo = 1.0;
+    setup->gain = 2.0;
 }
 #endif /* MUSIC_MID_ADLMIDI */
 
@@ -292,6 +294,7 @@ typedef struct
     struct ADL_MIDIPlayer *adlmidi;
     int volume;
     double tempo;
+    double gain;
 
     SDL_AudioStream *stream;
     void *buffer;
@@ -304,15 +307,14 @@ typedef struct
 static void ADLMIDI_setvolume(void *music_p, int volume)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
-    music->volume = volume * 2;
-    /* (int)(round(128.0 * sqrt(((double)volume) * (1.0 / 128.0))));*/
+    music->volume = (int)SDL_floor(((double)(volume) * music->gain) + 0.5);
 }
 
 /* Get the volume for a ADLMIDI stream */
 static int ADLMIDI_getvolume(void *music_p)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
-    return music->volume / 2;
+    return (int)SDL_floor(((double)(music->volume) / music->gain) + 0.5);
 }
 
 static double str_to_float(const char *str)
@@ -350,7 +352,7 @@ static void process_args(const char *args, AdlMidi_Setup *setup)
 
     for (i = 0; i < maxlen; i++) {
         char c = args[i];
-        if(value_opened == 1) {
+        if (value_opened == 1) {
             if ((c == ';') || (c == '\0')) {
                 int value;
                 arg[j] = '\0';
@@ -376,6 +378,14 @@ static void process_args(const char *args, AdlMidi_Setup *setup)
                         }
                     } else {
                         setup->tremolo = value;
+                    }
+                    break;
+                case 'g':
+                    if (arg[0] == '=') {
+                        setup->gain = str_to_float(arg + 1);
+                        if (setup->gain < 0.0) {
+                            setup->gain = 1.0;
+                        }
                     }
                     break;
                 case 'v':
@@ -428,142 +438,143 @@ static void ADLMIDI_delete(void *music_p);
 
 static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
 {
-    if(src != NULL)
-    {
-        void *bytes = 0;
-        long filesize = 0;
-        int err = 0;
-        Sint64 length = 0;
-        size_t bytes_l;
-        unsigned char byte[1];
-        AdlMIDI_Music *music = NULL;
-        AdlMidi_Setup setup = adlmidi_setup;
-        unsigned short src_format = music_spec.format;
+    void *bytes = 0;
+    long filesize = 0;
+    int err = 0;
+    Sint64 length = 0;
+    size_t bytes_l;
+    unsigned char byte[1];
+    AdlMIDI_Music *music = NULL;
+    AdlMidi_Setup setup = adlmidi_setup;
+    unsigned short src_format = music_spec.format;
 
-        process_args(args, &setup);
-
-        music = (AdlMIDI_Music *)SDL_calloc(1, sizeof(AdlMIDI_Music));
-
-        music->tempo = setup.tempo;
-
-        switch (music_spec.format)
-        {
-        case AUDIO_U8:
-            music->sample_format.type = ADLMIDI_SampleType_U8;
-            music->sample_format.containerSize = sizeof(Uint8);
-            music->sample_format.sampleOffset = sizeof(Uint8) * 2;
-            break;
-        case AUDIO_S8:
-            music->sample_format.type = ADLMIDI_SampleType_S8;
-            music->sample_format.containerSize = sizeof(Sint8);
-            music->sample_format.sampleOffset = sizeof(Sint8) * 2;
-            break;
-        case AUDIO_S16:
-            music->sample_format.type = ADLMIDI_SampleType_S16;
-            music->sample_format.containerSize = sizeof(Sint16);
-            music->sample_format.sampleOffset = sizeof(Sint16) * 2;
-            break;
-        case AUDIO_U16:
-            music->sample_format.type = ADLMIDI_SampleType_U16;
-            music->sample_format.containerSize = sizeof(Uint16);
-            music->sample_format.sampleOffset = sizeof(Uint16) * 2;
-            break;
-        case AUDIO_S32:
-            music->sample_format.type = ADLMIDI_SampleType_S32;
-            music->sample_format.containerSize = sizeof(Sint32);
-            music->sample_format.sampleOffset = sizeof(Sint32) * 2;
-            break;
-        case AUDIO_F32:
-        default:
-            music->sample_format.type = ADLMIDI_SampleType_F32;
-            music->sample_format.containerSize = sizeof(float);
-            music->sample_format.sampleOffset = sizeof(float) * 2;
-            src_format = AUDIO_F32;
-        }
-
-        music->stream = SDL_NewAudioStream(src_format, 2, music_spec.freq,
-                                           music_spec.format, music_spec.channels, music_spec.freq);
-
-        if (!music->stream) {
-            ADLMIDI_delete(music);
-            return NULL;
-        }
-
-        music->buffer_size = music_spec.samples * music->sample_format.containerSize * 2/*channels*/ * music_spec.channels;
-        music->buffer = SDL_malloc(music->buffer_size);
-        if (!music->buffer) {
-            ADLMIDI_delete(music);
-            return NULL;
-        }
-
-        length = SDL_RWseek(src, 0, RW_SEEK_END);
-        if(length < 0)
-        {
-            Mix_SetError("ADL-MIDI: wrong file\n");
-            return NULL;
-        }
-
-        SDL_RWseek(src, 0, RW_SEEK_SET);
-        bytes = SDL_malloc((size_t)length);
-
-        filesize = 0;
-        while((bytes_l = SDL_RWread(src, &byte, sizeof(Uint8), 1)) != 0)
-        {
-            ((unsigned char *)bytes)[filesize] = byte[0];
-            filesize++;
-        }
-
-        if(filesize == 0)
-        {
-            SDL_free(bytes);
-            ADLMIDI_delete(music);
-            Mix_SetError("ADL-MIDI: wrong file\n");
-            return NULL;
-        }
-
-        music->adlmidi = adl_init(music_spec.freq);
-
-        adl_setHVibrato(music->adlmidi, setup.vibrato);
-        adl_setHTremolo(music->adlmidi, setup.tremolo);
-        if(setup.custom_bank_path[0] != '\0')
-            err = adl_openBankFile(music->adlmidi, (char*)setup.custom_bank_path);
-        else
-            err = adl_setBank(music->adlmidi, setup.bank);
-        if(err < 0)
-        {
-            Mix_SetError("ADL-MIDI: %s", adl_errorInfo(music->adlmidi));
-            SDL_free(bytes);
-            ADLMIDI_delete(music);
-            return NULL;
-        }
-
-        adl_switchEmulator( music->adlmidi, (setup.emulator >= 0) ? setup.emulator : ADLMIDI_EMU_DOSBOX );
-        adl_setScaleModulators(music->adlmidi, setup.scalemod);
-        adl_setVolumeRangeModel(music->adlmidi, setup.volume_model);
-        adl_setFullRangeBrightness(music->adlmidi, setup.full_brightness_range);
-        adl_setSoftPanEnabled(music->adlmidi, setup.soft_pan);
-        adl_setNumChips(music->adlmidi, (setup.chips_count >= 0) ? setup.chips_count : ADLMIDI_DEFAULT_CHIPS_COUNT);
-        if (setup.four_op_channels >= 0)
-            adl_setNumFourOpsChn(music->adlmidi, setup.four_op_channels);
-        adl_setTempo(music->adlmidi, music->tempo);
-
-        err = adl_openData(music->adlmidi, bytes, (unsigned long)filesize);
-        SDL_free(bytes);
-
-        if(err != 0)
-        {
-            Mix_SetError("ADL-MIDI: %s", adl_errorInfo(music->adlmidi));
-            ADLMIDI_delete(music);
-            return NULL;
-        }
-
-        music->volume                 = MIX_MAX_VOLUME;
-        meta_tags_init(&music->tags);
-        meta_tags_set(&music->tags, MIX_META_TITLE, adl_metaMusicTitle(music->adlmidi));
-        meta_tags_set(&music->tags, MIX_META_COPYRIGHT, adl_metaMusicCopyright(music->adlmidi));
-        return music;
+    if (src == NULL) {
+        return NULL;
     }
-    return NULL;
+
+    process_args(args, &setup);
+
+    music = (AdlMIDI_Music *)SDL_calloc(1, sizeof(AdlMIDI_Music));
+
+    music->tempo = setup.tempo;
+    music->gain = setup.gain;
+
+    switch (music_spec.format)
+    {
+    case AUDIO_U8:
+        music->sample_format.type = ADLMIDI_SampleType_U8;
+        music->sample_format.containerSize = sizeof(Uint8);
+        music->sample_format.sampleOffset = sizeof(Uint8) * 2;
+        break;
+    case AUDIO_S8:
+        music->sample_format.type = ADLMIDI_SampleType_S8;
+        music->sample_format.containerSize = sizeof(Sint8);
+        music->sample_format.sampleOffset = sizeof(Sint8) * 2;
+        break;
+    case AUDIO_S16:
+        music->sample_format.type = ADLMIDI_SampleType_S16;
+        music->sample_format.containerSize = sizeof(Sint16);
+        music->sample_format.sampleOffset = sizeof(Sint16) * 2;
+        break;
+    case AUDIO_U16:
+        music->sample_format.type = ADLMIDI_SampleType_U16;
+        music->sample_format.containerSize = sizeof(Uint16);
+        music->sample_format.sampleOffset = sizeof(Uint16) * 2;
+        break;
+    case AUDIO_S32:
+        music->sample_format.type = ADLMIDI_SampleType_S32;
+        music->sample_format.containerSize = sizeof(Sint32);
+        music->sample_format.sampleOffset = sizeof(Sint32) * 2;
+        break;
+    case AUDIO_F32:
+    default:
+        music->sample_format.type = ADLMIDI_SampleType_F32;
+        music->sample_format.containerSize = sizeof(float);
+        music->sample_format.sampleOffset = sizeof(float) * 2;
+        src_format = AUDIO_F32;
+    }
+
+    music->stream = SDL_NewAudioStream(src_format, 2, music_spec.freq,
+                                       music_spec.format, music_spec.channels, music_spec.freq);
+
+    if (!music->stream) {
+        ADLMIDI_delete(music);
+        return NULL;
+    }
+
+    music->buffer_size = music_spec.samples * music->sample_format.containerSize * 2/*channels*/ * music_spec.channels;
+    music->buffer = SDL_malloc(music->buffer_size);
+    if (!music->buffer) {
+        ADLMIDI_delete(music);
+        return NULL;
+    }
+
+    length = SDL_RWseek(src, 0, RW_SEEK_END);
+    if(length < 0)
+    {
+        Mix_SetError("ADL-MIDI: wrong file\n");
+        return NULL;
+    }
+
+    SDL_RWseek(src, 0, RW_SEEK_SET);
+    bytes = SDL_malloc((size_t)length);
+
+    filesize = 0;
+    while((bytes_l = SDL_RWread(src, &byte, sizeof(Uint8), 1)) != 0)
+    {
+        ((unsigned char *)bytes)[filesize] = byte[0];
+        filesize++;
+    }
+
+    if(filesize == 0)
+    {
+        SDL_free(bytes);
+        ADLMIDI_delete(music);
+        Mix_SetError("ADL-MIDI: wrong file\n");
+        return NULL;
+    }
+
+    music->adlmidi = adl_init(music_spec.freq);
+
+    adl_setHVibrato(music->adlmidi, setup.vibrato);
+    adl_setHTremolo(music->adlmidi, setup.tremolo);
+    if(setup.custom_bank_path[0] != '\0')
+        err = adl_openBankFile(music->adlmidi, (char*)setup.custom_bank_path);
+    else
+        err = adl_setBank(music->adlmidi, setup.bank);
+    if(err < 0)
+    {
+        Mix_SetError("ADL-MIDI: %s", adl_errorInfo(music->adlmidi));
+        SDL_free(bytes);
+        ADLMIDI_delete(music);
+        return NULL;
+    }
+
+    adl_switchEmulator( music->adlmidi, (setup.emulator >= 0) ? setup.emulator : ADLMIDI_EMU_DOSBOX );
+    adl_setScaleModulators(music->adlmidi, setup.scalemod);
+    adl_setVolumeRangeModel(music->adlmidi, setup.volume_model);
+    adl_setFullRangeBrightness(music->adlmidi, setup.full_brightness_range);
+    adl_setSoftPanEnabled(music->adlmidi, setup.soft_pan);
+    adl_setNumChips(music->adlmidi, (setup.chips_count >= 0) ? setup.chips_count : ADLMIDI_DEFAULT_CHIPS_COUNT);
+    if (setup.four_op_channels >= 0)
+        adl_setNumFourOpsChn(music->adlmidi, setup.four_op_channels);
+    adl_setTempo(music->adlmidi, music->tempo);
+
+    err = adl_openData(music->adlmidi, bytes, (unsigned long)filesize);
+    SDL_free(bytes);
+
+    if(err != 0)
+    {
+        Mix_SetError("ADL-MIDI: %s", adl_errorInfo(music->adlmidi));
+        ADLMIDI_delete(music);
+        return NULL;
+    }
+
+    music->volume                 = MIX_MAX_VOLUME;
+    meta_tags_init(&music->tags);
+    meta_tags_set(&music->tags, MIX_META_TITLE, adl_metaMusicTitle(music->adlmidi));
+    meta_tags_set(&music->tags, MIX_META_COPYRIGHT, adl_metaMusicCopyright(music->adlmidi));
+    return music;
 }
 
 /* Load ADLMIDI stream from an SDL_RWops object */
@@ -572,10 +583,12 @@ static void *ADLMIDI_new_RWex(struct SDL_RWops *src, int freesrc, const char *ar
     AdlMIDI_Music *adlmidiMusic;
 
     adlmidiMusic = ADLMIDI_LoadSongRW(src, args);
-    if(!adlmidiMusic)
+    if (!adlmidiMusic) {
         return NULL;
-    if(freesrc)
+    }
+    if (freesrc) {
         SDL_RWclose(src);
+    }
 
     return adlmidiMusic;
 }
