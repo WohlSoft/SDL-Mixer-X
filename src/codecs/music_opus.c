@@ -209,7 +209,7 @@ static int OPUS_UpdateSection(OPUS_music *music)
 }
 
 /* Convert string into integer with clean-up from junk and leading zeroes */
-static ogg_int64_t str_to_ogg_int64(char *param)
+static ogg_int64_t str_to_int64(char *param)
 {
     char *front = param;
     char *back = NULL;
@@ -227,6 +227,47 @@ static ogg_int64_t str_to_ogg_int64(char *param)
     *back = '\0';
 
     return (ogg_int64_t)SDL_strtoull(front, NULL, 0);
+}
+
+/* Parse time string of the form HH:MM:SS.mmm and return equivalent sample
+ * position */
+static ogg_int64_t parse_time(char *time)
+{
+    const ogg_int64_t samplerate_hz = 48000;
+    char *num_start, *p;
+    ogg_int64_t result = 0;
+    char c;
+
+    /* Time is directly expressed as a sample position */
+    if (SDL_strchr(time, ':') == NULL) {
+        return str_to_int64(time);
+    }
+
+    result = 0;
+    num_start = time;
+
+    for (p = time; *p != '\0'; ++p) {
+        if (*p == '.' || *p == ':') {
+            c = *p; *p = '\0';
+            result = result * 60 + SDL_atoi(num_start);
+            num_start = p + 1;
+            *p = c;
+        }
+
+        if (*p == '.') {
+            return result * samplerate_hz
+                + (ogg_int64_t) (SDL_atof(p) * samplerate_hz);
+        }
+    }
+
+    return (result * 60 + SDL_atoi(num_start)) * samplerate_hz;
+}
+
+static SDL_bool is_loop_tag(const char *tag)
+{
+    char buf[5];
+    SDL_strlcpy(buf, tag, 5);
+    return SDL_strcasecmp(buf, "LOOP") == 0;
 }
 
 /* Load an Opus stream from an SDL_RWops object */
@@ -276,7 +317,7 @@ static void *OPUS_CreateFromRW(SDL_RWops *src, int freesrc)
     }
 
     tags = opus.op_tags(music->of, -1);
-    for (ci=0; ci<tags->comments; ci++) {
+    for (ci=0; ci < tags->comments; ci++) {
         char *param = SDL_strdup(tags->user_comments[ci]);
         char *argument = param;
         char *value = SDL_strchr(param, '=');
@@ -286,14 +327,20 @@ static void *OPUS_CreateFromRW(SDL_RWops *src, int freesrc)
             *(value++) = '\0';
         }
 
+        /* Want to match LOOP-START, LOOP_START, etc. Remove - or _ from
+         * string if it is present at position 4. */
+        if (is_loop_tag(argument) && ((argument[4] == '_') || (argument[4] == '-'))) {
+            SDL_memmove(argument + 4, argument + 5, SDL_strlen(argument) - 4);
+        }
+
         if (SDL_strcasecmp(argument, "LOOPSTART") == 0)
-            music->loop_start = str_to_ogg_int64(value);
+            music->loop_start = parse_time(value);
         else if (SDL_strcasecmp(argument, "LOOPLENGTH") == 0) {
-            music->loop_len = str_to_ogg_int64(value);
+            music->loop_len = str_to_int64(value);
             isLoopLength = 1;
         } else if (SDL_strcasecmp(argument, "LOOPEND") == 0) {
             isLoopLength = 0;
-            music->loop_end = str_to_ogg_int64(value);
+            music->loop_end = parse_time(value);
         } else if (SDL_strcasecmp(argument, "TITLE") == 0) {
             meta_tags_set(&music->tags, MIX_META_TITLE, value);
         } else if (SDL_strcasecmp(argument, "ARTIST") == 0) {
