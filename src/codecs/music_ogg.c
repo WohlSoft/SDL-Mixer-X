@@ -241,27 +241,6 @@ static int OGG_UpdateSection(OGG_music *music)
     return 0;
 }
 
-/* Convert string into integer with clean-up from junk and leading zeroes */
-static ogg_int64_t str_to_int64(char *param)
-{
-    char *front = param;
-    char *back = NULL;
-
-    /* Find digit between of 1 and 9 at begin */
-    while ( (*front != '\0') && ((*front < '1') || (*front > '9')) )
-        front++;
-
-    /* Find any non-digit character or NULL */
-    back = front;
-    while ((*back != '\0') && ((*back >= '0') && (*back <= '9')))
-        back++;
-
-    /* Put a string terminator into back just in case */
-    *back = '\0';
-
-    return (ogg_int64_t)SDL_strtoull(front, NULL, 0);
-}
-
 /* Parse time string of the form HH:MM:SS.mmm and return equivalent sample
  * position */
 static ogg_int64_t parse_time(char *time, ogg_int64_t samplerate_hz)
@@ -272,7 +251,7 @@ static ogg_int64_t parse_time(char *time, ogg_int64_t samplerate_hz)
 
     /* Time is directly expressed as a sample position */
     if (SDL_strchr(time, ':') == NULL) {
-        return str_to_int64(time);
+        return (ogg_int64_t)SDL_strtoull(time, NULL, 10);
     }
 
     result = 0;
@@ -365,7 +344,7 @@ static void *OGG_CreateFromRW(SDL_RWops *src, int freesrc)
         if (SDL_strcasecmp(argument, "LOOPSTART") == 0)
             music->loop_start = parse_time(value, music->sample_rate);
         else if (SDL_strcasecmp(argument, "LOOPLENGTH") == 0) {
-            music->loop_len = str_to_int64(value);
+            music->loop_len = (ogg_int64_t)SDL_strtoull(value, NULL, 10);
             isLoopLength = 1;
         } else if (SDL_strcasecmp(argument, "LOOPEND") == 0) {
             isLoopLength = 0;
