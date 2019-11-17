@@ -288,8 +288,9 @@ static void *OGG_CreateFromRW(SDL_RWops *src, int freesrc)
     ov_callbacks callbacks;
     vorbis_comment *vc;
     vorbis_info *vi;
-    int isLoopLength = 0, i;
-    ogg_int64_t fullLength;
+    int i;
+    ogg_int64_t full_length;
+    SDL_bool is_loop_length = SDL_FALSE;
 
     music = (OGG_music *)SDL_calloc(1, sizeof *music);
     if (!music) {
@@ -345,10 +346,10 @@ static void *OGG_CreateFromRW(SDL_RWops *src, int freesrc)
             music->loop_start = parse_time(value, music->sample_rate);
         else if (SDL_strcasecmp(argument, "LOOPLENGTH") == 0) {
             music->loop_len = (ogg_int64_t)SDL_strtoull(value, NULL, 10);
-            isLoopLength = 1;
+            is_loop_length = SDL_TRUE;
         } else if (SDL_strcasecmp(argument, "LOOPEND") == 0) {
-            isLoopLength = 0;
             music->loop_end = parse_time(value, music->sample_rate);
+            is_loop_length = SDL_FALSE;
         } else if (SDL_strcasecmp(argument, "TITLE") == 0) {
             meta_tags_set(&music->tags, MIX_META_TITLE, value);
         } else if (SDL_strcasecmp(argument, "ARTIST") == 0) {
@@ -361,19 +362,19 @@ static void *OGG_CreateFromRW(SDL_RWops *src, int freesrc)
         SDL_free(param);
     }
 
-    if (isLoopLength == 1) {
+    if (is_loop_length) {
         music->loop_end = music->loop_start + music->loop_len;
     } else {
         music->loop_len = music->loop_end - music->loop_start;
     }
 
-    fullLength = vorbis.ov_pcm_total(&music->vf, -1);
+    full_length = vorbis.ov_pcm_total(&music->vf, -1);
     if (((music->loop_start >= 0) || (music->loop_end > 0)) &&
         ((music->loop_start < music->loop_end) || (music->loop_end == 0)) &&
-         (music->loop_start < fullLength) &&
-         (music->loop_end <= fullLength)) {
+         (music->loop_start < full_length) &&
+         (music->loop_end <= full_length)) {
         if (music->loop_start < 0) music->loop_start = 0;
-        if (music->loop_end == 0)  music->loop_end = fullLength;
+        if (music->loop_end == 0)  music->loop_end = full_length;
         music->loop = 1;
     }
 
