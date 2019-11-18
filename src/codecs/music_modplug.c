@@ -39,9 +39,9 @@ typedef struct {
     void (*ModPlug_Unload)(ModPlugFile* file);
     int  (*ModPlug_Read)(ModPlugFile* file, void* buffer, int size);
     void (*ModPlug_Seek)(ModPlugFile* file, int millisecond);
-    #ifdef MODPLUG_HAS_TELL
+#ifdef MODPLUG_HAS_TELL
     int  (*ModPlug_Tell)(ModPlugFile* file);
-    #endif
+#endif
     int  (*ModPlug_GetLength)(ModPlugFile* file);
     void (*ModPlug_GetSettings)(ModPlug_Settings* settings);
     void (*ModPlug_SetSettings)(const ModPlug_Settings* settings);
@@ -95,15 +95,15 @@ static int MODPLUG_Load(void)
         FUNCTION_LOADER(ModPlug_Unload, void (*)(ModPlugFile* file))
         FUNCTION_LOADER(ModPlug_Read, int  (*)(ModPlugFile* file, void* buffer, int size))
         FUNCTION_LOADER(ModPlug_Seek, void (*)(ModPlugFile* file, int millisecond))
-        #ifdef MODPLUG_HAS_TELL
+#ifdef MODPLUG_HAS_TELL
         /* Use optional strategy to support both official and extended ABIs */
         FUNCTION_LOADER_OPTIONAL(ModPlug_Tell, int  (*)(ModPlugFile* file))
-        #endif
+#endif
         FUNCTION_LOADER(ModPlug_GetLength, int  (*)(ModPlugFile* file))
         FUNCTION_LOADER(ModPlug_GetSettings, void (*)(ModPlug_Settings* settings))
         FUNCTION_LOADER(ModPlug_SetSettings, void (*)(const ModPlug_Settings* settings))
         FUNCTION_LOADER(ModPlug_SetMasterVolume, void (*)(ModPlugFile* file,unsigned int cvol))
-        FUNCTION_LOADER(ModPlug_GetName, const char* (*)(ModPlugFile* file));
+        FUNCTION_LOADER(ModPlug_GetName, const char* (*)(ModPlugFile* file))
     }
     ++modplug.loaded;
 

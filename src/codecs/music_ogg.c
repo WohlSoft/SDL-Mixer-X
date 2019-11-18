@@ -338,6 +338,7 @@ static void *OGG_CreateFromRW(SDL_RWops *src, int freesrc)
 
         /* Want to match LOOP-START, LOOP_START, etc. Remove - or _ from
          * string if it is present at position 4. */
+
         if (is_loop_tag(argument) && ((argument[4] == '_') || (argument[4] == '-'))) {
             SDL_memmove(argument + 4, argument + 5, SDL_strlen(argument) - 4);
         }

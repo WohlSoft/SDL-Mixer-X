@@ -385,8 +385,9 @@ static int OPUS_Play(void *context, int play_count)
 static int OPUS_GetSome(void *context, void *data, int bytes, SDL_bool *done)
 {
     OPUS_music *music = (OPUS_music *)context;
+    int filled, samples, section;
+    int result;
     SDL_bool looped = SDL_FALSE;
-    int filled, samples, section, result;
     ogg_int64_t pcmPos;
 
     filled = SDL_AudioStreamGet(music->stream, data, bytes);

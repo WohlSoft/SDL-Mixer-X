@@ -24,8 +24,6 @@
   effect callback API. They are meant for speed over quality.  :)
 */
 
-/* $Id$ */
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -50,7 +48,6 @@
 */
 
 
-
 /*
  * Stereo reversal effect...this one's pretty straightforward...
  */
@@ -61,6 +58,7 @@ static void SDLCALL _Eff_reversestereo32(int chan, void *stream, int len, void *
     Uint32 *ptr = (Uint32 *) stream;
     Uint32 tmp;
     int i;
+
     MIX_UNUSED(chan);
     MIX_UNUSED(udata);
 
@@ -71,12 +69,12 @@ static void SDLCALL _Eff_reversestereo32(int chan, void *stream, int len, void *
     }
 }
 
-
 static void SDLCALL _Eff_reversestereo16(int chan, void *stream, int len, void *udata)
 {
     /* 16 bits * 2 channels. */
     Uint32 *ptr = (Uint32 *) stream;
     int i;
+
     MIX_UNUSED(chan);
     MIX_UNUSED(udata);
 
@@ -85,17 +83,17 @@ static void SDLCALL _Eff_reversestereo16(int chan, void *stream, int len, void *
     }
 }
 
-
 static void SDLCALL _Eff_reversestereo8(int chan, void *stream, int len, void *udata)
 {
     /* 8 bits * 2 channels. */
     Uint32 *ptr = (Uint32 *) stream;
     int i;
+
     MIX_UNUSED(chan);
     MIX_UNUSED(udata);
 
     /* get the last two bytes if len is not divisible by four... */
-    if ((size_t)len % sizeof (Uint32) != 0) {
+    if (len % (int)sizeof(Uint32) != 0) {
         Uint16 *p = (Uint16 *) (((Uint8 *) stream) + (len - 2));
         *p = (Uint16)((((*p) & 0xFF00) >> 8) | (((*ptr) & 0x00FF) << 8));
         len -= 2;
@@ -132,20 +130,13 @@ int SDLCALLCC Mix_SetReverseStereo(int channel, int flip)
             Mix_SetError("Unsupported audio format");
             return(0);
         }
-
-        if (!flip) {
-            return(Mix_UnregisterEffect(channel, f));
-        } else {
-            return(Mix_RegisterEffect(channel, f, NULL, NULL));
-        }
-    } else {
-        Mix_SetError("Trying to reverse stereo on a non-stereo stream");
-        return(0);
+        if (!flip) return Mix_UnregisterEffect(channel, f);
+        return(Mix_RegisterEffect(channel, f, NULL, NULL));
     }
 
-    /* return(1); */
+    Mix_SetError("Trying to reverse stereo on a non-stereo stream");
+    return(0);
 }
-
 
 /* end of effect_stereoreverse.c ... */
 
