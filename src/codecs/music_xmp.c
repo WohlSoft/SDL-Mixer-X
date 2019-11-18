@@ -82,6 +82,7 @@ void *XMP_CreateFromRW(SDL_RWops *src, int freesrc)
     music->buffer_size = music_spec.samples * 2 * 2;
     music->buffer = SDL_malloc((size_t)music->buffer_size);
     if (!music->buffer) {
+        SDL_OutOfMemory();
         XMP_Delete(music);
         return NULL;
     }

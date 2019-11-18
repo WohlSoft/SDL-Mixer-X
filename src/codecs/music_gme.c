@@ -198,6 +198,7 @@ GME_Music *GME_LoadSongRW(SDL_RWops *src, const char *args)
     music->buffer_size = music_spec.samples * sizeof(Sint16) * 2/*channels*/ * music_spec.channels;
     music->buffer = SDL_malloc(music->buffer_size);
     if (!music->buffer) {
+        SDL_OutOfMemory();
         GME_delete(music);
         return NULL;
     }
@@ -211,6 +212,11 @@ GME_Music *GME_LoadSongRW(SDL_RWops *src, const char *args)
 
     SDL_RWseek(src, 0, RW_SEEK_SET);
     bytes = SDL_malloc((size_t)length);
+    if (!bytes) {
+        SDL_OutOfMemory();
+        GME_delete(music);
+        return NULL;
+    }
 
     spcsize = 0;
     while ((bytes_l = (long)SDL_RWread(src, &byte, sizeof(unsigned char), 1)) != 0) {

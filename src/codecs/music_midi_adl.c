@@ -100,7 +100,7 @@ void SDLCALLCC Mix_ADLMIDI_setBankID(int bnk)
 #ifdef MUSIC_MID_ADLMIDI
     adlmidi_setup.bank = bnk;
 #else
-    MIX_UNUSED(bnk);
+    (void)bnk;
 #endif
 }
 
@@ -117,7 +117,7 @@ void SDLCALLCC Mix_ADLMIDI_setTremolo(int tr)
 #ifdef MUSIC_MID_ADLMIDI
     adlmidi_setup.tremolo = tr;
 #else
-    MIX_UNUSED(tr);
+    (void)tr;
 #endif
 }
 
@@ -135,7 +135,7 @@ void SDLCALLCC Mix_ADLMIDI_setVibrato(int vib)
 #ifdef MUSIC_MID_ADLMIDI
     adlmidi_setup.vibrato = vib;
 #else
-    MIX_UNUSED(vib);
+    (void)vib;
 #endif
 }
 
@@ -153,7 +153,7 @@ void SDLCALLCC Mix_ADLMIDI_setScaleMod(int sc)
 #ifdef MUSIC_MID_ADLMIDI
     adlmidi_setup.scalemod = sc;
 #else
-    MIX_UNUSED(sc);
+    (void)sc;
 #endif
 }
 
@@ -171,7 +171,7 @@ void SDLCALLCC Mix_ADLMIDI_setLogarithmicVolumes(int vm)
 #ifdef MUSIC_MID_ADLMIDI
     adlmidi_setup.volume_model = vm ? ADLMIDI_VolumeModel_NativeOPL3 : ADLMIDI_VolumeModel_AUTO;
 #else
-    MIX_UNUSED(vm);
+    (void)vm;
 #endif
 }
 
@@ -188,10 +188,11 @@ void SDLCALLCC Mix_ADLMIDI_setVolumeModel(int vm)
 {
 #ifdef MUSIC_MID_ADLMIDI
     adlmidi_setup.volume_model = vm;
-    if(vm < 0)
+    if (vm < 0) {
         adlmidi_setup.volume_model = 0;
+    }
 #else
-    MIX_UNUSED(vm);
+    (void)vm;
 #endif
 }
 
@@ -209,7 +210,7 @@ void SDLCALLCC Mix_ADLMIDI_setFullRangeBrightness(int frb)
 #ifdef MUSIC_MID_ADLMIDI
     adlmidi_setup.full_brightness_range = frb;
 #else
-    MIX_UNUSED(frb);
+    (void)frb;
 #endif
 }
 
@@ -227,7 +228,7 @@ void SDLCALLCC Mix_ADLMIDI_setFullPanStereo(int fp)
 #ifdef MUSIC_MID_ADLMIDI
     adlmidi_setup.soft_pan = fp;
 #else
-    MIX_UNUSED(fp);
+    (void)fp;
 #endif
 }
 
@@ -245,7 +246,7 @@ void SDLCALLCC Mix_ADLMIDI_setEmulator(int emu)
 #ifdef MUSIC_MID_ADLMIDI
     adlmidi_setup.emulator = emu;
 #else
-    MIX_UNUSED(emu);
+    (void)emu;
 #endif
 }
 
@@ -263,7 +264,7 @@ void SDLCALLCC Mix_ADLMIDI_setChipsCount(int chips)
 #ifdef MUSIC_MID_ADLMIDI
     adlmidi_setup.chips_count = chips;
 #else
-    MIX_UNUSED(emu);
+    (void)emu;
 #endif
 }
 
@@ -277,12 +278,13 @@ void SDLCALLCC Mix_ADLMIDI_setSetDefaults()
 void SDLCALLCC Mix_ADLMIDI_setCustomBankFile(const char *bank_wonl_path)
 {
 #ifdef MUSIC_MID_ADLMIDI
-    if (bank_wonl_path)
+    if (bank_wonl_path) {
         SDL_strlcpy(adlmidi_setup.custom_bank_path, bank_wonl_path, 2048);
-    else
+    } else {
         adlmidi_setup.custom_bank_path[0] = '\0';
+    }
 #else
-    MIX_UNUSED(bank_wonl_path);
+    (void)bank_wonl_path;
 #endif
 }
 
@@ -458,9 +460,9 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
 
     music->tempo = setup.tempo;
     music->gain = setup.gain;
+    music->volume = MIX_MAX_VOLUME;
 
-    switch (music_spec.format)
-    {
+    switch (music_spec.format) {
     case AUDIO_U8:
         music->sample_format.type = ADLMIDI_SampleType_U8;
         music->sample_format.containerSize = sizeof(Uint8);
@@ -505,29 +507,33 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
     music->buffer_size = music_spec.samples * music->sample_format.containerSize * 2/*channels*/ * music_spec.channels;
     music->buffer = SDL_malloc(music->buffer_size);
     if (!music->buffer) {
+        SDL_OutOfMemory();
         ADLMIDI_delete(music);
         return NULL;
     }
 
     length = SDL_RWseek(src, 0, RW_SEEK_END);
-    if(length < 0)
-    {
+    if (length < 0) {
         Mix_SetError("ADL-MIDI: wrong file\n");
+        ADLMIDI_delete(music);
         return NULL;
     }
 
     SDL_RWseek(src, 0, RW_SEEK_SET);
     bytes = SDL_malloc((size_t)length);
+    if (!bytes) {
+        SDL_OutOfMemory();
+        ADLMIDI_delete(music);
+        return NULL;
+    }
 
     filesize = 0;
-    while((bytes_l = SDL_RWread(src, &byte, sizeof(Uint8), 1)) != 0)
-    {
-        ((unsigned char *)bytes)[filesize] = byte[0];
+    while ((bytes_l = SDL_RWread(src, &byte, sizeof(Uint8), 1)) != 0) {
+        ((Uint8 *)bytes)[filesize] = byte[0];
         filesize++;
     }
 
-    if(filesize == 0)
-    {
+    if (filesize == 0) {
         SDL_free(bytes);
         ADLMIDI_delete(music);
         Mix_SetError("ADL-MIDI: wrong file\n");
@@ -535,15 +541,22 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
     }
 
     music->adlmidi = adl_init(music_spec.freq);
+    if (!music->adlmidi) {
+        SDL_OutOfMemory();
+        ADLMIDI_delete(music);
+        return NULL;
+    }
 
     adl_setHVibrato(music->adlmidi, setup.vibrato);
     adl_setHTremolo(music->adlmidi, setup.tremolo);
-    if(setup.custom_bank_path[0] != '\0')
+
+    if (setup.custom_bank_path[0] != '\0') {
         err = adl_openBankFile(music->adlmidi, (char*)setup.custom_bank_path);
-    else
+    } else {
         err = adl_setBank(music->adlmidi, setup.bank);
-    if(err < 0)
-    {
+    }
+
+    if (err < 0) {
         Mix_SetError("ADL-MIDI: %s", adl_errorInfo(music->adlmidi));
         SDL_free(bytes);
         ADLMIDI_delete(music);
@@ -556,21 +569,20 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
     adl_setFullRangeBrightness(music->adlmidi, setup.full_brightness_range);
     adl_setSoftPanEnabled(music->adlmidi, setup.soft_pan);
     adl_setNumChips(music->adlmidi, (setup.chips_count >= 0) ? setup.chips_count : ADLMIDI_DEFAULT_CHIPS_COUNT);
-    if (setup.four_op_channels >= 0)
+    if (setup.four_op_channels >= 0) {
         adl_setNumFourOpsChn(music->adlmidi, setup.four_op_channels);
+    }
     adl_setTempo(music->adlmidi, music->tempo);
 
     err = adl_openData(music->adlmidi, bytes, (unsigned long)filesize);
     SDL_free(bytes);
 
-    if(err != 0)
-    {
+    if (err != 0) {
         Mix_SetError("ADL-MIDI: %s", adl_errorInfo(music->adlmidi));
         ADLMIDI_delete(music);
         return NULL;
     }
 
-    music->volume                 = MIX_MAX_VOLUME;
     meta_tags_init(&music->tags);
     meta_tags_set(&music->tags, MIX_META_TITLE, adl_metaMusicTitle(music->adlmidi));
     meta_tags_set(&music->tags, MIX_META_COPYRIGHT, adl_metaMusicCopyright(music->adlmidi));
@@ -673,10 +685,9 @@ static int ADLMIDI_playAudio(void *music_p, void *stream, int len)
 static void ADLMIDI_delete(void *music_p)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
-    if(music)
-    {
+    if (music) {
         meta_tags_clear(&music->tags);
-        if(music->adlmidi) {
+        if (music->adlmidi) {
             adl_close(music->adlmidi);
         }
         if (music->stream) {
@@ -706,16 +717,18 @@ static int ADLMIDI_jump_to_time(void *music_p, double time)
 static double ADLMIDI_currentPosition(void *music_p)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
-    if(music)
+    if (music) {
         return adl_positionTell(music->adlmidi);
+    }
     return -1;
 }
 
 static double ADLMIDI_songLength(void *music_p)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
-    if(music)
+    if (music) {
         return adl_totalTimeLength(music->adlmidi);
+    }
     return -1;
 }
 
@@ -742,28 +755,30 @@ static double ADLMIDI_getTempo(void *music_p)
 static double ADLMIDI_loopStart(void *music_p)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
-    if(music)
+    if (music) {
         return adl_loopStartTime(music->adlmidi);
+    }
     return -1;
 }
 
 static double ADLMIDI_loopEnd(void *music_p)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
-    if(music)
+    if (music) {
         return adl_loopEndTime(music->adlmidi);
+    }
     return -1;
 }
 
 static double ADLMIDI_loopLength(void *music_p)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
-    if(music)
-    {
+    if (music) {
         double start = adl_loopStartTime(music->adlmidi);
         double end = adl_loopEndTime(music->adlmidi);
-        if(start >= 0 && end >= 0)
+        if (start >= 0 && end >= 0) {
             return (end - start);
+        }
     }
     return -1;
 }

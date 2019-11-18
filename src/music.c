@@ -1889,7 +1889,7 @@ void SDLCALLCC Mix_RewindMusic(void)
 
 int SDLCALLCC Mix_PausedMusicStream(Mix_Music *music)
 {
-    MIX_UNUSED(music);
+    (void)music;
     /* TODO: For MultiMusic: Implement "IsPaused" call
     int isPaused = SDL_FALSE;
     if (music->interface->IsPaused) {
@@ -2180,7 +2180,7 @@ int SDLCALLCC Mix_SetMidiPlayer(int player)
         return -1;
     }
 #else
-    MIX_UNUSED(player);
+    (void)player;
     Mix_SetError("MIDI support is disabled in this build");
     return -1;
 #endif
