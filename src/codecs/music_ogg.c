@@ -103,7 +103,7 @@ static int OGG_Load(void)
         FUNCTION_LOADER(ov_clear, int (*)(OggVorbis_File *))
         FUNCTION_LOADER(ov_info, vorbis_info *(*)(OggVorbis_File *,int))
         FUNCTION_LOADER(ov_comment, vorbis_comment *(*)(OggVorbis_File *,int))
-        FUNCTION_LOADER(ov_open_callbacks, int (*)(void *, OggVorbis_File *, const char *, long, ov_callbacks))
+        FUNCTION_LOADER(ov_open_callbacks, int (*)(void *,OggVorbis_File *,const char *,long,ov_callbacks))
         FUNCTION_LOADER(ov_pcm_total, ogg_int64_t (*)(OggVorbis_File *,int))
 #ifdef OGG_USE_TREMOR
         FUNCTION_LOADER(ov_read, long (*)(OggVorbis_File *,char *,int,int *))
