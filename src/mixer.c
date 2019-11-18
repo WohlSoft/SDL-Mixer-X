@@ -33,7 +33,7 @@
 #include "load_aiff.h"
 #include "load_voc.h"
 
-#define __MIX_INTERNAL_EFFECT__
+#define MIX_INTERNAL_EFFECT__
 #include "effects_internal.h"
 
 /* Magic numbers for various audio file formats */
@@ -130,7 +130,7 @@ void add_chunk_decoder(const char *decoder)
         }
     }
 
-    ptr = SDL_realloc((void *)chunk_decoders, (num_decoders + 1) * sizeof (const char *));
+    ptr = SDL_realloc((void *)chunk_decoders, (size_t)(num_decoders + 1) * sizeof (const char *));
     if (ptr == NULL) {
         return;  /* oh well, go on without it. */
     }
@@ -236,11 +236,11 @@ static void *Mix_DoEffects(int chan, void *snd, int len)
     if (e != NULL) {    /* are there any registered effects? */
         /* if this is the postmix, we can just overwrite the original. */
         if (!posteffect) {
-            buf = SDL_malloc(len);
+            buf = SDL_malloc((size_t)len);
             if (buf == NULL) {
                 return(snd);
             }
-            SDL_memcpy(buf, snd, len);
+            SDL_memcpy(buf, snd, (size_t)len);
         }
 
         for (; e != NULL; e = e->next) {
@@ -266,7 +266,7 @@ mix_channels(void *udata, Uint8 *stream, int len)
 
 #if SDL_VERSION_ATLEAST(1, 3, 0)
     /* Need to initialize the stream in SDL 1.3+ */
-    SDL_memset(stream, mixer.silence, len);
+    SDL_memset(stream, mixer.silence, (size_t)len);
 #endif
 
     /* Mix the music (must be done before the channels are added) */
