@@ -506,21 +506,21 @@ static int OGG_Seek(void *context, double time)
 static double OGG_Tell(void *context)
 {
     OGG_music *music = (OGG_music *)context;
-    #ifdef OGG_USE_TREMOR
+#ifdef OGG_USE_TREMOR
     return (double)(vorbis.ov_time_tell(&music->vf)) / 1000.0;
-    #else
+#else
     return vorbis.ov_time_tell(&music->vf);
-    #endif
+#endif
 }
 
 static double OGG_Total(void *context)
 {
     OGG_music *music = (OGG_music *)context;
-    #ifdef OGG_USE_TREMOR
+#ifdef OGG_USE_TREMOR
     return (double)(vorbis.ov_time_total(&music->vf, -1)) / 1000.0;
-    #else
+#else
     return vorbis.ov_time_total(&music->vf, -1);
-    #endif
+#endif
 }
 
 static double   OGG_get_loop_start(void *music_p)
