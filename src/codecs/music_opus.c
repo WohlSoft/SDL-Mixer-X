@@ -48,7 +48,8 @@ typedef struct {
 } opus_loader;
 
 static opus_loader opus = {
-    0, NULL
+    0, NULL,
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL /* Avoid a warning for missing fields */
 };
 
 #ifdef OPUS_DYNAMIC
@@ -120,7 +121,6 @@ typedef struct {
     ogg_int64_t loop_start;
     ogg_int64_t loop_end;
     ogg_int64_t loop_len;
-    ogg_int64_t channels;
     Mix_MusicMetaTags tags;
 } OPUS_music;
 
@@ -417,7 +417,7 @@ static int OPUS_GetSome(void *context, void *data, int bytes, SDL_bool *done)
 
     pcmPos = opus.op_pcm_tell(music->of);
     if ((music->loop == 1) && (music->play_count != 0) && (pcmPos >= music->loop_end)) {
-        samples -= (int)((pcmPos - music->loop_end) * music->channels) * (int)sizeof(Sint16);
+        samples -= (int)((pcmPos - music->loop_end) * music->op_info->channel_count) * (int)sizeof(Sint16);
         result = opus.op_pcm_seek(music->of, music->loop_start);
         if (result < 0) {
             set_op_error("ov_pcm_seek", result);

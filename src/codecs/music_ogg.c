@@ -71,7 +71,7 @@ typedef struct {
 
 static vorbis_loader vorbis = {
     0, NULL,
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL  /* Avoid a warning for missing fields */
 };
 
 #ifdef OGG_DYNAMIC
@@ -153,8 +153,6 @@ typedef struct {
     ogg_int64_t loop_start;
     ogg_int64_t loop_end;
     ogg_int64_t loop_len;
-    ogg_int64_t channels;
-    ogg_int64_t sample_rate;
     Mix_MusicMetaTags tags;
 } OGG_music;
 
@@ -243,7 +241,7 @@ static int OGG_UpdateSection(OGG_music *music)
 
 /* Parse time string of the form HH:MM:SS.mmm and return equivalent sample
  * position */
-static ogg_int64_t parse_time(char *time, ogg_int64_t samplerate_hz)
+static ogg_int64_t parse_time(char *time, long samplerate_hz)
 {
     char *num_start, *p;
     ogg_int64_t result = 0;
@@ -287,10 +285,10 @@ static void *OGG_CreateFromRW(SDL_RWops *src, int freesrc)
     OGG_music *music;
     ov_callbacks callbacks;
     vorbis_comment *vc;
-    vorbis_info *vi;
-    int i;
+    long rate;
     ogg_int64_t full_length;
     SDL_bool is_loop_length = SDL_FALSE;
+    int i;
 
     music = (OGG_music *)SDL_calloc(1, sizeof *music);
     if (!music) {
@@ -321,11 +319,8 @@ static void *OGG_CreateFromRW(SDL_RWops *src, int freesrc)
         return NULL;
     }
 
-    vi = vorbis.ov_info(&music->vf, -1);
-    music->channels = vi->channels;
-    music->sample_rate = vi->rate;
-
     vc = vorbis.ov_comment(&music->vf, -1);
+    rate = music->vi.rate;
     for (i = 0; i < vc->comments; i++) {
         char *param = SDL_strdup(vc->user_comments[i]);
         char *argument = param;
@@ -344,12 +339,12 @@ static void *OGG_CreateFromRW(SDL_RWops *src, int freesrc)
         }
 
         if (SDL_strcasecmp(argument, "LOOPSTART") == 0)
-            music->loop_start = parse_time(value, music->sample_rate);
+            music->loop_start = parse_time(value, rate);
         else if (SDL_strcasecmp(argument, "LOOPLENGTH") == 0) {
             music->loop_len = (ogg_int64_t)SDL_strtoull(value, NULL, 10);
             is_loop_length = SDL_TRUE;
         } else if (SDL_strcasecmp(argument, "LOOPEND") == 0) {
-            music->loop_end = parse_time(value, music->sample_rate);
+            music->loop_end = parse_time(value, rate);
             is_loop_length = SDL_FALSE;
         } else if (SDL_strcasecmp(argument, "TITLE") == 0) {
             meta_tags_set(&music->tags, MIX_META_TITLE, value);
@@ -451,7 +446,7 @@ static int OGG_GetSome(void *context, void *data, int bytes, SDL_bool *done)
 
     pcmPos = vorbis.ov_pcm_tell(&music->vf);
     if ((music->loop == 1) && (music->play_count != 0) && (pcmPos >= music->loop_end)) {
-        amount -= (int)((pcmPos - music->loop_end) * music->channels) * (int)sizeof(Sint16);
+        amount -= (int)((pcmPos - music->loop_end) * music->vi.channels) * (int)sizeof(Sint16);
         result = vorbis.ov_pcm_seek(&music->vf, music->loop_start);
         if (result < 0) {
             set_ov_error("ov_pcm_seek", result);
@@ -532,7 +527,7 @@ static double   OGG_get_loop_start(void *music_p)
 {
     OGG_music *music = (OGG_music *)music_p;
     if (music->loop) {
-        return (double)music->loop_start / (double)music->sample_rate;
+        return (double)music->loop_start / (double)music->vi.rate;
     }
     return -1.0;
 }
@@ -541,7 +536,7 @@ static double   OGG_get_loop_end(void *music_p)
 {
     OGG_music *music = (OGG_music *)music_p;
     if (music->loop) {
-        return (double)music->loop_end / (double)music->sample_rate;
+        return (double)music->loop_end / (double)music->vi.rate;
     }
     return -1.0;
 }
@@ -550,7 +545,7 @@ static double   OGG_get_loop_length(void *music_p)
 {
     OGG_music *music = (OGG_music *)music_p;
     if (music->loop) {
-        return (double)music->loop_len / (double)music->sample_rate;
+        return (double)music->loop_len / (double)music->vi.rate;
     }
     return -1.0;
 }
