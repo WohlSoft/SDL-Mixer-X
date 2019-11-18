@@ -153,7 +153,7 @@ static int set_op_error(const char *function, int error)
 
 static int sdl_read_func(void *datasource, unsigned char *ptr, int size)
 {
-    return (int)SDL_RWread((SDL_RWops*)datasource, ptr, 1, size);
+    return (int)SDL_RWread((SDL_RWops*)datasource, ptr, 1, (size_t)size);
 }
 
 static int sdl_seek_func(void *datasource, opus_int64 offset, int whence)
@@ -194,14 +194,14 @@ static int OPUS_UpdateSection(OPUS_music *music)
         music->stream = NULL;
     }
 
-    music->stream = SDL_NewAudioStream(AUDIO_S16, op_info->channel_count, 48000,
+    music->stream = SDL_NewAudioStream(AUDIO_S16, (Uint8)op_info->channel_count, 48000,
                                        music_spec.format, music_spec.channels, music_spec.freq);
     if (!music->stream) {
         return -1;
     }
 
-    music->buffer_size = music_spec.samples * sizeof(opus_int16) * op_info->channel_count;
-    music->buffer = (char *)SDL_malloc(music->buffer_size);
+    music->buffer_size = (int)music_spec.samples * (int)sizeof(opus_int16) * op_info->channel_count;
+    music->buffer = (char *)SDL_malloc((size_t)music->buffer_size);
     if (!music->buffer) {
         return -1;
     }
@@ -402,7 +402,7 @@ static int OPUS_GetSome(void *context, void *data, int bytes, SDL_bool *done)
     }
 
     section = music->section;
-    samples = opus.op_read(music->of, (opus_int16 *)music->buffer, music->buffer_size / sizeof(opus_int16), &section);
+    samples = opus.op_read(music->of, (opus_int16 *)music->buffer, music->buffer_size / (int)sizeof(opus_int16), &section);
     if (samples < 0) {
         set_op_error("op_read", samples);
         return -1;
