@@ -879,18 +879,18 @@ static SDL_bool LoadWAVMusic(WAV_Music *wave)
     Uint32 chunk_length;
     SDL_bool found_FMT = SDL_FALSE;
     SDL_bool found_DATA = SDL_FALSE;
-
     /* WAV magic header */
     Uint32 wavelen;
     Uint32 WAVEmagic;
-    MIX_UNUSED(WAVEmagic);
-    MIX_UNUSED(wavelen);
 
     meta_tags_init(&wave->tags);
 
     /* Check the magic header */
     wavelen = SDL_ReadLE32(src);
     WAVEmagic = SDL_ReadLE32(src);
+
+    (void)wavelen;   /* unused */
+    (void)WAVEmagic; /* unused */
 
     /* Read the chunks */
     for (; ;) {
@@ -1000,9 +1000,6 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
     Uint32 compressionType = 0;
     char *chunk_buffer;
 
-    MIX_UNUSED(blocksize);
-    MIX_UNUSED(AIFCVersion1);
-
     /* Check the magic header */
     chunk_length = SDL_ReadBE32(src);
     AIFFmagic = SDL_ReadLE32(src);
@@ -1035,11 +1032,13 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
             offset = SDL_ReadBE32(src);
             blocksize = SDL_ReadBE32(src);
             wave->start = SDL_RWtell(src) + offset;
+            (void)blocksize; /* unused */
             break;
 
         case FVER:
             found_FVER = SDL_TRUE;
             AIFCVersion1 = SDL_ReadBE32(src);
+            (void)AIFCVersion1; /* unused */
             break;
 
         case AIFF_ID3_:

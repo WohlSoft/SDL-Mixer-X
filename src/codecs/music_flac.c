@@ -176,7 +176,8 @@ static FLAC__StreamDecoderReadStatus flac_read_music_cb(
                                     void *client_data)
 {
     FLAC_Music *data = (FLAC_Music*)client_data;
-    MIX_UNUSED(decoder);
+
+    (void)decoder;
 
     /* make sure there is something to be reading */
     if (*bytes > 0) {
@@ -198,7 +199,8 @@ static FLAC__StreamDecoderSeekStatus flac_seek_music_cb(
                                     void *client_data)
 {
     FLAC_Music *data = (FLAC_Music*)client_data;
-    MIX_UNUSED(decoder);
+
+    (void)decoder;
 
     if (SDL_RWseek(data->src, (Sint64)absolute_byte_offset, RW_SEEK_SET) < 0) {
         return FLAC__STREAM_DECODER_SEEK_STATUS_ERROR;
@@ -215,7 +217,8 @@ static FLAC__StreamDecoderTellStatus flac_tell_music_cb(
     FLAC_Music *data = (FLAC_Music*)client_data;
 
     Sint64 pos = SDL_RWtell(data->src);
-    MIX_UNUSED(decoder);
+
+    (void)decoder;
 
     if (pos < 0) {
         return FLAC__STREAM_DECODER_TELL_STATUS_ERROR;
@@ -234,7 +237,8 @@ static FLAC__StreamDecoderLengthStatus flac_length_music_cb(
 
     Sint64 pos = SDL_RWtell(data->src);
     Sint64 length = SDL_RWseek(data->src, 0, RW_SEEK_END);
-    MIX_UNUSED(decoder);
+
+    (void)decoder;
 
     if (SDL_RWseek(data->src, pos, RW_SEEK_SET) != pos || length < 0) {
         /* there was an error attempting to return the stream to the original
@@ -254,7 +258,8 @@ static FLAC__bool flac_eof_music_cb(
 
     Sint64 pos = SDL_RWtell(data->src);
     Sint64 end = SDL_RWseek(data->src, 0, RW_SEEK_END);
-    MIX_UNUSED(decoder);
+
+    (void)decoder;
 
     /* was the original position equal to the end (a.k.a. the seek didn't move)? */
     if (pos == end) {
@@ -277,7 +282,8 @@ static FLAC__StreamDecoderWriteStatus flac_write_music_cb(
     Sint16 *data;
     unsigned int i, j, channels;
     int shift_amount = 0, amount;
-    MIX_UNUSED(decoder);
+
+    (void)decoder;
 
     if (!music->stream) {
         return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
@@ -411,7 +417,8 @@ static void flac_metadata_music_cb(
     unsigned rate;
     char *param, *argument, *value;
     SDL_bool is_loop_length = SDL_FALSE;
-    MIX_UNUSED(decoder);
+
+    (void)decoder;
 
     if (metadata->type == FLAC__METADATA_TYPE_STREAMINFO) {
         music->sample_rate = metadata->data.stream_info.sample_rate;
@@ -491,8 +498,9 @@ static void flac_error_music_cb(
                 FLAC__StreamDecoderErrorStatus status,
                 void *client_data)
 {
-    MIX_UNUSED(decoder);
-    MIX_UNUSED(client_data);
+    (void)decoder;
+    (void)client_data;
+
     /* print an SDL error based on the error status */
     switch (status) {
     case FLAC__STREAM_DECODER_ERROR_STATUS_LOST_SYNC:

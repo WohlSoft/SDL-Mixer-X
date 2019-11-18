@@ -91,38 +91,6 @@ static int mididevice_args_lock = 0;
 /*  ======== MIDI toggler END ==== */
 
 
-/*
- * public domain strtok_r() by Charlie Gordon
- *
- *   from comp.lang.c  9/14/2007
- *
- *      http://groups.google.com/group/comp.lang.c/msg/2ab1ecbb86646684
- *
- *     (Declaration that it's public domain):
- *      http://groups.google.com/group/comp.lang.c/msg/7c7b39328fefab9c
- */
-char *Mix_strtok_safe(char *str, const char *delim, char **nextp)
-{
-    char *ret;
-    if (str == NULL) {
-        str = *nextp;
-    }
-
-    str += strspn(str, delim);
-    if (*str == '\0') {
-        return NULL;
-    }
-    ret = str;
-
-    str += strcspn(str, delim);
-    if (*str) {
-        *str++ = '\0';
-    }
-
-    *nextp = str;
-    return ret;
-}
-
 /* Meta-Tags utiltiy */
 void meta_tags_init(Mix_MusicMetaTags *tags)
 {
@@ -335,7 +303,8 @@ int music_pcm_getaudio(void *context, void *data, int bytes, int volume,
 /* Mixing function */
 void SDLCALL music_mixer(void *udata, Uint8 *stream, int len)
 {
-    MIX_UNUSED(udata);
+    (void)udata;
+
     while (music_playing && music_active && len > 0) {
         /* Handle fading */
         if (music_playing->fading != MIX_NO_FADING) {
@@ -2102,6 +2071,38 @@ const char* SDLCALLCC Mix_GetSoundFonts(void)
     return NULL;
 }
 
+/*
+ * public domain strtok_r() by Charlie Gordon
+ *
+ *   from comp.lang.c  9/14/2007
+ *
+ *      http://groups.google.com/group/comp.lang.c/msg/2ab1ecbb86646684
+ *
+ *     (Declaration that it's public domain):
+ *      http://groups.google.com/group/comp.lang.c/msg/7c7b39328fefab9c
+ */
+static char *_strtok_safe(char *str, const char *delim, char **nextp)
+{
+    char *ret;
+    if (str == NULL) {
+        str = *nextp;
+    }
+
+    str += strspn(str, delim);
+    if (*str == '\0') {
+        return NULL;
+    }
+    ret = str;
+
+    str += strcspn(str, delim);
+    if (*str) {
+        *str++ = '\0';
+    }
+
+    *nextp = str;
+    return ret;
+}
+
 int SDLCALLCC Mix_EachSoundFont(int (SDLCALL *function)(const char*, void*), void *data)
 {
     char *context, *path, *paths;
@@ -2123,9 +2124,9 @@ int SDLCALLCC Mix_EachSoundFont(int (SDLCALL *function)(const char*, void*), voi
 #else
 #define SEPARATOR ":;"
 #endif
-    for (path = Mix_strtok_safe(paths, SEPARATOR, &context);
+    for (path = _strtok_safe(paths, SEPARATOR, &context);
          path;
-         path = Mix_strtok_safe(NULL, SEPARATOR, &context))
+         path = _strtok_safe(NULL, SEPARATOR, &context))
     {
         if (!function(path, data)) {
             continue;
