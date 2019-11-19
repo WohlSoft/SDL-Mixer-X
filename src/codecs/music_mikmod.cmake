@@ -24,6 +24,6 @@ if(USE_MIKMOD)
         endif()
         list(APPEND SDLMixerX_LINK_LIBS ${LIBMIKMOD_LIB})
         list(APPEND SDLMixerX_SOURCES
-            ${SDLMixerX_SOURCE_DIR}/src/codecs/music_mikmod.c)
+            ${CMAKE_CURRENT_LIST_DIR}/music_mikmod.c)
     endif()
 endif()

@@ -1,13 +1,15 @@
 if(LIBOGG_NEEDED)
     if(USE_SYSTEM_AUDIO_LIBRARIES)
-        find_library(LIBOGG_LIB NAMES ogg)
+        find_package(Ogg)
     else()
         if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
-            set(LIBOGG_LIB ogg)
+            set(OGG_LIBRARIES ogg)
         else()
-            find_library(LIBOGG_LIB NAMES ogg
+            find_library(OGG_LIBRARIES NAMES ogg
                          HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
         endif()
     endif()
-    list(APPEND SDLMixerX_LINK_LIBS ${LIBOGG_LIB})
+
+    list(APPEND SDL_MIXER_INCLUDE_PATHS ${OGG_INCLUDE_DIRS})
+    list(APPEND SDLMixerX_LINK_LIBS ${OGG_LIBRARIES})
 endif()

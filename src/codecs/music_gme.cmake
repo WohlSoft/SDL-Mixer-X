@@ -29,6 +29,6 @@ if(USE_GME)
         endif()
         list(APPEND SDLMixerX_LINK_LIBS ${LIBGME_LIB} ${LIBZLIB_LIB})
         list(APPEND SDLMixerX_SOURCES
-            ${SDLMixerX_SOURCE_DIR}/src/codecs/music_gme.c)
+            ${CMAKE_CURRENT_LIST_DIR}/music_gme.c)
     endif()
 endif()

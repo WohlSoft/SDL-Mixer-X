@@ -8,6 +8,6 @@ if(NOT WIN32 AND NOT EMSCRIPTEN) # CMD Music is not supported on Windows
             add_definitions(-DHAVE_FORK)
         endif()
         list(APPEND SDLMixerX_SOURCES
-            ${SDLMixerX_SOURCE_DIR}/src/codecs/music_cmd.c)
+            ${CMAKE_CURRENT_LIST_DIR}/music_cmd.c)
     endif()
 endif()

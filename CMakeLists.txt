@@ -8,7 +8,7 @@ include(CheckLibraryExists)
 #include(CheckCSourceRuns)
 #include(CheckCCompilerFlag)
 
-set(CMAKE_MODULE_PATH "${SDLMixerX_SOURCE_DIR}/cmake;${SDLMixerX_SOURCE_DIR}/cmake/find;${CMAKE_MODULE_PATH}")
+set(CMAKE_MODULE_PATH "${SDLMixerX_SOURCE_DIR}/cmake;${SDLMixerX_SOURCE_DIR}/cmake/find;${SDLMixerX_SOURCE_DIR}/src/codecs;${CMAKE_MODULE_PATH}")
 
 if(NOT CMAKE_VERSION VERSION_LESS 2.8.12)
     set(CMAKE_MACOSX_RPATH 0)
@@ -145,38 +145,38 @@ add_definitions(-Dmain=SDL_main -DPIC -D_REENTRANT -D_USE_MATH_DEFINES)
 set(SDLMixerX_SOURCES)
 set(SDLMixerX_LINK_LIBS)
 
-include(libWAV)
+include(music_wav)
 
-include(libVorbis)
-include(libOPUS)
-include(libFLAC)
-include(libOGG)
+include(music_ogg_vorbis)
+include(music_opus)
+include(music_flac)
+include(music_ogg)
 
-include(libMP3_MAD)
-include(libMPG123)
-include(libID3Tag)
+include(music_mad)
+include(music_mpg123)
+include(music_id3tag)
 
 if(USE_MP3_MAD OR USE_MP3_MPG123 OR USE_WAV)
     list(APPEND SDLMixerX_SOURCES
         ${SDLMixerX_SOURCE_DIR}/src/codecs/music_id3tag.c)
 endif()
 
-include(libModPlug)
-include(libMikMod)
-include(libXMP)
-include(libGME)
+include(music_modplug)
+include(music_mikmod)
+include(music_xmp)
+include(music_gme)
 
-include(libMusCmd)
+include(music_cmd)
 
 option(USE_MIDI            "Build with MIDI support" ON)
 if(USE_MIDI)
     add_definitions(-DMUSIC_USE_MIDI)
 
-    include(libADLMIDI)
-    include(libOPNMIDI)
-    include(libTimidity)
-    include(libFluidSynth)
-    include(libNativeMidi)
+    include(music_midi_adl)
+    include(music_midi_opn)
+    include(music_timidity)
+    include(music_fluidsynth)
+    include(music_nativemidi)
 
     if(NOT USE_MIDI_ADLMIDI AND
        NOT USE_MIDI_OPNMIDI AND
@@ -388,8 +388,9 @@ install(FILES
 
 if(USE_SYSTEM_AUDIO_LIBRARIES)
     message("==== SDL Mixer X system-wide libraries ====")
+    message("  OGG found: ${OGG_FOUND}")
     message("  Vorbis found: ${Vorbis_FOUND}")
-    message("  OPUS found: ${FOUND_OPUS}")
+    message("  OPUS found: ${Opus_FOUND}")
     message("  FLAC found: ${FOUND_FLAC}")
     message("  libMAD found: ${FOUND_MAD}")
     message("  MPG123 found: ${MPG123_FOUND}")

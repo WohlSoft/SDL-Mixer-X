@@ -24,6 +24,6 @@ if(USE_MIDI_FLUIDSYNTH)
         endif()
         list(APPEND SDLMixerX_LINK_LIBS ${LIBFLUIDSYNTH_LIB})
         list(APPEND SDLMixerX_SOURCES
-            ${SDLMixerX_SOURCE_DIR}/src/codecs/music_fluidsynth.c)
+            ${CMAKE_CURRENT_LIST_DIR}/music_fluidsynth.c)
     endif()
 endif()

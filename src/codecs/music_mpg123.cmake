@@ -12,5 +12,5 @@ if(USE_MP3_MPG123)
     set(LIBS ${LIBS} ${MPG123_LIBRARIES})
     list(APPEND SDLMixerX_LINK_LIBS mpg123)
     list(APPEND SDLMixerX_SOURCES
-        ${SDLMixerX_SOURCE_DIR}/src/codecs/music_mpg123.c)
+        ${CMAKE_CURRENT_LIST_DIR}/music_mpg123.c)
 endif()

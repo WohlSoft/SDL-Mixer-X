@@ -28,6 +28,6 @@ if(USE_MP3_MAD)
             list(APPEND SDL_MIXER_INCLUDE_PATHS ${AUDIO_CODECS_PATH}/libmad/include)
         endif()
         list(APPEND SDLMixerX_SOURCES
-            ${SDLMixerX_SOURCE_DIR}/src/codecs/music_mad.c)
+            ${CMAKE_CURRENT_LIST_DIR}/music_mad.c)
     endif()
 endif()

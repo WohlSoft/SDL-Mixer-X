@@ -27,7 +27,7 @@ if(USE_XMP)
         endif()
         list(APPEND SDLMixerX_LINK_LIBS ${LIBXMP_LIB})
         list(APPEND SDLMixerX_SOURCES
-            ${SDLMixerX_SOURCE_DIR}/src/codecs/music_xmp.c)
+            ${CMAKE_CURRENT_LIST_DIR}/music_xmp.c)
     endif()
 endif()
 

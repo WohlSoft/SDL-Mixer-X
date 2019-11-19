@@ -28,7 +28,7 @@ if(USE_FLAC)
         set(LIBOGG_NEEDED ON)
         list(APPEND SDLMixerX_LINK_LIBS ${LIBFLAC_LIB})
         list(APPEND SDLMixerX_SOURCES
-            ${SDLMixerX_SOURCE_DIR}/src/codecs/music_flac.c)
+            ${CMAKE_CURRENT_LIST_DIR}/music_flac.c)
     endif()
 endif()
 
