@@ -19,8 +19,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-/* This is Mac OS X only, using Core MIDI.
-   Mac OS 9 support via QuickTime is in native_midi_mac.c */
+/* This is Mac OS X only, using Core MIDI. */
 
 #include "SDL_config.h"
 
@@ -33,7 +32,7 @@
 
 #include "SDL_endian.h"
 #include "SDL_mixer_ext.h"
-#include "mixer.h"
+#include "../../mixer.h"
 #include "native_midi.h"
 
 /* Native Midi song */
