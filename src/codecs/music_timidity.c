@@ -29,11 +29,11 @@
 
 void SDLCALLCC Mix_Timidity_addToPathList(const char *path)
 {
-    #ifdef MUSIC_MID_TIMIDITY
+#ifdef MUSIC_MID_TIMIDITY
     Timidity_AddConfigPath(path);
-    #else
+#else
     (void)path;
-    #endif
+#endif
 }
 
 #ifdef MUSIC_MID_TIMIDITY
