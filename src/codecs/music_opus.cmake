@@ -21,6 +21,8 @@ if(USE_OPUS)
         endif()
         set(Opus_FOUND 1)
         set(Opus_INCLUDE_DIRS
+            ${AUDIO_CODECS_INSTALL_DIR}/include/opus
+            ${AUDIO_CODECS_INSTALL_DIR}/include/ogg
             ${AUDIO_CODECS_PATH}/libogg/include
             ${AUDIO_CODECS_PATH}/libopus/include
             ${AUDIO_CODECS_PATH}/libopusfile/include

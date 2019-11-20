@@ -21,6 +21,8 @@ if(USE_FLAC)
         add_definitions(-DMUSIC_FLAC -DFLAC__NO_DLL)
         if(AUDIO_CODECS_REPO_PATH)
             list(APPEND SDL_MIXER_INCLUDE_PATHS
+                ${AUDIO_CODECS_INSTALL_DIR}/include/FLAC
+                ${AUDIO_CODECS_INSTALL_DIR}/include/ogg
                 ${AUDIO_CODECS_PATH}/libogg/include
                 ${AUDIO_CODECS_PATH}/libFLAC/include
             )

@@ -31,6 +31,8 @@ if(USE_OGG_VORBIS)
         endif()
         set(Vorbis_FOUND 1)
         set(Vorbis_INCLUDE_DIRS
+            ${AUDIO_CODECS_INSTALL_DIR}/include/vorbis
+            ${AUDIO_CODECS_INSTALL_DIR}/include/ogg
             ${AUDIO_CODECS_PATH}/libogg/include
             ${AUDIO_CODECS_PATH}/libvorbis/include
         )
