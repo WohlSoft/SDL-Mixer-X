@@ -94,16 +94,16 @@ void *XMP_CreateFromRW(SDL_RWops *src, int freesrc)
         if (error < 0) {
             switch(error) {
             case -XMP_ERROR_FORMAT:
-                Mix_SetError("xmp_load_module failed: Unsupported file format");
+                Mix_SetError("xmp_load_module: Unsupported file format");
                 break;
             case -XMP_ERROR_LOAD:
-                Mix_SetError("xmp_load_module failed: Error loading file");
+                Mix_SetError("xmp_load_module: Error loading file");
                 break;
             case -XMP_ERROR_SYSTEM:
-                Mix_SetError("xmp_load_module failed: System error has occured");
+                Mix_SetError("xmp_load_module: System error has occured");
                 break;
             default:
-                Mix_SetError("xmp_load_module failed: Can't load file");
+                Mix_SetError("xmp_load_module: Can't load file");
                 break;
             }
             XMP_Delete(music);
@@ -111,7 +111,23 @@ void *XMP_CreateFromRW(SDL_RWops *src, int freesrc)
         }
     }
 
-    if (xmp_start_player(music->ctx, music_spec.freq, 0) != 0) {
+    error = xmp_start_player(music->ctx, music_spec.freq, 0);
+    if (error < 0) {
+        switch(error) {
+        case -XMP_ERROR_INVALID:
+            Mix_SetError("xmp_start_player: Invalid parameter");
+            break;
+        case -XMP_ERROR_STATE:
+            Mix_SetError("xmp_start_player: Bad state");
+            break;
+        case -XMP_ERROR_SYSTEM:
+            Mix_SetError("xmp_start_player: System error has occured");
+            break;
+        case -XMP_ERROR_INTERNAL:
+        default:
+            Mix_SetError("xmp_start_player: Can't start player");
+            break;
+        }
         XMP_Delete(music);
         return NULL;
     }
