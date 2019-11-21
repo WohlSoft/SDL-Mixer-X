@@ -264,7 +264,7 @@ void SDLCALLCC Mix_ADLMIDI_setChipsCount(int chips)
 #ifdef MUSIC_MID_ADLMIDI
     adlmidi_setup.chips_count = chips;
 #else
-    (void)emu;
+    (void)chips;
 #endif
 }
 

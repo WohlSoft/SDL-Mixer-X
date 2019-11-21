@@ -150,7 +150,7 @@ void SDLCALLCC Mix_OPNMIDI_setChipsCount(int chips)
 #ifdef MUSIC_MID_OPNMIDI
     opnmidi_setup.chips_count = chips;
 #else
-    (void)frb;
+    (void)chips;
 #endif
 }
 
