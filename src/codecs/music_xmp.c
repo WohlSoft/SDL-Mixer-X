@@ -90,6 +90,7 @@ void *XMP_CreateFromRW(SDL_RWops *src, int freesrc)
     buffer = SDL_LoadFile_RW(src, &size, SDL_FALSE);
     if (buffer) {
         error = xmp_load_module_from_memory(music->ctx, buffer, (long)size);
+        SDL_free(buffer);
         if (error < 0) {
             switch(error) {
             case -XMP_ERROR_FORMAT:
@@ -105,8 +106,9 @@ void *XMP_CreateFromRW(SDL_RWops *src, int freesrc)
                 Mix_SetError("xmp_load_module failed: Can't load file");
                 break;
             }
+            XMP_Delete(music);
+            return NULL;
         }
-        SDL_free(buffer);
     }
 
     if (xmp_start_player(music->ctx, music_spec.freq, 0) != 0) {
