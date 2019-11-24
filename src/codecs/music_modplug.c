@@ -52,9 +52,9 @@ typedef struct {
 static modplug_loader modplug = {
     0, NULL,
     NULL, NULL, NULL, NULL,
-    #ifdef MODPLUG_HAS_TELL
+#ifdef MODPLUG_HAS_TELL
     NULL,
-    #endif
+#endif
     NULL, NULL, NULL, NULL, NULL
 };
 
