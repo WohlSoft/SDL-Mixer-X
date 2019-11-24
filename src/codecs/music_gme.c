@@ -31,7 +31,6 @@ typedef struct Music_Emu Music_Emu;
 #include "music_gme.h"
 
 #include <gme.h>
-#include <stdio.h>
 
 /* Global flags which are applying on initializing of GME player with a file */
 typedef struct {
