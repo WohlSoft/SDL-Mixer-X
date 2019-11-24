@@ -4,7 +4,7 @@ if(USE_FLAC)
 
     if(USE_SYSTEM_AUDIO_LIBRARIES)
         find_package(FLAC REQUIRED)
-        message("FLAC: [${FOUND_FLAC}] ${FLAC_INCLUDE_DIRS} ${FLAC_LIBRARIES}")
+        message("FLAC: [${FLAC_FOUND}] ${FLAC_INCLUDE_DIRS} ${FLAC_LIBRARIES}")
         if(USE_FLAC_DYNAMIC)
             add_definitions(-DFLAC_DYNAMIC=\"${FLAC_DYNAMIC_LIBRARY}\")
             message("Dynamic FLAC: ${FLAC_DYNAMIC_LIBRARY}")
