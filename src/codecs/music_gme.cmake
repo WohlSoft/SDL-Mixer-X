@@ -13,8 +13,8 @@ if(USE_GME)
                          HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
             find_library(LIBZLIB_LIB NAMES zlib z
                          HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
-            set(GME_LIBRARIES ${LIBGME_LIB} ${LIBZLIB_LIB})
         endif()
+        set(GME_LIBRARIES ${LIBGME_LIB} ${LIBZLIB_LIB})
         set(GME_FOUND 1)
         set(GME_INCLUDE_DIRS
             ${AUDIO_CODECS_PATH}/libgme/include
