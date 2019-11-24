@@ -9,8 +9,6 @@ if(USE_MP3_MPG123)
     message("MPG123 found in ${MPG123_INCLUDE_DIR} folder")
 
     list(APPEND SDL_MIXER_INCLUDE_PATHS ${MPG123_INCLUDE_DIRS})
-    set(LIBS ${LIBS} ${MPG123_LIBRARIES})
-    list(APPEND SDLMixerX_LINK_LIBS mpg123)
-    list(APPEND SDLMixerX_SOURCES
-        ${CMAKE_CURRENT_LIST_DIR}/music_mpg123.c)
+    list(APPEND SDLMixerX_LINK_LIBS ${MPG123_LIBRARIES})
+    list(APPEND SDLMixerX_SOURCES ${CMAKE_CURRENT_LIST_DIR}/music_mpg123.c)
 endif()

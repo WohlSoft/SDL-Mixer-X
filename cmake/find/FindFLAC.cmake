@@ -10,7 +10,6 @@ find_path(Ogg_INCLUDE_DIR "ogg.h" PATH_SUFFIXES ogg)
 find_library(FLAC_LIBRARY NAMES FLAC)
 
 if(FLAC_INCLUDE_DIR AND FLAC_LIBRARY)
-    set(FLAC_FOUND 1)
     if(APPLE)
         find_library(FLAC_DYNAMIC_LIBRARY NAMES "FLAC"  PATH_SUFFIXES ".dylib")
     elseif(WIN32)
@@ -19,6 +18,12 @@ if(FLAC_INCLUDE_DIR AND FLAC_LIBRARY)
         find_library(FLAC_DYNAMIC_LIBRARY NAMES "FLAC" PATH_SUFFIXES ".so")
     endif()
 endif()
+
+include(FindPackageHandleStandardArgs)
+# handle the QUIETLY and REQUIRED arguments and set FLAC_FOUND to TRUE
+# if all listed variables are TRUE
+find_package_handle_standard_args(FLAC  DEFAULT_MSG
+                                  FLAC_LIBRARY FLAC_INCLUDE_DIR)
 
 mark_as_advanced(FLAC_INCLUDE_DIR Ogg_INCLUDE_DIR FLAC_LIBRARY)
 

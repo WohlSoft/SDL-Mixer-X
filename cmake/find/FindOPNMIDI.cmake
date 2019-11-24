@@ -7,9 +7,11 @@
 find_path(OPNMIDI_INCLUDE_DIR "opnmidi.h")
 find_library(OPNMIDI_LIBRARY NAMES OPNMIDI)
 
-if(OPNMIDI_INCLUDE_DIR AND OPNMIDI_LIBRARY)
-    set(OPNMIDI_FOUND 1)
-endif()
+include(FindPackageHandleStandardArgs)
+# handle the QUIETLY and REQUIRED arguments and set OPNMIDI_FOUND to TRUE
+# if all listed variables are TRUE
+find_package_handle_standard_args(OPNMIDI  DEFAULT_MSG
+                                  OPNMIDI_LIBRARY OPNMIDI_INCLUDE_DIR)
 
 mark_as_advanced(OPNMIDI_INCLUDE_DIR OPNMIDI_LIBRARY)
 

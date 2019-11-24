@@ -11,7 +11,6 @@ find_library(Opus_LIBRARY NAMES opus)
 find_library(OpusFile_LIBRARY NAMES opusfile)
 
 if(Opus_INCLUDE_DIR AND Opus_LIBRARY)
-    set(Opus_FOUND 1)
     if(APPLE)
         find_library(OpusFile_DYNAMIC_LIBRARY NAMES "opusfile"  PATH_SUFFIXES ".dylib")
     elseif(WIN32)
@@ -20,6 +19,12 @@ if(Opus_INCLUDE_DIR AND Opus_LIBRARY)
         find_library(OpusFile_DYNAMIC_LIBRARY NAMES "opusfile" PATH_SUFFIXES ".so")
     endif()
 endif()
+
+include(FindPackageHandleStandardArgs)
+# handle the QUIETLY and REQUIRED arguments and set Opus_FOUND to TRUE
+# if all listed variables are TRUE
+find_package_handle_standard_args(Opus DEFAULT_MSG
+                                  Opus_LIBRARY Opus_INCLUDE_DIR)
 
 mark_as_advanced(Opus_INCLUDE_DIR Ogg_INCLUDE_DIR Opus_LIBRARY)
 

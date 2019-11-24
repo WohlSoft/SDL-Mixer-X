@@ -187,14 +187,6 @@ if(USE_MIDI)
     endif()
 endif()
 
-# Keep those files in build list even those libraries are not used
-# (they are contains public calls are dummied when referred libraries are disabled from the use)
-list(APPEND SDLMixerX_SOURCES
-    ${SDLMixerX_SOURCE_DIR}/src/codecs/music_midi_adl.c
-    ${SDLMixerX_SOURCE_DIR}/src/codecs/music_midi_opn.c
-    ${SDLMixerX_SOURCE_DIR}/src/codecs/music_timidity.c
-)
-
 include(libSDL2)
 
 if(LIBMATH_NEEDED AND NOT MSVC)
@@ -389,14 +381,16 @@ install(FILES
 
 if(USE_SYSTEM_AUDIO_LIBRARIES)
     message("==== SDL Mixer X system-wide libraries ====")
-    message("  OGG found: ${OGG_FOUND}")
+    if(LIBOGG_NEEDED)
+        message("  OGG found: ${OGG_FOUND}")
+    endif()
     message("  Vorbis found: ${Vorbis_FOUND}")
     message("  OPUS found: ${Opus_FOUND}")
     message("  FLAC found: ${FLAC_FOUND}")
     message("  libMAD found: ${FOUND_MAD}")
     message("  MPG123 found: ${MPG123_FOUND}")
     message("  ModPlug found: ${ModPlug_FOUND}")
-    message("  MikMod found: ${FOUND_MIKMOD}")
+    message("  MikMod found: ${MikMod_FOUND}")
     message("  GME found: ${FOUND_GME}")
     message("  libADLMIDI found: ${ADLMIDI_FOUND}")
     message("  libOPNMIDI found: ${OPNMIDI_FOUND}")

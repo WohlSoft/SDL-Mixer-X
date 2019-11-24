@@ -8,9 +8,11 @@ find_path(OGG_INCLUDE_DIR "ogg.h" PATH_SUFFIXES ogg)
 
 find_library(OGG_LIBRARY NAMES ogg)
 
-if(OGG_INCLUDE_DIR AND OGG_LIBRARY)
-    set(OGG_FOUND 1)
-endif()
+include(FindPackageHandleStandardArgs)
+# handle the QUIETLY and REQUIRED arguments and set OGG_FOUND to TRUE
+# if all listed variables are TRUE
+find_package_handle_standard_args(OGG DEFAULT_MSG
+                                  OGG_LIBRARY OGG_INCLUDE_DIR)
 
 mark_as_advanced(OGG_INCLUDE_DIR OGG_LIBRARY)
 
