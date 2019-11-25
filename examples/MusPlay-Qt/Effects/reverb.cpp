@@ -2,9 +2,9 @@
 #include <deque>
 #include <cmath>
 #ifdef USE_SDL_MIXER_X
-#include <SDL2/SDL_mixer_ext.h>
+#   include "SDL_mixer_ext.h"
 #else
-#include <SDL2/SDL_mixer.h>
+#   include "SDL_mixer.h"
 #endif
 #include "reverb.h"
 

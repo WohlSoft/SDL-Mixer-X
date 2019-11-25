@@ -9,7 +9,14 @@ elseif(SDL_MIXER_X_STATIC)
 endif()
 
 add_executable(playmus playmus.c)
-target_link_libraries(playmus PUBLIC libSDLMixerX ${SDL2_LIBRARIES})
+target_include_directories(playmus PRIVATE ${SDL2_INCLUDE_DIRS})
+target_link_libraries(playmus PRIVATE libSDLMixerX ${SDL2_LIBRARIES})
 
 add_executable(playwave playwave.c)
-target_link_libraries(playwave PUBLIC libSDLMixerX ${SDL2_LIBRARIES})
+target_include_directories(playwave PRIVATE ${SDL2_INCLUDE_DIRS})
+target_link_libraries(playwave PRIVATE libSDLMixerX ${SDL2_LIBRARIES})
+
+option(BUILD_EXAMPLES_MUSPLAY_QT "Build MusPlay tool example (Qt5 Required)" OFF)
+if(BUILD_EXAMPLES_MUSPLAY_QT)
+    add_subdirectory(MusPlay-Qt)
+endif()

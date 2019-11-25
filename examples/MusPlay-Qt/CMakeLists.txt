@@ -8,14 +8,13 @@ set(CMAKE_AUTOMOC ON)
 # to always look for includes there:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(USE_SDL_MIXER_X_PREFIX "" CACHE STRING "Path to SDL Mixer X")
 option(USE_OFFICIAL_SDL_MIXER "Compile player in compatibility with official SDL Mixer variant" OFF)
 
 if(USE_OFFICIAL_SDL_MIXER)
     set(SDL_MIXER_X_LIB SDL2_mixer)
 else()
     add_definitions(-DUSE_SDL_MIXER_X)
-    set(SDL_MIXER_X_LIB SDL2_mixer_ext)
+    set(SDL_MIXER_X_LIB libSDLMixerX)
 endif()
 
 find_package(Qt5Widgets REQUIRED)
@@ -40,12 +39,13 @@ endif()
 include_directories(
     ${Qt5Widgets_INCLUDES}
     ${Qt5Network_INCLUDES}
-    ${USE_SDL_MIXER_X_PREFIX}/include)
+    ${SDL2_INCLUDE_DIRS}
+)
 
 link_directories(
     ${Qt5Widgets_LIBRARIES}
     ${Qt5Network_LIBRARIES}
-    ${USE_SDL_MIXER_X_PREFIX}/lib)
+)
 
 if(APPLE) # To use XCode-built SDL Mixer X
     string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_lower)
@@ -72,7 +72,7 @@ qt5_wrap_ui(UIS_HDRS
     AssocFiles/assoc_files.ui
 )
 
-set(RESOURCE ${CMAKE_SOURCE_DIR}/_resources/musicplayer.qrc)
+set(RESOURCE ${SDLMixerMusPlayer_SOURCE_DIR}/_resources/musicplayer.qrc)
 qt5_add_resources(RESOURCE_ADDED ${RESOURCE})
 
 set(SDLMixer_MusPlay_SRC)
@@ -106,34 +106,20 @@ add_executable(sdlmixer_musplay
 
 set(PGE_MUSPLAY_LINK_LIBS)
 list(APPEND PGE_MUSPLAY_LINK_LIBS
-    ${SDL_MIXER_X_LIB}
-    FLAC
-    opusfile
-    opus
-    vorbisfile
-    vorbis
-    ogg
-    mad
-    id3tag
-    modplug
-    ADLMIDI
-    OPNMIDI
-    timidity
-    gme
-    zlib
+    ${SDL_MIXER_X_LIB} ${SDL2_LIBRARIES}
 )
 
 if(WIN32)
-    target_link_libraries(sdlmixer_musplay SDL2main version ${PGE_MUSPLAY_LINK_LIBS} SDL2 comctl32)
+    target_link_libraries(sdlmixer_musplay SDL2main version ${PGE_MUSPLAY_LINK_LIBS} comctl32)
 elseif(APPLE)
-    target_link_libraries(sdlmixer_musplay ${PGE_MUSPLAY_LINK_LIBS} SDL2 iconv
+    target_link_libraries(sdlmixer_musplay ${PGE_MUSPLAY_LINK_LIBS} iconv
         ${COREAUDIO_LIBRARY} ${COREVIDEO_LIBRARY} ${COCOA_LIBRARY} ${CARBON_LIBRARY}
         ${FORCEFEEDBAK_LIBRARY} ${IOKIT_LIBRARY} ${COREFOUNDATION_LIBRARY}
         ${AUDIOTOOLBOX_LIBRARY} ${AUDIOUNIT_LIBRARY}
         ${METAL_LIBRARY}
     )
 else()
-    target_link_libraries(sdlmixer_musplay ${PGE_MUSPLAY_LINK_LIBS} SDL2)
+    target_link_libraries(sdlmixer_musplay ${PGE_MUSPLAY_LINK_LIBS})
 endif()
 
 qt5_use_modules(sdlmixer_musplay Widgets Network)

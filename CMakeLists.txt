@@ -265,12 +265,12 @@ if(SDL_MIXER_X_STATIC AND NOT BUILD_AS_VB6_BINDING)
     target_include_directories(SDL2_mixer_ext_Static PRIVATE
         ${SDLMixerX_SOURCE_DIR}/src
         ${SDLMixerX_SOURCE_DIR}/src/codecs
-        ${LIBSDL2CUSTOM_INCLUDES}
+        ${AUDIO_CODECS_INSTALL_DIR}/include/SDL2
+        ${SDL_MIXER_INCLUDE_PATHS}
     )
     target_include_directories(SDL2_mixer_ext_Static PUBLIC
         ${SDLMixerX_SOURCE_DIR}/include/SDL_mixer_ext
         ${SDLMixerX_SOURCE_DIR}/include
-        ${SDL_MIXER_INCLUDE_PATHS}
     )
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY AND AUDIO_CODECS_INSTALL_PATH)
         add_dependencies(SDL2_mixer_ext_Static AudioCodecs)
@@ -303,11 +303,11 @@ if(SDL_MIXER_X_SHARED AND NOT BUILD_AS_VB6_BINDING)
         ${SDLMixerX_SOURCE_DIR}/src
         ${SDLMixerX_SOURCE_DIR}/src/codecs
         ${AUDIO_CODECS_INSTALL_DIR}/include/SDL2
+        ${SDL_MIXER_INCLUDE_PATHS}
     )
     target_include_directories(SDL2_mixer_ext PUBLIC
         ${SDLMixerX_SOURCE_DIR}/include/SDL_mixer_ext
         ${SDLMixerX_SOURCE_DIR}/include
-        ${SDL_MIXER_INCLUDE_PATHS}
     )
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY AND AUDIO_CODECS_INSTALL_PATH)
         add_dependencies(SDL2_mixer_ext AudioCodecs)
@@ -364,7 +364,7 @@ if(BUILD_AS_VB6_BINDING)
 endif()
 
 option(BUILD_EXAMPLES "Build examples" OFF)
-if(BUILD_EXAMPLES)
+if(BUILD_EXAMPLES AND NOT BUILD_AS_VB6_BINDING)
     add_subdirectory(examples)
 endif()
 
