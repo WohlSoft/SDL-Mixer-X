@@ -119,6 +119,10 @@ int main(int argc, char *argv[])
     int i;
     Mix_MusicType type = MUS_NONE;
     const char *type_str = "NONE";
+    const char *tag_title = NULL;
+    const char *tag_artist = NULL;
+    const char *tag_album = NULL;
+    const char *tag_copyright = NULL;
 
     (void) argc;
 
@@ -258,6 +262,26 @@ int main(int argc, char *argv[])
             break;
         }
         SDL_Log("Detected music type: %s", type_str);
+
+        tag_title = Mix_GetMusicTitleTag(music);
+        if (tag_title && SDL_strlen(tag_title) > 0) {
+            SDL_Log("Title: %s", tag_title);
+        }
+
+        tag_artist = Mix_GetMusicArtistTag(music);
+        if (tag_artist && SDL_strlen(tag_artist) > 0) {
+            SDL_Log("Artist: %s", tag_artist);
+        }
+
+        tag_album = Mix_GetMusicAlbumTag(music);
+        if (tag_album && SDL_strlen(tag_album) > 0) {
+            SDL_Log("Album: %s", tag_album);
+        }
+
+        tag_copyright = Mix_GetMusicCopyrightTag(music);
+        if (tag_copyright && SDL_strlen(tag_copyright) > 0) {
+            SDL_Log("Copyright: %s", tag_copyright);
+        }
 
         /* Play and then exit */
         SDL_Log("Playing %s\n", argv[i]);
