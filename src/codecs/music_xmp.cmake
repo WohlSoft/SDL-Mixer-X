@@ -20,7 +20,10 @@ if(USE_XMP)
                          HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
         endif()
         set(XMP_FOUND 1)
-        set(XMP_INCLUDE_DIRS ${AUDIO_CODECS_PATH}/libxmp/include)
+        set(XMP_INCLUDE_DIRS
+            ${AUDIO_CODECS_PATH}/libxmp/include
+            ${AUDIO_CODECS_INSTALL_PATH}/include/xmp
+        )
     endif()
 
     if(XMP_FOUND)
