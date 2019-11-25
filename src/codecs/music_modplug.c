@@ -39,9 +39,7 @@ typedef struct {
     void (*ModPlug_Unload)(ModPlugFile* file);
     int  (*ModPlug_Read)(ModPlugFile* file, void* buffer, int size);
     void (*ModPlug_Seek)(ModPlugFile* file, int millisecond);
-#ifdef MODPLUG_HAS_TELL
     int  (*ModPlug_Tell)(ModPlugFile* file);
-#endif
     int  (*ModPlug_GetLength)(ModPlugFile* file);
     void (*ModPlug_GetSettings)(ModPlug_Settings* settings);
     void (*ModPlug_SetSettings)(const ModPlug_Settings* settings);
@@ -51,10 +49,7 @@ typedef struct {
 
 static modplug_loader modplug = {
     0, NULL,
-    NULL, NULL, NULL, NULL,
-#ifdef MODPLUG_HAS_TELL
-    NULL,
-#endif
+    NULL, NULL, NULL, NULL, NULL,
     NULL, NULL, NULL, NULL, NULL
 };
 
@@ -301,17 +296,17 @@ static int MODPLUG_Seek(void *context, double position)
 
 static double MODPLUG_Tell(void *context)
 {
-    #ifdef MODPLUG_HAS_TELL
+#ifdef MODPLUG_HAS_TELL
     if (modplug.ModPlug_Tell) {
         MODPLUG_Music *music = (MODPLUG_Music *)context;
         return (double)(modplug.ModPlug_Tell(music->file)) / 1000.0;
     } else {
         return -1;
     }
-    #else
+#else
     (void)context;
     return -1.0;
-    #endif
+#endif
 }
 
 static double MODPLUG_Length(void *context)
