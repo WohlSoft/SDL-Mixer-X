@@ -31,6 +31,7 @@ if(USE_OGG_VORBIS)
             find_library(LIBVORBIS_LIB NAMES vorbis
                          HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
             set(Vorbis_LIBRARIES ${LIBVORBISFILE_LIB} ${LIBVORBIS_LIB})
+            mark_as_advanced(LIBVORBISFILE_LIB LIBVORBIS_LIB)
         endif()
         set(Vorbis_FOUND 1)
         set(Vorbis_INCLUDE_DIRS
