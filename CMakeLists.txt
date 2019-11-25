@@ -1,6 +1,7 @@
 cmake_minimum_required (VERSION 2.8.11)
 project(SDLMixerX C)
 
+include(GNUInstallDirs)
 include(FindPkgConfig)
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
@@ -369,11 +370,12 @@ if(BUILD_EXAMPLES AND NOT BUILD_AS_VB6_BINDING)
 endif()
 
 install(TARGETS ${SDLMixerX_INSTALLS}
-        RUNTIME DESTINATION "bin"
-        LIBRARY DESTINATION "lib"
-        ARCHIVE DESTINATION "lib"
-        FRAMEWORK DESTINATION "lib"
-        INCLUDES DESTINATION "include")
+    RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+    FRAMEWORK DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+)
 
 if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
     install(DIRECTORY ${AUDIO_CODECS_INSTALL_DIR}/bin
@@ -385,10 +387,9 @@ if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
 endif()
 
 install(FILES
-        include/SDL_mixer_ext/begin_code.h
-        include/SDL_mixer_ext/close_code.h
-        include/SDL_mixer_ext/SDL_mixer_ext.h
-        DESTINATION include/SDL2)
+    include/SDL_mixer_ext/SDL_mixer_ext.h
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/SDL2"
+)
 
 if(USE_SYSTEM_AUDIO_LIBRARIES)
     message("==== SDL Mixer X system-wide libraries ====")
