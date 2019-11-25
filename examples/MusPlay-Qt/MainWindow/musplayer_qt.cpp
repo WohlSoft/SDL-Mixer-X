@@ -465,7 +465,7 @@ void MusPlayer_Qt::on_play_clicked()
         m_seekBar->clearLoopPoints();
         m_seekBar->setEnabled(false);
 
-        if(total > 0)
+        if(total > 0.0)
         {
             m_seekBar->setEnabled(true);
             m_seekBar->setLength(total);
@@ -576,15 +576,23 @@ void MusPlayer_Qt::_blink_red()
 
 void MusPlayer_Qt::updatePositionSlider()
 {
-    double pos =
 #if defined(SDL_MIXER_X) || defined(SDL_MIXER_GE21)
-        Mix_GetMusicPosition(PGE_MusicPlayer::play_mus);
+    const double pos = Mix_GetMusicPosition(PGE_MusicPlayer::play_mus);
 #else
-        -1.0;
+    const double pos = -1.0;
 #endif
+
     m_positionWatcherLock = true;
-    m_seekBar->setPosition(pos);
-    ui->playingTimeLabel->setText(QDateTime::fromTime_t((uint)std::floor(pos)).toUTC().toString("hh:mm:ss"));
+    if(pos < 0.0)
+    {
+        m_seekBar->setEnabled(false);
+        m_positionWatcher.stop();
+    }
+    else
+    {
+        m_seekBar->setPosition(pos);
+        ui->playingTimeLabel->setText(QDateTime::fromTime_t((uint)std::floor(pos)).toUTC().toString("hh:mm:ss"));
+    }
     m_positionWatcherLock = false;
 }
 
