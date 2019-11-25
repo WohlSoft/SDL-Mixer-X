@@ -118,6 +118,7 @@ int main(int argc, char *argv[])
     int rwops = 0;
     int i;
     Mix_MusicType type = MUS_NONE;
+    const char *type_str = "NONE";
 
     (void) argc;
 
@@ -218,46 +219,45 @@ int main(int argc, char *argv[])
             CleanUp(2);
         }
 
-        SDL_Log("Detected music type: ");
         type = Mix_GetMusicType(music);
         switch (type) {
         case MUS_NONE:
-            SDL_Log("NONE");
+            type_str = "NONE";
             break;
         case MUS_CMD:
-            SDL_Log("CMD");
+            type_str = "CMD";
             break;
         case MUS_WAV:
-            SDL_Log("WAV");
+            type_str = "WAV";
             break;
         case MUS_MOD:
         case MUS_MODPLUG_UNUSED:
-            SDL_Log("MOD");
+            type_str = "MOD";
             break;
         case MUS_FLAC:
-            SDL_Log("FLAC");
+            type_str = "FLAC";
             break;
         case MUS_MID:
-            SDL_Log("MIDI");
+            type_str = "MIDI";
             break;
         case MUS_OGG:
-            SDL_Log("OGG");
+            type_str = "OGG Vorbis";
             break;
         case MUS_MP3:
         case MUS_MP3_MAD_UNUSED:
-            SDL_Log("MP3");
+            type_str = "MP3";
             break;
         case MUS_OPUS:
-            SDL_Log("OPUS");
+            type_str = "OPUS";
             break;
         case MUS_GME:
-            SDL_Log("GME");
+            type_str = "GME";
             break;
         case MUS_ADLMIDI:
-            SDL_Log("IMF/MUS/XMI");
+            type_str = "IMF/MUS/XMI";
             break;
         }
-        SDL_Log("\n");
+        SDL_Log("Detected music type: %s", type_str);
 
         /* Play and then exit */
         SDL_Log("Playing %s\n", argv[i]);
