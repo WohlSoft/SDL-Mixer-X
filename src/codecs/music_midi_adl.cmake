@@ -2,7 +2,7 @@ option(USE_MIDI_ADLMIDI    "Build with libADLMIDI OPL3 Emulator based MIDI seque
 if(USE_MIDI_ADLMIDI)
 
     if(USE_SYSTEM_AUDIO_LIBRARIES)
-        find_package(ADLMIDI REQUIRED)
+        find_package(ADLMIDI QUIET)
         message("ADLMIDI: [${ADLMIDI_FOUND}] ${ADLMIDI_INCLUDE_DIRS} ${ADLMIDI_LIBRARIES}")
     else()
         if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
@@ -23,7 +23,7 @@ if(USE_MIDI_ADLMIDI)
         list(APPEND SDL_MIXER_INCLUDE_PATHS ${ADLMIDI_INCLUDE_DIRS})
         list(APPEND SDLMixerX_LINK_LIBS ${ADLMIDI_LIBRARIES})
     else()
-        message("== skipping ADLMIDI ==")
+        message("-- skipping ADLMIDI --")
     endif()
 endif()
 

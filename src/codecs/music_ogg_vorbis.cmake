@@ -5,10 +5,10 @@ if(USE_OGG_VORBIS)
 
     if(USE_SYSTEM_AUDIO_LIBRARIES)
         if(USE_OGG_VORBIS_TREMOR)
-            find_package(Tremor REQUIRED)
+            find_package(Tremor QUIET)
             message("Tremor: [${Tremor_FOUND}] ${Tremor_INCLUDE_DIRS} ${Tremor_LIBRARIES}")
         else()
-            find_package(Vorbis REQUIRED)
+            find_package(Vorbis QUIET)
             message("Vorbis: [${Vorbis_FOUND}] ${Vorbis_INCLUDE_DIRS} ${Vorbis_LIBRARIES}")
         endif()
 
@@ -57,6 +57,10 @@ if(USE_OGG_VORBIS)
             list(APPEND SDLMixerX_LINK_LIBS ${Vorbis_LIBRARIES})
             set(LIBOGG_NEEDED ON)
         endif()
+    endif()
+
+    if(NOT Vorbis_FOUND AND NOT Tremor_FOUND)
+        message("-- skipping Vorbis/Tremor --")
     endif()
 
     if(Vorbis_FOUND OR Tremor_FOUND)
