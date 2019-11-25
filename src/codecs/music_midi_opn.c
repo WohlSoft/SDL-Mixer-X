@@ -26,7 +26,6 @@
 #ifdef MUSIC_MID_OPNMIDI
 #include <opnmidi.h>
 #include "OPNMIDI/gm_opn_bank.h"
-#include <stdio.h>
 
 /* Global OPNMIDI flags which are applying on initializing of MIDI player with a file */
 typedef struct {
