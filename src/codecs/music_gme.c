@@ -494,7 +494,7 @@ Mix_MusicInterface Mix_MusicInterface_GME =
     SDL_FALSE,
     SDL_FALSE,
 
-    GME_Load,   /* Load */
+    GME_Load,
     NULL,   /* Open */
     GME_new_RW,
     GME_new_RWEx,   /* CreateFromRWex [MIXER-X]*/
@@ -519,7 +519,7 @@ Mix_MusicInterface Mix_MusicInterface_GME =
     NULL,   /* Stop */
     GME_delete,
     NULL,   /* Close */
-    GME_Unload,   /* Unload */
+    GME_Unload,
 };
 
 #endif /* MUSIC_GME */
