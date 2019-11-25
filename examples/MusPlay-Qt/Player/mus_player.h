@@ -23,6 +23,38 @@
 #define DebugLog(msg) qDebug() << msg;
 #endif
 
+#if !defined(SDL_MIXER_X) // Fallback for into raw SDL2_mixer
+#   define Mix_PlayingMusicStream(music) Mix_PlayingMusic()
+#   define Mix_PausedMusicStream(music) Mix_PausedMusic()
+#   define Mix_ResumeMusicStream(music) Mix_ResumeMusic()
+#   define Mix_PauseMusicStream(music) Mix_PauseMusic()
+#   define Mix_HaltMusicStream(music) Mix_HaltMusic()
+#   define Mix_VolumeMusicStream(music, volume) Mix_VolumeMusic(volume)
+
+#   define Mix_SetMusicStreamPosition(music, value) Mix_SetMusicPosition(value)
+#   define Mix_GetMusicTotalTime(music) -1.0
+#   define Mix_GetMusicPosition(music) -1.0
+#   define Mix_GetMusicLoopStartTime(music) -1.0
+#   define Mix_GetMusicLoopEndTime(music) -1.0
+#   define Mix_GetMusicTempo(music) -1.0
+
+inline int Mix_PlayChannelTimedVolume(int which, Mix_Chunk *chunk, int loops, int ticks, int volume)
+{
+    int ret = Mix_PlayChannelTimed(which, chunk, loops, ticks);
+    if(ret >= 0)
+        Mix_Volume(which, volume);
+    return ret;
+}
+
+inline int Mix_FadeInChannelTimedVolume(int which, Mix_Chunk *chunk, int loops, int ms, int ticks, int volume)
+{
+    int ret = Mix_FadeInChannelTimed(which, chunk, loops, ms, ticks);
+    if(ret >= 0)
+        Mix_Volume(which, volume);
+    return ret;
+}
+#endif
+
 namespace PGE_MusicPlayer
 {
     extern Mix_Music *play_mus;

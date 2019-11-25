@@ -25,6 +25,7 @@
 #include "setup_midi.h"
 #include "seek_bar.h"
 
+
 MusPlayer_Qt::MusPlayer_Qt(QWidget *parent) : QMainWindow(parent),
     MusPlayerBase(),
     ui(new Ui::MainWindow)
@@ -48,7 +49,7 @@ MusPlayer_Qt::MusPlayer_Qt(QWidget *parent) : QMainWindow(parent),
              .arg(mixer_ver->minor)
              .arg(mixer_ver->patch);
 #else
-    title += QString(" (SDL Mixer %1.%2.%3)")
+    title += QString(" (SDL2_mixer %1.%2.%3)")
              .arg(mixer_ver->major)
              .arg(mixer_ver->minor)
              .arg(mixer_ver->patch);
@@ -422,7 +423,7 @@ void MusPlayer_Qt::on_play_clicked()
         }
     }
 #else
-    currentMusic;
+    Q_UNUSED(currentMusic);
 #endif
 
     if(PGE_MusicPlayer::MUS_openFile(musicPath))
@@ -430,7 +431,7 @@ void MusPlayer_Qt::on_play_clicked()
         ui->tempo->blockSignals(true);
         ui->tempo->setValue(0);
         ui->tempo->blockSignals(false);
-        ui->tempoFrame->setEnabled((Mix_GetMusicTempo(PGE_MusicPlayer::play_mus) >= 0.0));
+        ui->tempoFrame->setEnabled(Mix_GetMusicTempo(PGE_MusicPlayer::play_mus) >= 0.0);
         PGE_MusicPlayer::MUS_changeVolume(ui->volume->value());
         playSuccess = PGE_MusicPlayer::MUS_playMusic();
         ui->play->setToolTip(tr("Pause"));
@@ -444,28 +445,16 @@ void MusPlayer_Qt::on_play_clicked()
 
     if(playSuccess)
     {
-        double total =
-#if defined(SDL_MIXER_X) || defined(SDL_MIXER_GE21)
-            Mix_GetMusicTotalTime(PGE_MusicPlayer::play_mus);
-#else
-            -1.0;
-#endif
-        double loopStart =
-#if defined(SDL_MIXER_X) || defined(SDL_MIXER_GE21)
-            Mix_GetMusicLoopStartTime(PGE_MusicPlayer::play_mus);
-#else
-            -1.0;
-#endif
-        double loopEnd =
-#if defined(SDL_MIXER_X) || defined(SDL_MIXER_GE21)
-            Mix_GetMusicLoopEndTime(PGE_MusicPlayer::play_mus);
-#else
-            -1.0;
-#endif
+        double total = Mix_GetMusicTotalTime(PGE_MusicPlayer::play_mus);
+        double curPos = Mix_GetMusicPosition(PGE_MusicPlayer::play_mus);
+
+        double loopStart = Mix_GetMusicLoopStartTime(PGE_MusicPlayer::play_mus);
+        double loopEnd = Mix_GetMusicLoopEndTime(PGE_MusicPlayer::play_mus);
+
         m_seekBar->clearLoopPoints();
         m_seekBar->setEnabled(false);
 
-        if(total > 0.0)
+        if(total > 0.0 && curPos >= 0.0)
         {
             m_seekBar->setEnabled(true);
             m_seekBar->setLength(total);
@@ -489,16 +478,16 @@ void MusPlayer_Qt::on_play_clicked()
         ui->smallInfo->setText(PGE_MusicPlayer::musicType());
         ui->gridLayout->update();
 
+#ifdef SDL_MIXER_X
         switch(PGE_MusicPlayer::type)
         {
-#ifdef SDL_MIXER_X
         case MUS_GME:
             ui->gme_setup->setEnabled(true);
             break;
-#endif
         default:
             break;
         }
+#endif
     }
     else
     {
@@ -525,6 +514,7 @@ void MusPlayer_Qt::on_trackID_editingFinished()
 
 void MusPlayer_Qt::on_tempo_valueChanged(int tempo)
 {
+#ifdef SDL_MIXER_X
     if(Mix_PlayingMusicStream(PGE_MusicPlayer::play_mus))
     {
         double tempoFactor = 1.0 + 0.01 * double(tempo);
@@ -532,6 +522,9 @@ void MusPlayer_Qt::on_tempo_valueChanged(int tempo)
         qDebug() << "Changed tempo factor: " << tempoFactor;
         QToolTip::showText(QCursor::pos(), QString("%1").arg(tempoFactor), this);
     }
+#else
+    Q_UNUSED(tempo);
+#endif
 }
 
 void MusPlayer_Qt::on_recordWav_clicked(bool checked)
@@ -576,12 +569,7 @@ void MusPlayer_Qt::_blink_red()
 
 void MusPlayer_Qt::updatePositionSlider()
 {
-#if defined(SDL_MIXER_X) || defined(SDL_MIXER_GE21)
     const double pos = Mix_GetMusicPosition(PGE_MusicPlayer::play_mus);
-#else
-    const double pos = -1.0;
-#endif
-
     m_positionWatcherLock = true;
     if(pos < 0.0)
     {
@@ -602,7 +590,6 @@ void MusPlayer_Qt::musicPosition_seeked(double value)
         return;
 
     qDebug() << "Seek to: " << value;
-
     if(Mix_PlayingMusicStream(PGE_MusicPlayer::play_mus))
     {
         Mix_SetMusicStreamPosition(PGE_MusicPlayer::play_mus, value);
@@ -640,7 +627,7 @@ void MusPlayer_Qt::on_actionHelpAbout_triggered()
              .arg(mixer_ver->minor)
              .arg(mixer_ver->patch);
 #else
-    library += QString("SDL Mixer %1.%2.%3")
+    library += QString("SDL2_mixer %1.%2.%3")
              .arg(mixer_ver->major)
              .arg(mixer_ver->minor)
              .arg(mixer_ver->patch);

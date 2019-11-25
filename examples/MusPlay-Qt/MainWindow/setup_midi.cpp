@@ -33,7 +33,7 @@ SetupMidi::SetupMidi(QWidget *parent) :
     const char *const *names = Mix_ADLMIDI_getBankNames();
 #else
     int totalBakns = 0;
-    const char *const *names = {0};
+    const char *const *names = {nullptr};
 #endif
 
     for(int i = 0; i < totalBakns; i++)
@@ -150,6 +150,7 @@ void SetupMidi::changeEvent(QEvent *e)
     }
 }
 
+#ifdef SDL_MIXER_X
 /**
  * @brief Convert menu ID into actual emulator ID
  * @param index index of menu
@@ -157,7 +158,6 @@ void SetupMidi::changeEvent(QEvent *e)
  */
 static int toOpnEmu(int index)
 {
-#ifdef SDL_MIXER_X
     switch(index)
     {
     case 0:
@@ -176,9 +176,9 @@ static int toOpnEmu(int index)
         index = OPNMIDI_OPN2_EMU_MAME_OPNA;
         break;
     }
-#endif
     return index;
 }
+#endif
 
 void SetupMidi::on_opnEmulator_currentIndexChanged(int index)
 {
@@ -187,6 +187,8 @@ void SetupMidi::on_opnEmulator_currentIndexChanged(int index)
 #ifdef SDL_MIXER_X
     Mix_OPNMIDI_setEmulator(toOpnEmu(index));
     restartForOpn();
+#else
+    Q_UNUSED(index);
 #endif
     updateAutoArgs();
 }
@@ -198,6 +200,8 @@ void SetupMidi::on_opnVolumeModel_currentIndexChanged(int index)
 #ifdef SDL_MIXER_X
     Mix_OPNMIDI_setVolumeModel(index);
     restartForOpn();
+#else
+    Q_UNUSED(index);
 #endif
     updateAutoArgs();
 }
@@ -240,7 +244,7 @@ void SetupMidi::on_opn_bank_editingFinished()
         }
         else
         {
-            Mix_OPNMIDI_setCustomBankFile(NULL);
+            Mix_OPNMIDI_setCustomBankFile(nullptr);
         }
         ui->opn_bank->setModified(false);
 #endif
@@ -253,6 +257,8 @@ void SetupMidi::on_adl_bankId_currentIndexChanged(int index)
     Mix_ADLMIDI_setBankID(index);
     if(ui->adl_bank->text().isEmpty() || !ui->adl_use_custom->isChecked())
         restartForAdl();
+#else
+    Q_UNUSED(index);
 #endif
     updateAutoArgs();
 }
@@ -297,7 +303,7 @@ void SetupMidi::on_adl_bank_editingFinished()
         }
         else
         {
-            Mix_ADLMIDI_setCustomBankFile(NULL);
+            Mix_ADLMIDI_setCustomBankFile(nullptr);
         }
         ui->adl_bank->setModified(false);
 #endif
@@ -311,6 +317,8 @@ void SetupMidi::on_adlEmulator_currentIndexChanged(int index)
 #ifdef SDL_MIXER_X
     Mix_ADLMIDI_setEmulator(index);
     restartForAdl();
+#else
+    Q_UNUSED(index);
 #endif
     updateAutoArgs();
 }
@@ -322,6 +330,8 @@ void SetupMidi::on_adlVolumeModel_currentIndexChanged(int index)
 #ifdef SDL_MIXER_X
     Mix_ADLMIDI_setVolumeModel(index);
     restartForAdl();
+#else
+    Q_UNUSED(index);
 #endif
     updateAutoArgs();
 }
@@ -445,6 +455,8 @@ void SetupMidi::on_mididevice_currentIndexChanged(int index)
 #endif
         break;
     }
+#else
+    Q_UNUSED(index);
 #endif
     updateAutoArgs();
     if(Mix_PlayingMusicStream(PGE_MusicPlayer::play_mus) && (PGE_MusicPlayer::type == MUS_MID))
@@ -455,6 +467,7 @@ void SetupMidi::on_mididevice_currentIndexChanged(int index)
 
 void SetupMidi::on_midiRawArgs_editingFinished()
 {
+#ifdef SDL_MIXER_X
     if(ui->midiRawArgs->isModified())
     {
         if(Mix_PlayingMusicStream(PGE_MusicPlayer::play_mus) &&
@@ -466,10 +479,12 @@ void SetupMidi::on_midiRawArgs_editingFinished()
         }
         ui->midiRawArgs->setModified(false);
     }
+#endif
 }
 
 void SetupMidi::restartForAdl()
 {
+#ifdef SDL_MIXER_X
     if(Mix_PlayingMusicStream(PGE_MusicPlayer::play_mus) &&
         (
             (PGE_MusicPlayer::type == MUS_MID && Mix_GetMidiPlayer() == MIDI_ADLMIDI) ||
@@ -479,10 +494,12 @@ void SetupMidi::restartForAdl()
     {
         emit songRestartNeeded();
     }
+#endif
 }
 
 void SetupMidi::restartForOpn()
 {
+#ifdef SDL_MIXER_X
     if(Mix_PlayingMusicStream(PGE_MusicPlayer::play_mus) &&
       (PGE_MusicPlayer::type == MUS_MID) &&
       (Mix_GetMidiPlayer() == MIDI_OPNMIDI)
@@ -490,4 +507,5 @@ void SetupMidi::restartForOpn()
     {
         emit songRestartNeeded();
     }
+#endif
 }

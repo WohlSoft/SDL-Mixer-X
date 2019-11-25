@@ -47,11 +47,18 @@ namespace PGE_MusicPlayer
                    type == MUS_MP3 ? "MP3" :
                    type == MUS_FLAC ? "FLAC" :
 #ifdef SDL_MIXER_X
-#   if SDL_MIXER_MAJOR_VERSION > 2 || (SDL_MIXER_MAJOR_VERSION == 2 && SDL_MIXER_MINOR_VERSION >= 2)
+#   if SDL_MIXER_MAJOR_VERSION > 2 || \
+    (SDL_MIXER_MAJOR_VERSION == 2 && SDL_MIXER_MINOR_VERSION >= 2)
                    type == MUS_OPUS ? "OPUS" :
 #   endif
                    type == MUS_ADLMIDI ? "IMF/MUS/XMI" :
                    type == MUS_GME ? "Game Music Emulator" :
+#else
+#   if SDL_MIXER_MAJOR_VERSION > 2 || \
+    (SDL_MIXER_MAJOR_VERSION == 2 && SDL_MIXER_MINOR_VERSION > 0) || \
+    (SDL_MIXER_MAJOR_VERSION == 2 && SDL_MIXER_MINOR_VERSION == 0 && SDL_MIXER_PATCHLEVEL >= 4)
+                   type == MUS_OPUS ? "OPUS" :
+#   endif
 #endif
                    "<Unknown>");
     }
@@ -118,11 +125,11 @@ namespace PGE_MusicPlayer
      */
     QString MUS_getMusAlbum()
     {
-        #if defined(SDL_MIXER_X) || defined(SDL_MIXER_GE21)
+#if defined(SDL_MIXER_X) || defined(SDL_MIXER_GE21)
         if(play_mus)
             return QString(Mix_GetMusicAlbumTag(play_mus));
         else
-        #endif
+#endif
             return QString("[Unknown Album]");
     }
 
