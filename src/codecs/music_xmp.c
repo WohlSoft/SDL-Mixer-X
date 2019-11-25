@@ -25,7 +25,7 @@
 
 #include "music_xmp.h"
 
-#include <xmp/xmp.h>
+#include <xmp.h>
 
 typedef struct
 {
@@ -240,21 +240,30 @@ static double XMP_Length(void *context)
 
 static int XMP_setTempo(void *music_p, double tempo)
 {
+#if XMP_VER_MAJOR > 4 || (XMP_VER_MAJOR == 4 && XMP_VER_MINOR >= 5)
     XMP_Music *music = (XMP_Music *)music_p;
     if (music && (tempo > 0.0)) {
         xmp_set_tempo_factor(music->ctx, (1.0 / tempo));
         music->tempo = tempo;
         return 0;
     }
+#else
+    (void)music_p;
+    (void)tempo;
+#endif
     return -1;
 }
 
 static double XMP_getTempo(void *music_p)
 {
+#if XMP_VER_MAJOR > 4 || (XMP_VER_MAJOR == 4 && XMP_VER_MINOR >= 5)
     XMP_Music *music = (XMP_Music *)music_p;
     if (music) {
         return music->tempo;
     }
+#else
+    (void)music_p;
+#endif
     return -1.0;
 }
 
