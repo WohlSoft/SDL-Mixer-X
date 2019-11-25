@@ -1,6 +1,9 @@
 cmake_minimum_required (VERSION 2.8.11)
 project(SDLMixerMusPlayer)
 
+include(GNUInstallDirs)
+include(NoPie)
+
 # Tell CMake to run moc when necessary:
 set(CMAKE_AUTOMOC ON)
 
@@ -103,6 +106,7 @@ endif()
 add_executable(sdlmixer_musplay
     ${SDLMixer_MusPlay_SRC}
 )
+pge_set_nopie(sdlmixer_musplay)
 
 set(PGE_MUSPLAY_LINK_LIBS)
 list(APPEND PGE_MUSPLAY_LINK_LIBS
@@ -123,3 +127,7 @@ else()
 endif()
 
 qt5_use_modules(sdlmixer_musplay Widgets Network)
+
+install(TARGETS sdlmixer_musplay
+    RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+)

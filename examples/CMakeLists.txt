@@ -8,11 +8,15 @@ elseif(SDL_MIXER_X_STATIC)
     target_link_libraries(libSDLMixerX INTERFACE SDL2_mixer_ext_Static)
 endif()
 
+include(NoPie)
+
 add_executable(playmus playmus.c)
+pge_set_nopie(playmus)
 target_include_directories(playmus PRIVATE ${SDL2_INCLUDE_DIRS})
 target_link_libraries(playmus PRIVATE libSDLMixerX ${SDL2_LIBRARIES})
 
 add_executable(playwave playwave.c)
+pge_set_nopie(playwave)
 target_include_directories(playwave PRIVATE ${SDL2_INCLUDE_DIRS})
 target_link_libraries(playwave PRIVATE libSDLMixerX ${SDL2_LIBRARIES})
 
