@@ -1,7 +1,7 @@
 option(USE_MP3_ID3TAG   "Build with MP3 Meta tags support provided by libID3Tag library" ON)
 if(USE_MP3_ID3TAG AND NOT USE_SYSTEM_AUDIO_LIBRARIES)
     message("== using ID3Tag-SDL ==")
-    add_definitions(-DMUSIC_MP3_ID3TAG)
+    list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_MP3_ID3TAG)
     if(AUDIO_CODECS_REPO_PATH)
         list(APPEND SDL_MIXER_INCLUDE_PATHS ${AUDIO_CODECS_PATH}/libid3tag/include)
     endif()

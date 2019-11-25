@@ -71,6 +71,7 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
     endif()
 endif()
 
+set(SDL_MIXER_DEFINITIONS)
 set(SDL_MIXER_INCLUDE_PATHS)
 
 if(NOT AUDIO_CODECS_REPO_PATH AND NOT AUDIO_CODECS_INSTALL_PATH)
@@ -139,8 +140,10 @@ else()
     set(USE_SYSTEM_AUDIO_LIBRARIES 1)
 endif()
 
-add_definitions(-DHAVE_INTTYPES_H -DHAVE_SETENV -DHAVE_SINF)
-add_definitions(-Dmain=SDL_main -DPIC -D_REENTRANT -D_USE_MATH_DEFINES)
+list(APPEND SDL_MIXER_DEFINITIONS
+    -DHAVE_INTTYPES_H -DHAVE_SETENV -DHAVE_SINF
+    -DPIC -D_REENTRANT -D_USE_MATH_DEFINES
+)
 
 set(SDLMixerX_SOURCES)
 set(SDLMixerX_LINK_LIBS)
@@ -170,7 +173,7 @@ include(music_cmd)
 
 option(USE_MIDI            "Build with MIDI support" ON)
 if(USE_MIDI)
-    add_definitions(-DMUSIC_USE_MIDI)
+    list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_USE_MIDI)
 
     include(music_midi_adl)
     include(music_midi_opn)
@@ -257,13 +260,15 @@ if(SDL_MIXER_X_STATIC AND NOT BUILD_AS_VB6_BINDING)
     else()
         set_target_properties(SDL2_mixer_ext_Static PROPERTIES OUTPUT_NAME SDL2_mixer_ext)
     endif()
+    target_link_libraries(SDL2_mixer_ext_Static PUBLIC ${SDLMixerX_LINK_LIBS})
+    target_compile_definitions(SDL2_mixer_ext_Static PRIVATE ${SDL_MIXER_DEFINITIONS})
     target_include_directories(SDL2_mixer_ext_Static PRIVATE
-        ${SDLMixerX_SOURCE_DIR}/include/SDL_mixer_ext
         ${SDLMixerX_SOURCE_DIR}/src
         ${SDLMixerX_SOURCE_DIR}/src/codecs
         ${LIBSDL2CUSTOM_INCLUDES}
     )
     target_include_directories(SDL2_mixer_ext_Static PUBLIC
+        ${SDLMixerX_SOURCE_DIR}/include/SDL_mixer_ext
         ${SDLMixerX_SOURCE_DIR}/include
         ${SDL_MIXER_INCLUDE_PATHS}
     )
@@ -292,14 +297,15 @@ endif()
 
 if(SDL_MIXER_X_SHARED AND NOT BUILD_AS_VB6_BINDING)
     add_library(SDL2_mixer_ext SHARED ${SDLMixerX_SOURCES})
-    target_link_libraries(SDL2_mixer_ext ${SDLMixerX_LINK_LIBS})
+    target_link_libraries(SDL2_mixer_ext PRIVATE ${SDLMixerX_LINK_LIBS})
+    target_compile_definitions(SDL2_mixer_ext PRIVATE ${SDL_MIXER_DEFINITIONS})
     target_include_directories(SDL2_mixer_ext PRIVATE
-        ${SDLMixerX_SOURCE_DIR}/include/SDL_mixer_ext
         ${SDLMixerX_SOURCE_DIR}/src
         ${SDLMixerX_SOURCE_DIR}/src/codecs
         ${AUDIO_CODECS_INSTALL_DIR}/include/SDL2
     )
     target_include_directories(SDL2_mixer_ext PUBLIC
+        ${SDLMixerX_SOURCE_DIR}/include/SDL_mixer_ext
         ${SDLMixerX_SOURCE_DIR}/include
         ${SDL_MIXER_INCLUDE_PATHS}
     )
@@ -326,7 +332,7 @@ if(BUILD_AS_VB6_BINDING)
     add_library(SDL2_mixer_ext_VB6 MODULE ${SDLMixerX_SOURCES})
     set_target_properties(SDL2_mixer_ext_VB6 PROPERTIES OUTPUT_NAME SDL2MixerVB)
     set_target_properties(SDL2_mixer_ext_VB6 PROPERTIES PREFIX "")
-    target_compile_definitions(SDL2_mixer_ext_VB6 PRIVATE -DFORCE_STDCALLS)
+    target_compile_definitions(SDL2_mixer_ext_VB6 PRIVATE ${SDL_MIXER_DEFINITIONS} -DFORCE_STDCALLS)
     target_link_libraries(SDL2_mixer_ext_VB6 ${SDLMixerX_LINK_LIBS})
     target_include_directories(SDL2_mixer_ext_VB6 PUBLIC
         ${SDLMixerX_SOURCE_DIR}/include/SDL_mixer_ext
@@ -355,6 +361,11 @@ if(BUILD_AS_VB6_BINDING)
                 ${CMAKE_SOURCE_DIR}/VB6_Wrapper/modSDL2_mixer_ext_vb6.bas
                 ${CMAKE_BINARY_DIR}/sdl-mixer-vb6)
     list(APPEND SDLMixerX_INSTALLS SDL2_mixer_ext_VB6)
+endif()
+
+option(BUILD_EXAMPLES "Build examples" OFF)
+if(BUILD_EXAMPLES)
+    add_subdirectory(examples)
 endif()
 
 install(TARGETS ${SDLMixerX_INSTALLS}

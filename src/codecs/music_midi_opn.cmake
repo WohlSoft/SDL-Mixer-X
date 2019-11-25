@@ -17,7 +17,7 @@ if(USE_MIDI_OPNMIDI)
 
     if(OPNMIDI_FOUND)
         message("== using OPNMIDI ==")
-        add_definitions(-DMUSIC_MID_OPNMIDI)
+        list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_MID_OPNMIDI)
         set(LIBMATH_NEEDED 1)
         list(APPEND SDL_MIXER_INCLUDE_PATHS ${OPNMIDI_INCLUDE_DIRS})
         list(APPEND SDLMixerX_LINK_LIBS ${OPNMIDI_LIBRARIES})

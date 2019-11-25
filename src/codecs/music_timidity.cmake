@@ -1,7 +1,7 @@
 option(USE_MIDI_TIMIDITY   "Build with Timidity wave table MIDI sequencer support" ON)
 if(USE_MIDI_TIMIDITY AND NOT USE_SYSTEM_AUDIO_LIBRARIES)
     message("== using Timidity-SDL ==")
-    add_definitions(-DMUSIC_MID_TIMIDITY)
+    list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_MID_TIMIDITY)
 
     if(AUDIO_CODECS_REPO_PATH)
         list(APPEND SDL_MIXER_INCLUDE_PATHS ${AUDIO_CODECS_PATH}/libtimidity/include)

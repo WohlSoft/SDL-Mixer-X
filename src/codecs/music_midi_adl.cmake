@@ -18,7 +18,7 @@ if(USE_MIDI_ADLMIDI)
 
     if(ADLMIDI_FOUND)
         message("== using ADLMIDI ==")
-        add_definitions(-DMUSIC_MID_ADLMIDI)
+        list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_MID_ADLMIDI)
         set(LIBMATH_NEEDED 1)
         list(APPEND SDL_MIXER_INCLUDE_PATHS ${ADLMIDI_INCLUDE_DIRS})
         list(APPEND SDLMixerX_LINK_LIBS ${ADLMIDI_LIBRARIES})
