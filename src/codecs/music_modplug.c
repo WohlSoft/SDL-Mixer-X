@@ -371,7 +371,7 @@ Mix_MusicInterface Mix_MusicInterface_MODPLUG =
     NULL,   /* Stop */
     MODPLUG_Delete,
     NULL,   /* Close */
-    MODPLUG_Unload,
+    MODPLUG_Unload
 };
 
 #endif /* MUSIC_MOD_MODPLUG */

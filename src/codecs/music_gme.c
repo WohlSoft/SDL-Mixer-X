@@ -144,14 +144,16 @@ static void GME_delete(void *context);
 void GME_setvolume(void *music_p, int volume)
 {
     GME_Music *music = (GME_Music*)music_p;
-    music->volume = (int)SDL_floor(((double)(volume) * music->gain) + 0.5);
+    double v = SDL_floor(((double)(volume) * music->gain) + 0.5);
+    music->volume = (int)v;
 }
 
 /* Get the volume for a GME stream */
 int GME_getvolume(void *music_p)
 {
     GME_Music *music = (GME_Music*)music_p;
-    return (int)SDL_floor(((double)(music->volume) / music->gain) + 0.5);
+    double v = SDL_floor(((double)(music->volume) / music->gain) + 0.5);
+    return (int)v;
 }
 
 static double str_to_float(const char *str)
@@ -519,7 +521,7 @@ Mix_MusicInterface Mix_MusicInterface_GME =
     NULL,   /* Stop */
     GME_delete,
     NULL,   /* Close */
-    GME_Unload,
+    GME_Unload
 };
 
 #endif /* MUSIC_GME */

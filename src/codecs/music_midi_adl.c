@@ -441,14 +441,16 @@ typedef struct
 static void ADLMIDI_setvolume(void *music_p, int volume)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
-    music->volume = (int)SDL_floor(((double)(volume) * music->gain) + 0.5);
+    double v = SDL_floor(((double)(volume) * music->gain) + 0.5);
+    music->volume = (int)v;
 }
 
 /* Get the volume for a ADLMIDI stream */
 static int ADLMIDI_getvolume(void *music_p)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
-    return (int)SDL_floor(((double)(music->volume) / music->gain) + 0.5);
+    double v = SDL_floor(((double)(music->volume) / music->gain) + 0.5);
+    return (int)v;
 }
 
 static double str_to_float(const char *str)
@@ -925,7 +927,7 @@ Mix_MusicInterface Mix_MusicInterface_ADLMIDI =
     SDL_FALSE,
     SDL_FALSE,
 
-    NULL,   /* Load */
+    ADLMIDI_Load,
     NULL,   /* Open */
     ADLMIDI_new_RW,
     ADLMIDI_new_RWex,   /* CreateFromRWex [MIXER-X]*/
@@ -950,7 +952,7 @@ Mix_MusicInterface Mix_MusicInterface_ADLMIDI =
     NULL,   /* Stop */
     ADLMIDI_delete,
     NULL,   /* Close */
-    NULL,   /* Unload */
+    ADLMIDI_Unload
 };
 
 /* Same as Mix_MusicInterface_ADLMIDI. Created to play special music formats separately from off MIDI interfaces */
@@ -987,7 +989,7 @@ Mix_MusicInterface Mix_MusicInterface_ADLIMF =
     NULL,   /* Stop */
     ADLMIDI_delete,
     NULL,   /* Close */
-    ADLMIDI_Unload,
+    ADLMIDI_Unload
 };
 
 #endif /* MUSIC_MID_ADLMIDI */

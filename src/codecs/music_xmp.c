@@ -411,7 +411,7 @@ Mix_MusicInterface Mix_MusicInterface_LIBXMP =
     NULL,   /* Stop */
     XMP_Delete,
     NULL,   /* Close */
-    XMP_Unload,
+    XMP_Unload
 };
 
 #endif /* MUSIC_MOD_XMP */
