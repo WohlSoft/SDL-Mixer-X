@@ -10,6 +10,43 @@ if(USE_MODPLUG)
             list(APPEND SDL_MIXER_DEFINITIONS -DMODPLUG_DYNAMIC=\"${ModPlug_DYNAMIC_LIBRARY}\")
             message("Dynamic ModPlug: ${ModPlug_DYNAMIC_LIBRARY}")
         endif()
+
+        if(ModPlug_FOUND)
+            if(USE_MODPLUG_STATIC)
+                list(APPEND SDL_MIXER_DEFINITIONS -DMODPLUG_STATIC)
+                if(UNIX AND NOT APPLE AND NOT HAIKU AND NOT EMSCRIPTEN)
+                    find_library(M_LIBRARY m)
+                else()
+                    set(M_LIBRARY "")
+                endif()
+
+                if(NOT MSVC)
+                    set(STDCPP_LIBRARY "stdc++") # TODO: Verify on FreeBSD/OpenBSD/NetBSD
+                else()
+                    set(STDCPP_LIBRARY "")
+                endif()
+                set(MODPLUG_STATIC_MACRO "-DMODPLUG_STATIC")
+            else()
+                set(STDCPP_LIBRARY "")
+                set(M_LIBRARY "")
+                set(MODPLUG_STATIC_MACRO "")
+            endif()
+
+            if(UNIX AND NOT APPLE AND NOT HAIKU AND NOT EMSCRIPTEN)
+                find_library(M_LIBRARY m)
+            endif()
+
+            try_compile(MODPLUG_HAS_TELL
+                ${CMAKE_BINARY_DIR}/compile_tests
+                ${SDLMixerX_SOURCE_DIR}/cmake/tests/modplug_tell.c
+                COMPILE_DEFINITIONS ${MODPLUG_STATIC_MACRO}
+                LINK_LIBRARIES ${ModPlug_LIBRARIES} ${STDCPP_LIBRARY} ${M_LIBRARY}
+                CMAKE_FLAGS "-DINCLUDE_DIRECTORIES=${ModPlug_INCLUDE_DIRS}"
+                OUTPUT_VARIABLE MODPLUG_TEST_RESULT
+            )
+            message("ModPlug_Tell() compile test result: ${MODPLUG_HAS_TELL}")
+        endif()
+
     else()
         if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
             set(ModPlug_LIBRARIES modplug)
@@ -18,6 +55,7 @@ if(USE_MODPLUG)
                          HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
         endif()
         set(ModPlug_FOUND 1)
+        set(MODPLUG_HAS_TELL True)
         set(ModPlug_INCLUDE_DIRS "${AUDIO_CODECS_PATH}/libmodplug/include")
     endif()
 
@@ -33,6 +71,9 @@ if(USE_MODPLUG)
         list(APPEND SDL_MIXER_INCLUDE_PATHS ${ModPlug_INCLUDE_DIRS})
         list(APPEND SDLMixerX_SOURCES
             ${SDLMixerX_SOURCE_DIR}/src/codecs/music_modplug.c)
+        if(MODPLUG_HAS_TELL)
+            list(APPEND SDL_MIXER_DEFINITIONS -DMODPLUG_HAS_TELL)
+        endif()
     else()
         message("-- skipping libModPlug --")
     endif()
