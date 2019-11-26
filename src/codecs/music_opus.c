@@ -561,7 +561,7 @@ Mix_MusicInterface Mix_MusicInterface_Opus =
     NULL,   /* Stop */
     OPUS_Delete,
     NULL,   /* Close */
-    OPUS_Unload,
+    OPUS_Unload
 };
 
 #endif /* MUSIC_OPUS */

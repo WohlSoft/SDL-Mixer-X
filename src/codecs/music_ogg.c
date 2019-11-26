@@ -602,7 +602,7 @@ Mix_MusicInterface Mix_MusicInterface_OGG =
     NULL,   /* Stop */
     OGG_Delete,
     NULL,   /* Close */
-    OGG_Unload,
+    OGG_Unload
 };
 
 #endif /* MUSIC_OGG */

@@ -812,7 +812,7 @@ Mix_MusicInterface Mix_MusicInterface_FLAC =
     NULL,   /* Stop */
     FLAC_Delete,
     NULL,   /* Close */
-    FLAC_Unload,
+    FLAC_Unload
 };
 
 #endif /* MUSIC_FLAC */
