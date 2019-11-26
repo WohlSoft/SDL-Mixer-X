@@ -117,8 +117,7 @@ int main(int argc, char *argv[])
     int interactive = 0;
     int rwops = 0;
     int i;
-    Mix_MusicType type = MUS_NONE;
-    const char *type_str = "NONE";
+    const char *typ;
     const char *tag_title = NULL;
     const char *tag_artist = NULL;
     const char *tag_album = NULL;
@@ -223,45 +222,45 @@ int main(int argc, char *argv[])
             CleanUp(2);
         }
 
-        type = Mix_GetMusicType(music);
-        switch (type) {
-        case MUS_NONE:
-            type_str = "NONE";
-            break;
+        switch (Mix_GetMusicType(music)) {
         case MUS_CMD:
-            type_str = "CMD";
+            typ = "CMD";
             break;
         case MUS_WAV:
-            type_str = "WAV";
+            typ = "WAV";
             break;
         case MUS_MOD:
         case MUS_MODPLUG_UNUSED:
-            type_str = "MOD";
+            typ = "MOD";
             break;
         case MUS_FLAC:
-            type_str = "FLAC";
+            typ = "FLAC";
             break;
         case MUS_MID:
-            type_str = "MIDI";
+            typ = "MIDI";
             break;
         case MUS_OGG:
-            type_str = "OGG Vorbis";
+            typ = "OGG Vorbis";
             break;
         case MUS_MP3:
         case MUS_MP3_MAD_UNUSED:
-            type_str = "MP3";
+            typ = "MP3";
             break;
         case MUS_OPUS:
-            type_str = "OPUS";
+            typ = "OPUS";
             break;
         case MUS_GME:
-            type_str = "GME";
+            typ = "GME";
             break;
         case MUS_ADLMIDI:
-            type_str = "IMF/MUS/XMI";
+            typ = "IMF/MUS/XMI";
+            break;
+        case MUS_NONE:
+        default:
+            typ = "NONE";
             break;
         }
-        SDL_Log("Detected music type: %s", type_str);
+        SDL_Log("Detected music type: %s", typ);
 
         tag_title = Mix_GetMusicTitleTag(music);
         if (tag_title && SDL_strlen(tag_title) > 0) {
