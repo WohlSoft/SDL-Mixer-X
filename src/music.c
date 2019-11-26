@@ -589,7 +589,7 @@ void open_music(const SDL_AudioSpec *spec)
     Mix_VolumeMusicStream(NULL, MIX_MAX_VOLUME);
 
     /* Calculate the number of ms for each callback */
-    ms_per_step = (int) (((double)spec->samples * 1000.0) / spec->freq);
+    ms_per_step = (int) (((float)spec->samples * 1000.0f) / spec->freq);
 }
 
 /* Return SDL_TRUE if the music type is available */
@@ -2093,7 +2093,7 @@ int SDLCALLCC Mix_EachSoundFont(int (SDLCALL *function)(const char*, void*), voi
 #define PATHSEP ":;"
 #endif
     for (path = SDL_strtokr(paths, PATHSEP, &context); path;
-         path = SDL_strtokr(NULL, PATHSEP, &context)) {
+         path = SDL_strtokr(NULL,  PATHSEP, &context)) {
         if (!function(path, data)) {
             continue;
         }
