@@ -24,8 +24,119 @@
 #include "music_midi_opn.h"
 
 #ifdef MUSIC_MID_OPNMIDI
+
+#include "SDL_loadso.h"
+
 #include <opnmidi.h>
 #include "OPNMIDI/gm_opn_bank.h"
+
+typedef struct {
+    int loaded;
+    void *handle;
+
+    struct OPN2_MIDIPlayer *(*opn2_init)(long sample_rate);
+    void (*opn2_close)(struct OPN2_MIDIPlayer *device);
+    int (*opn2_openBankFile)(struct OPN2_MIDIPlayer *device, const char *filePath);
+    int (*opn2_openBankData)(struct OPN2_MIDIPlayer *device, const void *mem, long size);
+    const char *(*opn2_errorInfo)(struct OPN2_MIDIPlayer *device);
+    int (*opn2_switchEmulator)(struct OPN2_MIDIPlayer *device, int emulator);
+    void (*opn2_setScaleModulators)(struct OPN2_MIDIPlayer *device, int smod);
+    void (*opn2_setVolumeRangeModel)(struct OPN2_MIDIPlayer *device, int volumeModel);
+    void (*opn2_setFullRangeBrightness)(struct OPN2_MIDIPlayer *device, int fr_brightness);
+    void (*opn2_setSoftPanEnabled)(struct OPN2_MIDIPlayer *device, int softPanEn);
+    int (*opn2_setNumChips)(struct OPN2_MIDIPlayer *device, int numChips);
+    void (*opn2_setTempo)(struct OPN2_MIDIPlayer *device, double tempo);
+    int (*opn2_openData)(struct OPN2_MIDIPlayer *device, const void *mem, unsigned long size);
+    const char *(*opn2_metaMusicTitle)(struct OPN2_MIDIPlayer *device);
+    const char *(*opn2_metaMusicCopyright)(struct OPN2_MIDIPlayer *device);
+    void (*opn2_positionRewind)(struct OPN2_MIDIPlayer *device);
+    void (*opn2_setLoopEnabled)(struct OPN2_MIDIPlayer *device, int loopEn);
+    int  (*opn2_playFormat)(struct OPN2_MIDIPlayer *device, int sampleCount,
+                           OPN2_UInt8 *left, OPN2_UInt8 *right,
+                           const struct OPNMIDI_AudioFormat *format);
+    void (*opn2_positionSeek)(struct OPN2_MIDIPlayer *device, double seconds);
+    double (*opn2_positionTell)(struct OPN2_MIDIPlayer *device);
+    double (*opn2_totalTimeLength)(struct OPN2_MIDIPlayer *device);
+    double (*opn2_loopStartTime)(struct OPN2_MIDIPlayer *device);
+    double (*opn2_loopEndTime)(struct OPN2_MIDIPlayer *device);
+} opnmidi_loader;
+
+static opnmidi_loader OPNMIDI = {
+    0, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL
+};
+
+#ifdef OPNMIDI_DYNAMIC
+#define FUNCTION_LOADER(FUNC, SIG) \
+    OPNMIDI.FUNC = (SIG) SDL_LoadFunction(OPNMIDI.handle, #FUNC); \
+    if (OPNMIDI.FUNC == NULL) { SDL_UnloadObject(OPNMIDI.handle); return -1; }
+#else
+#define FUNCTION_LOADER(FUNC, SIG) \
+    OPNMIDI.FUNC = FUNC;
+#endif
+
+static int OPNMIDI_Load(void)
+{
+    if (OPNMIDI.loaded == 0) {
+#ifdef OPNMIDI_DYNAMIC
+        OPNMIDI.handle = SDL_LoadObject(OPNMIDI_DYNAMIC);
+        if (OPNMIDI.handle == NULL) {
+            return -1;
+        }
+#elif defined(__MACOSX__)
+        extern struct OPN2_MIDIPlayer *opn2_init(long) __attribute__((weak_import));
+        if (opn2_init == NULL) {
+            /* Missing weakly linked framework */
+            Mix_SetError("Missing OPNMIDI.framework");
+            return -1;
+        }
+#endif
+        FUNCTION_LOADER(opn2_init, struct OPN2_MIDIPlayer *(*)(long))
+        FUNCTION_LOADER(opn2_close, void(*)(struct OPN2_MIDIPlayer*))
+        FUNCTION_LOADER(opn2_openBankFile, int(*)(struct OPN2_MIDIPlayer*,const char*))
+        FUNCTION_LOADER(opn2_openBankData, int(*)(struct OPN2_MIDIPlayer*,const void*,long))
+        FUNCTION_LOADER(opn2_errorInfo, const char *(*)(struct OPN2_MIDIPlayer*))
+        FUNCTION_LOADER(opn2_switchEmulator, int(*)(struct OPN2_MIDIPlayer*,int))
+        FUNCTION_LOADER(opn2_setScaleModulators, void(*)(struct OPN2_MIDIPlayer*,int))
+        FUNCTION_LOADER(opn2_setVolumeRangeModel, void(*)(struct OPN2_MIDIPlayer*,int))
+        FUNCTION_LOADER(opn2_setFullRangeBrightness, void(*)(struct OPN2_MIDIPlayer*,int))
+        FUNCTION_LOADER(opn2_setSoftPanEnabled, void(*)(struct OPN2_MIDIPlayer*,int))
+        FUNCTION_LOADER(opn2_setNumChips, int(*)(struct OPN2_MIDIPlayer *, int))
+        FUNCTION_LOADER(opn2_setTempo, void(*)(struct OPN2_MIDIPlayer*,double))
+        FUNCTION_LOADER(opn2_openData, int(*)(struct OPN2_MIDIPlayer *, const void *, unsigned long))
+        FUNCTION_LOADER(opn2_metaMusicTitle, const char*(*)(struct OPN2_MIDIPlayer*))
+        FUNCTION_LOADER(opn2_metaMusicCopyright, const char*(*)(struct OPN2_MIDIPlayer*))
+        FUNCTION_LOADER(opn2_positionRewind, void (*)(struct OPN2_MIDIPlayer*))
+        FUNCTION_LOADER(opn2_setLoopEnabled, void(*)(struct OPN2_MIDIPlayer*,int))
+        FUNCTION_LOADER(opn2_playFormat, int(*)(struct OPN2_MIDIPlayer *,int,
+                               OPN2_UInt8*,OPN2_UInt8*,const struct OPNMIDI_AudioFormat*))
+        FUNCTION_LOADER(opn2_positionSeek, void(*)(struct OPN2_MIDIPlayer*,double))
+        FUNCTION_LOADER(opn2_positionTell, double(*)(struct OPN2_MIDIPlayer*))
+        FUNCTION_LOADER(opn2_totalTimeLength, double(*)(struct OPN2_MIDIPlayer*))
+        FUNCTION_LOADER(opn2_loopStartTime, double(*)(struct OPN2_MIDIPlayer*))
+        FUNCTION_LOADER(opn2_loopEndTime, double(*)(struct OPN2_MIDIPlayer*))
+    }
+    ++OPNMIDI.loaded;
+
+    return 0;
+}
+
+static void OPNMIDI_Unload(void)
+{
+    if (OPNMIDI.loaded == 0) {
+        return;
+    }
+    if (OPNMIDI.loaded == 1) {
+#ifdef OPNMIDI_DYNAMIC
+        SDL_UnloadObject(OPNMIDI.handle);
+#endif
+    }
+    --OPNMIDI.loaded;
+}
 
 /* Global OPNMIDI flags which are applying on initializing of MIDI player with a file */
 typedef struct {
@@ -197,14 +308,16 @@ typedef struct
 static void OPNMIDI_setvolume(void *music_p, int volume)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music*)music_p;
-    music->volume = (int)SDL_floor(((double)(volume) * music->gain) + 0.5);
+    double v = SDL_floor(((double)(volume) * music->gain) + 0.5);
+    music->volume = (int)v;
 }
 
 /* Get the volume for a OPNMIDI stream */
 static int OPNMIDI_getvolume(void *music_p)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music*)music_p;
-    return (int)SDL_floor(((double)(music->volume) / music->gain) + 0.5);
+    double v = SDL_floor(((double)(music->volume) / music->gain) + 0.5);
+    return (int)v;
 }
 
 static double str_to_float(const char *str)
@@ -413,7 +526,7 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
         return NULL;
     }
 
-    music->opnmidi = opn2_init(music_spec.freq);
+    music->opnmidi = OPNMIDI.opn2_init(music_spec.freq);
     if (!music->opnmidi) {
         SDL_OutOfMemory();
         OPNMIDI_delete(music);
@@ -421,40 +534,40 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
     }
 
     if (setup.custom_bank_path[0] != '\0') {
-        err = opn2_openBankFile(music->opnmidi, (char*)setup.custom_bank_path);
+        err = OPNMIDI.opn2_openBankFile(music->opnmidi, (char*)setup.custom_bank_path);
     } else {
-        err = opn2_openBankData(music->opnmidi, g_gm_opn2_bank, sizeof(g_gm_opn2_bank));
+        err = OPNMIDI.opn2_openBankData(music->opnmidi, g_gm_opn2_bank, sizeof(g_gm_opn2_bank));
     }
 
     if ( err < 0 ) {
-        Mix_SetError("OPN2-MIDI: %s", opn2_errorInfo(music->opnmidi));
+        Mix_SetError("OPN2-MIDI: %s", OPNMIDI.opn2_errorInfo(music->opnmidi));
         SDL_free(bytes);
         OPNMIDI_delete(music);
         return NULL;
     }
 
     if (setup.emulator >= 0) {
-        opn2_switchEmulator(music->opnmidi, setup.emulator);
+        OPNMIDI.opn2_switchEmulator(music->opnmidi, setup.emulator);
     }
-    opn2_setVolumeRangeModel(music->opnmidi, setup.volume_model);
-    opn2_setFullRangeBrightness(music->opnmidi, setup.full_brightness_range);
-    opn2_setSoftPanEnabled(music->opnmidi, setup.soft_pan);
-    opn2_setNumChips(music->opnmidi, (setup.chips_count >= 0) ? setup.chips_count : OPNMIDI_DEFAULT_CHIPS_COUNT);
-    opn2_setTempo(music->opnmidi, music->tempo);
+    OPNMIDI.opn2_setVolumeRangeModel(music->opnmidi, setup.volume_model);
+    OPNMIDI.opn2_setFullRangeBrightness(music->opnmidi, setup.full_brightness_range);
+    OPNMIDI.opn2_setSoftPanEnabled(music->opnmidi, setup.soft_pan);
+    OPNMIDI.opn2_setNumChips(music->opnmidi, (setup.chips_count >= 0) ? setup.chips_count : OPNMIDI_DEFAULT_CHIPS_COUNT);
+    OPNMIDI.opn2_setTempo(music->opnmidi, music->tempo);
 
-    err = opn2_openData( music->opnmidi, bytes, (unsigned long)filesize);
+    err = OPNMIDI.opn2_openData( music->opnmidi, bytes, (unsigned long)filesize);
     SDL_free(bytes);
 
     if (err != 0) {
-        Mix_SetError("OPN2-MIDI: %s", opn2_errorInfo(music->opnmidi));
+        Mix_SetError("OPN2-MIDI: %s", OPNMIDI.opn2_errorInfo(music->opnmidi));
         OPNMIDI_delete(music);
         return NULL;
     }
 
     music->volume                 = MIX_MAX_VOLUME;
     meta_tags_init(&music->tags);
-    meta_tags_set(&music->tags, MIX_META_TITLE, opn2_metaMusicTitle(music->opnmidi));
-    meta_tags_set(&music->tags, MIX_META_COPYRIGHT, opn2_metaMusicCopyright(music->opnmidi));
+    meta_tags_set(&music->tags, MIX_META_TITLE, OPNMIDI.opn2_metaMusicTitle(music->opnmidi));
+    meta_tags_set(&music->tags, MIX_META_COPYRIGHT, OPNMIDI.opn2_metaMusicCopyright(music->opnmidi));
     return music;
 }
 
@@ -483,9 +596,9 @@ static void *OPNMIDI_new_RW(struct SDL_RWops *src, int freesrc)
 static int OPNMIDI_play(void *music_p, int play_counts)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music*)music_p;
-    opn2_positionRewind(music->opnmidi);
+    OPNMIDI.opn2_positionRewind(music->opnmidi);
     music->play_count = play_counts;
-    opn2_setLoopEnabled(music->opnmidi, (play_counts < 0));
+    OPNMIDI.opn2_setLoopEnabled(music->opnmidi, (play_counts < 0));
     return 0;
 }
 
@@ -510,10 +623,11 @@ static int OPNMIDI_playSome(void *context, void *data, int bytes, SDL_bool *done
         bytes += ((int)music->sample_format.sampleOffset - (bytes % (int)music->sample_format.sampleOffset));
     }
 
-    gottenLen = opn2_playFormat(music->opnmidi, (bytes / (int)music->sample_format.containerSize),
-                               (OPN2_UInt8*)music->buffer,
-                               (OPN2_UInt8*)music->buffer + music->sample_format.containerSize,
-                               &music->sample_format);
+    gottenLen = OPNMIDI.opn2_playFormat(music->opnmidi,
+                                       (bytes / (int)music->sample_format.containerSize),
+                                       (OPN2_UInt8*)music->buffer,
+                                       (OPN2_UInt8*)music->buffer + music->sample_format.containerSize,
+                                       &music->sample_format);
 
     if (gottenLen <= 0) {
         *done = SDL_TRUE;
@@ -534,7 +648,7 @@ static int OPNMIDI_playSome(void *context, void *data, int bytes, SDL_bool *done
             if (music->play_count > 0) {
                 play_count = (music->play_count - 1);
             }
-            opn2_positionRewind(music->opnmidi);
+            OPNMIDI.opn2_positionRewind(music->opnmidi);
             music->play_count = play_count;
         }
     }
@@ -556,7 +670,7 @@ static void OPNMIDI_delete(void *music_p)
     if (music) {
         meta_tags_clear(&music->tags);
         if (music->opnmidi) {
-            opn2_close( music->opnmidi );
+            OPNMIDI.opn2_close(music->opnmidi);
         }
         if (music->stream) {
             SDL_FreeAudioStream(music->stream);
@@ -578,28 +692,28 @@ static const char* OPNMIDI_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
 static int OPNMIDI_jump_to_time(void *music_p, double time)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music*)music_p;
-    opn2_positionSeek(music->opnmidi, time);
+    OPNMIDI.opn2_positionSeek(music->opnmidi, time);
     return 0;
 }
 
 static double OPNMIDI_currentPosition(void* music_p)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music *)music_p;
-    return opn2_positionTell(music->opnmidi);
+    return OPNMIDI.opn2_positionTell(music->opnmidi);
 }
 
 
 static double OPNMIDI_songLength(void* music_p)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music *)music_p;
-    return opn2_totalTimeLength(music->opnmidi);
+    return OPNMIDI.opn2_totalTimeLength(music->opnmidi);
 }
 
 static int OPNMIDI_setTempo(void *music_p, double tempo)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music *)music_p;
     if (music && (tempo > 0.0)) {
-        opn2_setTempo(music->opnmidi, tempo);
+        OPNMIDI.opn2_setTempo(music->opnmidi, tempo);
         music->tempo = tempo;
         return 0;
     }
@@ -618,21 +732,21 @@ static double OPNMIDI_getTempo(void *music_p)
 static double OPNMIDI_loopStart(void* music_p)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music *)music_p;
-    return opn2_loopStartTime(music->opnmidi);
+    return OPNMIDI.opn2_loopStartTime(music->opnmidi);
 }
 
 static double OPNMIDI_loopEnd(void* music_p)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music *)music_p;
-    return opn2_loopEndTime(music->opnmidi);
+    return OPNMIDI.opn2_loopEndTime(music->opnmidi);
 }
 
 static double OPNMIDI_loopLength(void* music_p)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music *)music_p;
     if (music) {
-        double start = opn2_loopStartTime(music->opnmidi);
-        double end = opn2_loopEndTime(music->opnmidi);
+        double start = OPNMIDI.opn2_loopStartTime(music->opnmidi);
+        double end = OPNMIDI.opn2_loopEndTime(music->opnmidi);
         if (start >= 0 && end >= 0) {
             return (end - start);
         }
@@ -649,7 +763,7 @@ Mix_MusicInterface Mix_MusicInterface_OPNMIDI =
     SDL_FALSE,
     SDL_FALSE,
 
-    NULL,   /* Load */
+    OPNMIDI_Load,
     NULL,   /* Open */
     OPNMIDI_new_RW,
     OPNMIDI_new_RWex,/* CreateFromRWex [MIXER-X]*/
@@ -674,7 +788,7 @@ Mix_MusicInterface Mix_MusicInterface_OPNMIDI =
     NULL,   /* Stop */
     OPNMIDI_delete,
     NULL,   /* Close */
-    NULL,   /* Unload */
+    OPNMIDI_Unload
 };
 
 #endif /* MUSIC_MID_OPNMIDI */
