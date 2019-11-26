@@ -319,7 +319,7 @@ static int voc_get_block(SDL_RWops *src, vs_t *v, SDL_AudioSpec *spec)
 }
 
 
-static int voc_read(SDL_RWops *src, vs_t *v, Uint8 *buf, SDL_AudioSpec *spec)
+static Uint32 voc_read(SDL_RWops *src, vs_t *v, Uint8 *buf, SDL_AudioSpec *spec)
 {
     Uint32 done = 0;
     Uint8 silence = 0x80;
@@ -362,7 +362,7 @@ static int voc_read(SDL_RWops *src, vs_t *v, Uint8 *buf, SDL_AudioSpec *spec)
         }
     }
 
-    return (int)done;
+    return done;
 } /* voc_read */
 
 
@@ -408,7 +408,7 @@ SDL_AudioSpec *Mix_LoadVOC_RW (SDL_RWops *src, int freesrc,
 
     fillptr = *audio_buf;
 
-    while (voc_read(src, &v, fillptr, spec) > 0)
+    while (voc_read(src, &v, fillptr, spec))
     {
         if (!voc_get_block(src, &v, spec))
             goto done;
