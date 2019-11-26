@@ -416,7 +416,7 @@ static int OPUS_GetSome(void *context, void *data, int bytes, SDL_bool *done)
     }
 
     pcmPos = opus.op_pcm_tell(music->of);
-    if ((music->loop == 1) && (music->play_count != 0) && (pcmPos >= music->loop_end)) {
+    if ((music->loop == 1) && (music->play_count != 1) && (pcmPos >= music->loop_end)) {
         samples -= (int)((pcmPos - music->loop_end) * music->op_info->channel_count) * (int)sizeof(Sint16);
         result = opus.op_pcm_seek(music->of, music->loop_start);
         if (result < 0) {
