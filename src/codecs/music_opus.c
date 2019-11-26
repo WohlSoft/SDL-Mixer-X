@@ -48,8 +48,7 @@ typedef struct {
 } opus_loader;
 
 static opus_loader opus = {
-    0, NULL,
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL /* Avoid a warning for missing fields */
+    0, NULL
 };
 
 #ifdef OPUS_DYNAMIC

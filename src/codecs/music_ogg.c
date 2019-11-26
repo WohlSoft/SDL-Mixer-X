@@ -70,8 +70,7 @@ typedef struct {
 } vorbis_loader;
 
 static vorbis_loader vorbis = {
-    0, NULL,
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL  /* Avoid a warning for missing fields */
+    0, NULL
 };
 
 #ifdef OGG_DYNAMIC

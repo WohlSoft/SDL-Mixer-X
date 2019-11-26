@@ -62,11 +62,7 @@ typedef struct {
 } fluidsynth_loader;
 
 static fluidsynth_loader fluidsynth = {
-    0, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL
+    0, NULL
 };
 
 #ifdef FLUIDSYNTH_DYNAMIC
@@ -139,7 +135,6 @@ static int SDLCALL fluidsynth_check_soundfont(const char *path, void *data)
     FILE *file = fopen(path, "r");
 
     (void)data;
-
     if (file) {
         fclose(file);
         return 1;
@@ -159,7 +154,6 @@ static int SDLCALL fluidsynth_load_soundfont(const char *path, void *data)
 static int FLUIDSYNTH_Open(const SDL_AudioSpec *spec)
 {
     (void)spec;
-
     if (!Mix_EachSoundFont(fluidsynth_check_soundfont, NULL)) {
         return -1;
     }

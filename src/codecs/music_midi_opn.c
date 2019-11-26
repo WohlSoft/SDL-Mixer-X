@@ -62,12 +62,7 @@ typedef struct {
 } opnmidi_loader;
 
 static opnmidi_loader OPNMIDI = {
-    0, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL
+    0, NULL
 };
 
 #ifdef OPNMIDI_DYNAMIC

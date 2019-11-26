@@ -45,9 +45,7 @@ typedef struct {
 } xmp_loader;
 
 static xmp_loader xmp = {
-    0, NULL,
-    NULL, NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL
+    0, NULL
 };
 
 #ifdef XMP_DYNAMIC

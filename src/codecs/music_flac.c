@@ -69,9 +69,7 @@ typedef struct {
 } flac_loader;
 
 static flac_loader flac = {
-    0, NULL,
-    NULL, NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL, NULL
+    0, NULL
 };
 
 #ifdef FLAC_DYNAMIC
