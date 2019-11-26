@@ -4,6 +4,9 @@ project(SDLMixerMusPlayer)
 include(GNUInstallDirs)
 include(NoPie)
 
+# Version
+include(version.cmake)
+
 # Tell CMake to run moc when necessary:
 set(CMAKE_AUTOMOC ON)
 
