@@ -411,6 +411,8 @@ is_already_initialized(const SDL_AudioSpec spec)
 */
 int SDLCALLCC Mix_InitMixer(const SDL_AudioSpec spec, SDL_bool skip_init_check)
 {
+    int i;
+
     /* Check if we can skip initalization */
     if (!skip_init_check && is_already_initialized(spec)) {
         return(0);
@@ -425,7 +427,6 @@ int SDLCALLCC Mix_InitMixer(const SDL_AudioSpec spec, SDL_bool skip_init_check)
     mix_channel = (struct _Mix_Channel *) SDL_malloc(num_channels * sizeof(struct _Mix_Channel));
 
     /* Clear out the audio channels */
-    int i;
     for (i=0; i<num_channels; ++i) {
         mix_channel[i].chunk = NULL;
         mix_channel[i].playing = 0;
@@ -449,6 +450,7 @@ int SDLCALLCC Mix_InitMixer(const SDL_AudioSpec spec, SDL_bool skip_init_check)
 
     /* Initialize the music players */
     open_music(&mixer);
+
     audio_opened = 1;
     return(0);
 }
