@@ -160,8 +160,8 @@ static void do_panning_update(void)
 {
     static Uint8 leftvol = 128;
     static Uint8 rightvol = 128;
-    static Sint16 leftincr = -1;
-    static Uint8 rightincr = 1;
+    static Sint8 leftincr = -1;
+    static Sint8 rightincr = 1;
     static int panningok = 1;
     static Uint32 next_panning_update = 0;
 
@@ -199,7 +199,7 @@ static void do_panning_update(void)
 static void do_distance_update(void)
 {
     static Uint8 distance = 1;
-    static Uint8 distincr = 1;
+    static Sint8 distincr = 1;
     static int distanceok = 1;
     static Uint32 next_distance_update = 0;
 
