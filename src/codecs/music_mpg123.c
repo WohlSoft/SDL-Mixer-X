@@ -230,8 +230,9 @@ static void *MPG123_CreateFromRW(SDL_RWops *src, int freesrc)
     }
     music->src = src;
     music->volume = MIX_MAX_VOLUME;
+
     meta_tags_init(&music->tags);
-    id3tag_fetchTags(&music->tags, music->src);
+    id3tag_fetchTags(&music->tags, music->src, NULL);
 
     /* Just assume 16-bit 2 channel audio for now */
     music->buffer_size = music_spec.samples * sizeof(Sint16) * 2;

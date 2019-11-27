@@ -861,7 +861,7 @@ static SDL_bool ParseID3(WAV_Music *wave, Uint32 chunk_length)
     }
 
     if (SDL_strncmp((char *)data, "ID3", 3) == 0) {
-        id3tag_fetchTagsFromMemory(&wave->tags, data, chunk_length);
+        id3tag_fetchTagsFromMemory(&wave->tags, data, chunk_length, NULL);
         loaded = SDL_TRUE;
     }
 

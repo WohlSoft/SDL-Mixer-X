@@ -23,7 +23,12 @@
 
 #include "music.h"
 
-extern Sint64 id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src);
-extern Sint64 id3tag_fetchTagsFromMemory(Mix_MusicMetaTags *out_tags, Uint8 *data, size_t length);
+typedef struct {
+    Sint64 begin;
+    Sint64 end;
+} Id3TagLengthStrip;
+
+extern int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthStrip *file_edges);
+extern int id3tag_fetchTagsFromMemory(Mix_MusicMetaTags *out_tags, Uint8 *data, size_t length, Id3TagLengthStrip *file_edges);
 
 /* vi: set ts=4 sw=4 expandtab: */

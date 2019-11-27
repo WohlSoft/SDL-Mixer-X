@@ -236,11 +236,14 @@ static void calculate_total_time(MAD_Music *music)
 }
 
 static int MAD_Seek(void *context, double position);
+#if 0 /* Moved into "music_id3tag.c" */
 static int skip_tags(MAD_Music *music);
+#endif
 
 static void *MAD_CreateFromRW(SDL_RWops *src, int freesrc)
 {
     MAD_Music *music;
+    Id3TagLengthStrip len_strip;
 
     music = (MAD_Music *)SDL_calloc(1, sizeof(MAD_Music));
     if (!music) {
@@ -251,16 +254,15 @@ static void *MAD_CreateFromRW(SDL_RWops *src, int freesrc)
     music->volume = MIX_MAX_VOLUME;
 
     music->length = SDL_RWsize(src);
-
     meta_tags_init(&music->tags);
-    music->start = id3tag_fetchTags(&music->tags, music->src);
-    music->length -= music->start;
-
-    if ((music->start == 0) && skip_tags(music) < 0) {
+    if (id3tag_fetchTags(&music->tags, music->src, &len_strip) < 0) {
         SDL_free(music);
         Mix_SetError("music_mad: corrupt mp3 file.");
         return NULL;
     }
+
+    music->start = len_strip.begin;
+    music->length -= (music->start + len_strip.end);
 
     calculate_total_time(music);
 
@@ -295,7 +297,7 @@ static int MAD_Play(void *context, int play_count)
 
 
 /*************************** TAG HANDLING: ******************************/
-
+#if 0 /* Moved into "music_id3tag.c" */
 static SDL_INLINE SDL_bool is_id3v1(const unsigned char *data, size_t length)
 {
     /* http://id3.org/ID3v1 :  3 bytes "TAG" identifier and 125 bytes tag data */
@@ -471,6 +473,7 @@ static int skip_tags(MAD_Music *music)
     end:
     return (music->length > 0)? 0: -1;
 }
+#endif
 
 /* Reads the next frame from the file.
    Returns true on success or false on failure.
