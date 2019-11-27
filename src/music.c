@@ -714,7 +714,7 @@ static int detect_ea_rsxx(SDL_RWops *in, Sint64 start, Uint8 magic_byte)
 static int detect_mp3(Uint8 *magic, SDL_RWops *src, Sint64 start)
 {
     Uint32 null = 0;
-    Uint8  magic2[8];
+    Uint8  magic2[9];
     unsigned char byte = 0;
     Sint64 endPos = 0;
     Sint64 notNullPos = 0;
