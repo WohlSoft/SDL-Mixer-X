@@ -256,14 +256,11 @@ static void handle_id3v2_string(Mix_MusicMetaTags *out_tags, const Uint8 *key, c
 {
     if (SDL_memcmp(key, "TIT2", 4) == 0) {
         write_id3v2_string(out_tags, MIX_META_TITLE, string, size);
-    }
-    else if (SDL_memcmp(key, "TPE1", 4) == 0) {
+    } else if (SDL_memcmp(key, "TPE1", 4) == 0) {
         write_id3v2_string(out_tags, MIX_META_ARTIST, string, size);
-    }
-    else if (SDL_memcmp(key, "TALB", 4) == 0) {
+    } else if (SDL_memcmp(key, "TALB", 4) == 0) {
         write_id3v2_string(out_tags, MIX_META_ALBUM, string, size);
-    }
-    else if (SDL_memcmp(key, "TCOP", 4) == 0) {
+    } else if (SDL_memcmp(key, "TCOP", 4) == 0) {
         write_id3v2_string(out_tags, MIX_META_COPYRIGHT, string, size);
     }
 /* TODO: Extract "Copyright message" from TXXX value: a KEY=VALUE string divided by a zero byte:*/
@@ -274,35 +271,68 @@ static void handle_id3v2_string(Mix_MusicMetaTags *out_tags, const Uint8 *key, c
 */
 }
 
+/* Identify a meta-key and decode the string (Note: input buffer should have at least 4 characters!) */
+static void handle_id3v2x2_string(Mix_MusicMetaTags *out_tags, const Uint8 *key, const Uint8 *string, long size)
+{
+    if (SDL_memcmp(key, "TT2", 3) == 0) {
+        write_id3v2_string(out_tags, MIX_META_TITLE, string, size);
+    } else if (SDL_memcmp(key, "TP1", 3) == 0) {
+        write_id3v2_string(out_tags, MIX_META_ARTIST, string, size);
+    } else if (SDL_memcmp(key, "TAL", 3) == 0) {
+        write_id3v2_string(out_tags, MIX_META_ALBUM, string, size);
+    } else if (SDL_memcmp(key, "TCR", 3) == 0) {
+        write_id3v2_string(out_tags, MIX_META_COPYRIGHT, string, size);
+    }
+}
+
 /* Parse a frame in ID3v2 format */
 static size_t id3v2_parse_frame(Mix_MusicMetaTags *out_tags, const Uint8 *buffer, size_t read_size, Uint8 version)
 {
     const Uint8 *key = buffer;
-    long size;
+    long size, head_size;
     Uint8 flags[2];
     const Uint8 *frame_data = NULL;
 
-    if (read_size < 10) {
-        SDL_Log("id3v2_parse_frame: Buffer size that left is too small");
-        return 0; /* Buffer size that left is too small */
-    }
+    if (version > 2) {
+        head_size = 10;
+        if (read_size < head_size) {
+            SDL_Log("id3v2_parse_frame: Buffer size that left is too small %zu < 10", read_size);
+            return 0; /* Buffer size that left is too small */
+        }
 
-    if (SDL_memcmp(buffer, "\0\0\0\0", 4) == 0) {
-        return 0;
-    }
+        if (SDL_memcmp(buffer, "\0\0\0\0", 4) == 0) {
+            return 0;
+        }
 
-    if (version == 4) {
-        size = id3v2_synchsafe_decode(buffer + 4);
+        if (version == 4) {
+            size = id3v2_synchsafe_decode(buffer + 4);
+        } else {
+            size = id3v2_byteint_decode(buffer + 4, 4);
+        }
+
+        SDL_memcpy(flags, buffer + 8, 2);
+        frame_data = buffer + head_size;
+
+        handle_id3v2_string(out_tags, key, frame_data, size);
+
     } else {
-        size = id3v2_byteint_decode(buffer + 4, 4);
+        head_size = 6;
+        if (read_size < 6) {
+            SDL_Log("id3v2_parse_frame: Buffer size that left is too small %zu < 6", read_size);
+            return 0; /* Buffer size that left is too small */
+        }
+
+        if (SDL_memcmp(buffer, "\0\0\0", 3) == 0) {
+            return 0;
+        }
+
+        size = id3v2_byteint_decode(buffer + 3, 3);
+        frame_data = buffer + head_size;
+
+        handle_id3v2x2_string(out_tags, key, frame_data, size);
     }
 
-    SDL_memcpy(flags, buffer + 8, 2);
-    frame_data = buffer + 10;
-
-    handle_id3v2_string(out_tags, key, frame_data, size);
-
-    return (size_t)(size + 10); /* data size + size of the header */
+    return (size_t)(size + head_size); /* data size + size of the header */
 }
 
 
@@ -327,14 +357,13 @@ static SDL_bool parse_id3v2(Mix_MusicMetaTags *out_tags, const Uint8 *buffer, si
     flags = buffer[5]; /* Flags */
     tag_len = id3v2_synchsafe_decode(buffer + 6); /* Length of a tag */
 
-    if ((flags & 0x40) == 0x40 ) {
-        tag_extended_len = id3v2_synchsafe_decode(buffer + 10); /* Length of an extended header */
+    if (version_major != 2 && version_major != 3 && version_major != 4) {
+        SDL_Log("parse_id3v2: Unsupported version %d", version_major);
+        return SDL_FALSE; /* Unsupported version of the tag */
     }
 
-    /* TODO: Implement the support for ID3v2.2 */
-    if (version_major != 3 && version_major != 4) {
-        SDL_Log("parse_id3v2: Unsupported version %d >= zu", version_major);
-        return SDL_FALSE; /* Unsupported version of the tag */
+    if ((version_major > 2) && ((flags & 0x40) == 0x40)) {
+        tag_extended_len = id3v2_synchsafe_decode(buffer + 10); /* Length of an extended header */
     }
 
     pos = buffer;
