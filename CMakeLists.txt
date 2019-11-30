@@ -24,8 +24,11 @@ if(NOT CMAKE_BUILD_TYPE)
     message("== Using default build configuration which is a Release!")
 endif()
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(MIX_DEBUG_SUFFIX "d")
+
+string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_LOWER)
+
+if(CMAKE_BUILD_TYPE_LOWER STREQUAL "debug")
+    set(MIX_DEBUG_SUFFIX d)
 else()
     set(MIX_DEBUG_SUFFIX "")
 endif()
@@ -202,7 +205,7 @@ if(WIN32 AND NOT EMSCRIPTEN)
         message("== SDL Mixer X will be built as solid module that is ready for MS-VB6 binding! ==")
         list(APPEND SDLMixerX_SOURCES ${SDLMixerX_SOURCE_DIR}/src/vb6_binding/vb6_sdl_binds.c)
         list(REMOVE_ITEM SDLMixerX_LINK_LIBS SDL2)
-        list(REMOVE_ITEM SDLMixerX_LINK_LIBS SDL2$<$<CONFIG:Debug>:d>)
+        list(REMOVE_ITEM SDLMixerX_LINK_LIBS SDL2d)
         list(APPEND SDLMixerX_LINK_LIBS
                     SDL2-static
                     uuid winmm ole32 imm32 version oleaut32 user32 gdi32 setupapi)
@@ -275,12 +278,14 @@ if(SDL_MIXER_X_STATIC AND NOT BUILD_AS_VB6_BINDING)
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY AND AUDIO_CODECS_INSTALL_PATH)
         add_dependencies(SDL2_mixer_ext_Static AudioCodecs)
     endif()
-    set_target_properties(SDL2_mixer_ext_Static
-        PROPERTIES
-        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/$<$<CONFIG:Debug>:>"
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/$<$<CONFIG:Debug>:>"
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<$<CONFIG:Debug>:>"
-    )
+    if(NOT CMAKE_VERSION VERSION_LESS 3.0.2)
+        set_target_properties(SDL2_mixer_ext_Static
+            PROPERTIES
+            ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/$<$<CONFIG:Debug>:>"
+            LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/$<$<CONFIG:Debug>:>"
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<$<CONFIG:Debug>:>"
+        )
+    endif()
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
         add_custom_command(
             TARGET SDL2_mixer_ext_Static POST_BUILD
@@ -312,12 +317,14 @@ if(SDL_MIXER_X_SHARED AND NOT BUILD_AS_VB6_BINDING)
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY AND AUDIO_CODECS_INSTALL_PATH)
         add_dependencies(SDL2_mixer_ext AudioCodecs)
     endif()
-    set_target_properties(SDL2_mixer_ext
-        PROPERTIES
-        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/$<$<CONFIG:Debug>:>"
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/$<$<CONFIG:Debug>:>"
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<$<CONFIG:Debug>:>"
-    )
+    if(NOT CMAKE_VERSION VERSION_LESS 3.0.2)
+        set_target_properties(SDL2_mixer_ext
+            PROPERTIES
+            ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/$<$<CONFIG:Debug>:>"
+            LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/$<$<CONFIG:Debug>:>"
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<$<CONFIG:Debug>:>"
+        )
+    endif()
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
         add_custom_command(
             TARGET SDL2_mixer_ext POST_BUILD
@@ -349,12 +356,14 @@ if(BUILD_AS_VB6_BINDING)
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY AND AUDIO_CODECS_INSTALL_PATH)
         add_dependencies(SDL2_mixer_ext_VB6 AudioCodecs)
     endif()
-    set_target_properties(SDL2_mixer_ext_VB6
-        PROPERTIES
-        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/sdl-mixer-vb6/$<$<CONFIG:Debug>:>"
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/sdl-mixer-vb6/$<$<CONFIG:Debug>:>"
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/sdl-mixer-vb6/$<$<CONFIG:Debug>:>"
-    )
+    if(NOT CMAKE_VERSION VERSION_LESS 3.0.2)
+        set_target_properties(SDL2_mixer_ext_VB6
+            PROPERTIES
+            ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/sdl-mixer-vb6/$<$<CONFIG:Debug>:>"
+            LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/sdl-mixer-vb6/$<$<CONFIG:Debug>:>"
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/sdl-mixer-vb6/$<$<CONFIG:Debug>:>"
+        )
+    endif()
     add_custom_command(
         TARGET SDL2_mixer_ext_VB6 POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
