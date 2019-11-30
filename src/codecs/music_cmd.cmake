@@ -1,4 +1,4 @@
-if(NOT WIN32 AND NOT EMSCRIPTEN) # CMD Music is not supported on Windows
+if(UNIX) # CMD Music is not supported on Windows
     option(USE_CMD             "Build with CMD music player support" ON)
     if(USE_CMD)
         message("== using CMD Music ==")
