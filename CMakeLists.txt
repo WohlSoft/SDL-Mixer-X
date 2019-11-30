@@ -64,7 +64,7 @@ set(AUDIO_CODECS_INSTALL_PATH "" CACHE PATH "Path to installed AudioCodecs prefi
 
 option(USE_SYSTEM_SDL2   "Use SDL2 from system" OFF)
 
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     # Turn on warnings and legacy C/C++ standards to support more compilers
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -std=c89")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -std=c++98")
