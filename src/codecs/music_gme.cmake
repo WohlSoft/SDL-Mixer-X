@@ -9,6 +9,14 @@ if(USE_GME)
             list(APPEND SDL_MIXER_DEFINITIONS -DGME_DYNAMIC=\"${GME_DYNAMIC_LIBRARY}\")
             message("Dynamic GME: ${GME_DYNAMIC_LIBRARY}")
         endif()
+
+        cpp_needed(${SDLMixerX_SOURCE_DIR}/cmake/tests/cpp_needed/gme.c
+            ""
+            ${GME_INCLUDE_DIRS}
+            "${GME_LIBRARIES};${M_LIBRARY}"
+            STDCPP_NEEDED
+        )
+
     else()
         if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
             set(LIBGME_LIB gme)
@@ -22,6 +30,7 @@ if(USE_GME)
         mark_as_advanced(LIBGME_LIB LIBZLIB_LIB)
         set(GME_LIBRARIES ${LIBGME_LIB} ${LIBZLIB_LIB})
         set(GME_FOUND 1)
+        set(STDCPP_NEEDED 1) # Statically linking GME which is C++ library
         set(GME_INCLUDE_DIRS
             ${AUDIO_CODECS_PATH}/libgme/include
             ${AUDIO_CODECS_PATH}/zlib/include

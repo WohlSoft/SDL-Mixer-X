@@ -9,6 +9,14 @@ if(USE_MIDI_ADLMIDI)
             list(APPEND SDL_MIXER_DEFINITIONS -DADLMIDI_DYNAMIC=\"${ADLMIDI_DYNAMIC_LIBRARY}\")
             message("Dynamic libADLMIDI: ${ADLMIDI_DYNAMIC_LIBRARY}")
         endif()
+
+        cpp_needed(${SDLMixerX_SOURCE_DIR}/cmake/tests/cpp_needed/adlmidi.c
+            ""
+            ${ADLMIDI_INCLUDE_DIRS}
+            "${ADLMIDI_LIBRARIES};${M_LIBRARY}"
+            STDCPP_NEEDED
+        )
+
     else()
         if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
             set(ADLMIDI_LIBRARIES ADLMIDI)
@@ -17,6 +25,7 @@ if(USE_MIDI_ADLMIDI)
         endif()
         if(ADLMIDI_LIBRARIES)
             set(ADLMIDI_FOUND 1)
+            set(STDCPP_NEEDED 1) # Statically linking ADLMIDI which is C++ library
         endif()
         set(ADLMIDI_INCLUDE_DIRS "${AUDIO_CODECS_PATH}/libADLMIDI/include")
     endif()

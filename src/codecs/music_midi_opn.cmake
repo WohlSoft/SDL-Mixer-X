@@ -9,6 +9,14 @@ if(USE_MIDI_OPNMIDI)
             list(APPEND SDL_MIXER_DEFINITIONS -DOPNMIDI_DYNAMIC=\"${OPNMIDI_DYNAMIC_LIBRARY}\")
             message("Dynamic libOPNMIDI: ${OPNMIDI_DYNAMIC_LIBRARY}")
         endif()
+
+        cpp_needed(${SDLMixerX_SOURCE_DIR}/cmake/tests/cpp_needed/opnmidi.c
+            ""
+            ${OPNMIDI_INCLUDE_DIRS}
+            "${OPNMIDI_LIBRARIES};${M_LIBRARY}"
+            STDCPP_NEEDED
+        )
+
     else()
         if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
             set(OPNMIDI_LIBRARIES OPNMIDI)
@@ -17,6 +25,7 @@ if(USE_MIDI_OPNMIDI)
         endif()
         if(OPNMIDI_LIBRARIES)
             set(OPNMIDI_FOUND 1)
+            set(STDCPP_NEEDED 1) # Statically linking OPNMIDI which is C++ library
         endif()
         set(OPNMIDI_INCLUDE_DIRS "${AUDIO_CODECS_PATH}/libOPNMIDI/include")
     endif()

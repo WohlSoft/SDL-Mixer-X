@@ -11,6 +11,8 @@ include(CheckCCompilerFlag)
 
 set(CMAKE_MODULE_PATH "${SDLMixerX_SOURCE_DIR}/cmake;${SDLMixerX_SOURCE_DIR}/cmake/find;${SDLMixerX_SOURCE_DIR}/src/codecs;${CMAKE_MODULE_PATH}")
 
+include(CppNeedCheck)
+
 if(NOT CMAKE_VERSION VERSION_LESS 2.8.12)
     set(CMAKE_MACOSX_RPATH 0)
 endif()
@@ -158,6 +160,18 @@ list(APPEND SDL_MIXER_DEFINITIONS
     -DPIC -D_REENTRANT -D_USE_MATH_DEFINES
 )
 
+if(UNIX AND NOT APPLE AND NOT HAIKU AND NOT EMSCRIPTEN)
+    find_library(M_LIBRARY m)
+else()
+    set(M_LIBRARY "")
+endif()
+
+if ("${CMAKE_SYSTEM_NAME}" MATCHES "(Open|Free|Net)BSD")
+    set(STDCPP_LIBRARY c++abi)
+else()
+    set(STDCPP_LIBRARY stdc++)
+endif()
+
 set(SDLMixerX_SOURCES)
 set(SDLMixerX_LINK_LIBS)
 
@@ -204,10 +218,11 @@ endif()
 
 include(libSDL2)
 
-if(LIBMATH_NEEDED AND NOT MSVC)
-    list(APPEND SDLMixerX_LINK_LIBS m)
+if(LIBMATH_NEEDED AND NOT MSVC AND M_LIBRARY)
+    list(APPEND SDLMixerX_LINK_LIBS ${M_LIBRARY})
 endif()
 
+# It's the solid-built DLL of MixerX which is a mix of statically linked SDL2 and codec libraries
 if(WIN32 AND NOT EMSCRIPTEN)
     option(BUILD_AS_VB6_BINDING "Compile library into solid module compatible with VisualBasic 6" OFF)
     if(BUILD_AS_VB6_BINDING)
@@ -220,6 +235,7 @@ if(WIN32 AND NOT EMSCRIPTEN)
                     uuid winmm ole32 imm32 version oleaut32 user32 gdi32 setupapi)
         if(NOT MSVC)
             list(APPEND SDLMixerX_LINK_LIBS stdc++ gcc pthread)
+            unset(STDCPP_NEEDED) # stdc++ has been handled, no need to link it twice
         endif()
     endif()
 endif()
@@ -247,19 +263,21 @@ if(APPLE)
     list(APPEND SDLMixerX_LINK_LIBS objc)
 endif()
 
-if(NOT MSVC)
-    list(APPEND SDLMixerX_LINK_LIBS stdc++)
+# When statically linking some libraries, it's need to link  also
+if(STDCPP_NEEDED AND NOT MSVC)
+    message("Note: ${STDCPP_LIBRARY} will be linked!")
+    list(APPEND SDLMixerX_LINK_LIBS ${STDCPP_LIBRARY})
 endif()
 
 list(APPEND SDLMixerX_SOURCES
-        ${SDLMixerX_SOURCE_DIR}/src/compat.c
-        ${SDLMixerX_SOURCE_DIR}/src/effect_position.c
-        ${SDLMixerX_SOURCE_DIR}/src/effects_internal.c
-        ${SDLMixerX_SOURCE_DIR}/src/effect_stereoreverse.c
-        ${SDLMixerX_SOURCE_DIR}/src/mixer.c
-        ${SDLMixerX_SOURCE_DIR}/src/music.c
-        ${SDLMixerX_SOURCE_DIR}/src/mixer_x_deprecated.c
-    )
+    ${SDLMixerX_SOURCE_DIR}/src/compat.c
+    ${SDLMixerX_SOURCE_DIR}/src/effect_position.c
+    ${SDLMixerX_SOURCE_DIR}/src/effects_internal.c
+    ${SDLMixerX_SOURCE_DIR}/src/effect_stereoreverse.c
+    ${SDLMixerX_SOURCE_DIR}/src/mixer.c
+    ${SDLMixerX_SOURCE_DIR}/src/music.c
+    ${SDLMixerX_SOURCE_DIR}/src/mixer_x_deprecated.c
+)
 
 file(GLOB SDLMixerX_SOURCES ${SDLMixerX_SOURCES})
 

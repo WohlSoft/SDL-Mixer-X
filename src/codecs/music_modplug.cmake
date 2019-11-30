@@ -14,27 +14,17 @@ if(USE_MODPLUG)
         if(ModPlug_FOUND)
             if(USE_MODPLUG_STATIC)
                 list(APPEND SDL_MIXER_DEFINITIONS -DMODPLUG_STATIC)
-                if(UNIX AND NOT APPLE AND NOT HAIKU AND NOT EMSCRIPTEN)
-                    find_library(M_LIBRARY m)
-                else()
-                    set(M_LIBRARY "")
-                endif()
-
-                if(NOT MSVC)
-                    set(STDCPP_LIBRARY "stdc++") # TODO: Verify on FreeBSD/OpenBSD/NetBSD
-                else()
-                    set(STDCPP_LIBRARY "")
-                endif()
                 set(MODPLUG_STATIC_MACRO "-DMODPLUG_STATIC")
             else()
-                set(STDCPP_LIBRARY "")
-                set(M_LIBRARY "")
                 set(MODPLUG_STATIC_MACRO "")
             endif()
 
-            if(UNIX AND NOT APPLE AND NOT HAIKU AND NOT EMSCRIPTEN)
-                find_library(M_LIBRARY m)
-            endif()
+            cpp_needed(${SDLMixerX_SOURCE_DIR}/cmake/tests/cpp_needed/modplug.c
+                "${MODPLUG_STATIC_MACRO}"
+                ${ModPlug_INCLUDE_DIRS}
+                "${ModPlug_LIBRARIES};${M_LIBRARY}"
+                STDCPP_NEEDED
+            )
 
             try_compile(MODPLUG_HAS_TELL
                 ${CMAKE_BINARY_DIR}/compile_tests
@@ -55,6 +45,7 @@ if(USE_MODPLUG)
                          HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
         endif()
         set(ModPlug_FOUND 1)
+        set(STDCPP_NEEDED 1) # Statically linking ModPlug which is C++ library
         set(MODPLUG_HAS_TELL True)
         set(ModPlug_INCLUDE_DIRS "${AUDIO_CODECS_PATH}/libmodplug/include")
     endif()
