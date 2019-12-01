@@ -1,5 +1,16 @@
 
-find_package(SDL2 REQUIRED)
+if(USE_SYSTEM_AUDIO_LIBRARIES OR USE_SYSTEM_SDL2)
+    find_package(SDL2 REQUIRED)
+else()
+    if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
+        set(SDL2_LIBRARIES SDL2${MIX_DEBUG_SUFFIX})
+    else()
+        set(CMAKE_FIND_LIBRARY_SUFFIXES ${FIND_PREFER_SHARED})
+        find_library(SDL2_LIBRARIES NAMES SDL2
+                     HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
+    endif()
+    set(SDL2_INCLUDE_DIRS ${AUDIO_CODECS_INSTALL_DIR}/include/SDL2)
+endif()
 
 add_library(libSDLMixerX INTERFACE)
 if(SDL_MIXER_X_SHARED)
