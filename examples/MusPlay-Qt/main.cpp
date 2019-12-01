@@ -23,7 +23,7 @@ static void error(QString msg)
     QMessageBox::warning(nullptr, "SDL error", msg, QMessageBox::Ok);
 }
 
-int main(int argc, char *argv[])
+extern "C" int main(int argc, char *argv[])
 {
     QApplication::addLibraryPath(".");
     QApplication::addLibraryPath(QFileInfo(QString::fromUtf8(argv[0])).dir().path());

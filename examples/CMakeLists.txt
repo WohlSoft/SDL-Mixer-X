@@ -1,16 +1,33 @@
 
 if(USE_SYSTEM_AUDIO_LIBRARIES OR USE_SYSTEM_SDL2)
     find_package(SDL2 REQUIRED)
+    if(WIN32)
+        find_library(SDL2main_LIBRARY NAMES SDL2main${MIX_DEBUG_SUFFIX} SDL2main)
+    endif()
 else()
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
-        set(SDL2_LIBRARIES SDL2${MIX_DEBUG_SUFFIX})
+        if(WIN32)
+            set(SDL2_LIBRARIES SDL2${MIX_DEBUG_SUFFIX} SDL2main${MIX_DEBUG_SUFFIX})
+            set(SDL2main_LIBRARY SDL2main${MIX_DEBUG_SUFFIX})
+        else()
+            set(SDL2_LIBRARIES SDL2${MIX_DEBUG_SUFFIX})
+        endif()
     else()
         set(CMAKE_FIND_LIBRARY_SUFFIXES ${FIND_PREFER_SHARED})
-        find_library(SDL2_LIBRARIES NAMES SDL2
+        find_library(SDL2_LIBRARY NAMES SDL2 SDL2d
                      HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
+        mark_as_advanced(SDL2_LIBRARY)
+        set(SDL2_LIBRARIES ${SDL2_LIBRARY})
+        if(WIN32)
+            find_library(SDL2main_LIBRARY NAMES SDL2main SDL2maind
+                        HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
+            mark_as_advanced(SDL2main_LIBRARY)
+        endif()
     endif()
     set(SDL2_INCLUDE_DIRS ${AUDIO_CODECS_INSTALL_DIR}/include/SDL2)
 endif()
+
+message("Examples: SDL2 [${SDL2_LIBRARIES}] SDL2main: [${SDL2main_LIBRARY}]")
 
 add_library(libSDLMixerX INTERFACE)
 if(SDL_MIXER_X_SHARED)
@@ -21,19 +38,31 @@ endif()
 
 include(NoPie)
 
+function(console_app ${_target})
+    if(WIN32)
+        if(MSVC)
+            set_target_properties(${_target} PROPERTIES LINK_FLAGS /SUBSYSTEM:CONSOLE)
+        else()
+            set_target_properties(${_target} PROPERTIES LINK_FLAGS -mconsole)
+        endif()
+    endif()
+endfunction()
 
 
 add_executable(playmus playmus.c)
 pge_set_nopie(playmus)
 target_include_directories(playmus PRIVATE ${SDL2_INCLUDE_DIRS})
-target_link_libraries(playmus PRIVATE libSDLMixerX ${SDL2_LIBRARIES})
-
+target_compile_definitions(playmus PRIVATE -DSDL_MAIN_HANDLED=1) # WORKAROUND to fix "WinMain" is not found. Linking of SDL2main doesn't helps at all...
+target_link_libraries(playmus PRIVATE libSDLMixerX ${SDL2main_LIBRARY} ${SDL2_LIBRARIES})
+console_app(playmus)
 
 
 add_executable(playwave playwave.c)
 pge_set_nopie(playwave)
 target_include_directories(playwave PRIVATE ${SDL2_INCLUDE_DIRS})
-target_link_libraries(playwave PRIVATE libSDLMixerX ${SDL2_LIBRARIES})
+target_compile_definitions(playwave PRIVATE -DSDL_MAIN_HANDLED=1)
+target_link_libraries(playwave PRIVATE libSDLMixerX ${SDL2main_LIBRARY} ${SDL2_LIBRARIES})
+console_app(playwave)
 
 set(PLAYWAVE_TEST_MACROS)
 
@@ -74,4 +103,5 @@ target_compile_definitions(playwave PRIVATE ${PLAYWAVE_TEST_MACROS})
 option(BUILD_EXAMPLES_MUSPLAY_QT "Build MusPlay tool example (Qt5 Required)" OFF)
 if(BUILD_EXAMPLES_MUSPLAY_QT)
     add_subdirectory(MusPlay-Qt)
+    target_compile_definitions(sdlmixer_musplay PRIVATE -DSDL_MAIN_HANDLED=1)
 endif()

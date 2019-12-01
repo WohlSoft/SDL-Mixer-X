@@ -1,8 +1,7 @@
 #ifndef MUS_PLAYER_H
 #define MUS_PLAYER_H
 
-#define SDL_MAIN_HANDLED
-#   include "SDL.h"
+#include "SDL.h"
 #ifdef USE_SDL_MIXER_X
 #   include "SDL_mixer_ext.h"
 #else
