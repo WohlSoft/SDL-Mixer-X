@@ -189,7 +189,7 @@ static char *id3v2_decode_string(const Uint8 *string, size_t size)
     if (string[0] == '\x01') { /* UTF-16 string with a BOM */
         if (size <= 5) {
             if (size < 5) {
-                SDL_Log("id3v2_decode_string: Bad BOM-UTF16 string size: %zu < 5", size);
+                SDL_Log("id3v2_decode_string: Bad BOM-UTF16 string size: %d < 5", (int)size);
             }
             return NULL;
         }
@@ -209,7 +209,7 @@ static char *id3v2_decode_string(const Uint8 *string, size_t size)
     } else if (string[0] == '\x02') { /* UTF-16BEstring without a BOM */
         if (size <= 3) {
             if (size < 3) {
-                SDL_Log("id3v2_decode_string: Bad UTF16BE string size: %zu < 3", size);
+                SDL_Log("id3v2_decode_string: Bad UTF16BE string size: %d < 3", (int)size);
             }
             return NULL; /* Blank string*/
         }
@@ -296,7 +296,7 @@ static size_t id3v2_parse_frame(Mix_MusicMetaTags *out_tags, const Uint8 *buffer
     if (version > 2) {
         head_size = 10;
         if (read_size < head_size) {
-            SDL_Log("id3v2_parse_frame: Buffer size that left is too small %zu < 10", read_size);
+            SDL_Log("id3v2_parse_frame: Buffer size that left is too small %d < 10", (int)read_size);
             return 0; /* Buffer size that left is too small */
         }
 
@@ -318,7 +318,7 @@ static size_t id3v2_parse_frame(Mix_MusicMetaTags *out_tags, const Uint8 *buffer
     } else {
         head_size = 6;
         if (read_size < 6) {
-            SDL_Log("id3v2_parse_frame: Buffer size that left is too small %zu < 6", read_size);
+            SDL_Log("id3v2_parse_frame: Buffer size that left is too small %d < 6", (int)read_size);
             return 0; /* Buffer size that left is too small */
         }
 
@@ -348,7 +348,7 @@ static SDL_bool parse_id3v2(Mix_MusicMetaTags *out_tags, const Uint8 *buffer, si
 
     len = get_id3v2_len(buffer, (long)read_size);
     if (len >= read_size) {
-        SDL_Log("parse_id3v2: Tag is bigger than buffer: %ld >= %zu", len, read_size);
+        SDL_Log("parse_id3v2: Tag is bigger than buffer: %ld >= %d", len, (int)read_size);
         return SDL_FALSE; /* Tag is bigger than buffer that we have */
     }
 
