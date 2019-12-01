@@ -24,22 +24,46 @@ if(USE_OGG_VORBIS)
 
     else()
         if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
-            set(Vorbis_LIBRARIES vorbisfile vorbis)
+            if(USE_OGG_VORBIS_TREMOR)
+                set(Vorbis_LIBRARIES vorbisfile vorbis)
+            else()
+                set(Vorbis_LIBRARIES vorbisidec)
+            endif()
         else()
-            find_library(LIBVORBISFILE_LIB NAMES vorbisfile
-                         HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
-            find_library(LIBVORBIS_LIB NAMES vorbis
-                         HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
-            set(Vorbis_LIBRARIES ${LIBVORBISFILE_LIB} ${LIBVORBIS_LIB})
-            mark_as_advanced(LIBVORBISFILE_LIB LIBVORBIS_LIB)
+            if(USE_OGG_VORBIS_TREMOR)
+                find_library(LIBVORBISFILE_LIB NAMES vorbisfile
+                             HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
+                find_library(LIBVORBIS_LIB NAMES vorbis
+                             HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
+                set(Vorbis_LIBRARIES ${LIBVORBISFILE_LIB} ${LIBVORBIS_LIB})
+                mark_as_advanced(LIBVORBISFILE_LIB LIBVORBIS_LIB)
+            else()
+                find_library(LIBVORBISFILE_LIB NAMES vorbisidec
+                             HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
+                set(Vorbis_LIBRARIES ${LIBVORBISFILE_LIB})
+                mark_as_advanced(LIBVORBISFILE_LIB)
+            endif()
         endif()
-        set(Vorbis_FOUND 1)
+
+        if(USE_OGG_VORBIS_TREMOR)
+            set(Tremor_FOUND 1)
+        else()
+            set(Vorbis_FOUND 1)
+        endif()
+
         set(Vorbis_INCLUDE_DIRS
-            ${AUDIO_CODECS_INSTALL_DIR}/include/vorbis
             ${AUDIO_CODECS_INSTALL_DIR}/include/ogg
             ${AUDIO_CODECS_PATH}/libogg/include
-            ${AUDIO_CODECS_PATH}/libvorbis/include
         )
+
+        if(USE_OGG_VORBIS_TREMOR)
+            list(APPEND Vorbis_INCLUDE_DIRS ${AUDIO_CODECS_INSTALL_DIR}/include/tremor)
+        else()
+            list(APPEND Vorbis_INCLUDE_DIRS
+                ${AUDIO_CODECS_INSTALL_DIR}/include/vorbis
+                ${AUDIO_CODECS_PATH}/libvorbis/include
+            )
+        endif()
     endif()
 
     if(USE_OGG_VORBIS_TREMOR AND Tremor_FOUND)
