@@ -12,15 +12,8 @@ if(USE_MODPLUG)
         endif()
 
         if(ModPlug_FOUND)
-            if(USE_MODPLUG_STATIC)
-                list(APPEND SDL_MIXER_DEFINITIONS)
-#                set(MODPLUG_STATIC_MACRO "-DMODPLUG_STATIC")
-            else()
-                set(MODPLUG_STATIC_MACRO "")
-            endif()
-
             cpp_needed(${SDLMixerX_SOURCE_DIR}/cmake/tests/cpp_needed/modplug.c
-                "${MODPLUG_STATIC_MACRO}"
+                "-DMODPLUG_STATIC"
                 ${ModPlug_INCLUDE_DIRS}
                 "${ModPlug_LIBRARIES};${M_LIBRARY}"
                 STDCPP_NEEDED
@@ -29,7 +22,7 @@ if(USE_MODPLUG)
             try_compile(MODPLUG_HAS_TELL
                 ${CMAKE_BINARY_DIR}/compile_tests
                 ${SDLMixerX_SOURCE_DIR}/cmake/tests/modplug_tell.c
-                COMPILE_DEFINITIONS ${MODPLUG_STATIC_MACRO}
+                COMPILE_DEFINITIONS "-DMODPLUG_STATIC"
                 LINK_LIBRARIES ${ModPlug_LIBRARIES} ${STDCPP_LIBRARY} ${M_LIBRARY}
                 CMAKE_FLAGS "-DINCLUDE_DIRECTORIES=${ModPlug_INCLUDE_DIRS}"
                 OUTPUT_VARIABLE MODPLUG_TEST_RESULT
@@ -52,7 +45,7 @@ if(USE_MODPLUG)
 
     if(ModPlug_FOUND)
         message("== using libModPlug ==")
-        list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_MOD_MODPLUG)
+        list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_MOD_MODPLUG -DMODPLUG_STATIC)
         if(USE_MODPLUG_STATIC)
             list(APPEND SDL_MIXER_DEFINITIONS)
         endif()
