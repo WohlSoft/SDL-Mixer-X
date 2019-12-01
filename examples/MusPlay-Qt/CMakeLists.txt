@@ -113,11 +113,11 @@ pge_set_nopie(sdlmixer_musplay)
 
 set(PGE_MUSPLAY_LINK_LIBS)
 list(APPEND PGE_MUSPLAY_LINK_LIBS
-    ${SDL_MIXER_X_LIB} ${SDL2_LIBRARIES}
+    ${SDL_MIXER_X_LIB}
 )
 
 if(WIN32)
-    target_link_libraries(sdlmixer_musplay ${SDL2main_LIBRARY} version ${PGE_MUSPLAY_LINK_LIBS} comctl32)
+    target_link_libraries(sdlmixer_musplay version ${PGE_MUSPLAY_LINK_LIBS} comctl32)
 elseif(APPLE)
     target_link_libraries(sdlmixer_musplay ${PGE_MUSPLAY_LINK_LIBS} iconv
         ${COREAUDIO_LIBRARY} ${COREVIDEO_LIBRARY} ${COCOA_LIBRARY} ${CARBON_LIBRARY}

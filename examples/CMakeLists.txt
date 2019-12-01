@@ -31,9 +31,9 @@ message("Examples: SDL2 [${SDL2_LIBRARIES}] SDL2main: [${SDL2main_LIBRARY}]")
 
 add_library(libSDLMixerX INTERFACE)
 if(SDL_MIXER_X_SHARED)
-    target_link_libraries(libSDLMixerX INTERFACE SDL2_mixer_ext)
+    target_link_libraries(libSDLMixerX INTERFACE SDL2_mixer_ext ${SDL2_LIBRARIES})
 elseif(SDL_MIXER_X_STATIC)
-    target_link_libraries(libSDLMixerX INTERFACE SDL2_mixer_ext_Static)
+    target_link_libraries(libSDLMixerX INTERFACE SDL2_mixer_ext_Static ${SDL2_LIBRARIES})
 endif()
 
 include(NoPie)
@@ -53,7 +53,7 @@ add_executable(playmus playmus.c)
 pge_set_nopie(playmus)
 target_include_directories(playmus PRIVATE ${SDL2_INCLUDE_DIRS})
 target_compile_definitions(playmus PRIVATE -DSDL_MAIN_HANDLED=1) # WORKAROUND to fix "WinMain" is not found. Linking of SDL2main doesn't helps at all...
-target_link_libraries(playmus PRIVATE libSDLMixerX ${SDL2main_LIBRARY} ${SDL2_LIBRARIES})
+target_link_libraries(playmus PRIVATE libSDLMixerX)
 console_app(playmus)
 
 
@@ -61,7 +61,7 @@ add_executable(playwave playwave.c)
 pge_set_nopie(playwave)
 target_include_directories(playwave PRIVATE ${SDL2_INCLUDE_DIRS})
 target_compile_definitions(playwave PRIVATE -DSDL_MAIN_HANDLED=1)
-target_link_libraries(playwave PRIVATE libSDLMixerX ${SDL2main_LIBRARY} ${SDL2_LIBRARIES})
+target_link_libraries(playwave PRIVATE libSDLMixerX)
 console_app(playwave)
 
 set(PLAYWAVE_TEST_MACROS)
