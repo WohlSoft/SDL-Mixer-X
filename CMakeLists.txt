@@ -162,14 +162,31 @@ list(APPEND SDL_MIXER_DEFINITIONS
 
 if(UNIX AND NOT APPLE AND NOT HAIKU AND NOT EMSCRIPTEN)
     find_library(M_LIBRARY m)
+    if(M_LIBRARY) # No need to link it by an absolute path
+        set(M_LIBRARY m)
+    endif()
+    mark_as_advanced(M_LIBRARY)
 else()
     set(M_LIBRARY "")
 endif()
 
-if ("${CMAKE_SYSTEM_NAME}" MATCHES "(Open|Free|Net)BSD")
-    set(STDCPP_LIBRARY c++abi)
-else()
-    set(STDCPP_LIBRARY stdc++)
+if(NOT MSVC)
+    try_compile(STDCPP_FOUND
+        ${CMAKE_BINARY_DIR}/compile_tests
+        ${SDLMixerX_SOURCE_DIR}/cmake/tests/dummy.c
+        LINK_LIBRARIES stdc++
+    )
+    try_compile(CPPABI_FOUND
+        ${CMAKE_BINARY_DIR}/compile_tests
+        ${SDLMixerX_SOURCE_DIR}/cmake/tests/dummy.c
+        LINK_LIBRARIES c++abi
+    )
+    message("C++ Library: stdc++ [${STDCPP_FOUND}], c++abi [${CPPABI_FOUND}]")
+    if(STDCPP_FOUND)
+        set(STDCPP_LIBRARY stdc++)
+    elseif(CPPABI_FOUND)
+        set(STDCPP_LIBRARY c++abi)
+    endif()
 endif()
 
 set(SDLMixerX_SOURCES)
