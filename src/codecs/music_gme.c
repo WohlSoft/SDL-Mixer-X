@@ -24,6 +24,7 @@
 #include "SDL_loadso.h"
 
 #include "music_gme.h"
+#include "utils.h"
 
 #include <gme.h>
 
@@ -152,20 +153,6 @@ int GME_getvolume(void *music_p)
     GME_Music *music = (GME_Music*)music_p;
     double v = SDL_floor(((double)(music->volume) / music->gain) + 0.5);
     return (int)v;
-}
-
-static double str_to_float(const char *str)
-{
-    char str_buff[25];
-    char float_buff[4];
-    char *p;
-    /* UGLY WORKAROUND: Replace dot with local character (for example, comma) */
-    SDL_strlcpy(str_buff, str, 25);
-    SDL_snprintf(float_buff, 4, "%.1f", 0.0);
-    for (p = str_buff; (p = SDL_strchr(p, '.')); ++p) {
-        *p = float_buff[1];
-    }
-    return SDL_strtod(str_buff, NULL);
 }
 
 static void process_args(const char *args, Gme_Setup *setup)
