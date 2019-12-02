@@ -24,7 +24,7 @@ if(USE_GME)
         else()
             find_library(LIBGME_LIB NAMES gme
                          HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
-            find_library(LIBZLIB_LIB NAMES zlib z
+            find_library(LIBZLIB_LIB NAMES zlib
                          HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
         endif()
         mark_as_advanced(LIBGME_LIB LIBZLIB_LIB)
