@@ -26,6 +26,7 @@
 #ifdef MUSIC_MID_OPNMIDI
 
 #include "SDL_loadso.h"
+#include "utils.h"
 
 #include <opnmidi.h>
 #include "OPNMIDI/gm_opn_bank.h"
@@ -315,20 +316,6 @@ static int OPNMIDI_getvolume(void *music_p)
     return (int)v;
 }
 
-static double str_to_float(const char *str)
-{
-    char str_buff[25];
-    char float_buff[4];
-    char *p;
-    /* UGLY WORKAROUND: Replace dot with local character (for example, comma) */
-    SDL_strlcpy(str_buff, str, 25);
-    SDL_snprintf(float_buff, 4, "%.1f", 0.0);
-    for (p = str_buff; (p = SDL_strchr(p, '.')); ++p) {
-        *p = float_buff[1];
-    }
-    return SDL_strtod(str_buff, NULL);
-}
-
 static void process_args(const char *args, OpnMidi_Setup *setup)
 {
 #define ARG_BUFFER_SIZE    1024
@@ -561,8 +548,8 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
 
     music->volume                 = MIX_MAX_VOLUME;
     meta_tags_init(&music->tags);
-    meta_tags_set(&music->tags, MIX_META_TITLE, OPNMIDI.opn2_metaMusicTitle(music->opnmidi));
-    meta_tags_set(&music->tags, MIX_META_COPYRIGHT, OPNMIDI.opn2_metaMusicCopyright(music->opnmidi));
+    meta_tags_set_from_midi(&music->tags, MIX_META_TITLE, OPNMIDI.opn2_metaMusicTitle(music->opnmidi));
+    meta_tags_set_from_midi(&music->tags, MIX_META_COPYRIGHT, OPNMIDI.opn2_metaMusicCopyright(music->opnmidi));
     return music;
 }
 

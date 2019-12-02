@@ -295,6 +295,7 @@ list(APPEND SDLMixerX_SOURCES
     ${SDLMixerX_SOURCE_DIR}/src/mixer.c
     ${SDLMixerX_SOURCE_DIR}/src/music.c
     ${SDLMixerX_SOURCE_DIR}/src/mixer_x_deprecated.c
+    ${SDLMixerX_SOURCE_DIR}/src/utils.c
 )
 
 file(GLOB SDLMixerX_SOURCES ${SDLMixerX_SOURCES})
