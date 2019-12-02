@@ -28,6 +28,7 @@
 #include "SDL_loadso.h"
 
 #include "music_flac.h"
+#include "utils.h"
 
 #include <FLAC/stream_decoder.h>
 
@@ -365,6 +366,7 @@ static FLAC__StreamDecoderWriteStatus flac_write_music_cb(
     return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }
 
+#if 0 /* Moved into "utils.c" */
 /* Parse time string of the form HH:MM:SS.mmm and return equivalent sample
  * position */
 static FLAC__uint64 parse_time(char *time, unsigned samplerate_hz)
@@ -404,6 +406,7 @@ static SDL_bool is_loop_tag(const char *tag)
     SDL_strlcpy(buf, tag, 5);
     return SDL_strcasecmp(buf, "LOOP") == 0;
 }
+#endif /* Moved into "utils.c" */
 
 static void flac_metadata_music_cb(
                     const FLAC__StreamDecoder *decoder,

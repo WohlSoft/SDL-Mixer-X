@@ -32,4 +32,11 @@ extern void meta_tags_set_from_midi(Mix_MusicMetaTags *tags,
                                     Mix_MusicMetaTag tag,
                                     const char *src);
 
+/* Is given tag a loop tag? */
+extern SDL_bool is_loop_tag(const char *tag);
+
+/* Parse time string of the form HH:MM:SS.mmm and return equivalent sample
+ * position */
+extern Uint64 parse_time(char *time, long samplerate_hz);
+
 #endif /* UTILS_H_ */

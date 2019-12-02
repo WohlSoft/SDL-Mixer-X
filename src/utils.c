@@ -69,3 +69,44 @@ void meta_tags_set_from_midi(Mix_MusicMetaTags *tags, Mix_MusicMetaTag tag, cons
         SDL_free(dst);
     }
 }
+
+/* Is given tag a loop tag? */
+SDL_bool is_loop_tag(const char *tag)
+{
+    char buf[5];
+    SDL_strlcpy(buf, tag, 5);
+    return SDL_strcasecmp(buf, "LOOP") == 0;
+}
+
+/* Parse time string of the form HH:MM:SS.mmm and return equivalent sample
+ * position */
+Uint64 parse_time(char *time, long samplerate_hz)
+{
+    char *num_start, *p;
+    Uint64 result = 0;
+    char c;
+
+    /* Time is directly expressed as a sample position */
+    if (SDL_strchr(time, ':') == NULL) {
+        return (Uint64)SDL_strtoull(time, NULL, 10);
+    }
+
+    result = 0;
+    num_start = time;
+
+    for (p = time; *p != '\0'; ++p) {
+        if (*p == '.' || *p == ':') {
+            c = *p; *p = '\0';
+            result = result * 60 + (Uint64)SDL_atoi(num_start);
+            num_start = p + 1;
+            *p = c;
+        }
+
+        if (*p == '.') {
+            return result * (Uint64)samplerate_hz
+                + (Uint64) (SDL_atof(p) * samplerate_hz);
+        }
+    }
+
+    return (result * 60 + (Uint64)SDL_atoi(num_start)) * (Uint64)samplerate_hz;
+}

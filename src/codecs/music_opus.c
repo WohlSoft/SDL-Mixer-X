@@ -26,6 +26,7 @@
 #include "SDL_loadso.h"
 
 #include "music_opus.h"
+#include "utils.h"
 
 #if defined(OPUS_HEADER)
 #include OPUS_HEADER
@@ -207,6 +208,7 @@ static int OPUS_UpdateSection(OPUS_music *music)
     return 0;
 }
 
+#if 0 /* Moved into "utils.c" */
 /* Parse time string of the form HH:MM:SS.mmm and return equivalent sample
  * position */
 static ogg_int64_t parse_time(char *time)
@@ -247,6 +249,7 @@ static SDL_bool is_loop_tag(const char *tag)
     SDL_strlcpy(buf, tag, 5);
     return SDL_strcasecmp(buf, "LOOP") == 0;
 }
+#endif /* Moved into "utils.c" */
 
 /* Load an Opus stream from an SDL_RWops object */
 static void *OPUS_CreateFromRW(SDL_RWops *src, int freesrc)
@@ -313,12 +316,12 @@ static void *OPUS_CreateFromRW(SDL_RWops *src, int freesrc)
         }
 
         if (SDL_strcasecmp(argument, "LOOPSTART") == 0)
-            music->loop_start = parse_time(value);
+            music->loop_start = (ogg_int64_t)parse_time(value, 48000);
         else if (SDL_strcasecmp(argument, "LOOPLENGTH") == 0) {
             music->loop_len = (ogg_int64_t)SDL_strtoull(value, NULL, 10);
             is_loop_length = SDL_TRUE;
         } else if (SDL_strcasecmp(argument, "LOOPEND") == 0) {
-            music->loop_end = parse_time(value);
+            music->loop_end = (ogg_int64_t)parse_time(value, 48000);
             is_loop_length = SDL_FALSE;
         } else if (SDL_strcasecmp(argument, "TITLE") == 0) {
             meta_tags_set(&music->tags, MIX_META_TITLE, value);
