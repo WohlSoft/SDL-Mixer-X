@@ -411,7 +411,7 @@ static SDL_bool parse_id3v2(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Sint64 
         total_length += 10; /* footer size */
     }
 
-    if ((SDL_RWtell(src) + tag_len) >= file_size) {
+    if ((SDL_RWtell(src) + tag_len) > file_size) {
         SDL_Log("parse_id3v2: Tag size bigger than actual file size");
         SDL_RWseek(src, begin_pos, RW_SEEK_SET);
         return SDL_FALSE; /* Tag size is bigger than actual buffer data */
@@ -469,7 +469,7 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
     /* ID3v2 tag is at the start */
     if (is_id3v2(in_buffer, readsize)) {
         len = get_id3v2_len(in_buffer, (long)readsize);
-        if (len >= file_size) {
+        if (len > file_size) {
             return -1;
         }
         tag_handled = parse_id3v2(out_tags, src, begin_pos);
