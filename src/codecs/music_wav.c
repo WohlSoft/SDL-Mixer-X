@@ -434,7 +434,7 @@ static Sint16 uLAW_To_PCM16(Uint8 u_val)
 static Sint16 ALAW_To_PCM16(Uint8 a_val)
 {
 #ifdef SDL_WAVE_LAW_LUT
-    return alaw_lut[u_val];
+    return alaw_lut[a_val];
 #else
     Uint8 nibble = a_val;
     Uint8 exponent = (nibble & 0x7f) ^ 0x55;
