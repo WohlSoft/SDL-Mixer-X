@@ -1,6 +1,12 @@
 cmake_minimum_required (VERSION 2.8.11)
 project(SDLMixerX C)
 
+set(SDLMixerX_VERSION_MAJOR 2)
+set(SDLMixerX_VERSION_MINOR 5)
+set(SDLMixerX_VERSION_PATCH 0)
+set(SDLMixerX_VERSION_TWEAK 0)
+set(SDLMixerX_VERSION      "${SDLMixerX_VERSION_MAJOR}.${SDLMixerX_VERSION_MINOR}.${SDLMixerX_VERSION_PATCH}.${SDLMixerX_VERSION_TWEAK}")
+
 include(GNUInstallDirs)
 include(FindPkgConfig)
 include(CheckIncludeFiles)
@@ -348,6 +354,10 @@ endif()
 
 if(SDL_MIXER_X_SHARED AND NOT BUILD_AS_VB6_BINDING)
     add_library(SDL2_mixer_ext SHARED ${SDLMixerX_SOURCES})
+    set_target_properties(SDL2_mixer_ext PROPERTIES
+        VERSION ${SDLMixerX_VERSION}
+        SOVERSION ${SDLMixerX_VERSION_MAJOR}
+    )
     target_link_libraries(SDL2_mixer_ext PRIVATE ${SDLMixerX_LINK_LIBS})
     target_compile_definitions(SDL2_mixer_ext PRIVATE ${SDL_MIXER_DEFINITIONS})
     target_include_directories(SDL2_mixer_ext PRIVATE
