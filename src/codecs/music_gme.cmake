@@ -32,6 +32,8 @@ if(USE_GME)
         set(GME_FOUND 1)
         set(STDCPP_NEEDED 1) # Statically linking GME which is C++ library
         set(GME_INCLUDE_DIRS
+            ${AUDIO_CODECS_INSTALL_PATH}/include/gme
+            ${AUDIO_CODECS_INSTALL_PATH}/include
             ${AUDIO_CODECS_PATH}/libgme/include
             ${AUDIO_CODECS_PATH}/zlib/include
         )
