@@ -25,6 +25,7 @@
 
 #define TAGS_INPUT_BUFFER_SIZE (5 * 8192)
 #define ID3v2_BUFFER_SIZE       1024
+#define APE_BUFFER_SIZE         256
 
 static SDL_INLINE SDL_bool is_id3v1(const Uint8 *data, size_t length)
 {
@@ -429,13 +430,144 @@ static SDL_bool parse_id3v2(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Sint64 
     return SDL_TRUE;
 }
 
-/* Parse content of APE tag  */
-static void parse_ape(Mix_MusicMetaTags *out_tags, const Uint8 *buffer, size_t read_size)
+
+static SDL_INLINE long ape_byteint_decode(const Uint8 *data, size_t size)
 {
-    (void)out_tags;
-    (void)buffer;
-    (void)read_size;
-    /* TODO: Implement the APE tags support*/
+    Uint32 result = 0;
+    Sint32 i;
+
+    for (i = size - 1; i >= 0; i--) {
+        result <<= 8;
+        result = result | (Uint8)data[i];
+    }
+
+    return (long)result;
+}
+
+static char *ape_find_value(char *key)
+{
+    char *end = (key + APE_BUFFER_SIZE - 4);
+
+    while (*key && key != end) {
+        key++;
+    }
+
+    if (key >= end) {
+        return NULL;
+    }
+
+    return key + 1;
+}
+
+static Uint32 ape_handle_tag(Mix_MusicMetaTags *out_tags, Uint8 *data, size_t valsize)
+{
+    char *key = (char*)(data + 4);
+    char *value = NULL;
+    Uint32 key_len; /* Length of the key field */
+
+    value = ape_find_value(key);
+
+    if (!value) {
+        return 0;
+    }
+
+    key_len = (Uint32)(value - key);
+
+    if (valsize > APE_BUFFER_SIZE - key_len) {
+        data[APE_BUFFER_SIZE] = '\0';
+    } else {
+        value[valsize] = '\0';
+    }
+
+    if (SDL_strncasecmp(key, "Title", 5) == 0) {
+        meta_tags_set(out_tags, MIX_META_TITLE, (const char*)(value));
+    } else if (SDL_memcmp(key, "Album", 5) == 0) {
+        meta_tags_set(out_tags, MIX_META_ARTIST, (const char*)(value));
+    } else if (SDL_memcmp(key, "Artist", 6) == 0) {
+        meta_tags_set(out_tags, MIX_META_ALBUM, (const char*)(value));
+    } else if (SDL_memcmp(key, "Copyright", 9) == 0) {
+        meta_tags_set(out_tags, MIX_META_COPYRIGHT, (const char*)(value));
+    }
+
+    return 4 + valsize + key_len;
+}
+
+/* Parse content of APE tag  */
+static SDL_bool parse_ape(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Sint64 begin_pos, Uint32 version)
+{
+    Uint8 buffer[APE_BUFFER_SIZE + 1];
+    Uint32 v, i, tag_size, tag_items_count, tag_item_size;
+    Sint64 file_size, cur_tag;
+    size_t read_size;
+
+    file_size = SDL_RWsize(src);
+    SDL_RWseek(src, begin_pos, RW_SEEK_SET);
+    read_size = SDL_RWread(src, buffer, 1, 32); /* Retrieve the header */
+
+    if (read_size < 32) {
+        SDL_RWseek(src, begin_pos, RW_SEEK_SET);
+        return SDL_FALSE;
+    }
+
+    v = (Uint32)ape_byteint_decode(buffer + 8, 4); /* version */
+    if (v != 2000U && v != 1000U) {
+        return SDL_FALSE;
+    }
+
+    tag_size = (Uint32)ape_byteint_decode(buffer + 12, 4); /* tag size */
+
+    if (version == 1) { /* If version 1, we are at footer */
+        if (begin_pos - (tag_size - 32) < 0) {
+            SDL_RWseek(src, begin_pos, RW_SEEK_SET);
+            return SDL_FALSE;
+        }
+        SDL_RWseek(src, begin_pos - (tag_size - 32), RW_SEEK_SET);
+    } else if ((begin_pos + tag_size + 32) > file_size) {
+        SDL_RWseek(src, begin_pos, RW_SEEK_SET);
+        return SDL_FALSE;
+    }
+
+    tag_items_count = (Uint32)ape_byteint_decode(buffer + 16, 4); /* count tag items */
+
+    /*flags = (Uint32)ape_byteint_decode(buffer + 20, 4);*/ /* global flags, unused */
+
+    v = 0; /* reserved bits : */
+    if (SDL_memcmp(&buffer[24], &v, 4) != 0 || SDL_memcmp(&buffer[28], &v, 4) != 0) {
+        return SDL_FALSE;
+    }
+
+    for(i = 0; i < tag_items_count; i++) {
+        cur_tag = SDL_RWtell(src);
+        if (cur_tag < 0) {
+            break;
+        }
+        read_size = SDL_RWread(src, buffer, 1, 4); /* Retrieve the size */
+        if (read_size < 4) {
+            SDL_RWseek(src, begin_pos, RW_SEEK_SET);
+            return SDL_FALSE;
+        }
+
+        v = (Uint32)ape_byteint_decode(buffer, 4); /* size of the tag's value field */
+        /* (we still need to find key size by a null termination) */
+
+        /* Retrieve the tag's data with an aproximal size as we can */
+        if (v + 40 < APE_BUFFER_SIZE) {
+            read_size = SDL_RWread(src, buffer, 1, v + 40);
+        } else {
+            read_size = SDL_RWread(src, buffer, 1, APE_BUFFER_SIZE);
+        }
+        buffer[read_size] = '\0';
+
+        tag_item_size = ape_handle_tag(out_tags, buffer, v);
+        if (tag_item_size == 0) {
+            break;
+        }
+        SDL_RWseek(src, cur_tag + tag_item_size + 4, RW_SEEK_SET);
+    }
+
+    SDL_RWseek(src, begin_pos, RW_SEEK_SET);
+
+    return SDL_TRUE;
 }
 
 int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthStrip *file_edges)
@@ -443,7 +575,7 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
     Uint8 in_buffer[TAGS_INPUT_BUFFER_SIZE];
     long len;
     size_t readsize;
-    Sint64 file_size, begin_pos, begin_offset = 0, tail_size = 0;
+    Sint64 file_size, begin_pos, begin_offset = 0, tail_size = 0, ape_tag_pos;
     SDL_bool tag_handled = SDL_FALSE;
 
     if (file_edges) {
@@ -487,7 +619,7 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
         if (len >= file_size) {
             return -1;
         }
-        parse_ape(out_tags, in_buffer, readsize);
+        parse_ape(out_tags, src, begin_pos, 2);
         tag_handled = SDL_TRUE;
         begin_offset += len;
         file_size -= (size_t)len;
@@ -535,6 +667,7 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
             }
             if (v == 2000U) { /* verify header : */
                 SDL_RWseek(src, -(tail_size + len), RW_SEEK_END);
+                ape_tag_pos = SDL_RWtell(src);
                 readsize = SDL_RWread(src, in_buffer, 1, 32);
                 SDL_RWseek(src, begin_pos, RW_SEEK_SET);
                 if (readsize != 32) {
@@ -544,8 +677,14 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
                     return -1;
                 }
                 if (!tag_handled) {
-                    parse_ape(out_tags, in_buffer, (size_t)len);
+                    parse_ape(out_tags, src, ape_tag_pos, 2);
+                    SDL_RWseek(src, begin_pos, RW_SEEK_SET);
                 }
+            } else {
+                SDL_RWseek(src, -(tail_size + 32), RW_SEEK_END);
+                ape_tag_pos = SDL_RWtell(src);
+                parse_ape(out_tags, src, ape_tag_pos, 1);
+                SDL_RWseek(src, begin_pos, RW_SEEK_SET);
             }
             file_size -= (size_t)len;
             tail_size += len;
@@ -597,6 +736,7 @@ ape: /* APE tag may be at the end: read the footer */
             }
             if (v == 2000U) { /* verify header : */
                 SDL_RWseek(src, -(tail_size + len), RW_SEEK_END);
+                ape_tag_pos = SDL_RWtell(src);
                 readsize = SDL_RWread(src, in_buffer, 1, 32);
                 SDL_RWseek(src, begin_pos, RW_SEEK_SET);
                 if (readsize != 32) {
@@ -606,8 +746,14 @@ ape: /* APE tag may be at the end: read the footer */
                     return -1;
                 }
                 if (!tag_handled) {
-                    parse_ape(out_tags, in_buffer, (size_t)len);
+                    parse_ape(out_tags, src, ape_tag_pos, 2);
+                    SDL_RWseek(src, begin_pos, RW_SEEK_SET);
                 }
+            } else if (!tag_handled) {
+                SDL_RWseek(src, -(tail_size + 32), RW_SEEK_END);
+                ape_tag_pos = SDL_RWtell(src);
+                parse_ape(out_tags, src, ape_tag_pos, 1);
+                SDL_RWseek(src, begin_pos, RW_SEEK_SET);
             }
             file_size -= (size_t)len;
             tail_size += len;
