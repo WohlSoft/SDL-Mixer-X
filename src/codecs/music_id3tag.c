@@ -478,9 +478,7 @@ static long lyrics3_skip(Sint64 tag_end_at, Sint64 begin_pos, SDL_RWops *src)
         return 0; /* Invalid tag */
     }
 
-    SDL_RWseek(src, -tag_end_at, RW_SEEK_END);
-
-    SDL_RWseek(src, -LYRICS3v1_TAIL_SIZE, RW_SEEK_CUR);
+    SDL_RWseek(src, -(tag_end_at + LYRICS3v1_TAIL_SIZE), RW_SEEK_END);
     read_size = SDL_RWread(src, buffer, 1, LYRICS3v1_TAIL_SIZE);
 
     /* Find and validate borders of the lyrics tag */
@@ -916,6 +914,7 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
         SDL_RWseek(src, -(tail_size + LYRICS3v1_TAIL_SIZE), RW_SEEK_END);
         readsize = SDL_RWread(src, in_buffer, 1, LYRICS3v1_TAIL_SIZE);
         SDL_RWseek(src, begin_pos, RW_SEEK_SET);
+
         if (is_lyrics3(in_buffer, readsize)) {
             len = lyrics3_skip(tail_size, begin_pos, src);
             if (len > 0) {
