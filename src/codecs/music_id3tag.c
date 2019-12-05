@@ -445,6 +445,120 @@ static SDL_bool parse_id3v2(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Sint64 
 
 
 /********************************************************
+ *                   Lyrics3 skip                       *
+ ********************************************************/
+
+/* The maximum length of the lyrics is 5100 bytes. (Regard to a specification) */
+#define LYRICS3v1_SEARCH_BUFFER     5120
+
+#define LYRICS3v1_HEAD_SIZE         11
+#define LYRICS3v1_TAIL_SIZE         9
+#define LYRICS3v2_TAG_SIZE_VALUE    6
+
+
+static SDL_INLINE SDL_bool is_lyrics3(const Uint8 *data, size_t length)
+{
+    if (length < LYRICS3v1_TAIL_SIZE || (SDL_memcmp(data,"LYRICSEND", 9) != 0 && SDL_memcmp(data,"LYRICS200", 9) != 0)) {
+        return SDL_FALSE;
+    }
+    return SDL_TRUE;
+}
+
+static long lyrics3_skip(Sint64 tag_end_at, Sint64 begin_pos, SDL_RWops *src)
+{
+    Sint64 file_size, pos_begin, pos_end;
+    size_t read_size;
+    char buffer[LYRICS3v1_SEARCH_BUFFER + 1];
+    char *cur, *end = (buffer + LYRICS3v1_SEARCH_BUFFER);
+    long len = 0;
+
+    file_size = SDL_RWsize(src);
+    if (file_size < 0) {
+        SDL_RWseek(src, begin_pos, RW_SEEK_SET);
+        return 0; /* Invalid tag */
+    }
+
+    SDL_RWseek(src, -tag_end_at, RW_SEEK_END);
+
+    SDL_RWseek(src, -LYRICS3v1_TAIL_SIZE, RW_SEEK_CUR);
+    read_size = SDL_RWread(src, buffer, 1, LYRICS3v1_TAIL_SIZE);
+
+    /* Find and validate borders of the lyrics tag */
+    if (SDL_memcmp(buffer, "LYRICSEND", LYRICS3v1_TAIL_SIZE) == 0) { /* Lyrics3 v1 */
+        /* Lyrics3 v1.00 tag
+         * http://id3.org/Lyrics3 */
+        pos_end = SDL_RWtell(src);
+        if (pos_end > LYRICS3v1_SEARCH_BUFFER) {
+            SDL_RWseek(src, -LYRICS3v1_SEARCH_BUFFER, RW_SEEK_CUR);
+        } else {
+            SDL_RWseek(src, 0, RW_SEEK_SET);
+        }
+        pos_begin = SDL_RWtell(src);
+
+        read_size = SDL_RWread(src, buffer, 1, (size_t)(pos_end - pos_begin));
+        end = (buffer + read_size);
+
+        /* Find the lyrics begin tag... */
+        for (cur = buffer; cur != end; cur++) {
+            if (SDL_memcmp(cur, "LYRICSBEGIN", LYRICS3v1_HEAD_SIZE) == 0) {
+                /* Calculate a full length of a tag */
+                len = (long)(end - cur);
+                break;
+            }
+        }
+
+        if (cur == end) {
+            SDL_RWseek(src, begin_pos, RW_SEEK_SET);
+            return 0;
+        }
+
+    } else if (SDL_memcmp(buffer, "LYRICS200", 9) == 0) { /* Lyrics3 v2 */
+        /* Lyrics3 v2.00 tag
+         * http://id3.org/Lyrics3v2 */
+        pos_end = SDL_RWtell(src);
+        if (pos_end > LYRICS3v2_TAG_SIZE_VALUE + LYRICS3v1_TAIL_SIZE) {
+            SDL_RWseek(src, -(LYRICS3v2_TAG_SIZE_VALUE + LYRICS3v1_TAIL_SIZE), RW_SEEK_CUR);
+        } else {
+            SDL_RWseek(src, begin_pos, RW_SEEK_SET);
+            return 0; /* Invalid tag */
+        }
+
+        read_size = SDL_RWread(src, buffer, 1, LYRICS3v2_TAG_SIZE_VALUE);
+        if (read_size < LYRICS3v2_TAG_SIZE_VALUE) {
+            SDL_RWseek(src, begin_pos, RW_SEEK_SET);
+            return 0;  /* Invalid tag */
+        }
+        buffer[read_size] = '\0';
+
+        len = SDL_strtol(buffer, NULL, 10);
+        if (len == 0) {
+            SDL_RWseek(src, begin_pos, RW_SEEK_SET);
+            return 0;  /* Invalid tag */
+        }
+
+        len += LYRICS3v2_TAG_SIZE_VALUE + LYRICS3v1_TAIL_SIZE;
+
+        if (pos_end > len) {
+            SDL_RWseek(src, (pos_end - len), RW_SEEK_SET);
+            read_size = SDL_RWread(src, buffer, 1, LYRICS3v1_HEAD_SIZE);
+            if (read_size < LYRICS3v1_HEAD_SIZE) {
+                SDL_RWseek(src, begin_pos, RW_SEEK_SET);
+                return 0;  /* Invalid tag */
+            }
+
+            if (SDL_memcmp(buffer, "LYRICSBEGIN", LYRICS3v1_HEAD_SIZE) != 0) {
+                SDL_RWseek(src, begin_pos, RW_SEEK_SET);
+                return 0;  /* Invalid tag */
+            }
+        }
+    }
+
+    SDL_RWseek(src, begin_pos, RW_SEEK_SET);
+    return len;
+}
+
+
+/********************************************************
  *                  APE v1 and v2                       *
  ********************************************************/
 
@@ -630,7 +744,7 @@ static SDL_bool parse_ape(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Sint64 be
 
     SDL_RWseek(src, begin_pos, RW_SEEK_SET);
 
-    return SDL_TRUE;
+    return 0;
 }
 
 int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthStrip *file_edges)
@@ -715,6 +829,23 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
             goto end;
         }
 
+        /* Skip the lyrics tag that is going before ID3v1 tag */
+        SDL_RWseek(src, -(tail_size + LYRICS3v1_TAIL_SIZE), RW_SEEK_END);
+        readsize = SDL_RWread(src, in_buffer, 1, LYRICS3v1_TAIL_SIZE);
+        SDL_RWseek(src, begin_pos, RW_SEEK_SET);
+
+        if (is_lyrics3(in_buffer, readsize)) {
+            len = lyrics3_skip(tail_size, begin_pos, src);
+            if (len > 0) {
+                file_size -= (size_t)len;
+                tail_size += len;
+                if (file_edges) {
+                    file_edges->end += len;
+                }
+            }
+        }
+
+        /* Skip the APE tag */
         SDL_RWseek(src, -(tail_size + APE_HEADER_SIZE), RW_SEEK_END);
         readsize = SDL_RWread(src, in_buffer, 1, APE_HEADER_SIZE);
         SDL_RWseek(src, begin_pos, RW_SEEK_SET);
@@ -777,6 +908,23 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
                 file_edges->end += ID3v1EXT_TAG_SIZE;
             }
             goto end;
+        }
+    }
+
+    /* Skip the lyrics tag at end of file */
+    if (file_size >= LYRICS3v1_TAIL_SIZE) {
+        SDL_RWseek(src, -(tail_size + LYRICS3v1_TAIL_SIZE), RW_SEEK_END);
+        readsize = SDL_RWread(src, in_buffer, 1, LYRICS3v1_TAIL_SIZE);
+        SDL_RWseek(src, begin_pos, RW_SEEK_SET);
+        if (is_lyrics3(in_buffer, readsize)) {
+            len = lyrics3_skip(tail_size, begin_pos, src);
+            if (len > 0) {
+                file_size -= (size_t)len;
+                tail_size += len;
+                if (file_edges) {
+                    file_edges->end += len;
+                }
+            }
         }
     }
 
