@@ -417,6 +417,9 @@ static SDL_bool parse_id3v2(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Sint64 
  *                  APE v1 and v2                       *
  ********************************************************/
 
+#define APE_V1 1000U
+#define APE_V2 2000U
+
 static SDL_INLINE long ape_byteint_decode(const Uint8 *data, size_t size)
 {
     Uint32 result = 0;
@@ -442,7 +445,7 @@ static SDL_INLINE SDL_bool is_apetag(const Uint8 *data, size_t length)
     }
 
     v = (Uint32)(ape_byteint_decode(data + 8, 4)); /* version */
-    if (v != 2000U && v != 1000U) {
+    if (v != APE_V2 && v != APE_V1) {
         return SDL_FALSE;
     }
     v = 0; /* reserved bits : */
@@ -477,6 +480,16 @@ static char *ape_find_value(char *key)
 
 static Uint32 ape_handle_tag(Mix_MusicMetaTags *out_tags, Uint8 *data, size_t valsize)
 {
+    /* http://wiki.hydrogenaud.io/index.php?title=APE_Tag_Item
+     * Tag entry has unclear size because of no size value for a key field
+     * However, we only know next sizes:
+     * - 4 bytes is a [length] of value field
+     * - 4 bytes of value-specific flags
+     * - unknown lenght of a key field. To detect it's size
+     *   it's need to find a zero byte looking at begin of the key field
+     * - 1 byte of a null-terminator
+     * - [length] bytes a value content
+     */
     char *key = (char*)(data + 4);
     char *value = NULL;
     Uint32 key_len; /* Length of the key field */
@@ -495,13 +508,13 @@ static Uint32 ape_handle_tag(Mix_MusicMetaTags *out_tags, Uint8 *data, size_t va
         value[valsize] = '\0';
     }
 
-    if (SDL_strncasecmp(key, "Title", 5) == 0) {
+    if (SDL_strncasecmp(key, "Title", 6) == 0) {
         meta_tags_set(out_tags, MIX_META_TITLE, (const char*)(value));
-    } else if (SDL_memcmp(key, "Album", 5) == 0) {
+    } else if (SDL_strncasecmp(key, "Album", 6) == 0) {
         meta_tags_set(out_tags, MIX_META_ARTIST, (const char*)(value));
-    } else if (SDL_memcmp(key, "Artist", 6) == 0) {
+    } else if (SDL_strncasecmp(key, "Artist", 7) == 0) {
         meta_tags_set(out_tags, MIX_META_ALBUM, (const char*)(value));
-    } else if (SDL_memcmp(key, "Copyright", 9) == 0) {
+    } else if (SDL_strncasecmp(key, "Copyright", 10) == 0) {
         meta_tags_set(out_tags, MIX_META_COPYRIGHT, (const char*)(value));
     }
 
@@ -526,7 +539,7 @@ static SDL_bool parse_ape(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Sint64 be
     }
 
     v = (Uint32)ape_byteint_decode(buffer + 8, 4); /* version */
-    if (v != 2000U && v != 1000U) {
+    if (v != APE_V2 && v != APE_V1) {
         return SDL_FALSE;
     }
 
@@ -675,13 +688,13 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
         if (is_apetag(in_buffer, 32)) {
             Uint32 v;
             len = get_ape_len(in_buffer, readsize, &v);
-            if (v == 2000U) {
+            if (v == APE_V2) {
                 len += 32; /* header */
             }
             if (len >= file_size) {
                 return -1;
             }
-            if (v == 2000U) { /* verify header : */
+            if (v == APE_V2) { /* verify header : */
                 SDL_RWseek(src, -(tail_size + len), RW_SEEK_END);
                 ape_tag_pos = SDL_RWtell(src);
                 readsize = SDL_RWread(src, in_buffer, 1, 32);
@@ -744,13 +757,13 @@ ape: /* APE tag may be at the end: read the footer */
         if (is_apetag(in_buffer, 32)) {
             Uint32 v;
             len = get_ape_len(in_buffer, readsize, &v);
-            if (v == 2000U) {
+            if (v == APE_V2) {
                 len += 32; /* header */
             }
             if (len >= file_size) {
                 return -1;
             }
-            if (v == 2000U) { /* verify header : */
+            if (v == APE_V2) { /* verify header : */
                 SDL_RWseek(src, -(tail_size + len), RW_SEEK_END);
                 ape_tag_pos = SDL_RWtell(src);
                 readsize = SDL_RWread(src, in_buffer, 1, 32);
