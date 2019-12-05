@@ -27,6 +27,11 @@
 #define ID3v2_BUFFER_SIZE       1024
 #define APE_BUFFER_SIZE         256
 
+
+/********************************************************
+ *                  ID3v1 and ID3v1EXT                  *
+ ********************************************************/
+
 static SDL_INLINE SDL_bool is_id3v1(const Uint8 *data, size_t length)
 {
     /* http://id3.org/ID3v1 :  3 bytes "TAG" identifier and 125 bytes tag data */
@@ -47,6 +52,50 @@ static SDL_INLINE SDL_bool is_id3v1ext(const Uint8 *data, size_t length)
     }
     return SDL_TRUE;
 }
+
+/* Parse ASCII string and clean it up from non-ASCII characters (replace them with a question mark '?') */
+static char *parse_id3v1_ansi_string(const Uint8 *buffer, size_t src_len)
+{
+    char *src_buffer = (char*)SDL_malloc(src_len + 1);
+    char *ret;
+    SDL_memset(src_buffer, 0, src_len);
+    SDL_memcpy(src_buffer, buffer, src_len - 1);
+    ret = SDL_iconv_string("UTF-8", "ISO-8859-1", src_buffer, src_len);
+    SDL_free(src_buffer);
+    return ret;
+}
+
+static void id3v1_set_tag(Mix_MusicMetaTags *out_tags, Mix_MusicMetaTag tag, const Uint8 *buffer, size_t len)
+{
+    char *src_buf = parse_id3v1_ansi_string(buffer, len);
+    if (src_buf) {
+        meta_tags_set(out_tags, tag, src_buf);
+        SDL_free(src_buf);
+    }
+}
+
+/* Parse content of ID3v1 tag */
+static void parse_id3v1(Mix_MusicMetaTags *out_tags, const Uint8 *buffer)
+{
+    id3v1_set_tag(out_tags, MIX_META_TITLE, buffer + 3, 30);
+    id3v1_set_tag(out_tags, MIX_META_ARTIST, buffer + 33, 30);
+    id3v1_set_tag(out_tags, MIX_META_ALBUM, buffer + 63, 30);
+    id3v1_set_tag(out_tags, MIX_META_COPYRIGHT, buffer + 97, 30);
+}
+
+/* Parse content of ID3v1 Enhanced tag */
+static void parse_id3v1ext(Mix_MusicMetaTags *out_tags, const Uint8 *buffer)
+{
+    id3v1_set_tag(out_tags, MIX_META_TITLE, buffer + 4, 60);
+    id3v1_set_tag(out_tags, MIX_META_ARTIST, buffer + 64, 60);
+    id3v1_set_tag(out_tags, MIX_META_ALBUM, buffer + 124, 60);
+}
+
+
+
+/********************************************************
+ *                       ID3v2                          *
+ ********************************************************/
 
 static SDL_INLINE SDL_bool is_id3v2(const Uint8 *data, size_t length)
 {
@@ -103,73 +152,6 @@ static SDL_INLINE long get_id3v2_len(const Uint8 *data, long length)
         ++size;
     }
     return size;
-}
-
-static SDL_INLINE SDL_bool is_apetag(const Uint8 *data, size_t length)
-{
-   /* http://wiki.hydrogenaud.io/index.php?title=APEv2_specification
-    * Header/footer is 32 bytes: bytes 0-7 ident, bytes 8-11 version,
-    * bytes 12-17 size. bytes 24-31 are reserved: must be all zeroes. */
-    Uint32 v;
-
-    if (length < 32 || SDL_memcmp(data,"APETAGEX",8) != 0) {
-        return SDL_FALSE;
-    }
-    v = (Uint32)((data[11]<<24) | (data[10]<<16) | (data[9]<<8) | data[8]); /* version */
-    if (v != 2000U && v != 1000U) {
-        return SDL_FALSE;
-    }
-    v = 0; /* reserved bits : */
-    if (SDL_memcmp(&data[24],&v,4) != 0 || SDL_memcmp(&data[28],&v,4) != 0) {
-        return SDL_FALSE;
-    }
-    return SDL_TRUE;
-}
-
-static SDL_INLINE long get_ape_len(const Uint8 *data, size_t datalen, Uint32 *version)
-{
-    long size = (long)((data[15]<<24) | (data[14]<<16) | (data[13]<<8) | data[12]);
-    *version = (Uint32)((data[11]<<24) | (data[10]<<16) | (data[9]<<8) | data[8]);
-    (void)datalen;
-    return size; /* caller will handle the additional v2 header length */
-}
-
-/* Parse ASCII string and clean it up from non-ASCII characters (replace them with a question mark '?') */
-static char *parse_id3v1_ansi_string(const Uint8 *buffer, size_t src_len)
-{
-    char *src_buffer = (char*)SDL_malloc(src_len + 1);
-    char *ret;
-    SDL_memset(src_buffer, 0, src_len);
-    SDL_memcpy(src_buffer, buffer, src_len - 1);
-    ret = SDL_iconv_string("UTF-8", "ISO-8859-1", src_buffer, src_len);
-    SDL_free(src_buffer);
-    return ret;
-}
-
-static void id3v1_set_tag(Mix_MusicMetaTags *out_tags, Mix_MusicMetaTag tag, const Uint8 *buffer, size_t len)
-{
-    char *src_buf = parse_id3v1_ansi_string(buffer, len);
-    if (src_buf) {
-        meta_tags_set(out_tags, tag, src_buf);
-        SDL_free(src_buf);
-    }
-}
-
-/* Parse content of ID3v1 tag */
-static void parse_id3v1(Mix_MusicMetaTags *out_tags, const Uint8 *buffer)
-{
-    id3v1_set_tag(out_tags, MIX_META_TITLE, buffer + 3, 30);
-    id3v1_set_tag(out_tags, MIX_META_ARTIST, buffer + 33, 30);
-    id3v1_set_tag(out_tags, MIX_META_ALBUM, buffer + 63, 30);
-    id3v1_set_tag(out_tags, MIX_META_COPYRIGHT, buffer + 97, 30);
-}
-
-/* Parse content of ID3v1 Enhanced tag */
-static void parse_id3v1ext(Mix_MusicMetaTags *out_tags, const Uint8 *buffer)
-{
-    id3v1_set_tag(out_tags, MIX_META_TITLE, buffer + 4, 60);
-    id3v1_set_tag(out_tags, MIX_META_ARTIST, buffer + 64, 60);
-    id3v1_set_tag(out_tags, MIX_META_ALBUM, buffer + 124, 60);
 }
 
 /* Decode a string in the frame according to an encoding marker */
@@ -431,17 +413,51 @@ static SDL_bool parse_id3v2(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Sint64 
 }
 
 
+/********************************************************
+ *                  APE v1 and v2                       *
+ ********************************************************/
+
 static SDL_INLINE long ape_byteint_decode(const Uint8 *data, size_t size)
 {
     Uint32 result = 0;
     Sint32 i;
 
-    for (i = size - 1; i >= 0; i--) {
+    for (i = (Sint32)size - 1; i >= 0; i--) {
         result <<= 8;
         result = result | (Uint8)data[i];
     }
 
     return (long)result;
+}
+
+static SDL_INLINE SDL_bool is_apetag(const Uint8 *data, size_t length)
+{
+   /* http://wiki.hydrogenaud.io/index.php?title=APEv2_specification
+    * Header/footer is 32 bytes: bytes 0-7 ident, bytes 8-11 version,
+    * bytes 12-17 size. bytes 24-31 are reserved: must be all zeroes. */
+    Uint32 v;
+
+    if (length < 32 || SDL_memcmp(data,"APETAGEX",8) != 0) {
+        return SDL_FALSE;
+    }
+
+    v = (Uint32)(ape_byteint_decode(data + 8, 4)); /* version */
+    if (v != 2000U && v != 1000U) {
+        return SDL_FALSE;
+    }
+    v = 0; /* reserved bits : */
+    if (SDL_memcmp(&data[24],&v,4) != 0 || SDL_memcmp(&data[28],&v,4) != 0) {
+        return SDL_FALSE;
+    }
+    return SDL_TRUE;
+}
+
+static SDL_INLINE long get_ape_len(const Uint8 *data, size_t datalen, Uint32 *version)
+{
+    long size = (long)(ape_byteint_decode(data + 12, 4));
+    *version = (Uint32)(ape_byteint_decode(data + 8, 4));
+    (void)datalen;
+    return size; /* caller will handle the additional v2 header length */
 }
 
 static char *ape_find_value(char *key)
@@ -489,7 +505,7 @@ static Uint32 ape_handle_tag(Mix_MusicMetaTags *out_tags, Uint8 *data, size_t va
         meta_tags_set(out_tags, MIX_META_COPYRIGHT, (const char*)(value));
     }
 
-    return 4 + valsize + key_len;
+    return 4 + (Uint32)valsize + key_len;
 }
 
 /* Parse content of APE tag  */
