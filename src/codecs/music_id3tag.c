@@ -66,7 +66,7 @@ static SDL_INLINE SDL_bool is_id3v1ext(const Uint8 *data, size_t length)
 }
 
 /* Parse ASCII string and clean it up from non-ASCII characters (replace them with a question mark '?') */
-static char *parse_id3v1_ansi_string(const Uint8 *buffer, size_t src_len)
+static SDL_INLINE char *parse_id3v1_ansi_string(const Uint8 *buffer, size_t src_len)
 {
     char *src_buffer = (char*)SDL_malloc(src_len + 1);
     char *ret;
@@ -77,7 +77,7 @@ static char *parse_id3v1_ansi_string(const Uint8 *buffer, size_t src_len)
     return ret;
 }
 
-static void id3v1_set_tag(Mix_MusicMetaTags *out_tags, Mix_MusicMetaTag tag, const Uint8 *buffer, size_t len)
+static SDL_INLINE void id3v1_set_tag(Mix_MusicMetaTags *out_tags, Mix_MusicMetaTag tag, const Uint8 *buffer, size_t len)
 {
     char *src_buf = parse_id3v1_ansi_string(buffer, len);
     if (src_buf) {
@@ -86,7 +86,7 @@ static void id3v1_set_tag(Mix_MusicMetaTags *out_tags, Mix_MusicMetaTag tag, con
     }
 }
 
-static void id3v1ext_rtrim(char *str, size_t len)
+static SDL_INLINE void id3v1ext_rtrim(char *str, size_t len)
 {
     char *beg = str, *cur = (str + len - 1);
     while(cur != beg && (*cur == '\0' || *cur == ' ' || *cur == '\t')) {
@@ -115,7 +115,7 @@ static void id3v1_set_ext_tag(Mix_MusicMetaTags *out_tags, Mix_MusicMetaTag tag,
 }
 
 /* Parse content of ID3v1 tag */
-static void parse_id3v1(Mix_MusicMetaTags *out_tags, const Uint8 *buffer)
+static SDL_INLINE void parse_id3v1(Mix_MusicMetaTags *out_tags, const Uint8 *buffer)
 {
     id3v1_set_tag(out_tags, MIX_META_TITLE,     buffer + ID3v1_FIELD_TITLE,     ID3v1_SIZE_OF_FIELD);
     id3v1_set_tag(out_tags, MIX_META_ARTIST,    buffer + ID3v1_FIELD_ARTIST,    ID3v1_SIZE_OF_FIELD);
@@ -124,7 +124,7 @@ static void parse_id3v1(Mix_MusicMetaTags *out_tags, const Uint8 *buffer)
 }
 
 /* Parse content of ID3v1 Enhanced tag */
-static void parse_id3v1ext(Mix_MusicMetaTags *out_tags, const Uint8 *buffer)
+static SDL_INLINE void parse_id3v1ext(Mix_MusicMetaTags *out_tags, const Uint8 *buffer)
 {
     id3v1_set_ext_tag(out_tags, MIX_META_TITLE,  buffer + ID3v1EXT_FIELD_TITLE,  ID3v1EXT_SIZE_OF_FIELD);
     id3v1_set_ext_tag(out_tags, MIX_META_ARTIST, buffer + ID3v1EXT_FIELD_ARTIST, ID3v1EXT_SIZE_OF_FIELD);
@@ -283,7 +283,7 @@ static char *id3v2_decode_string(const Uint8 *string, size_t size)
 }
 
 /* Write a tag string into internal meta-tags storage */
-static void write_id3v2_string(Mix_MusicMetaTags *out_tags, Mix_MusicMetaTag tag, const Uint8 *string, size_t size)
+static SDL_INLINE void write_id3v2_string(Mix_MusicMetaTags *out_tags, Mix_MusicMetaTag tag, const Uint8 *string, size_t size)
 {
     char *str_buffer = id3v2_decode_string(string, size);
 
@@ -295,7 +295,7 @@ static void write_id3v2_string(Mix_MusicMetaTags *out_tags, Mix_MusicMetaTag tag
 }
 
 /* Identify a meta-key and decode the string (Note: input buffer should have at least 4 characters!) */
-static void handle_id3v2_string(Mix_MusicMetaTags *out_tags, const char *key, const Uint8 *string, size_t size)
+static SDL_INLINE void handle_id3v2_string(Mix_MusicMetaTags *out_tags, const char *key, const Uint8 *string, size_t size)
 {
     if (SDL_memcmp(key, "TIT2", 4) == 0) {
         write_id3v2_string(out_tags, MIX_META_TITLE, string, size);
@@ -315,7 +315,7 @@ static void handle_id3v2_string(Mix_MusicMetaTags *out_tags, const char *key, co
 }
 
 /* Identify a meta-key and decode the string (Note: input buffer should have at least 4 characters!) */
-static void handle_id3v2x2_string(Mix_MusicMetaTags *out_tags, const char *key, const Uint8 *string, size_t size)
+static SDL_INLINE void handle_id3v2x2_string(Mix_MusicMetaTags *out_tags, const char *key, const Uint8 *string, size_t size)
 {
     if (SDL_memcmp(key, "TT2", 3) == 0) {
         write_id3v2_string(out_tags, MIX_META_TITLE, string, size);
@@ -637,7 +637,7 @@ static SDL_INLINE long get_ape_len(const Uint8 *data, size_t datalen, Uint32 *ve
     return size; /* caller will handle the additional v2 header length */
 }
 
-static char *ape_find_value(char *key)
+static SDL_INLINE char *ape_find_value(char *key)
 {
     char *end = (key + APE_BUFFER_SIZE - 4);
 
