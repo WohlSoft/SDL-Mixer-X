@@ -850,6 +850,8 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
         SDL_RWseek(src, begin_pos, RW_SEEK_SET);
 
         if (is_apetag(in_buffer, APE_HEADER_SIZE)) {
+            goto ape;
+#if 0 /* TODO: Test this and remove to reduce duplicateness */
             Uint32 v;
             len = get_ape_len(in_buffer, readsize, &v);
             if (v == APE_V2) {
@@ -873,7 +875,7 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
                     parse_ape(out_tags, src, ape_tag_pos, 2);
                     SDL_RWseek(src, begin_pos, RW_SEEK_SET);
                 }
-            } else {
+            } else if (!tag_handled) {
                 SDL_RWseek(src, -(tail_size + APE_HEADER_SIZE), RW_SEEK_END);
                 ape_tag_pos = SDL_RWtell(src);
                 parse_ape(out_tags, src, ape_tag_pos, 1);
@@ -885,6 +887,7 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
                 file_edges->end += len;
             }
             goto end;
+#endif
         }
 
         /* extended ID3v1 just before the ID3v1 tag? (unlikely)  */
