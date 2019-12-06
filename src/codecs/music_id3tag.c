@@ -804,7 +804,7 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
     }
 
     if (file_size < ID3v1_TAG_SIZE) {
-        goto ape;
+        goto lyrics3;
     }
 
     SDL_RWseek(src, -(tail_size + ID3v1_TAG_SIZE), RW_SEEK_END);
@@ -833,6 +833,8 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
         SDL_RWseek(src, begin_pos, RW_SEEK_SET);
 
         if (is_lyrics3(in_buffer, readsize)) {
+            goto lyrics3_proc;
+#if 0 /* TODO: Test this and remove to reduce duplicateness */
             len = lyrics3_skip(tail_size, begin_pos, src);
             if (len < 0) {
                 return -1;
@@ -842,6 +844,7 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
             if (file_edges) {
                 file_edges->end += len;
             }
+#endif
         }
 
         /* Skip the APE tag */
@@ -850,7 +853,7 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
         SDL_RWseek(src, begin_pos, RW_SEEK_SET);
 
         if (is_apetag(in_buffer, APE_HEADER_SIZE)) {
-            goto ape;
+            goto ape_proc;
 #if 0 /* TODO: Test this and remove to reduce duplicateness */
             Uint32 v;
             len = get_ape_len(in_buffer, readsize, &v);
@@ -913,13 +916,15 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
         }
     }
 
-    /* Skip the lyrics tag at end of file */
+
+lyrics3: /* Skip the lyrics tag at end of file */
     if (file_size >= LYRICS3v1_TAIL_SIZE) {
         SDL_RWseek(src, -(tail_size + LYRICS3v1_TAIL_SIZE), RW_SEEK_END);
         readsize = SDL_RWread(src, in_buffer, 1, LYRICS3v1_TAIL_SIZE);
         SDL_RWseek(src, begin_pos, RW_SEEK_SET);
 
         if (is_lyrics3(in_buffer, readsize)) {
+lyrics3_proc: /* TODO: Make a function from this */
             len = lyrics3_skip(tail_size, begin_pos, src);
             if (len < 0) {
                 return -1;
@@ -929,10 +934,11 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
             if (file_edges) {
                 file_edges->end += len;
             }
+            goto end;
         }
     }
 
-ape: /* APE tag may be at the end: read the footer */
+/*ape:*/  /* APE tag may be at the end: read the footer */
     if (file_size >= APE_HEADER_SIZE) {
         SDL_RWseek(src, -(tail_size + APE_HEADER_SIZE), RW_SEEK_END);
         readsize = SDL_RWread(src, in_buffer, 1, APE_HEADER_SIZE);
@@ -940,6 +946,7 @@ ape: /* APE tag may be at the end: read the footer */
         if (readsize != APE_HEADER_SIZE) {
             return -1;
         }
+ape_proc: /* TODO: Make a function from this */
         if (is_apetag(in_buffer, APE_HEADER_SIZE)) {
             Uint32 v;
             len = get_ape_len(in_buffer, readsize, &v);
