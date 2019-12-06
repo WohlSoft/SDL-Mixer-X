@@ -70,9 +70,9 @@ static char *parse_id3v1_ansi_string(const Uint8 *buffer, size_t src_len)
 {
     char *src_buffer = (char*)SDL_malloc(src_len + 1);
     char *ret;
-    SDL_memset(src_buffer, 0, src_len);
-    SDL_memcpy(src_buffer, buffer, src_len - 1);
-    ret = SDL_iconv_string("UTF-8", "ISO-8859-1", src_buffer, src_len);
+    SDL_memset(src_buffer, 0, src_len + 1);
+    SDL_memcpy(src_buffer, buffer, src_len);
+    ret = SDL_iconv_string("UTF-8", "ISO-8859-1", src_buffer, src_len + 1);
     SDL_free(src_buffer);
     return ret;
 }
@@ -103,7 +103,7 @@ static void id3v1_set_ext_tag(Mix_MusicMetaTags *out_tags, Mix_MusicMetaTag tag,
 
     if (src_buf) {
         SDL_memset(mid_buffer, 0, ID3v1_SIZE_OF_FIELD + ID3v1EXT_SIZE_OF_FIELD + 1);
-        SDL_strlcpy(mid_buffer, meta_tags_get(out_tags, tag), ID3v1_SIZE_OF_FIELD);
+        SDL_strlcpy(mid_buffer, meta_tags_get(out_tags, tag), ID3v1_SIZE_OF_FIELD + 1);
         mid_len = SDL_strlen(mid_buffer);
         if (mid_len > 0) {
             SDL_memcpy(mid_buffer + mid_len, buffer, len);
