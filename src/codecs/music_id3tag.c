@@ -86,6 +86,34 @@ static void id3v1_set_tag(Mix_MusicMetaTags *out_tags, Mix_MusicMetaTag tag, con
     }
 }
 
+static void id3v1ext_rtrim(char *str, size_t len)
+{
+    char *beg = str, *cur = (str + len - 1);
+    while(cur != beg && (*cur == '\0' || *cur == ' ' || *cur == '\t')) {
+        *cur = '\0';
+        cur--;
+    }
+}
+
+static void id3v1_set_ext_tag(Mix_MusicMetaTags *out_tags, Mix_MusicMetaTag tag, const Uint8 *buffer, size_t len)
+{
+    char mid_buffer[ID3v1_SIZE_OF_FIELD + ID3v1EXT_SIZE_OF_FIELD + 1];
+    char *src_buf = parse_id3v1_ansi_string(buffer, len);
+    size_t mid_len;
+
+    if (src_buf) {
+        SDL_memset(mid_buffer, 0, ID3v1_SIZE_OF_FIELD + ID3v1EXT_SIZE_OF_FIELD + 1);
+        SDL_strlcpy(mid_buffer, meta_tags_get(out_tags, tag), ID3v1_SIZE_OF_FIELD);
+        mid_len = SDL_strlen(mid_buffer);
+        if (mid_len > 0) {
+            SDL_memcpy(mid_buffer + mid_len, buffer, len);
+            id3v1ext_rtrim(mid_buffer, ID3v1_SIZE_OF_FIELD + ID3v1EXT_SIZE_OF_FIELD);
+            meta_tags_set(out_tags, tag, mid_buffer);
+        }
+        SDL_free(src_buf);
+    }
+}
+
 /* Parse content of ID3v1 tag */
 static void parse_id3v1(Mix_MusicMetaTags *out_tags, const Uint8 *buffer)
 {
@@ -98,9 +126,9 @@ static void parse_id3v1(Mix_MusicMetaTags *out_tags, const Uint8 *buffer)
 /* Parse content of ID3v1 Enhanced tag */
 static void parse_id3v1ext(Mix_MusicMetaTags *out_tags, const Uint8 *buffer)
 {
-    id3v1_set_tag(out_tags, MIX_META_TITLE,  buffer + ID3v1EXT_FIELD_TITLE,  ID3v1EXT_SIZE_OF_FIELD);
-    id3v1_set_tag(out_tags, MIX_META_ARTIST, buffer + ID3v1EXT_FIELD_ARTIST, ID3v1EXT_SIZE_OF_FIELD);
-    id3v1_set_tag(out_tags, MIX_META_ALBUM,  buffer + ID3v1EXT_FIELD_ALBUM,  ID3v1EXT_SIZE_OF_FIELD);
+    id3v1_set_ext_tag(out_tags, MIX_META_TITLE,  buffer + ID3v1EXT_FIELD_TITLE,  ID3v1EXT_SIZE_OF_FIELD);
+    id3v1_set_ext_tag(out_tags, MIX_META_ARTIST, buffer + ID3v1EXT_FIELD_ARTIST, ID3v1EXT_SIZE_OF_FIELD);
+    id3v1_set_ext_tag(out_tags, MIX_META_ALBUM,  buffer + ID3v1EXT_FIELD_ALBUM,  ID3v1EXT_SIZE_OF_FIELD);
 }
 
 
