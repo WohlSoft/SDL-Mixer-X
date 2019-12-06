@@ -475,7 +475,7 @@ static long lyrics3_skip(Sint64 tag_end_at, Sint64 begin_pos, SDL_RWops *src)
     file_size = SDL_RWsize(src);
     if (file_size < 0) {
         SDL_RWseek(src, begin_pos, RW_SEEK_SET);
-        return 0; /* Invalid tag */
+        return -1; /* Invalid tag */
     }
 
     SDL_RWseek(src, -(tag_end_at + LYRICS3v1_TAIL_SIZE), RW_SEEK_END);
@@ -507,7 +507,7 @@ static long lyrics3_skip(Sint64 tag_end_at, Sint64 begin_pos, SDL_RWops *src)
 
         if (cur == end) {
             SDL_RWseek(src, begin_pos, RW_SEEK_SET);
-            return 0;
+            return -1; /* Invalid tag */
         }
 
     } else if (SDL_memcmp(buffer, "LYRICS200", 9) == 0) { /* Lyrics3 v2 */
@@ -518,20 +518,20 @@ static long lyrics3_skip(Sint64 tag_end_at, Sint64 begin_pos, SDL_RWops *src)
             SDL_RWseek(src, -(LYRICS3v2_TAG_SIZE_VALUE + LYRICS3v1_TAIL_SIZE), RW_SEEK_CUR);
         } else {
             SDL_RWseek(src, begin_pos, RW_SEEK_SET);
-            return 0; /* Invalid tag */
+            return -1; /* Invalid tag */
         }
 
         read_size = SDL_RWread(src, buffer, 1, LYRICS3v2_TAG_SIZE_VALUE);
         if (read_size < LYRICS3v2_TAG_SIZE_VALUE) {
             SDL_RWseek(src, begin_pos, RW_SEEK_SET);
-            return 0;  /* Invalid tag */
+            return -1; /* Invalid tag */
         }
         buffer[read_size] = '\0';
 
         len = SDL_strtol(buffer, NULL, 10);
         if (len == 0) {
             SDL_RWseek(src, begin_pos, RW_SEEK_SET);
-            return 0;  /* Invalid tag */
+            return -1; /* Invalid tag */
         }
 
         len += LYRICS3v2_TAG_SIZE_VALUE + LYRICS3v1_TAIL_SIZE;
@@ -541,12 +541,12 @@ static long lyrics3_skip(Sint64 tag_end_at, Sint64 begin_pos, SDL_RWops *src)
             read_size = SDL_RWread(src, buffer, 1, LYRICS3v1_HEAD_SIZE);
             if (read_size < LYRICS3v1_HEAD_SIZE) {
                 SDL_RWseek(src, begin_pos, RW_SEEK_SET);
-                return 0;  /* Invalid tag */
+                return -1; /* Invalid tag */
             }
 
             if (SDL_memcmp(buffer, "LYRICSBEGIN", LYRICS3v1_HEAD_SIZE) != 0) {
                 SDL_RWseek(src, begin_pos, RW_SEEK_SET);
-                return 0;  /* Invalid tag */
+                return -1; /* Invalid tag */
             }
         }
     }
@@ -834,12 +834,13 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
 
         if (is_lyrics3(in_buffer, readsize)) {
             len = lyrics3_skip(tail_size, begin_pos, src);
-            if (len > 0) {
-                file_size -= (size_t)len;
-                tail_size += len;
-                if (file_edges) {
-                    file_edges->end += len;
-                }
+            if (len < 0) {
+                return -1;
+            }
+            file_size -= (size_t)len;
+            tail_size += len;
+            if (file_edges) {
+                file_edges->end += len;
             }
         }
 
@@ -917,12 +918,13 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
 
         if (is_lyrics3(in_buffer, readsize)) {
             len = lyrics3_skip(tail_size, begin_pos, src);
-            if (len > 0) {
-                file_size -= (size_t)len;
-                tail_size += len;
-                if (file_edges) {
-                    file_edges->end += len;
-                }
+            if (len < 0) {
+                return -1;
+            }
+            file_size -= (size_t)len;
+            tail_size += len;
+            if (file_edges) {
+                file_edges->end += len;
             }
         }
     }
