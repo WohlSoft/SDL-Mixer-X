@@ -594,6 +594,14 @@ static long lyrics3_skip(Sint64 tag_end_at, Sint64 begin_pos, SDL_RWops *src)
 #define APE_V2              2000U
 #define APE_HEADER_SIZE     32
 
+#define APE_HEAD_FIELD_VERSION      8
+#define APE_HEAD_FIELD_TAGSIZE      12
+#define APE_HEAD_FIELD_ITEMS_COUNT  16
+#define APE_HEAD_FIELD_FLAGS        20
+#define APE_HEAD_FIELD_RESERVED     24
+
+#define APE_FRAME_TAG_KEY       4
+
 static SDL_INLINE long ape_byteint_decode(const Uint8 *data, size_t size)
 {
     Uint32 result = 0;
@@ -629,12 +637,16 @@ static SDL_INLINE SDL_bool is_apetag(const Uint8 *data, size_t length)
     return SDL_TRUE;
 }
 
-static SDL_INLINE long get_ape_len(const Uint8 *data, size_t datalen, Uint32 *version)
+static SDL_INLINE long get_ape_len(const Uint8 *data, Uint32 *version)
 {
-    long size = (long)(ape_byteint_decode(data + 12, 4));
-    *version = (Uint32)(ape_byteint_decode(data + 8, 4));
-    (void)datalen;
-    return size; /* caller will handle the additional v2 header length */
+    Uint32 flags;
+    long size = (long)(ape_byteint_decode(data + APE_HEAD_FIELD_TAGSIZE, 4));
+    *version = (Uint32)(ape_byteint_decode(data + APE_HEAD_FIELD_VERSION, 4));
+    flags = (Uint32)(ape_byteint_decode(data + APE_HEAD_FIELD_FLAGS, 4));
+    if (*version == APE_V2 && (flags & (1U<<31))) {
+        size += APE_HEADER_SIZE; /* header present. */
+    }
+    return size;
 }
 
 static SDL_INLINE char *ape_find_value(char *key)
@@ -664,7 +676,7 @@ static Uint32 ape_handle_tag(Mix_MusicMetaTags *out_tags, Uint8 *data, size_t va
      * - 1 byte of a null-terminator
      * - [length] bytes a value content
      */
-    char *key = (char*)(data + 4);
+    char *key = (char*)(data + APE_FRAME_TAG_KEY);
     char *value = NULL;
     Uint32 key_len; /* Length of the key field */
 
@@ -712,14 +724,14 @@ static SDL_bool parse_ape(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Sint64 be
         return SDL_FALSE;
     }
 
-    v = (Uint32)ape_byteint_decode(buffer + 8, 4); /* version */
+    v = (Uint32)ape_byteint_decode(buffer + APE_HEAD_FIELD_VERSION, 4); /* version */
     if (v != APE_V2 && v != APE_V1) {
         return SDL_FALSE;
     }
 
-    tag_size = (Uint32)ape_byteint_decode(buffer + 12, 4); /* tag size */
+    tag_size = (Uint32)ape_byteint_decode(buffer + APE_HEAD_FIELD_TAGSIZE, 4); /* tag size */
 
-    if (version == 1) { /* If version 1, we are at footer */
+    if (version == APE_V1) { /* If version 1, we are at footer */
         if (begin_pos - (tag_size - APE_HEADER_SIZE) < 0) {
             SDL_RWseek(src, begin_pos, RW_SEEK_SET);
             return SDL_FALSE;
@@ -730,9 +742,9 @@ static SDL_bool parse_ape(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Sint64 be
         return SDL_FALSE;
     }
 
-    tag_items_count = (Uint32)ape_byteint_decode(buffer + 16, 4); /* count tag items */
+    tag_items_count = (Uint32)ape_byteint_decode(buffer + APE_HEAD_FIELD_ITEMS_COUNT, 4); /* count tag items */
 
-    /*flags = (Uint32)ape_byteint_decode(buffer + 20, 4);*/ /* global flags, unused */
+    /*flags = (Uint32)ape_byteint_decode(buffer + APE_HEAD_FIELD_FLAGS, 4);*/ /* global flags, unused */
 
     v = 0; /* reserved bits : */
     if (SDL_memcmp(&buffer[24], &v, 4) != 0 || SDL_memcmp(&buffer[28], &v, 4) != 0) {
@@ -812,15 +824,18 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
         begin_offset += len;
         file_size -= (size_t)len;
     }
-    /* APE tag _might_ be at the start: read the header */
+    /* APE tag _might_ be at the start (discouraged
+     * but not forbidden, either.)  read the header. */
     else if (is_apetag(in_buffer, readsize)) {
         Uint32 v;
-        len = get_ape_len(in_buffer, readsize, &v);
-        len += APE_HEADER_SIZE; /* we're at top: have a header. */
+        len = get_ape_len(in_buffer, &v);
         if (len >= file_size) {
             return -1;
         }
-        parse_ape(out_tags, src, begin_pos, 2);
+        if (v != APE_V2) {
+            return -1; /* APEv1 can't be at begin of the file, it's invalid tag */
+        }
+        parse_ape(out_tags, src, begin_pos, v);
         tag_handled = SDL_TRUE;
         begin_offset += len;
         file_size -= (size_t)len;
@@ -858,10 +873,7 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
         /* APE tag may be at end or before ID3v1 tag */
         if (is_apetag(in_buffer, APE_HEADER_SIZE)) {
             Uint32 v;
-            len = get_ape_len(in_buffer, readsize, &v);
-            if (v == APE_V2) {
-                len += APE_HEADER_SIZE; /* header */
-            }
+            len = get_ape_len(in_buffer, &v);
             if (len >= file_size) {
                 return -1;
             }
@@ -877,14 +889,14 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
                     return -1;
                 }
                 if (!tag_handled) {
-                    parse_ape(out_tags, src, ape_tag_pos, 2);
+                    parse_ape(out_tags, src, ape_tag_pos, APE_V2);
                     SDL_RWseek(src, begin_pos, RW_SEEK_SET);
                 }
             } else if (!tag_handled) {
                 SDL_bool ape_tag_valid;
                 SDL_RWseek(src, -(tail_size + APE_HEADER_SIZE), RW_SEEK_END);
                 ape_tag_pos = SDL_RWtell(src);
-                ape_tag_valid = parse_ape(out_tags, src, ape_tag_pos, 1);
+                ape_tag_valid = parse_ape(out_tags, src, ape_tag_pos, APE_V1);
                 SDL_RWseek(src, begin_pos, RW_SEEK_SET);
                 if (!ape_tag_valid) {
                     return -1;
@@ -920,7 +932,9 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
         }
     }
 
-    /* extended ID3v1 just before the ID3v1 tag? (unlikely)  */
+    /* extended ID3v1 just before the ID3v1 tag? (unlikely)
+     * if found, assume no additional tags: this stupidity
+     * is non-standard..  */
     if (has_id3v1 && (file_size >= ID3v1EXT_TAG_SIZE)) {
         SDL_RWseek(src, -(tail_size + ID3v1EXT_TAG_SIZE), RW_SEEK_END);
         readsize = SDL_RWread(src, in_buffer, 1, ID3v1EXT_TAG_SIZE);
