@@ -712,6 +712,7 @@ static SDL_bool parse_ape(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Sint64 be
 {
     Uint8 buffer[APE_BUFFER_SIZE + 1];
     Uint32 v, i, tag_size, tag_items_count, tag_item_size;
+    Uint32 zero8[2] = {0, 0};
     Sint64 file_size, cur_tag;
     size_t read_size;
 
@@ -746,8 +747,8 @@ static SDL_bool parse_ape(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Sint64 be
 
     /*flags = (Uint32)ape_byteint_decode(buffer + APE_HEAD_FIELD_FLAGS, 4);*/ /* global flags, unused */
 
-    v = 0; /* reserved bits : */
-    if (SDL_memcmp(&buffer[24], &v, 4) != 0 || SDL_memcmp(&buffer[28], &v, 4) != 0) {
+    /* reserved bits : */
+    if (SDL_memcmp(buffer + APE_HEAD_FIELD_RESERVED, zero8, 8) != 0) {
         return SDL_FALSE;
     }
 
