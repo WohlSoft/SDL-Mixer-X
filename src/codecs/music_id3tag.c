@@ -37,29 +37,10 @@
 #define ID3v1_FIELD_ALBUM       63
 #define ID3v1_FIELD_COPYRIGHT   97
 
-#define ID3v1EXT_TAG_SIZE       227
-#define ID3v1EXT_SIZE_OF_FIELD  60
-
-#define ID3v1EXT_FIELD_TITLE    4
-#define ID3v1EXT_FIELD_ARTIST   64
-#define ID3v1EXT_FIELD_ALBUM    124
-
 static SDL_INLINE SDL_bool is_id3v1(const Uint8 *data, size_t length)
 {
     /* http://id3.org/ID3v1 :  3 bytes "TAG" identifier and 125 bytes tag data */
     if (length < ID3v1_TAG_SIZE || SDL_memcmp(data,"TAG", 3) != 0) {
-        return SDL_FALSE;
-    }
-    return SDL_TRUE;
-}
-
-static SDL_INLINE SDL_bool is_id3v1ext(const Uint8 *data, size_t length)
-{
-    /* ID3v1 extended tag: just before ID3v1, always 227 bytes.
-     * https://www.getid3.org/phpBB3/viewtopic.php?t=1202
-     * https://en.wikipedia.org/wiki/ID3v1#Enhanced_tag
-     * Not an official standard, is only supported by few programs. */
-    if (length < ID3v1EXT_TAG_SIZE || SDL_memcmp(data,"TAG+",4) != 0) {
         return SDL_FALSE;
     }
     return SDL_TRUE;
@@ -86,34 +67,6 @@ static SDL_INLINE void id3v1_set_tag(Mix_MusicMetaTags *out_tags, Mix_MusicMetaT
     }
 }
 
-static SDL_INLINE void id3v1ext_rtrim(char *str, size_t len)
-{
-    char *beg = str, *cur = (str + len - 1);
-    while(cur != beg && (*cur == '\0' || *cur == ' ' || *cur == '\t')) {
-        *cur = '\0';
-        cur--;
-    }
-}
-
-static void id3v1_set_ext_tag(Mix_MusicMetaTags *out_tags, Mix_MusicMetaTag tag, const Uint8 *buffer, size_t len)
-{
-    char mid_buffer[ID3v1_SIZE_OF_FIELD + ID3v1EXT_SIZE_OF_FIELD + 1];
-    char *src_buf = parse_id3v1_ansi_string(buffer, len);
-    size_t mid_len;
-
-    if (src_buf) {
-        SDL_memset(mid_buffer, 0, ID3v1_SIZE_OF_FIELD + ID3v1EXT_SIZE_OF_FIELD + 1);
-        SDL_strlcpy(mid_buffer, meta_tags_get(out_tags, tag), ID3v1_SIZE_OF_FIELD + 1);
-        mid_len = SDL_strlen(mid_buffer);
-        if (mid_len > 0) {
-            SDL_memcpy(mid_buffer + mid_len, buffer, len);
-            id3v1ext_rtrim(mid_buffer, ID3v1_SIZE_OF_FIELD + ID3v1EXT_SIZE_OF_FIELD);
-            meta_tags_set(out_tags, tag, mid_buffer);
-        }
-        SDL_free(src_buf);
-    }
-}
-
 /* Parse content of ID3v1 tag */
 static SDL_INLINE void parse_id3v1(Mix_MusicMetaTags *out_tags, const Uint8 *buffer)
 {
@@ -122,15 +75,6 @@ static SDL_INLINE void parse_id3v1(Mix_MusicMetaTags *out_tags, const Uint8 *buf
     id3v1_set_tag(out_tags, MIX_META_ALBUM,     buffer + ID3v1_FIELD_ALBUM,     ID3v1_SIZE_OF_FIELD);
     id3v1_set_tag(out_tags, MIX_META_COPYRIGHT, buffer + ID3v1_FIELD_COPYRIGHT, ID3v1_SIZE_OF_FIELD);
 }
-
-/* Parse content of ID3v1 Enhanced tag */
-static SDL_INLINE void parse_id3v1ext(Mix_MusicMetaTags *out_tags, const Uint8 *buffer)
-{
-    id3v1_set_ext_tag(out_tags, MIX_META_TITLE,  buffer + ID3v1EXT_FIELD_TITLE,  ID3v1EXT_SIZE_OF_FIELD);
-    id3v1_set_ext_tag(out_tags, MIX_META_ARTIST, buffer + ID3v1EXT_FIELD_ARTIST, ID3v1EXT_SIZE_OF_FIELD);
-    id3v1_set_ext_tag(out_tags, MIX_META_ALBUM,  buffer + ID3v1EXT_FIELD_ALBUM,  ID3v1EXT_SIZE_OF_FIELD);
-}
-
 
 
 /********************************************************
@@ -793,7 +737,6 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
     size_t readsize;
     Sint64 file_size, begin_pos, begin_offset = 0, tail_size = 0, ape_tag_pos;
     SDL_bool tag_handled = SDL_FALSE;
-    SDL_bool has_id3v1 = SDL_FALSE;
 
     if (file_edges) {
         file_edges->begin = 0;
@@ -859,7 +802,6 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
                 }
                 tail_size += ID3v1_TAG_SIZE;
                 file_size -= ID3v1_TAG_SIZE;
-                has_id3v1 = SDL_TRUE;
                 continue;
             }
         }
@@ -931,27 +873,6 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
                 }
                 file_size -= (size_t)len;
                 tail_size += len;
-                continue;
-            }
-        }
-
-        /* extended ID3v1 just before the ID3v1 tag? (unlikely)
-         * if found, assume no additional tags: this stupidity
-         * is non-standard..  */
-        if (has_id3v1 && (file_size >= ID3v1EXT_TAG_SIZE)) {
-            SDL_RWseek(src, -(tail_size + ID3v1EXT_TAG_SIZE), RW_SEEK_END);
-            readsize = SDL_RWread(src, in_buffer, 1, ID3v1EXT_TAG_SIZE);
-            SDL_RWseek(src, begin_pos, RW_SEEK_SET);
-            if (readsize != ID3v1EXT_TAG_SIZE) {
-                return -1;
-            }
-
-            if (is_id3v1ext(in_buffer, readsize)) {
-                if (!tag_handled) {
-                    parse_id3v1ext(out_tags, in_buffer);
-                }
-                file_size -= ID3v1EXT_TAG_SIZE;
-                tail_size += ID3v1EXT_TAG_SIZE;
                 continue;
             }
         }
