@@ -469,7 +469,7 @@ static SDL_INLINE long get_lyrics3v1_len(Sint64 begin_pos, SDL_RWops *src)
     pos_begin = SDL_RWtell(src);
 
     read_size = SDL_RWread(src, buffer, 1, (size_t)(pos_end - pos_begin));
-    end = (buffer + read_size);
+    end = (buffer + read_size - LYRICS3v1_HEAD_SIZE);
 
     /* Find the lyrics begin tag... */
     /* strstr() won't work here. */
