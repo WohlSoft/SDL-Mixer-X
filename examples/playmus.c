@@ -1,6 +1,6 @@
 /*
   PLAYMUS:  A test application for the SDL mixer library.
-  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -32,8 +32,8 @@
 #include <unistd.h>
 #endif
 
-#include <SDL2/SDL.h>
-#include <SDL_mixer_ext.h>
+#include "SDL.h"
+#include "SDL_mixer_ext.h"
 
 #ifdef HAVE_SIGNAL_H
 #include <signal.h>
@@ -46,18 +46,15 @@ static int next_track = 0;
 
 void CleanUp(int exitcode)
 {
-    if(Mix_PlayingMusic())
-    {
+    if(Mix_PlayingMusic()) {
         Mix_FadeOutMusic(1500);
         SDL_Delay(1500);
     }
-    if(music)
-    {
+    if (music) {
         Mix_FreeMusic(music);
         music = NULL;
     }
-    if(audio_open)
-    {
+    if (audio_open) {
         Mix_CloseAudio();
         audio_open = 0;
     }
@@ -67,7 +64,7 @@ void CleanUp(int exitcode)
 
 void Usage(char *argv0)
 {
-    fprintf(stderr, "Usage: %s [-i] [-l] [-8] [-r rate] [-c channels] [-b buffers] [-v N] [-rwops] <musicfile>\n", argv0);
+    SDL_Log("Usage: %s [-i] [-l] [-8] [-f32] [-r rate] [-c channels] [-b buffers] [-v N] [-rwops] <musicfile>\n", argv0);
 }
 
 void Menu(void)
@@ -76,25 +73,19 @@ void Menu(void)
 
     printf("Available commands: (p)ause (r)esume (h)alt volume(v#) > ");
     fflush(stdin);
-    if(scanf("%s", buf) == 1)
-    {
-        switch(buf[0])
-        {
-        case 'p':
-        case 'P':
+    if (scanf("%s",buf) == 1) {
+        switch(buf[0]){
+        case 'p': case 'P':
             Mix_PauseMusic();
             break;
-        case 'r':
-        case 'R':
+        case 'r': case 'R':
             Mix_ResumeMusic();
             break;
-        case 'h':
-        case 'H':
+        case 'h': case 'H':
             Mix_HaltMusic();
             break;
-        case 'v':
-        case 'V':
-            Mix_VolumeMusic(atoi(buf + 1));
+        case 'v': case 'V':
+            Mix_VolumeMusic(atoi(buf+1));
             break;
         }
     }
@@ -106,11 +97,10 @@ void Menu(void)
 
 void IntHandler(int sig)
 {
-    switch(sig)
-    {
-    case SIGINT:
-        next_track++;
-        break;
+    switch (sig) {
+            case SIGINT:
+            next_track++;
+            break;
     }
 }
 
@@ -127,95 +117,87 @@ int main(int argc, char *argv[])
     int interactive = 0;
     int rwops = 0;
     int i;
-    Mix_MusicType type = MUS_NONE;
+    const char *typ;
+    const char *tag_title = NULL;
+    const char *tag_artist = NULL;
+    const char *tag_album = NULL;
+    const char *tag_copyright = NULL;
+
+    (void) argc;
 
     /* Initialize variables */
-    audio_rate = 22050;
-    audio_format = AUDIO_S16;
-    audio_channels = 2;
+    audio_rate = MIX_DEFAULT_FREQUENCY;
+    audio_format = MIX_DEFAULT_FORMAT;
+    audio_channels = MIX_DEFAULT_CHANNELS;
     audio_buffers = 4096;
 
     /* Check command line usage */
-    for(i = 1; argv[i] && (*argv[i] == '-'); ++i)
-    {
-        if((strcmp(argv[i], "-r") == 0) && argv[i + 1])
-        {
+    for (i=1; argv[i] && (*argv[i] == '-'); ++i) {
+        if ((strcmp(argv[i], "-r") == 0) && argv[i+1]) {
             ++i;
             audio_rate = atoi(argv[i]);
-        }
-        else if(strcmp(argv[i], "-m") == 0)
-        {
+        } else
+        if (strcmp(argv[i], "-m") == 0) {
             audio_channels = 1;
-        }
-        else if((strcmp(argv[i], "-c") == 0) && argv[i + 1])
-        {
+        } else
+        if ((strcmp(argv[i], "-c") == 0) && argv[i+1]) {
             ++i;
             audio_channels = atoi(argv[i]);
-        }
-        else if((strcmp(argv[i], "-b") == 0) && argv[i + 1])
-        {
+        } else
+        if ((strcmp(argv[i], "-b") == 0) && argv[i+1]) {
             ++i;
             audio_buffers = atoi(argv[i]);
-        }
-        else if((strcmp(argv[i], "-v") == 0) && argv[i + 1])
-        {
+        } else
+        if ((strcmp(argv[i], "-v") == 0) && argv[i+1]) {
             ++i;
             audio_volume = atoi(argv[i]);
-        }
-        else if(strcmp(argv[i], "-l") == 0)
-        {
+        } else
+        if (strcmp(argv[i], "-l") == 0) {
             looping = -1;
-        }
-        else if(strcmp(argv[i], "-i") == 0)
-        {
+        } else
+        if (strcmp(argv[i], "-i") == 0) {
             interactive = 1;
-        }
-        else if(strcmp(argv[i], "-8") == 0)
-        {
+        } else
+        if (strcmp(argv[i], "-8") == 0) {
             audio_format = AUDIO_U8;
-        }
-        else if(strcmp(argv[i], "-rwops") == 0)
-        {
+        } else
+        if (strcmp(argv[i], "-f32") == 0) {
+            audio_format = AUDIO_F32;
+        } else
+        if (strcmp(argv[i], "-rwops") == 0) {
             rwops = 1;
-        }
-        else
-        {
+        } else {
             Usage(argv[0]);
             return(1);
         }
     }
-    if(! argv[i])
-    {
+    if (! argv[i]) {
         Usage(argv[0]);
         return(1);
     }
 
     /* Initialize the SDL library */
-    if(SDL_Init(SDL_INIT_AUDIO) < 0)
-    {
-        fprintf(stderr, "Couldn't initialize SDL: %s\n", SDL_GetError());
+    if (SDL_Init(SDL_INIT_AUDIO) < 0) {
+        SDL_Log("Couldn't initialize SDL: %s\n",SDL_GetError());
         return(255);
     }
 
-    #ifdef HAVE_SIGNAL_H
+#ifdef HAVE_SIGNAL_H
     signal(SIGINT, IntHandler);
     signal(SIGTERM, CleanUp);
-    #endif
+#endif
 
     /* Open the audio device */
-    if(Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers) < 0)
-    {
-        fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError());
+    if (Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers) < 0) {
+        SDL_Log("Couldn't open audio: %s\n", SDL_GetError());
         return(2);
-    }
-    else
-    {
+    } else {
         Mix_QuerySpec(&audio_rate, &audio_format, &audio_channels);
-        printf("Opened audio at %d Hz %d bit %s (%s), %d bytes audio buffer\n", audio_rate,
-               (audio_format & 0xFF),
-               (audio_channels > 2) ? "surround" : (audio_channels > 1) ? "stereo" : "mono",
-               (audio_format & 0x1000) ? "BE" : "LE",
-               audio_buffers);
+        SDL_Log("Opened audio at %d Hz %d bit%s %s %d bytes audio buffer\n", audio_rate,
+            (audio_format&0xFF),
+            (SDL_AUDIO_ISFLOAT(audio_format) ? " (float)" : ""),
+            (audio_channels > 2) ? "surround" : (audio_channels > 1) ? "stereo" : "mono",
+            audio_buffers);
     }
     audio_open = 1;
 
@@ -225,74 +207,85 @@ int main(int argc, char *argv[])
     /* Set the external music player, if any */
     Mix_SetMusicCMD(SDL_getenv("MUSIC_CMD"));
 
-    while(argv[i])
-    {
+    while (argv[i]) {
         next_track = 0;
 
         /* Load the requested music file */
-        if(rwops)
-        {
+        if (rwops) {
             music = Mix_LoadMUS_RW(SDL_RWFromFile(argv[i], "rb"), SDL_TRUE);
-        }
-        else
-        {
+        } else {
             music = Mix_LoadMUS(argv[i]);
         }
-        if(music == NULL)
-        {
-            fprintf(stderr, "Couldn't load %s: %s\n",
-                    argv[i], SDL_GetError());
+        if (music == NULL) {
+            SDL_Log("Couldn't load %s: %s\n",
+                argv[i], SDL_GetError());
             CleanUp(2);
         }
 
-        printf("Detected music type: ");
-        type = Mix_GetMusicType(music);
-        switch(type)
-        {
-        case MUS_NONE:
-            printf("NONE");
-            break;
+        switch (Mix_GetMusicType(music)) {
         case MUS_CMD:
-            printf("CMD");
+            typ = "CMD";
             break;
         case MUS_WAV:
-            printf("WAV");
+            typ = "WAV";
             break;
         case MUS_MOD:
-            printf("MOD (MikMod)");
-            break;
-        case MUS_MODPLUG:
-            printf("MOD (ModPlug)");
+        case MUS_MODPLUG_UNUSED:
+            typ = "MOD";
             break;
         case MUS_FLAC:
-            printf("FLAC");
+            typ = "FLAC";
             break;
         case MUS_MID:
-            printf("MIDI");
+            typ = "MIDI";
             break;
         case MUS_OGG:
-            printf("OGG");
+            typ = "OGG Vorbis";
             break;
         case MUS_MP3:
-            printf("MP3 (SMPEG)");
+        case MUS_MP3_MAD_UNUSED:
+            typ = "MP3";
             break;
-        case MUS_MP3_MAD:
-            printf("MP3 (libMAD)");
+        case MUS_OPUS:
+            typ = "OPUS";
             break;
         case MUS_GME:
-            printf("GME");
+            typ = "GME";
             break;
         case MUS_ADLMIDI:
-            printf("AdlMIDI");
+            typ = "IMF/MUS/XMI";
+            break;
+        case MUS_NONE:
+        default:
+            typ = "NONE";
             break;
         }
-        printf("\n");
+        SDL_Log("Detected music type: %s", typ);
+
+        tag_title = Mix_GetMusicTitleTag(music);
+        if (tag_title && SDL_strlen(tag_title) > 0) {
+            SDL_Log("Title: %s", tag_title);
+        }
+
+        tag_artist = Mix_GetMusicArtistTag(music);
+        if (tag_artist && SDL_strlen(tag_artist) > 0) {
+            SDL_Log("Artist: %s", tag_artist);
+        }
+
+        tag_album = Mix_GetMusicAlbumTag(music);
+        if (tag_album && SDL_strlen(tag_album) > 0) {
+            SDL_Log("Album: %s", tag_album);
+        }
+
+        tag_copyright = Mix_GetMusicCopyrightTag(music);
+        if (tag_copyright && SDL_strlen(tag_copyright) > 0) {
+            SDL_Log("Copyright: %s", tag_copyright);
+        }
 
         /* Play and then exit */
-        printf("Playing %s\n", argv[i]);
-        Mix_FadeInMusic(music, looping, 2000);
-        while(!next_track && (Mix_PlayingMusic() || Mix_PausedMusic()))
-        {
+        SDL_Log("Playing %s\n", argv[i]);
+        Mix_FadeInMusic(music,looping,2000);
+        while (!next_track && (Mix_PlayingMusic() || Mix_PausedMusic())) {
             if(interactive)
                 Menu();
             else
@@ -303,7 +296,7 @@ int main(int argc, char *argv[])
 
         /* If the user presses Ctrl-C more than once, exit. */
         SDL_Delay(500);
-        if(next_track > 1) break;
+        if (next_track > 1) break;
 
         i++;
     }
@@ -312,3 +305,5 @@ int main(int argc, char *argv[])
     /* Not reached, but fixes compiler warnings */
     return 0;
 }
+
+/* vi: set ts=4 sw=4 expandtab: */

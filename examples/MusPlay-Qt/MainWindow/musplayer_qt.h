@@ -1,8 +1,7 @@
-#if !defined(MUSPLAYER_QT_H) && !defined(MUSPLAY_USE_WINAPI)
+#ifndef MUSPLAYER_QT_H
 #define MUSPLAYER_QT_H
 
 #include "musplayer_base.h"
-//#include "mw_qt/playlist_model.h"
 
 #include <QMainWindow>
 

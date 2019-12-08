@@ -447,6 +447,7 @@ static int MIKMOD_GetAudio(void *context, void *data, int bytes)
 static int MIKMOD_Seek(void *context, double position)
 {
     (void)context;
+    /* FIXME: WRONG: THIS IS NOT A TIME SEEK */
     mikmod.Player_SetPosition((UWORD)position);
     return 0;
 }
@@ -515,7 +516,7 @@ Mix_MusicInterface Mix_MusicInterface_MIKMOD =
     MIKMOD_Stop,
     MIKMOD_Delete,
     MIKMOD_Close,
-    MIKMOD_Unload,
+    MIKMOD_Unload
 };
 
 #endif /* MUSIC_MOD_MIKMOD */

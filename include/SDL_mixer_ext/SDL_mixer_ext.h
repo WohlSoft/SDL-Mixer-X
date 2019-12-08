@@ -38,13 +38,13 @@
 #define MIXSDLCALL
 
 #if defined(FORCE_STDCALLS) && defined(_WIN32)
-#ifdef SDLCALL
-#undef SDLCALL
-#endif
-#define SDLCALL   __stdcall
-#define SDLCALLCC __stdcall
+#   ifdef SDLCALL
+#       undef SDLCALL
+#   endif
+#   define SDLCALL   __stdcall
+#   define SDLCALLCC __stdcall
 #else
-#define SDLCALLCC
+#   define SDLCALLCC
 #endif
 
 #ifndef MIXERX_DEPRECATED
@@ -57,7 +57,7 @@
 
 #   ifdef __clang__
 #       if __has_extension(attribute_deprecated_with_message)
-#           define JSONCPP_DEPRECATED(message) __attribute__((deprecated(message)))
+#           define MIXERX_DEPRECATED(message) __attribute__((deprecated(message)))
 #       endif
 #   elif defined __GNUC__ /* not clang (gcc comes later since clang emulates gcc) */
 #       if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5))
@@ -934,12 +934,9 @@ extern DECLSPEC int  SDLCALL Mix_SetMidiPlayer(int player);
 /* Disables support of MIDI file arguments */
 extern DECLSPEC void SDLCALL Mix_SetLockMIDIArgs(int lock_midiargs);
 
-/*  DEPRECATED NAMES for new-added SDL Mixer X functions
-    Those names are made with mistake - beginning with "MIX_" than "Mix_"
-    which makes confusion when you looking for Mix_ function in your IDE
-    because some applications are still use them, to don't break ABI we will keep those
-    aliases until we will remove all usages of them from applications and libraries are used them
-*/
+
+/*  DEPRECATED FUNCTIONS */
+
 MIXERX_DEPRECATED("Use Mix_GetMidiPlayer() instead")
 extern DECLSPEC int  SDLCALL Mix_GetMidiDevice(void);
 
@@ -948,6 +945,8 @@ extern DECLSPEC int  SDLCALL Mix_GetNextMidiDevice(void);
 
 MIXERX_DEPRECATED("Use Mix_SetMidiPlayer() instead")
 extern DECLSPEC int  SDLCALL Mix_SetMidiDevice(int player);
+
+/*  DEPRECATED FUNCTIONS, END */
 
 /* We'll use SDL for reporting errors */
 #define Mix_SetError    SDL_SetError

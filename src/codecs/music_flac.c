@@ -28,6 +28,7 @@
 #include "SDL_loadso.h"
 
 #include "music_flac.h"
+#include "utils.h"
 
 #include <FLAC/stream_decoder.h>
 
@@ -69,9 +70,7 @@ typedef struct {
 } flac_loader;
 
 static flac_loader flac = {
-    0, NULL,
-    NULL, NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL, NULL
+    0, NULL
 };
 
 #ifdef FLAC_DYNAMIC
@@ -355,7 +354,8 @@ static FLAC__StreamDecoderWriteStatus flac_write_music_cb(
     }
     amount = (int)(frame->header.blocksize * channels * sizeof(*data));
     music->pcm_pos += ((FLAC__uint64)frame->header.blocksize);
-    if ((music->loop == 1) && (music->pcm_pos >= music->loop_end)) {
+    if ((music->loop == 1) && (music->play_count != 1) &&
+        (music->pcm_pos >= music->loop_end)) {
         amount -= (music->pcm_pos - music->loop_end) * channels * sizeof(*data);
         music->loop_flag = SDL_TRUE;
     }
@@ -366,6 +366,7 @@ static FLAC__StreamDecoderWriteStatus flac_write_music_cb(
     return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }
 
+#if 0 /* Moved into "utils.c" */
 /* Parse time string of the form HH:MM:SS.mmm and return equivalent sample
  * position */
 static FLAC__uint64 parse_time(char *time, unsigned samplerate_hz)
@@ -405,6 +406,7 @@ static SDL_bool is_loop_tag(const char *tag)
     SDL_strlcpy(buf, tag, 5);
     return SDL_strcasecmp(buf, "LOOP") == 0;
 }
+#endif /* Moved into "utils.c" */
 
 static void flac_metadata_music_cb(
                     const FLAC__StreamDecoder *decoder,
@@ -661,6 +663,11 @@ static int FLAC_GetSome(void *context, void *data, int bytes, SDL_bool *done)
             flac.FLAC__stream_decoder_flush(music->flac_decoder);
             return -1;
         } else {
+            int play_count = -1;
+            if (music->play_count > 0) {
+                play_count = (music->play_count - 1);
+            }
+            music->play_count = play_count;
             music->loop_flag = SDL_FALSE;
         }
     }
@@ -693,11 +700,11 @@ static int FLAC_GetAudio(void *context, void *data, int bytes)
 static int FLAC_Seek(void *context, double position)
 {
     FLAC_Music *music = (FLAC_Music *)context;
-    double seek_sample = music->sample_rate * position;
+    FLAC__uint64 seek_sample = (FLAC__uint64) (music->sample_rate * position);
 
     SDL_AudioStreamClear(music->stream);
-    music->pcm_pos = (FLAC__uint64)seek_sample;
-    if (!flac.FLAC__stream_decoder_seek_absolute(music->flac_decoder, (FLAC__uint64)seek_sample)) {
+    music->pcm_pos = seek_sample;
+    if (!flac.FLAC__stream_decoder_seek_absolute(music->flac_decoder, seek_sample)) {
         if (flac.FLAC__stream_decoder_get_state(music->flac_decoder) == FLAC__STREAM_DECODER_SEEK_ERROR) {
             flac.FLAC__stream_decoder_flush(music->flac_decoder);
         }
@@ -812,7 +819,7 @@ Mix_MusicInterface Mix_MusicInterface_FLAC =
     NULL,   /* Stop */
     FLAC_Delete,
     NULL,   /* Close */
-    FLAC_Unload,
+    FLAC_Unload
 };
 
 #endif /* MUSIC_FLAC */

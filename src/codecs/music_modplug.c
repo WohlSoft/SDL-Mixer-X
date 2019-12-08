@@ -39,9 +39,7 @@ typedef struct {
     void (*ModPlug_Unload)(ModPlugFile* file);
     int  (*ModPlug_Read)(ModPlugFile* file, void* buffer, int size);
     void (*ModPlug_Seek)(ModPlugFile* file, int millisecond);
-#ifdef MODPLUG_HAS_TELL
     int  (*ModPlug_Tell)(ModPlugFile* file);
-#endif
     int  (*ModPlug_GetLength)(ModPlugFile* file);
     void (*ModPlug_GetSettings)(ModPlug_Settings* settings);
     void (*ModPlug_SetSettings)(const ModPlug_Settings* settings);
@@ -50,12 +48,7 @@ typedef struct {
 } modplug_loader;
 
 static modplug_loader modplug = {
-    0, NULL,
-    NULL, NULL, NULL, NULL,
-    #ifdef MODPLUG_HAS_TELL
-    NULL,
-    #endif
-    NULL, NULL, NULL, NULL, NULL
+    0, NULL
 };
 
 
@@ -65,12 +58,8 @@ static ModPlug_Settings settings;
 #define FUNCTION_LOADER(FUNC, SIG) \
     modplug.FUNC = (SIG) SDL_LoadFunction(modplug.handle, #FUNC); \
     if (modplug.FUNC == NULL) { SDL_UnloadObject(modplug.handle); return -1; }
-#define FUNCTION_LOADER_OPTIONAL(FUNC, SIG) \
-    modplug.FUNC = (SIG) SDL_LoadFunction(modplug.handle, #FUNC);
 #else
 #define FUNCTION_LOADER(FUNC, SIG) \
-    modplug.FUNC = FUNC;
-#define FUNCTION_LOADER_OPTIONAL(FUNC, SIG) \
     modplug.FUNC = FUNC;
 #endif
 
@@ -95,15 +84,18 @@ static int MODPLUG_Load(void)
         FUNCTION_LOADER(ModPlug_Unload, void (*)(ModPlugFile* file))
         FUNCTION_LOADER(ModPlug_Read, int  (*)(ModPlugFile* file, void* buffer, int size))
         FUNCTION_LOADER(ModPlug_Seek, void (*)(ModPlugFile* file, int millisecond))
-#ifdef MODPLUG_HAS_TELL
-        /* Use optional strategy to support both official and extended ABIs */
-        FUNCTION_LOADER_OPTIONAL(ModPlug_Tell, int  (*)(ModPlugFile* file))
-#endif
         FUNCTION_LOADER(ModPlug_GetLength, int  (*)(ModPlugFile* file))
         FUNCTION_LOADER(ModPlug_GetSettings, void (*)(ModPlug_Settings* settings))
         FUNCTION_LOADER(ModPlug_SetSettings, void (*)(const ModPlug_Settings* settings))
         FUNCTION_LOADER(ModPlug_SetMasterVolume, void (*)(ModPlugFile* file,unsigned int cvol))
         FUNCTION_LOADER(ModPlug_GetName, const char* (*)(ModPlugFile* file))
+#ifdef MODPLUG_DYNAMIC
+        modplug.ModPlug_Tell = (int (*)(ModPlugFile* file)) SDL_LoadFunction(modplug.handle, "ModPlug_Tell");
+#elif defined(MODPLUG_HAS_TELL)
+        modplug.ModPlug_Tell = ModPlug_Tell;
+#else
+        modplug.ModPlug_Tell = NULL;
+#endif
     }
     ++modplug.loaded;
 
@@ -301,17 +293,12 @@ static int MODPLUG_Seek(void *context, double position)
 
 static double MODPLUG_Tell(void *context)
 {
-    #ifdef MODPLUG_HAS_TELL
     if (modplug.ModPlug_Tell) {
         MODPLUG_Music *music = (MODPLUG_Music *)context;
         return (double)(modplug.ModPlug_Tell(music->file)) / 1000.0;
     } else {
-        return -1;
+        return -1.0;
     }
-    #else
-    (void)context;
-    return -1.0;
-    #endif
 }
 
 static double MODPLUG_Length(void *context)
@@ -376,7 +363,7 @@ Mix_MusicInterface Mix_MusicInterface_MODPLUG =
     NULL,   /* Stop */
     MODPLUG_Delete,
     NULL,   /* Close */
-    MODPLUG_Unload,
+    MODPLUG_Unload
 };
 
 #endif /* MUSIC_MOD_MODPLUG */

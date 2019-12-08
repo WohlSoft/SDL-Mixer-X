@@ -698,6 +698,7 @@ static void SDLCALL _Eff_position_u16lsb_c6(int chan, void *stream, int len, voi
     volatile position_args *args = (volatile position_args *) udata;
     Uint16 *ptr = (Uint16 *) stream;
     int i;
+
     (void)chan;
 
     for (i = 0; i < len; i += sizeof (Uint16) * 6) {
