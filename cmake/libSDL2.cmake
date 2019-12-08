@@ -1,3 +1,5 @@
+# FIXME: Detect a version of SDL2 for pkg-config script
+
 if(USE_SYSTEM_AUDIO_LIBRARIES OR USE_SYSTEM_SDL2)
     find_package(SDL2 REQUIRED)
     set(LIBSDL2CUSTOM_LIB ${SDL2_LIBRARIES})

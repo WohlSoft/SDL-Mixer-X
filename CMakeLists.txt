@@ -455,6 +455,21 @@ install(FILES
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/SDL2"
 )
 
+if(NOT ANDROID)
+    set(prefix ${CMAKE_INSTALL_PREFIX})
+    set(exec_prefix "\${prefix}")
+    set(libdir "\${exec_prefix}/lib${LIB_SUFFIX}")
+    set(bindir "\${exec_prefix}/bin")
+    set(includedir "\${prefix}/include")
+    set(VERSION ${SDLMixerX_VERSION})
+
+    configure_file("${SDLMixerX_SOURCE_DIR}/SDL2_mixer_ext.pc.in"
+        "${SDLMixerX_BINARY_DIR}/SDL2_mixer_ext.pc" @ONLY)
+    install(FILES "${SDLMixerX_BINARY_DIR}/SDL2_mixer_ext.pc"
+            DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+endif()
+
+
 function(print_sumary _libName _isEnabled _wasFound _whatFound)
     if(${_isEnabled})
         if(${_wasFound})
