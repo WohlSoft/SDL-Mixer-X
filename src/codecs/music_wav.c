@@ -24,7 +24,7 @@
 /* This file supports streaming WAV files */
 
 #include "music_wav.h"
-#include "music_id3tag.h"
+#include "mp3utils.h"
 
 typedef struct {
     SDL_bool active;
@@ -881,7 +881,7 @@ static SDL_bool ParseID3(WAV_Music *wave, Uint32 chunk_length)
     }
 
     if (SDL_strncmp((char *)data, "ID3", 3) == 0) {
-        id3tag_fetchTagsFromMemory(&wave->tags, data, chunk_length, NULL);
+        mp3_read_tags_mem(&wave->tags, data, chunk_length, NULL);
         loaded = SDL_TRUE;
     }
 

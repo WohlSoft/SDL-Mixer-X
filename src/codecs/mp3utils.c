@@ -19,9 +19,44 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "music_id3tag.h"
+#include "mp3utils.h"
 
 #include "SDL_log.h"
+
+#if defined(MUSIC_MP3_MAD) /*|| defined(MUSIC_MP3_MPG123)*/
+
+/*********************** SDL_RW WITH BOOKKEEPING ************************/
+
+size_t MP3_RWread(struct mp3file_t *fil, void *ptr, size_t size, size_t maxnum) {
+    size_t remaining = (size_t)(fil->length - fil->pos);
+    size_t ret;
+    maxnum *= size;
+    if (maxnum > remaining) maxnum = remaining;
+    ret = SDL_RWread(fil->src, ptr, 1, maxnum);
+    fil->pos += (Sint64)ret;
+    return ret;
+}
+
+Sint64 MP3_RWseek(struct mp3file_t *fil, Sint64 offset, int whence) {
+    Sint64 ret;
+    switch (whence) { /* assumes a legal whence value */
+    case RW_SEEK_CUR:
+        offset += fil->pos;
+        break;
+    case RW_SEEK_END:
+        offset = fil->length + offset;
+        break;
+    }
+    if (offset < 0) return -1;
+    if (offset > fil->length)
+        offset = fil->length;
+    ret = SDL_RWseek(fil->src, fil->start + offset, RW_SEEK_SET);
+    if (ret < 0) return ret;
+    fil->pos = offset;
+    return (fil->pos - fil->start);
+}
+
+#endif
 
 #define TAGS_INPUT_BUFFER_SIZE (5 * 8192)
 
@@ -772,7 +807,7 @@ static SDL_bool parse_ape(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Sint64 be
     return SDL_TRUE;
 }
 
-int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthStrip *file_edges)
+int mp3_read_tags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, struct mp3file_t *file_edges)
 {
     Uint8 in_buffer[TAGS_INPUT_BUFFER_SIZE];
     long len;
@@ -780,17 +815,16 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
     Sint64 file_size, begin_pos, begin_offset = 0, tail_size = 0, ape_tag_pos;
     SDL_bool tag_handled = SDL_FALSE;
 
-    if (file_edges) {
-        file_edges->begin = 0;
-        file_edges->end = 0;
-    }
-
     if (!src) {
         return -1;
     }
 
     begin_pos = SDL_RWtell(src);
-    file_size = SDL_RWsize(src);
+    if (file_edges) {
+        file_size = file_edges->length;
+    } else {
+        file_size = SDL_RWsize(src);
+    }
 
     SDL_RWseek(src, begin_pos, RW_SEEK_SET);
     readsize = SDL_RWread(src, in_buffer, 1, TAGS_INPUT_BUFFER_SIZE);
@@ -891,9 +925,6 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
                 }
                 file_size -= (size_t)len;
                 tail_size += len;
-                if (file_edges) {
-                    file_edges->end += len;
-                }
                 continue;
             }
         }
@@ -923,18 +954,18 @@ int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthSt
     }
 
     if (file_edges) {
-        file_edges->begin = begin_offset;
-        file_edges->end = tail_size;
+        file_edges->start = begin_offset;
+        file_edges->length = file_size;
     }
 
     return (file_size > 0) ? 0 :-1;
 }
 
-int id3tag_fetchTagsFromMemory(Mix_MusicMetaTags *out_tags, Uint8 *data, size_t length, Id3TagLengthStrip *file_edges)
+int mp3_read_tags_mem(Mix_MusicMetaTags *out_tags, Uint8 *data, size_t length, struct mp3file_t *file_edges)
 {
     SDL_RWops *src = SDL_RWFromConstMem(data, (int)length);
     if (src) {
-        int ret = id3tag_fetchTags(out_tags, src, file_edges);
+        int ret = mp3_read_tags(out_tags, src, file_edges);
         SDL_RWclose(src);
         return ret;
     }

@@ -28,7 +28,15 @@ typedef struct {
     Sint64 end;
 } Id3TagLengthStrip;
 
-extern int id3tag_fetchTags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Id3TagLengthStrip *file_edges);
-extern int id3tag_fetchTagsFromMemory(Mix_MusicMetaTags *out_tags, Uint8 *data, size_t length, Id3TagLengthStrip *file_edges);
+struct mp3file_t {
+    SDL_RWops *src;
+    Sint64 start, length, pos;
+};
+
+extern int mp3_read_tags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, struct mp3file_t *file_edges);
+extern int mp3_read_tags_mem(Mix_MusicMetaTags *out_tags, Uint8 *data, size_t length, struct mp3file_t *file_edges);
+
+extern size_t MP3_RWread(struct mp3file_t *fil, void *ptr, size_t size, size_t maxnum);
+extern Sint64 MP3_RWseek(struct mp3file_t *fil, Sint64 offset, int whence);
 
 /* vi: set ts=4 sw=4 expandtab: */

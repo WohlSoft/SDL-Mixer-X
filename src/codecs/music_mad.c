@@ -22,7 +22,7 @@
 #ifdef MUSIC_MP3_MAD
 
 #include "music_mad.h"
-#include "music_id3tag.h"
+#include "mp3utils.h"
 
 #include "mad.h"
 
@@ -137,9 +137,8 @@ enum {
 };
 
 typedef struct {
+    struct mp3file_t mp3file;
     int play_count;
-    SDL_RWops *src;
-    Sint64 start, length, pos;
     int freesrc;
     struct mad_stream stream;
     struct mad_frame frame;
@@ -158,35 +157,6 @@ typedef struct {
 } MAD_Music;
 
 
-static size_t MAD_RWread(MAD_Music *music, void *ptr, size_t size, size_t maxnum) {
-    size_t remaining = (size_t)(music->length - music->pos);
-    size_t ret;
-    maxnum *= size;
-    if (maxnum > remaining) maxnum = remaining;
-    ret = SDL_RWread(music->src, ptr, 1, maxnum);
-    music->pos += (Sint64)ret;
-    return ret;
-}
-
-static Sint64 MAD_RWseek(MAD_Music *music, Sint64 offset, int whence) {
-    Sint64 ret;
-    switch (whence) { /* assumes a legal whence value */
-    case RW_SEEK_CUR:
-        offset += music->pos;
-        break;
-    case RW_SEEK_END:
-        offset = music->length + offset;
-        break;
-    }
-    if (offset < 0) return -1;
-    if (offset > music->length)
-        offset = music->length;
-    ret = SDL_RWseek(music->src, music->start + offset, RW_SEEK_SET);
-    if (ret < 0) return ret;
-    music->pos = offset;
-    return (music->pos - music->start);
-}
-
 static void read_update_buffer(struct mad_stream *stream, MAD_Music *music);
 
 static void calculate_total_time(MAD_Music *music)
@@ -197,7 +167,7 @@ static void calculate_total_time(MAD_Music *music)
     mad_header_init(&header);
     mad_stream_init(&stream);
 
-    MAD_RWseek(music, 0, RW_SEEK_SET);
+    MP3_RWseek(&music->mp3file, 0, RW_SEEK_SET);
 
     while (1)
     {
@@ -232,7 +202,7 @@ static void calculate_total_time(MAD_Music *music)
 
     music->status = 0;
 
-    MAD_RWseek(music, 0, RW_SEEK_SET);
+    MP3_RWseek(&music->mp3file, 0, RW_SEEK_SET);
 }
 
 static int MAD_Seek(void *context, double position);
@@ -243,26 +213,22 @@ static int skip_tags(MAD_Music *music);
 static void *MAD_CreateFromRW(SDL_RWops *src, int freesrc)
 {
     MAD_Music *music;
-    Id3TagLengthStrip len_strip;
 
     music = (MAD_Music *)SDL_calloc(1, sizeof(MAD_Music));
     if (!music) {
         SDL_OutOfMemory();
         return NULL;
     }
-    music->src = src;
+    music->mp3file.src = src;
     music->volume = MIX_MAX_VOLUME;
 
-    music->length = SDL_RWsize(src);
+    music->mp3file.length = SDL_RWsize(src);
     meta_tags_init(&music->tags);
-    if (id3tag_fetchTags(&music->tags, music->src, &len_strip) < 0) {
+    if (mp3_read_tags(&music->tags, music->mp3file.src, &music->mp3file) < 0) {
         SDL_free(music);
         Mix_SetError("music_mad: corrupt mp3 file.");
         return NULL;
     }
-
-    music->start = len_strip.begin;
-    music->length -= (music->start + len_strip.end);
 
     calculate_total_time(music);
 
@@ -296,10 +262,6 @@ static int MAD_Play(void *context, int play_count)
 }
 
 
-/*************************** TAG HANDLING: ******************************/
-/* Moved into "music_id3tag.c" */
-/*************************** TAG HANDLING: ******************************/
-
 /* Reads the next frame from the file.
    Returns true on success or false on failure.
  */
@@ -327,7 +289,7 @@ static void read_update_buffer(struct mad_stream *stream, MAD_Music *music)
         }
 
         /* Now read additional bytes from the input file. */
-        read_size = MAD_RWread(music, read_start, 1, read_size);
+        read_size = MP3_RWread(&music->mp3file, read_start, 1, read_size);
 
         if (read_size == 0) {
             if ((music->status & (MS_input_eof | MS_input_error)) == 0) {
@@ -485,6 +447,7 @@ static int MAD_GetSome(void *context, void *data, int bytes, SDL_bool *done)
     }
     return 0;
 }
+
 static int MAD_GetAudio(void *context, void *data, int bytes)
 {
     MAD_Music *music = (MAD_Music *)context;
@@ -512,7 +475,7 @@ static int MAD_Seek(void *context, double position)
         mad_timer_reset(&music->next_frame_start);
         music->status &= ~MS_error_flags;
 
-        MAD_RWseek(music, 0, RW_SEEK_SET);
+        MP3_RWseek(&music->mp3file, 0, RW_SEEK_SET);
         /* Avoid junk chunk be played after seek */
         SDL_memset(music->input_buffer, 0, sizeof(music->input_buffer));
     }
@@ -567,7 +530,7 @@ static void MAD_Delete(void *context)
         SDL_FreeAudioStream(music->audiostream);
     }
     if (music->freesrc) {
-        SDL_RWclose(music->src);
+        SDL_RWclose(music->mp3file.src);
     }
     SDL_free(music);
 }

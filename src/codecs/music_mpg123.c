@@ -29,7 +29,7 @@
 #include "SDL_loadso.h"
 
 #include "music_mpg123.h"
-#include "music_id3tag.h"
+#include "mp3utils.h"
 
 #include <mpg123.h>
 
@@ -232,7 +232,7 @@ static void *MPG123_CreateFromRW(SDL_RWops *src, int freesrc)
     music->volume = MIX_MAX_VOLUME;
 
     meta_tags_init(&music->tags);
-    id3tag_fetchTags(&music->tags, music->src, NULL);
+    mp3_read_tags(&music->tags, music->src, NULL);
 
     /* Just assume 16-bit 2 channel audio for now */
     music->buffer_size = music_spec.samples * sizeof(Sint16) * 2;

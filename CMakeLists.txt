@@ -210,7 +210,7 @@ include(music_mpg123)
 
 if(USE_MP3_MAD OR USE_MP3_MPG123 OR USE_WAV)
     list(APPEND SDLMixerX_SOURCES
-        ${SDLMixerX_SOURCE_DIR}/src/codecs/music_id3tag.c)
+        ${SDLMixerX_SOURCE_DIR}/src/codecs/mp3utils.c)
 endif()
 
 include(music_modplug)
