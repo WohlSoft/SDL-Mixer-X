@@ -972,6 +972,11 @@ int read_id3v2_from_mem(Mix_MusicMetaTags *out_tags, Uint8 *data, size_t length)
             return -1;
         }
 
+        if (get_id3v2_len(data, (long)length) > (long)length) {
+            SDL_RWclose(src);
+            return -1;
+        }
+
         is_valid = parse_id3v2(out_tags, src, 0);
         SDL_RWclose(src);
 
