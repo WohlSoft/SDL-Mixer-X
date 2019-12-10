@@ -255,7 +255,7 @@ static char *id3v2_decode_string(const Uint8 *string, size_t size)
         if (size <= 2) {
             return NULL; /* Blank string*/
         }
-        str_buffer = parse_id3v1_ansi_string((string + 1), size);
+        str_buffer = parse_id3v1_ansi_string((string + 1), size - 1);
     }
 
     return str_buffer;
