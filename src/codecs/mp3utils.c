@@ -23,8 +23,7 @@
 
 #include "SDL_log.h"
 
-#if defined(MUSIC_MP3_MAD) || defined(MUSIC_MP3_MPG123)
-
+#ifdef ENABLE_ALL_MP3_TAGS
 /*********************** SDL_RW WITH BOOKKEEPING ************************/
 
 size_t MP3_RWread(struct mp3file_t *fil, void *ptr, size_t size, size_t maxnum) {
@@ -56,8 +55,9 @@ Sint64 MP3_RWseek(struct mp3file_t *fil, Sint64 offset, int whence) {
     return (fil->pos - fil->start);
 }
 
-#endif
+#endif /* ENABLE_ALL_MP3_TAGS */
 
+#ifdef ENABLE_ALL_MP3_TAGS
 #define TAGS_INPUT_BUFFER_SIZE (5 * 8192)
 
 /********************************************************
@@ -80,8 +80,10 @@ static SDL_INLINE SDL_bool is_id3v1(const Uint8 *data, size_t length)
     }
     return SDL_TRUE;
 }
+#endif
 
-/* Parse ASCII string and clean it up from non-ASCII characters (replace them with a question mark '?') */
+#ifdef ENABLE_ID3V2_TAG
+/* Parse ISO-8859-1 string and convert it into UTF-8 */
 static SDL_INLINE char *parse_id3v1_ansi_string(const Uint8 *buffer, size_t src_len)
 {
     char *src_buffer = (char*)SDL_malloc(src_len + 1);
@@ -92,7 +94,9 @@ static SDL_INLINE char *parse_id3v1_ansi_string(const Uint8 *buffer, size_t src_
     SDL_free(src_buffer);
     return ret;
 }
+#endif /* ENABLE_ID3V2_TAG */
 
+#ifdef ENABLE_ALL_MP3_TAGS
 static SDL_INLINE void id3v1_set_tag(Mix_MusicMetaTags *out_tags, Mix_MusicMetaTag tag, const Uint8 *buffer, size_t len)
 {
     char *src_buf = parse_id3v1_ansi_string(buffer, len);
@@ -110,8 +114,9 @@ static SDL_INLINE void parse_id3v1(Mix_MusicMetaTags *out_tags, const Uint8 *buf
     id3v1_set_tag(out_tags, MIX_META_ALBUM,     buffer + ID3v1_FIELD_ALBUM,     ID3v1_SIZE_OF_FIELD);
     id3v1_set_tag(out_tags, MIX_META_COPYRIGHT, buffer + ID3v1_FIELD_COPYRIGHT, ID3v1_SIZE_OF_FIELD);
 }
+#endif /* ENABLE_ALL_MP3_TAGS */
 
-
+#ifdef ENABLE_ID3V2_TAG
 /********************************************************
  *                       ID3v2                          *
  ********************************************************/
@@ -459,8 +464,9 @@ static SDL_bool parse_id3v2(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Sint64 
 
     return SDL_TRUE;
 }
+#endif /* ENABLE_ID3V2_TAG */
 
-
+#ifdef ENABLE_ALL_MP3_TAGS
 /********************************************************
  *                   Lyrics3 skip                       *
  ********************************************************/
@@ -960,7 +966,9 @@ int mp3_read_tags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, struct mp3file_t 
 
     return (file_size > 0) ? 0 :-1;
 }
+#endif /* ENABLE_ALL_MP3_TAGS */
 
+#ifdef ENABLE_ID3V2_TAG
 int read_id3v2_from_mem(Mix_MusicMetaTags *out_tags, Uint8 *data, size_t length)
 {
     SDL_RWops *src = SDL_RWFromConstMem(data, (int)length);
@@ -984,3 +992,4 @@ int read_id3v2_from_mem(Mix_MusicMetaTags *out_tags, Uint8 *data, size_t length)
     }
     return -1;
 }
+#endif /* ENABLE_ID3V2_TAG */

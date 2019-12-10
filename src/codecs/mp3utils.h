@@ -23,20 +23,30 @@
 
 #include "music.h"
 
-typedef struct {
-    Sint64 begin;
-    Sint64 end;
-} Id3TagLengthStrip;
+#if defined(MUSIC_MP3_MAD) || defined(MUSIC_MP3_MPG123)
+#define ENABLE_ALL_MP3_TAGS
+#endif
 
+#if defined(MUSIC_WAV) || defined(ENABLE_ALL_MP3_TAGS)
+#define ENABLE_ID3V2_TAG
+#endif
+
+#ifdef ENABLE_ALL_MP3_TAGS
 struct mp3file_t {
     SDL_RWops *src;
     Sint64 start, length, pos;
 };
 
 extern int mp3_read_tags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, struct mp3file_t *file_edges);
-extern int read_id3v2_from_mem(Mix_MusicMetaTags *out_tags, Uint8 *data, size_t length);
+#endif /* ENABLE_ALL_MP3_TAGS */
 
+#ifdef ENABLE_ID3V2_TAG
+extern int read_id3v2_from_mem(Mix_MusicMetaTags *out_tags, Uint8 *data, size_t length);
+#endif
+
+#ifdef ENABLE_ALL_MP3_TAGS
 extern size_t MP3_RWread(struct mp3file_t *fil, void *ptr, size_t size, size_t maxnum);
 extern Sint64 MP3_RWseek(struct mp3file_t *fil, Sint64 offset, int whence);
+#endif /* ENABLE_ALL_MP3_TAGS */
 
 /* vi: set ts=4 sw=4 expandtab: */
