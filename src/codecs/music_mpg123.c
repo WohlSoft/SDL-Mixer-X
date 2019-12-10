@@ -126,8 +126,8 @@ static void MPG123_Unload(void)
 
 typedef struct
 {
+    struct mp3file_t mp3file;
     int play_count;
-    SDL_RWops* src;
     int freesrc;
     int volume;
 
@@ -191,12 +191,14 @@ static char const* mpg_err(mpg123_handle* mpg, int result)
 /* we're gonna override mpg123's I/O with these wrappers for RWops */
 static ssize_t rwops_read(void* p, void* dst, size_t n)
 {
-    return (ssize_t)SDL_RWread((SDL_RWops*)p, dst, 1, n);
+    struct mp3file_t *t = (struct mp3file_t *)p;
+    return (ssize_t)MP3_RWread(t, dst, 1, n);
 }
 
 static off_t rwops_seek(void* p, off_t offset, int whence)
 {
-    return (off_t)SDL_RWseek((SDL_RWops*)p, (Sint64)offset, whence);
+    struct mp3file_t *t = (struct mp3file_t *)p;
+    return (off_t)MP3_RWseek(t, (Sint64)offset, whence);
 }
 
 static void rwops_cleanup(void* p)
@@ -228,11 +230,17 @@ static void *MPG123_CreateFromRW(SDL_RWops *src, int freesrc)
     if (!music) {
         return NULL;
     }
-    music->src = src;
+    music->mp3file.src = src;
     music->volume = MIX_MAX_VOLUME;
 
+    music->mp3file.length = SDL_RWsize(src);
     meta_tags_init(&music->tags);
-    mp3_read_tags(&music->tags, music->src, NULL);
+    if (mp3_read_tags(&music->tags, music->mp3file.src, &music->mp3file) < 0) {
+        SDL_free(music);
+        Mix_SetError("music_mpg123: corrupt mp3 file.");
+        return NULL;
+    }
+    MP3_RWseek(&music->mp3file, 0, RW_SEEK_SET);
 
     /* Just assume 16-bit 2 channel audio for now */
     music->buffer_size = music_spec.samples * sizeof(Sint16) * 2;
@@ -280,7 +288,7 @@ static void *MPG123_CreateFromRW(SDL_RWops *src, int freesrc)
         mpg123.mpg123_format(music->handle, rates[i], channels, formats);
     }
 
-    result = mpg123.mpg123_open_handle(music->handle, music->src);
+    result = mpg123.mpg123_open_handle(music->handle, &music->mp3file);
     if (result != MPG123_OK) {
         MPG123_Delete(music);
         Mix_SetError("mpg123_open_handle: %s", mpg_err(music->handle, result));
@@ -468,7 +476,7 @@ static void MPG123_Delete(void *context)
         SDL_free(music->buffer);
     }
     if (music->freesrc) {
-        SDL_RWclose(music->src);
+        SDL_RWclose(music->mp3file.src);
     }
     SDL_free(music);
 }
