@@ -23,7 +23,7 @@
 
 #include "SDL_log.h"
 
-#if defined(MUSIC_MP3_MAD) /*|| defined(MUSIC_MP3_MPG123)*/
+#if defined(MUSIC_MP3_MAD) || defined(MUSIC_MP3_MPG123)
 
 /*********************** SDL_RW WITH BOOKKEEPING ************************/
 
