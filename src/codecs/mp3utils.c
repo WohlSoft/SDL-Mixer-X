@@ -504,14 +504,14 @@ static SDL_INLINE long get_lyrics3v1_len(Sint64 begin_pos, SDL_RWops *src)
     pos_begin = SDL_RWtell(src);
 
     read_size = SDL_RWread(src, buffer, 1, (size_t)(pos_end - pos_begin));
-    end = (buffer + read_size - LYRICS3v1_HEAD_SIZE);
+    end = (buffer + read_size - LYRICS3v1_TAIL_SIZE);
 
     /* Find the lyrics begin tag... */
     /* strstr() won't work here. */
     for (cur = buffer; cur != end; cur++) {
         if (SDL_memcmp(cur, "LYRICSBEGIN", LYRICS3v1_HEAD_SIZE) == 0) {
             /* Calculate a full length of a tag */
-            len = (long)(end - cur);
+            len = (long)(end - cur) + LYRICS3v1_TAIL_SIZE;
             break;
         }
     }
@@ -596,7 +596,7 @@ static long get_lyrics3_len(Sint64 tag_end_at, Sint64 begin_pos, SDL_RWops *src)
     /* Find and validate borders of the lyrics tag */
     if (SDL_memcmp(buffer, "LYRICSEND", LYRICS3v1_TAIL_SIZE) == 0) { /* v1 */
         return get_lyrics3v1_len(begin_pos, src);
-    } else if (SDL_memcmp(buffer, "LYRICS200", 9) == 0) { /* v2 */
+    } else if (SDL_memcmp(buffer, "LYRICS200", LYRICS3v1_TAIL_SIZE) == 0) { /* v2 */
         return get_lyrics3v2_len(begin_pos, src);
     }
 
