@@ -34,7 +34,7 @@ struct mp3file_t {
 };
 
 extern int mp3_read_tags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, struct mp3file_t *file_edges);
-extern int mp3_read_tags_mem(Mix_MusicMetaTags *out_tags, Uint8 *data, size_t length, struct mp3file_t *file_edges);
+extern int read_id3v2_from_mem(Mix_MusicMetaTags *out_tags, Uint8 *data, size_t length);
 
 extern size_t MP3_RWread(struct mp3file_t *fil, void *ptr, size_t size, size_t maxnum);
 extern Sint64 MP3_RWseek(struct mp3file_t *fil, Sint64 offset, int whence);

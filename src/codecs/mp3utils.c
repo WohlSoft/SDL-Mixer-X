@@ -961,13 +961,21 @@ int mp3_read_tags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, struct mp3file_t 
     return (file_size > 0) ? 0 :-1;
 }
 
-int mp3_read_tags_mem(Mix_MusicMetaTags *out_tags, Uint8 *data, size_t length, struct mp3file_t *file_edges)
+int read_id3v2_from_mem(Mix_MusicMetaTags *out_tags, Uint8 *data, size_t length)
 {
     SDL_RWops *src = SDL_RWFromConstMem(data, (int)length);
+    SDL_bool is_valid;
+
     if (src) {
-        int ret = mp3_read_tags(out_tags, src, file_edges);
+        if (!is_id3v2(data, length)) {
+            SDL_RWclose(src);
+            return -1;
+        }
+
+        is_valid = parse_id3v2(out_tags, src, 0);
         SDL_RWclose(src);
-        return ret;
+
+        return is_valid ? 0 : -1;
     }
     return -1;
 }

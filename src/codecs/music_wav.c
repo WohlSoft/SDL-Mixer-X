@@ -865,24 +865,24 @@ static SDL_bool ParseLIST(WAV_Music *wave, Uint32 chunk_length)
 
 static SDL_bool ParseID3(WAV_Music *wave, Uint32 chunk_length)
 {
-    SDL_bool loaded = SDL_FALSE;
+    SDL_bool loaded = SDL_TRUE;
 
     Uint8 *data;
     data = (Uint8 *)SDL_malloc(chunk_length);
 
     if (!data) {
-        Mix_SetError("Out of memory");
+        SDL_OutOfMemory();
         return SDL_FALSE;
     }
 
     if (!SDL_RWread(wave->src, data, chunk_length, 1)) {
         Mix_SetError("Couldn't read %d bytes from WAV file", chunk_length);
-        return SDL_FALSE;
+        loaded = SDL_FALSE;
     }
 
-    if (SDL_strncmp((char *)data, "ID3", 3) == 0) {
-        mp3_read_tags_mem(&wave->tags, data, chunk_length, NULL);
-        loaded = SDL_TRUE;
+    if (loaded && read_id3v2_from_mem(&wave->tags, data, chunk_length) < 0) {
+        Mix_SetError("Invalid ID3 chunk");
+        loaded = SDL_FALSE;
     }
 
     /* done: */
