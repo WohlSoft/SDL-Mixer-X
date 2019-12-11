@@ -813,6 +813,97 @@ static SDL_bool parse_ape(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Sint64 be
     return SDL_TRUE;
 }
 
+
+/********************************************************
+ *                    MusicMatch                        *
+ ********************************************************/
+
+#define MUSICMATCH_FOOTER_SIZE          48
+
+static SDL_INLINE SDL_bool is_musicmatch(const Uint8 *data, long length)
+{
+  /* From docs/musicmatch.txt in id3lib: https://sourceforge.net/projects/id3lib/
+     Overall tag structure:
+
+      +-----------------------------+
+      |           Header            |
+      |    (256 bytes, OPTIONAL)    |
+      +-----------------------------+
+      |  Image extension (4 bytes)  |
+      +-----------------------------+
+      |        Image binary         |
+      |  (var. length >= 4 bytes)   |
+      +-----------------------------+
+      |      Unused (4 bytes)       |
+      +-----------------------------+
+      |  Version info (256 bytes)   |
+      +-----------------------------+
+      |       Audio meta-data       |
+      | (var. length >= 7868 bytes) |
+      +-----------------------------+
+      |   Data offsets (20 bytes)   |
+      +-----------------------------+
+      |      Footer (48 bytes)      |
+      +-----------------------------+
+     */
+    if (length < MUSICMATCH_FOOTER_SIZE) return 0;
+    /* sig: 19 bytes company name + 13 bytes space */
+    if (SDL_memcmp(data,"Brava Software Inc.             ",32) != 0) {
+        return SDL_FALSE;
+    }
+    /* 4 bytes version: x.xx */
+    if (!SDL_isdigit(data[32]) || data[33] != '.' ||
+        !SDL_isdigit(data[34]) ||!SDL_isdigit(data[35])) {
+        return SDL_FALSE;
+    }
+    /* [36..47]: 12 bytes trailing space */
+    return SDL_TRUE;
+}
+
+static SDL_INLINE long get_musicmatch_len(SDL_RWops *m, Sint64 tail_size, long file_size)
+{
+    const Sint32 metasizes[4] = { 7868, 7936, 8004, 8132 };
+    const unsigned char syncstr[10] = {'1','8','2','7','3','6','4','5',0,0};
+    unsigned char buf[20];
+    Sint32 i, imgext_ofs, version_ofs;
+    long len;
+
+    /* calc. the image extension section ofs */
+    SDL_RWseek(m, -(tail_size + 68), RW_SEEK_END);
+    SDL_RWread(m, buf, 1, 20);
+    imgext_ofs  = (Sint32)((buf[3] <<24) | (buf[2] <<16) | (buf[1] <<8) | buf[0] );
+    version_ofs = (Sint32)((buf[15]<<24) | (buf[14]<<16) | (buf[13]<<8) | buf[12]);
+    /* Try finding the version info section:
+     * Because metadata section comes after it, and because metadata section
+     * has different sizes across versions (format ver. <= 3.00: always 7868
+     * bytes), we can _not_ directly calculate using deltas from the offsets
+     * section. */
+    for (i = 0; i < 4; ++i) {
+    /* 48: footer, 20: offsets, 256: version info */
+        len = metasizes[i] + MUSICMATCH_FOOTER_SIZE + 20 + 256;
+        if (file_size < len) return -1;
+        SDL_RWseek(m, -(tail_size + len), RW_SEEK_END);
+        SDL_RWread(m, buf, 1, 10);
+        /* [0..9]: sync string, [30..255]: 0x20 */
+        if (SDL_memcmp(buf, syncstr, 10) == 0) {
+            break;
+        }
+    }
+    if (i == 4) return -1; /* no luck. */
+    len += (version_ofs - imgext_ofs);
+    if (file_size < len) return -1;
+    if (file_size < len + 256) return len;
+    /* try finding the optional header */
+    SDL_RWseek(m, -(tail_size + len + 256), RW_SEEK_END);
+    SDL_RWread(m, buf, 1, 10);
+    /* [0..9]: sync string, [30..255]: 0x20 */
+    if (SDL_memcmp(buf, syncstr, 10) != 0) {
+        return len;
+    }
+    return len + 256; /* header is present. */
+}
+
+
 int mp3_read_tags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, struct mp3file_t *file_edges)
 {
     Uint8 in_buffer[TAGS_INPUT_BUFFER_SIZE];
@@ -884,6 +975,30 @@ int mp3_read_tags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, struct mp3file_t 
                 }
                 tail_size += ID3v1_TAG_SIZE;
                 file_size -= ID3v1_TAG_SIZE;
+                continue;
+            }
+        }
+
+        /* check for the _old_ MusicMatch tag at end. */
+        if (file_size >= MUSICMATCH_FOOTER_SIZE) {
+            SDL_RWseek(src, -(tail_size + MUSICMATCH_FOOTER_SIZE), RW_SEEK_END);
+            readsize = SDL_RWread(src, in_buffer, 1, MUSICMATCH_FOOTER_SIZE);
+            SDL_RWseek(src, begin_pos, RW_SEEK_SET);
+            if (readsize != 48) {
+                return -1;
+            }
+            if (is_musicmatch(in_buffer, MUSICMATCH_FOOTER_SIZE)) {
+                len = get_musicmatch_len(src, tail_size, (long)file_size);
+                SDL_RWseek(src, begin_pos, RW_SEEK_SET);
+                if (len < 0) {
+                    return -1;
+                }
+
+                if (len >= (long)file_size) {
+                    return -1;
+                }
+                file_size -= len;
+                tail_size += len;
                 continue;
             }
         }
