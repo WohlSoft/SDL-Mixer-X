@@ -818,8 +818,11 @@ static SDL_bool parse_ape(Mix_MusicMetaTags *out_tags, SDL_RWops *src, Sint64 be
  *                    MusicMatch                        *
  ********************************************************/
 
+#define MUSICMATCH_HEADER_SIZE          256
+#define MUSICMATCH_VERSION_INFO_SIZE    256
 #define MUSICMATCH_FOOTER_SIZE          48
 
+#define MMTAG_PARANOID
 static SDL_INLINE SDL_bool is_musicmatch(const Uint8 *data, long length)
 {
   /* From docs/musicmatch.txt in id3lib: https://sourceforge.net/projects/id3lib/
@@ -846,7 +849,7 @@ static SDL_INLINE SDL_bool is_musicmatch(const Uint8 *data, long length)
       |      Footer (48 bytes)      |
       +-----------------------------+
      */
-    if (length < MUSICMATCH_FOOTER_SIZE) return 0;
+    if (length < MUSICMATCH_FOOTER_SIZE) return SDL_FALSE;
     /* sig: 19 bytes company name + 13 bytes space */
     if (SDL_memcmp(data,"Brava Software Inc.             ",32) != 0) {
         return SDL_FALSE;
@@ -856,7 +859,12 @@ static SDL_INLINE SDL_bool is_musicmatch(const Uint8 *data, long length)
         !SDL_isdigit(data[34]) ||!SDL_isdigit(data[35])) {
         return SDL_FALSE;
     }
+#ifdef MMTAG_PARANOID
     /* [36..47]: 12 bytes trailing space */
+    for (length = 36; length < MUSICMATCH_FOOTER_SIZE; ++length) {
+        if (data[length] != ' ') return SDL_FALSE;
+    }
+#endif
     return SDL_TRUE;
 }
 
@@ -864,15 +872,16 @@ static SDL_INLINE long get_musicmatch_len(SDL_RWops *m, Sint64 tail_size, long f
 {
     const Sint32 metasizes[4] = { 7868, 7936, 8004, 8132 };
     const unsigned char syncstr[10] = {'1','8','2','7','3','6','4','5',0,0};
-    unsigned char buf[20];
-    Sint32 i, imgext_ofs, version_ofs;
-    long len;
+    unsigned char buf[256];
+    Sint32 i, j, imgext_ofs, version_ofs;
+    long len = 0;
 
-    /* calc. the image extension section ofs */
     SDL_RWseek(m, -(tail_size + 68), RW_SEEK_END);
     SDL_RWread(m, buf, 1, 20);
     imgext_ofs  = (Sint32)((buf[3] <<24) | (buf[2] <<16) | (buf[1] <<8) | buf[0] );
     version_ofs = (Sint32)((buf[15]<<24) | (buf[14]<<16) | (buf[13]<<8) | buf[12]);
+    if (version_ofs <= imgext_ofs) return -1;
+    if (version_ofs <= 0 || imgext_ofs <= 0) return -1;
     /* Try finding the version info section:
      * Because metadata section comes after it, and because metadata section
      * has different sizes across versions (format ver. <= 3.00: always 7868
@@ -880,27 +889,51 @@ static SDL_INLINE long get_musicmatch_len(SDL_RWops *m, Sint64 tail_size, long f
      * section. */
     for (i = 0; i < 4; ++i) {
     /* 48: footer, 20: offsets, 256: version info */
-        len = metasizes[i] + MUSICMATCH_FOOTER_SIZE + 20 + 256;
+        len = metasizes[i] + MUSICMATCH_FOOTER_SIZE + 20 + MUSICMATCH_VERSION_INFO_SIZE;
         if (file_size < len) return -1;
         SDL_RWseek(m, -(tail_size + len), RW_SEEK_END);
-        SDL_RWread(m, buf, 1, 10);
+        SDL_RWread(m, buf, 1, MUSICMATCH_VERSION_INFO_SIZE);
         /* [0..9]: sync string, [30..255]: 0x20 */
+#ifdef MMTAG_PARANOID
+        for (j = 30; j < MUSICMATCH_VERSION_INFO_SIZE; ++j) {
+            if (buf[j] != ' ') break;
+        }
+        if (j < MUSICMATCH_VERSION_INFO_SIZE) continue;
+#endif
         if (SDL_memcmp(buf, syncstr, 10) == 0) {
             break;
         }
     }
     if (i == 4) return -1; /* no luck. */
+#ifdef MMTAG_PARANOID
+    /* unused section: (4 bytes of 0x00) */
+    SDL_RWseek(m, -(tail_size + len + 4), RW_SEEK_END);
+    SDL_RWread(m, buf, 1, 4); j = 0;
+    if (SDL_memcmp(buf, &j, 4) != 0) return -1;
+#endif
     len += (version_ofs - imgext_ofs);
     if (file_size < len) return -1;
-    if (file_size < len + 256) return len;
+    SDL_RWseek(m, -(tail_size + len), RW_SEEK_END);
+    SDL_RWread(m, buf, 1, 8);
+    j = (Sint32)((buf[7] <<24) | (buf[6] <<16) | (buf[5] <<8) | buf[4]);
+    if (j < 0) return -1;
+    /* verify image size: */
+    /* without this, we may land at a wrong place. */
+    if (j + 12 != version_ofs - imgext_ofs) return -1;
     /* try finding the optional header */
-    SDL_RWseek(m, -(tail_size + len + 256), RW_SEEK_END);
-    SDL_RWread(m, buf, 1, 10);
+    if (file_size < len + MUSICMATCH_HEADER_SIZE) return len;
+    SDL_RWseek(m, -(tail_size + len + MUSICMATCH_HEADER_SIZE), RW_SEEK_END);
+    SDL_RWread(m, buf, 1, MUSICMATCH_HEADER_SIZE);
     /* [0..9]: sync string, [30..255]: 0x20 */
     if (SDL_memcmp(buf, syncstr, 10) != 0) {
         return len;
     }
-    return len + 256; /* header is present. */
+#ifdef MMTAG_PARANOID
+    for (j = 30; j < MUSICMATCH_HEADER_SIZE; ++j) {
+        if (buf[j] != ' ') return len;
+    }
+#endif
+    return len + MUSICMATCH_HEADER_SIZE; /* header is present. */
 }
 
 
