@@ -35,6 +35,7 @@ typedef struct {
     gme_err_t (*gme_open_data)(void const* data, long size, Music_Emu** out, int sample_rate);
     int (*gme_track_count)(Music_Emu const*);
     gme_err_t (*gme_start_track)( Music_Emu*, int index);
+    int (*gme_track_ended)( Music_Emu const*);
     void (*gme_set_tempo)(Music_Emu*, double tempo);
     void (*gme_set_fade)(Music_Emu*, int start_msec);
     gme_err_t (*gme_track_info)(Music_Emu const*, gme_info_t** out, int track);
@@ -77,6 +78,7 @@ static int GME_Load(void)
         FUNCTION_LOADER(gme_open_data, gme_err_t (*)(void const*,long,Music_Emu**,int))
         FUNCTION_LOADER(gme_track_count, int (*)(Music_Emu const*))
         FUNCTION_LOADER(gme_start_track, gme_err_t (*)( Music_Emu*,int))
+        FUNCTION_LOADER(gme_track_ended, int (*)( Music_Emu const*))
         FUNCTION_LOADER(gme_set_tempo, void (*)(Music_Emu*,double))
         FUNCTION_LOADER(gme_set_fade, void (*)(Music_Emu*,int))
         FUNCTION_LOADER(gme_track_info, gme_err_t (*)(Music_Emu const*, gme_info_t**, int))
@@ -128,6 +130,9 @@ typedef struct
 {
     int play_count;
     Music_Emu* game_emu;
+    int track_length;
+    int intro_length;
+    int loop_length;
     int volume;
     double tempo;
     double gain;
@@ -310,11 +315,6 @@ GME_Music *GME_LoadSongRW(SDL_RWops *src, const char *args)
 
     gme.gme_set_tempo(music->game_emu, music->tempo);
 
-    /* Set infinite playback */
-    gme.gme_set_fade(music->game_emu, -1);
-    /* For old versions, for newer the next call is supported: */
-    /* gme_set_autoload_playback_limit(music->game_emu, 0); */
-
     music->volume = MIX_MAX_VOLUME;
     meta_tags_init(&music->tags);
 
@@ -325,11 +325,28 @@ GME_Music *GME_LoadSongRW(SDL_RWops *src, const char *args)
         return NULL;
     }
 
-    /*
-     * TODO:
-     * Implement loop and length management to catch loop times and be able
-     * to limit song to play specified loops count
-     */
+    music->track_length = musInfo->length;
+    music->intro_length = musInfo->intro_length;
+    music->loop_length = musInfo->loop_length;
+
+    if (music->track_length <= 0 ) {
+        music->track_length = (int)(2.5 * 60 * 1000);
+    }
+
+    if (music->intro_length <= 0 ) {
+        if (music->track_length > 0) {
+            music->intro_length = 0;
+        } else {
+            music->intro_length = (int)(0.1 * 60 * 1000);
+        }
+    }
+    if (music->loop_length <= 0 ) {
+        if (music->track_length > 0) {
+            music->loop_length = music->track_length;
+        } else {
+            music->loop_length = (int)(2.5 * 60 * 1000);
+        }
+    }
 
     meta_tags_set(&music->tags, MIX_META_TITLE, musInfo->song);
     meta_tags_set(&music->tags, MIX_META_ARTIST, musInfo->author);
@@ -367,6 +384,7 @@ static int GME_play(void *music_p, int play_count)
     GME_Music *music = (GME_Music*)music_p;
     if (music) {
         music->play_count = play_count;
+        gme.gme_set_fade(music->game_emu, play_count > 0 ? music->intro_length + (music->loop_length * play_count) : -1);
         gme.gme_seek(music->game_emu, 0);
     }
     return 0;
@@ -383,7 +401,7 @@ static int GME_GetSome(void *context, void *data, int bytes, SDL_bool *done)
         return filled;
     }
 
-    if (!music->play_count) {
+    if (gme.gme_track_ended(music->game_emu)) {
         /* All done */
         *done = SDL_TRUE;
         return 0;
