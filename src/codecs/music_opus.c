@@ -477,13 +477,13 @@ static int OPUS_Seek(void *context, double time)
 static double OPUS_Tell(void *context)
 {
     OPUS_music *music = (OPUS_music *)context;
-    return (double)opus.op_pcm_tell(music->of) / 48000.0;
+    return (double)(opus.op_pcm_tell(music->of)) / 48000.0;
 }
 
 static double OPUS_Total(void *context)
 {
     OPUS_music *music = (OPUS_music *)context;
-    return (double)opus.op_pcm_total(music->of, -1) / 48000.0;
+    return (double)music->full_length / 48000.0;
 }
 
 static double OPUS_get_loop_start(void *music_p)
