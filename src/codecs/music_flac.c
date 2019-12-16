@@ -715,7 +715,7 @@ static int FLAC_Seek(void *context, double position)
     return 0;
 }
 
-static double FLAC_get_time(void *context)
+static double FLAC_Tell(void *context)
 {
     FLAC_Music *music = (FLAC_Music *)context;
     if (music) {
@@ -726,7 +726,7 @@ static double FLAC_get_time(void *context)
     return -1.0;
 }
 
-static double   FLAC_get_time_length(void *context)
+static double FLAC_Duration(void *context)
 {
     FLAC_Music *music = (FLAC_Music *)context;
     if (music) {
@@ -735,7 +735,7 @@ static double   FLAC_get_time_length(void *context)
     return -1.0;
 }
 
-static double FLAC_get_loop_start(void *music_p)
+static double FLAC_LoopStart(void *music_p)
 {
     FLAC_Music *music = (FLAC_Music *)music_p;
     if (music->loop) {
@@ -744,7 +744,7 @@ static double FLAC_get_loop_start(void *music_p)
     return -1.0;
 }
 
-static double FLAC_get_loop_end(void *music_p)
+static double FLAC_LoopEnd(void *music_p)
 {
     FLAC_Music *music = (FLAC_Music *)music_p;
     if (music->loop) {
@@ -753,7 +753,7 @@ static double FLAC_get_loop_end(void *music_p)
     return -1.0;
 }
 
-static double FLAC_get_loop_length(void *music_p)
+static double FLAC_LoopLength(void *music_p)
 {
     FLAC_Music *music = (FLAC_Music *)music_p;
     if (music->loop) {
@@ -802,13 +802,13 @@ Mix_MusicInterface Mix_MusicInterface_FLAC =
     NULL,   /* IsPlaying */
     FLAC_GetAudio,
     FLAC_Seek,
-    FLAC_get_time,/* Tell [MIXER-X]*/
-    FLAC_get_time_length,/* FullLength [MIXER-X]*/
+    FLAC_Tell,/* Tell [MIXER-X]*/
+    FLAC_Duration,/* FullLength [MIXER-X]*/
     NULL,   /* Set Tempo multiplier [MIXER-X] */
     NULL,   /* Get Tempo multiplier [MIXER-X] */
-    FLAC_get_loop_start,/* LoopStart [MIXER-X]*/
-    FLAC_get_loop_end,/* LoopEnd [MIXER-X]*/
-    FLAC_get_loop_length,/* LoopLength [MIXER-X]*/
+    FLAC_LoopStart,/* LoopStart [MIXER-X]*/
+    FLAC_LoopEnd,/* LoopEnd [MIXER-X]*/
+    FLAC_LoopLength,/* LoopLength [MIXER-X]*/
     FLAC_GetMetaTag,/* GetMetaTag [MIXER-X]*/
     NULL,   /* Pause */
     NULL,   /* Resume */

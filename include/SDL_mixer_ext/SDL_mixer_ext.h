@@ -768,10 +768,16 @@ extern DECLSPEC int SDLCALL Mix_SetMusicPosition(double position);
     returns -1.0 if this feature is not supported for some codec
  */
 extern DECLSPEC double SDLCALL Mix_GetMusicPosition(Mix_Music *music);
-/*
-    Get the total time length of music stream
-    returns -1.0 if this feature is not supported for some codec
+
+/* Return music duration in second.
+    if NULL is passed, return current playing music duration.
+    return -1 on error.
  */
+extern DECLSPEC double SDLCALL Mix_MusicDuration(Mix_Music *music);
+/*
+    Same as Mix_MusicDuration()
+ */
+/* MIXERX_DEPRECATED("Use Mix_MusicDuration(Mix_Music*) instead") */
 extern DECLSPEC double SDLCALL Mix_GetMusicTotalTime(Mix_Music *music);
 
 /*

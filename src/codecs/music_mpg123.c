@@ -444,7 +444,7 @@ static double MPG123_Tell(void *context)
 }
 
 
-static double MPG123_Length(void *context)
+static double MPG123_Duration(void *context)
 {
     MPG123_Music *music = (MPG123_Music *)context;
     if (!music->sample_rate) {
@@ -507,7 +507,7 @@ Mix_MusicInterface Mix_MusicInterface_MPG123 =
     MPG123_GetAudio,
     MPG123_Seek,
     MPG123_Tell, /* Tell [MIXER-X]*/
-    MPG123_Length, /* FullLength [MIXER-X]*/
+    MPG123_Duration, /* FullLength [MIXER-X]*/
     NULL,   /* Set Tempo multiplier [MIXER-X] */
     NULL,   /* Get Tempo multiplier [MIXER-X] */
     NULL,   /* LoopStart [MIXER-X]*/

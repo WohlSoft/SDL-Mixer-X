@@ -130,8 +130,8 @@ typedef struct
     /* MIXER-X: Tell a play position (in seconds) */
     double (*Tell)(void *music);
 
-    /* MIXER-X: Tell a total length of a track (in seconds) */
-    double (*FullLength)(void *music);
+    /* MIXER-X: Get Music duration (in seconds) */
+    double (*Duration)(void *music);
 
     /* MIXER-X: Set a tempo multiplier */
     int (*SetTempo)(void *music, double tempo);

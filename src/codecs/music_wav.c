@@ -593,7 +593,7 @@ static double WAV_Tell(void *context)
     return (double)(phys_pos - music->start) / (double)(music->spec.freq * music->samplesize);
 }
 
-static double WAV_Length(void *context)
+static double WAV_Duration(void *context)
 {
     WAV_Music *music = (WAV_Music *)context;
     Sint64 sample_size = music->spec.freq * music->samplesize;
@@ -1238,7 +1238,7 @@ Mix_MusicInterface Mix_MusicInterface_WAV =
     WAV_GetAudio,
     WAV_Seek,   /* Seek */
     WAV_Tell,   /* Tell [MIXER-X]*/
-    WAV_Length, /* FullLength [MIXER-X]*/
+    WAV_Duration, /* FullLength [MIXER-X]*/
     NULL,   /* Set Tempo multiplier [MIXER-X] */
     NULL,   /* Get Tempo multiplier [MIXER-X] */
     NULL,   /* LoopStart [MIXER-X]*/

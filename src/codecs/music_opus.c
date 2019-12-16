@@ -121,6 +121,7 @@ typedef struct {
     ogg_int64_t loop_start;
     ogg_int64_t loop_end;
     ogg_int64_t loop_len;
+    ogg_int64_t full_length;
     Mix_MusicMetaTags tags;
 } OPUS_music;
 
@@ -351,6 +352,7 @@ static void *OPUS_CreateFromRW(SDL_RWops *src, int freesrc)
         music->loop = 1;
     }
 
+    music->full_length = full_length;
     music->freesrc = freesrc;
     return music;
 }
@@ -480,7 +482,7 @@ static double OPUS_Tell(void *context)
     return (double)(opus.op_pcm_tell(music->of)) / 48000.0;
 }
 
-static double OPUS_Total(void *context)
+static double OPUS_Duration(void *context)
 {
     OPUS_music *music = (OPUS_music *)context;
     return (double)music->full_length / 48000.0;
@@ -551,7 +553,7 @@ Mix_MusicInterface Mix_MusicInterface_Opus =
     OPUS_GetAudio,
     OPUS_Seek,
     OPUS_Tell, /* Tell [MIXER-X]*/
-    OPUS_Total, /* FullLength [MIXER-X]*/
+    OPUS_Duration, /* FullLength [MIXER-X]*/
     NULL,   /* Set Tempo multiplier [MIXER-X] */
     NULL,   /* Get Tempo multiplier [MIXER-X] */
     OPUS_get_loop_start, /* LoopStart [MIXER-X]*/

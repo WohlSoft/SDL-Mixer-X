@@ -1506,23 +1506,25 @@ double SDLCALLCC Mix_GetMusicPosition(Mix_Music *music)
     return(retval);
 }
 
-/* Get total playing music position */
-static double music_internal_position_total(Mix_Music *music)
+/* Get a music duration in seconds */
+static double music_internal_duration(Mix_Music *music)
 {
-    if (music->interface->FullLength) {
-        return music->interface->FullLength(music->context);
+    if (music->interface->Duration) {
+        return music->interface->Duration(music->context);
+    } else {
+        Mix_SetError("Duration not implemented for music type");
+        return -1;
     }
-    return -1;
 }
-double SDLCALLCC Mix_GetMusicTotalTime(Mix_Music *music)
+double SDLCALLCC Mix_MusicDuration(Mix_Music *music)
 {
     double retval;
 
     Mix_LockAudio();
     if (music) {
-        retval = music_internal_position_total(music);
+        retval = music_internal_duration(music);
     } else if (music_playing) {
-        retval = music_internal_position_total(music_playing);
+        retval = music_internal_duration(music_playing);
     } else {
         Mix_SetError("Music isn't playing");
         retval = -1.0;
@@ -1530,6 +1532,12 @@ double SDLCALLCC Mix_GetMusicTotalTime(Mix_Music *music)
     Mix_UnlockAudio();
 
     return(retval);
+}
+
+/* Old name call, kept for ABI compatibility */
+double SDLCALLCC Mix_GetMusicTotalTime(Mix_Music *music)
+{
+    return Mix_MusicDuration(music);
 }
 
 /* Set the playing music tempo */

@@ -301,7 +301,7 @@ static double MODPLUG_Tell(void *context)
     }
 }
 
-static double MODPLUG_Length(void *context)
+static double MODPLUG_Duration(void *context)
 {
     MODPLUG_Music *music = (MODPLUG_Music *)context;
     return (double)(modplug.ModPlug_GetLength(music->file)) / 1000.0;
@@ -351,7 +351,7 @@ Mix_MusicInterface Mix_MusicInterface_MODPLUG =
     MODPLUG_GetAudio,
     MODPLUG_Seek,
     MODPLUG_Tell, /* Tell [MIXER-X]*/
-    MODPLUG_Length, /* FullLength [MIXER-X]*/
+    MODPLUG_Duration, /* FullLength [MIXER-X]*/
     NULL,   /* Set Tempo multiplier [MIXER-X] */
     NULL,   /* Get Tempo multiplier [MIXER-X] */
     NULL,   /* LoopStart [MIXER-X]*/
