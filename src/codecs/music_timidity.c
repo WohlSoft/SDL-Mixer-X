@@ -50,12 +50,18 @@ static void TIMIDITY_Delete(void *context);
 # define TIMIDITY_CFG_FREEPATS  "/etc/timidity/freepats.cfg"
 #endif
 
+static SDL_bool timidity_is_loaded = SDL_FALSE;
+
 static int TIMIDITY_Open(const SDL_AudioSpec *spec)
 {
     const char *cfg;
     int rc = -1;
 
     (void) spec;
+
+    if (timidity_is_loaded) {
+        return rc; /* Already loaded */
+    }
 
     cfg = SDL_getenv("TIMIDITY_CFG");
     if(!cfg) cfg = Mix_GetTimidityCfg();
@@ -73,12 +79,17 @@ static int TIMIDITY_Open(const SDL_AudioSpec *spec)
 #endif
     if (rc < 0) rc = Timidity_Init(NULL); /* library's default cfg. */
 
+    timidity_is_loaded = SDL_TRUE;
+
     return rc;
 }
 
 static void TIMIDITY_Close(void)
 {
-    Timidity_Exit();
+    if (timidity_is_loaded) {
+        Timidity_Exit();
+        timidity_is_loaded = SDL_FALSE;
+    }
 }
 
 void *TIMIDITY_CreateFromRW(SDL_RWops *src, int freesrc)
@@ -86,6 +97,11 @@ void *TIMIDITY_CreateFromRW(SDL_RWops *src, int freesrc)
     TIMIDITY_Music *music;
     SDL_AudioSpec spec;
     SDL_bool need_stream = SDL_FALSE;
+
+    if (TIMIDITY_Open(NULL) < 0) {
+        Mix_SetError("Timidity: Can't open more than one concurrent songs, please close previous song first.");
+        return NULL;
+    }
 
     music = (TIMIDITY_Music *)SDL_calloc(1, sizeof(*music));
     if (!music) {
@@ -227,6 +243,7 @@ static void TIMIDITY_Delete(void *context)
         SDL_free(music->buffer);
     }
     SDL_free(music);
+    TIMIDITY_Close();
 }
 
 Mix_MusicInterface Mix_MusicInterface_TIMIDITY =
@@ -238,7 +255,7 @@ Mix_MusicInterface Mix_MusicInterface_TIMIDITY =
     SDL_FALSE,
 
     NULL,   /* Load */
-    TIMIDITY_Open,
+    NULL,   /* Open */
     TIMIDITY_CreateFromRW,
     NULL,   /* CreateFromRWex [MIXER-X]*/
     NULL,   /* CreateFromFile */
@@ -261,7 +278,7 @@ Mix_MusicInterface Mix_MusicInterface_TIMIDITY =
     NULL,   /* Resume */
     NULL,   /* Stop */
     TIMIDITY_Delete,
-    TIMIDITY_Close,
+    NULL,   /* Close */
     NULL    /* Unload */
 };
 
