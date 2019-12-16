@@ -364,7 +364,7 @@ void SetupMidi::on_timidityCfgPathBrowse_clicked()
 #ifdef SDL_MIXER_X
     QString path = QFileDialog::getOpenFileName(this,
                    tr("Select Timidity config file"),
-                   ui->opn_bank->text(),
+                   ui->timidityCfgPath->text(),
                    "Timidity config files (*.cfg);;"
                    "All Files (*.*)");
     if(!path.isEmpty())
