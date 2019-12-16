@@ -54,7 +54,7 @@ extern "C" int main(int argc, char *argv[])
     {
         qDebug() << "Timidity path is" << timidityPath;
         QByteArray tp = timidityPath.toUtf8();
-        Mix_Timidity_addToPathList(tp.data());
+        Mix_SetTimidityCfg(tp.data());
     }
 #endif
 

@@ -25,18 +25,6 @@
 
 #ifdef MUSIC_MID_TIMIDITY
 #include <timidity.h>
-#endif
-
-void SDLCALLCC Mix_Timidity_addToPathList(const char *path)
-{
-#ifdef MUSIC_MID_TIMIDITY
-    Timidity_AddConfigPath(path);
-#else
-    (void)path;
-#endif
-}
-
-#ifdef MUSIC_MID_TIMIDITY
 
 typedef struct
 {
@@ -52,10 +40,40 @@ typedef struct
 static int TIMIDITY_Seek(void *context, double position);
 static void TIMIDITY_Delete(void *context);
 
+/* Config file should contain any other directory that needs
+ * to be added to the search path. The library adds the path
+ * of the config file to its search path, too. */
+#if defined(__WIN32__) || defined(__OS2__)
+# define TIMIDITY_CFG           "C:\\TIMIDITY\\TIMIDITY.CFG"
+#else  /* unix: */
+# define TIMIDITY_CFG_ETC       "/etc/timidity.cfg"
+# define TIMIDITY_CFG_FREEPATS  "/etc/timidity/freepats.cfg"
+#endif
+
 static int TIMIDITY_Open(const SDL_AudioSpec *spec)
 {
+    const char *cfg;
+    int rc = -1;
+
     (void) spec;
-    return Timidity_Init();
+
+    cfg = SDL_getenv("TIMIDITY_CFG");
+    if(!cfg) cfg = Mix_GetTimidityCfg();
+    if (cfg) {
+        return Timidity_Init(cfg); /* env or user override: no other tries */
+    }
+#if defined(TIMIDITY_CFG)
+    if (rc < 0) rc = Timidity_Init(TIMIDITY_CFG);
+#endif
+#if defined(TIMIDITY_CFG_ETC)
+    if (rc < 0) rc = Timidity_Init(TIMIDITY_CFG_ETC);
+#endif
+#if defined(TIMIDITY_CFG_FREEPATS)
+    if (rc < 0) rc = Timidity_Init(TIMIDITY_CFG_FREEPATS);
+#endif
+    if (rc < 0) rc = Timidity_Init(NULL); /* library's default cfg. */
+
+    return rc;
 }
 
 static void TIMIDITY_Close(void)
@@ -97,7 +115,7 @@ void *TIMIDITY_CreateFromRW(SDL_RWops *src, int freesrc)
         }
 
         music->buffer_size = spec.samples * (SDL_AUDIO_BITSIZE(spec.format) / 8) * spec.channels;
-        music->buffer = SDL_malloc(music->buffer_size);
+        music->buffer = SDL_malloc((size_t)music->buffer_size);
         if (!music->buffer) {
             SDL_OutOfMemory();
             TIMIDITY_Delete(music);

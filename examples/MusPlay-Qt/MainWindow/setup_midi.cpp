@@ -78,7 +78,6 @@ void SetupMidi::loadSetup()
     ui->adl_bank->setModified(true);
     on_adl_bank_editingFinished();
 
-
     ui->opnEmulator->setCurrentIndex(setup.value("OPNMIDI-Emulator", 0).toInt());
     Mix_OPNMIDI_setEmulator(ui->opnEmulator->currentIndex());
 
@@ -89,6 +88,10 @@ void SetupMidi::loadSetup()
     ui->opn_use_custom->setChecked(setup.value("OPNMIDI-Bank-UseCustom", true).toBool());
     ui->opn_bank->setModified(true);
     on_opn_bank_editingFinished();
+
+    ui->timidityCfgPath->setText(setup.value("Timidity-Config-Path", "").toString());
+    ui->timidityCfgPath->setModified(true);
+    on_timidityCfgPath_editingFinished();
 #endif
 }
 
@@ -114,6 +117,8 @@ void SetupMidi::saveSetup()
 
     setup.setValue("OPNMIDI-Bank", ui->opn_bank->text());
     setup.setValue("OPNMIDI-Bank-UseCustom", ui->opn_use_custom->isChecked());
+
+    setup.setValue("Timidity-Config-Path", ui->timidityCfgPath->text());
 
     setup.sync();
 #endif
@@ -354,6 +359,45 @@ void SetupMidi::on_adl_scalableModulation_clicked()
 #endif
 }
 
+void SetupMidi::on_timidityCfgPathBrowse_clicked()
+{
+#ifdef SDL_MIXER_X
+    QString path = QFileDialog::getOpenFileName(this,
+                   tr("Select Timidity config file"),
+                   ui->opn_bank->text(),
+                   "Timidity config files (*.cfg);;"
+                   "All Files (*.*)");
+    if(!path.isEmpty())
+    {
+        ui->timidityCfgPath->setText(path);
+        ui->timidityCfgPath->setModified(true);
+        on_timidityCfgPath_editingFinished();
+    }
+#endif
+}
+
+void SetupMidi::on_timidityCfgPath_editingFinished()
+{
+#ifdef SDL_MIXER_X
+    if(m_setupLock)
+        return;
+    if(ui->timidityCfgPath->isModified())
+    {
+        QString file = ui->timidityCfgPath->text();
+        if(!file.isEmpty() && QFile::exists(file))
+        {
+            Mix_SetTimidityCfg(file.toUtf8().data());
+        }
+        else
+        {
+            Mix_SetTimidityCfg(nullptr);
+        }
+        emit restartForTimidity();
+        ui->timidityCfgPath->setModified(false);
+    }
+#endif
+}
+
 void SetupMidi::on_resetDefaultADLMIDI_clicked()
 {
 #ifdef SDL_MIXER_X
@@ -483,6 +527,19 @@ void SetupMidi::restartForOpn()
     if(Mix_PlayingMusicStream(PGE_MusicPlayer::s_playMus) &&
       (PGE_MusicPlayer::type == MUS_MID) &&
       (Mix_GetMidiPlayer() == MIDI_OPNMIDI)
+    )
+    {
+        emit songRestartNeeded();
+    }
+#endif
+}
+
+void SetupMidi::restartForTimidity()
+{
+#ifdef SDL_MIXER_X
+    if(Mix_PlayingMusicStream(PGE_MusicPlayer::s_playMus) &&
+      (PGE_MusicPlayer::type == MUS_MID) &&
+      (Mix_GetMidiPlayer() == MIDI_Timidity)
     )
     {
         emit songRestartNeeded();

@@ -19,7 +19,6 @@ if(USE_MIDI_TIMIDITY AND NOT USE_SYSTEM_AUDIO_LIBRARIES)
             list(APPEND SDL_MIXER_INCLUDE_PATHS ${AUDIO_CODECS_PATH}/libtimidity/include)
         endif()
         list(APPEND SDLMixerX_LINK_LIBS ${TIMIDITYSDL_LIBRARIES})
+        list(APPEND SDLMixerX_SOURCES ${CMAKE_CURRENT_LIST_DIR}/music_timidity.c)
     endif()
 endif()
-
-list(APPEND SDLMixerX_SOURCES ${CMAKE_CURRENT_LIST_DIR}/music_timidity.c)

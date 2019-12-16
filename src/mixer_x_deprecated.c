@@ -28,7 +28,12 @@
 
 void SDLCALLCC MIX_Timidity_addToPathList(const char *path)
 {
-    Mix_Timidity_addToPathList(path);
+    Mix_SetTimidityCfg(path);
+}
+
+void SDLCALLCC Mix_Timidity_addToPathList(const char *path)
+{
+    Mix_SetTimidityCfg(path);
 }
 
 const char *const *SDLCALLCC  MIX_ADLMIDI_getBankNames()

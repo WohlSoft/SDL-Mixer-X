@@ -83,6 +83,9 @@ static int num_decoders = 0;
 /* Semicolon-separated SoundFont paths */
 static char* soundfont_paths = NULL;
 
+/* full path of timidity config file */
+static char* timidity_cfg = NULL;
+
 /*  ======== MIDI toggler ======== */
 /* MIDI device currently in use */
 int mididevice_current = MIDI_ANY;
@@ -2019,6 +2022,28 @@ void unload_music(void)
         }
         interface->loaded = SDL_FALSE;
     }
+}
+
+int SDLCALLCC Mix_SetTimidityCfg(const char *path)
+{
+    if (timidity_cfg) {
+        SDL_free(timidity_cfg);
+        timidity_cfg = NULL;
+    }
+
+    if (path && *path) {
+        if (!(timidity_cfg = SDL_strdup(path))) {
+            Mix_SetError("Insufficient memory to set Timidity cfg file");
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+const char* SDLCALLCC Mix_GetTimidityCfg(void)
+{
+    return timidity_cfg;
 }
 
 int SDLCALLCC Mix_SetSoundFonts(const char *paths)

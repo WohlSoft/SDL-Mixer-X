@@ -41,6 +41,9 @@ private slots:
     void on_adl_vibrato_clicked();
     void on_adl_scalableModulation_clicked();
 
+    void on_timidityCfgPathBrowse_clicked();
+    void on_timidityCfgPath_editingFinished();
+
     void updateAutoArgs();
 
     void on_mididevice_currentIndexChanged(int index);
@@ -60,6 +63,7 @@ private:
     Ui::SetupMidi *ui;
     void restartForAdl();
     void restartForOpn();
+    void restartForTimidity();
     bool m_setupLock = false;
 };
 
