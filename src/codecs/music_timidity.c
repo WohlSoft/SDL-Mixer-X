@@ -50,7 +50,7 @@ static void TIMIDITY_Delete(void *context);
 # define TIMIDITY_CFG_FREEPATS  "/etc/timidity/freepats.cfg"
 #endif
 
-static SDL_bool timidity_is_loaded = SDL_FALSE;
+static int timidity_loaded = 0;
 
 static int TIMIDITY_Open(const SDL_AudioSpec *spec)
 {
@@ -59,8 +59,9 @@ static int TIMIDITY_Open(const SDL_AudioSpec *spec)
 
     (void) spec;
 
-    if (timidity_is_loaded) {
-        return rc; /* Already loaded */
+    if (timidity_loaded > 0) {
+        timidity_loaded++;
+        return 0;
     }
 
     cfg = SDL_getenv("TIMIDITY_CFG");
@@ -79,16 +80,18 @@ static int TIMIDITY_Open(const SDL_AudioSpec *spec)
 #endif
     if (rc < 0) rc = Timidity_Init(NULL); /* library's default cfg. */
 
-    timidity_is_loaded = SDL_TRUE;
+    timidity_loaded = SDL_TRUE;
 
     return rc;
 }
 
 static void TIMIDITY_Close(void)
 {
-    if (timidity_is_loaded) {
-        Timidity_Exit();
-        timidity_is_loaded = SDL_FALSE;
+    if (timidity_loaded >= 1) {
+        timidity_loaded--;
+        if (timidity_loaded == 0) {
+            Timidity_Exit();
+        }
     }
 }
 
@@ -99,7 +102,7 @@ void *TIMIDITY_CreateFromRW(SDL_RWops *src, int freesrc)
     SDL_bool need_stream = SDL_FALSE;
 
     if (TIMIDITY_Open(NULL) < 0) {
-        Mix_SetError("Timidity: Can't open more than one concurrent songs, please close previous song first.");
+        Mix_SetError("Timidity: Can't initialize library");
         return NULL;
     }
 
