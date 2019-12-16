@@ -229,6 +229,12 @@ static int TIMIDITY_Seek(void *context, double position)
     return 0;
 }
 
+static double TIMIDITY_Duration(void *context)
+{
+    TIMIDITY_Music *music = (TIMIDITY_Music *)context;
+    return (double)(Timidity_GetSongLength(music->song)) / 1000;
+}
+
 static void TIMIDITY_Delete(void *context)
 {
     TIMIDITY_Music *music = (TIMIDITY_Music *)context;
@@ -267,7 +273,7 @@ Mix_MusicInterface Mix_MusicInterface_TIMIDITY =
     TIMIDITY_GetAudio,
     TIMIDITY_Seek,
     NULL,   /* Tell [MIXER-X]*/
-    NULL,   /* FullLength [MIXER-X]*/
+    TIMIDITY_Duration,
     NULL,   /* Set Tempo multiplier [MIXER-X] */
     NULL,   /* Get Tempo multiplier [MIXER-X] */
     NULL,   /* LoopStart [MIXER-X]*/
