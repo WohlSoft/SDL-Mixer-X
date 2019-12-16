@@ -728,13 +728,8 @@ static double FLAC_get_time(void *context)
 static double   FLAC_get_time_length(void *context)
 {
     FLAC_Music *music = (FLAC_Music *)context;
-    if(music)
-    {
-        if(music->flac_decoder)
-        {
-            /* FLAC__uint64 len = flac.FLAC__stream_decoder_get_total_samples(music->flac_decoder); */
-            return (double)music->total_samples / (double)(music->sample_rate);
-        }
+    if (music) {
+        return (double)music->total_samples / (double)(music->sample_rate);
     }
     return -1.0;
 }
