@@ -718,10 +718,11 @@ static int FLAC_Seek(void *context, double position)
 static double FLAC_get_time(void *context)
 {
     FLAC_Music *music = (FLAC_Music *)context;
-    if(music)
+    if (music) {
         return (double)music->pcm_pos / (double)(music->sample_rate);
-    else
+    } else {
         SDL_SetError("Getting position of FLAC stream failed: music was NULL.");
+    }
     return -1.0;
 }
 
