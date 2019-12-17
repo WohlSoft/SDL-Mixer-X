@@ -486,7 +486,7 @@ static double OPUS_Tell(void *context)
 static double OPUS_Duration(void *context)
 {
     OPUS_music *music = (OPUS_music *)context;
-    return (double)music->full_length / 48000.0;
+    return music->full_length / 48000.0;
 }
 
 static double OPUS_LoopStart(void *music_p)

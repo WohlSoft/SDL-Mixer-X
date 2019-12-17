@@ -237,7 +237,7 @@ static int TIMIDITY_Seek(void *context, double position)
 static double TIMIDITY_Duration(void *context)
 {
     TIMIDITY_Music *music = (TIMIDITY_Music *)context;
-    return (double)(Timidity_GetSongLength(music->song)) / 1000;
+    return Timidity_GetSongLength(music->song) / 1000.0;
 }
 
 static void TIMIDITY_Delete(void *context)

@@ -509,7 +509,7 @@ static double OGG_Tell(void *context)
 {
     OGG_music *music = (OGG_music *)context;
 #ifdef OGG_USE_TREMOR
-    return (double)(vorbis.ov_time_tell(&music->vf)) / 1000.0;
+    return vorbis.ov_time_tell(&music->vf) / 1000.0;
 #else
     return vorbis.ov_time_tell(&music->vf);
 #endif
@@ -520,7 +520,7 @@ static double OGG_Duration(void *context)
 {
     OGG_music *music = (OGG_music *)context;
 #ifdef OGG_USE_TREMOR
-    return (double)(vorbis.ov_time_total(&music->vf, -1)) / 1000.0;
+    return vorbis.ov_time_total(&music->vf, -1) / 1000.0;
 #else
     return vorbis.ov_time_total(&music->vf, -1);
 #endif

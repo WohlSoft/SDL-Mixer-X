@@ -305,7 +305,7 @@ static double MODPLUG_Tell(void *context)
 static double MODPLUG_Duration(void *context)
 {
     MODPLUG_Music *music = (MODPLUG_Music *)context;
-    return (double)(modplug.ModPlug_GetLength(music->file)) / 1000.0;
+    return modplug.ModPlug_GetLength(music->file) / 1000.0;
 }
 
 static const char* MODPLUG_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
