@@ -421,7 +421,7 @@ static int OGG_GetSome(void *context, void *data, int bytes, SDL_bool *done)
 
     section = music->section;
 #ifdef OGG_USE_TREMOR
-    amount = vorbis.ov_read(&music->vf, music->buffer, music->buffer_size, &section);
+    amount = (int)vorbis.ov_read(&music->vf, music->buffer, music->buffer_size, &section);
 #else
     amount = (int)vorbis.ov_read(&music->vf, music->buffer, music->buffer_size, 0, 2, 1, &section);
 #endif
