@@ -598,7 +598,7 @@ static double WAV_Duration(void *context)
 {
     WAV_Music *music = (WAV_Music *)context;
     Sint64 sample_size = music->spec.freq * music->samplesize;
-    return (double)(music->stop - music->start) / (double)(sample_size);
+    return (double)(music->stop - music->start) / sample_size;
 }
 
 static const char* WAV_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)

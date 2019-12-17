@@ -353,7 +353,7 @@ static FLAC__StreamDecoderWriteStatus flac_write_music_cb(
         }
     }
     amount = (int)(frame->header.blocksize * channels * sizeof(*data));
-    music->pcm_pos += ((FLAC__uint64)frame->header.blocksize);
+    music->pcm_pos += (FLAC__uint64) frame->header.blocksize;
     if ((music->loop == 1) && (music->play_count != 1) &&
         (music->pcm_pos >= music->loop_end)) {
         amount -= (music->pcm_pos - music->loop_end) * channels * sizeof(*data);
@@ -377,7 +377,7 @@ static FLAC__uint64 parse_time(char *time, unsigned samplerate_hz)
 
     /* Time is directly expressed as a sample position */
     if (SDL_strchr(time, ':') == NULL) {
-        return (FLAC__uint64)SDL_strtoull(time, NULL, 10);
+        return SDL_strtoull(time, NULL, 10);
     }
 
     result = 0;
@@ -548,8 +548,6 @@ static void *FLAC_CreateFromRW(SDL_RWops *src, int freesrc)
     if (music->flac_decoder) {
         init_stage++; /* stage 1! */
         flac.FLAC__stream_decoder_set_metadata_respond(music->flac_decoder,
-                    FLAC__METADATA_TYPE_STREAMINFO);
-        flac.FLAC__stream_decoder_set_metadata_respond(music->flac_decoder,
                     FLAC__METADATA_TYPE_VORBIS_COMMENT);
 
         if (flac.FLAC__stream_decoder_init_stream(
@@ -719,7 +717,7 @@ static double FLAC_Tell(void *context)
 {
     FLAC_Music *music = (FLAC_Music *)context;
     if (music) {
-        return (double)music->pcm_pos / (double)(music->sample_rate);
+        return (double)music->pcm_pos / music->sample_rate;
     } else {
         SDL_SetError("Getting position of FLAC stream failed: music was NULL.");
     }
@@ -730,14 +728,14 @@ static double FLAC_Tell(void *context)
 static double FLAC_Duration(void *context)
 {
     FLAC_Music *music = (FLAC_Music *)context;
-    return (double)music->full_length / (double)music->sample_rate;
+    return (double)music->full_length / music->sample_rate;
 }
 
 static double FLAC_LoopStart(void *music_p)
 {
     FLAC_Music *music = (FLAC_Music *)music_p;
     if (music->loop) {
-        return (double)music->loop_start / (double)music->sample_rate;
+        return (double)music->loop_start / music->sample_rate;
     }
     return -1.0;
 }
@@ -746,7 +744,7 @@ static double FLAC_LoopEnd(void *music_p)
 {
     FLAC_Music *music = (FLAC_Music *)music_p;
     if (music->loop) {
-        return (double)music->loop_end / (double)music->sample_rate;
+        return (double)music->loop_end / music->sample_rate;
     }
     return -1.0;
 }
@@ -755,7 +753,7 @@ static double FLAC_LoopLength(void *music_p)
 {
     FLAC_Music *music = (FLAC_Music *)music_p;
     if (music->loop) {
-        return (double)music->loop_len / (double)music->sample_rate;
+        return (double)music->loop_len / music->sample_rate;
     }
     return -1.0;
 }

@@ -530,7 +530,7 @@ static double   OGG_get_loop_start(void *music_p)
 {
     OGG_music *music = (OGG_music *)music_p;
     if (music->loop) {
-        return (double)music->loop_start / (double)music->vi.rate;
+        return (double)music->loop_start / music->vi.rate;
     }
     return -1.0;
 }
@@ -539,7 +539,7 @@ static double   OGG_get_loop_end(void *music_p)
 {
     OGG_music *music = (OGG_music *)music_p;
     if (music->loop) {
-        return (double)music->loop_end / (double)music->vi.rate;
+        return (double)music->loop_end / music->vi.rate;
     }
     return -1.0;
 }
@@ -548,7 +548,7 @@ static double   OGG_get_loop_length(void *music_p)
 {
     OGG_music *music = (OGG_music *)music_p;
     if (music->loop) {
-        return (double)music->loop_len / (double)music->vi.rate;
+        return (double)music->loop_len / music->vi.rate;
     }
     return -1.0;
 }

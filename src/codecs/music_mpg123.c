@@ -441,7 +441,7 @@ static double MPG123_Tell(void *context)
     if ((offset = mpg123.mpg123_tell(music->handle)) < 0) {
         return Mix_SetError("mpg123_tell: %s", mpg_err(music->handle, (int)-offset));
     }
-    return (double)offset / (double)music->sample_rate;
+    return (double)offset / music->sample_rate;
 }
 
 /* Return music duration in seconds */
@@ -451,7 +451,7 @@ static double MPG123_Duration(void *context)
     if (music->total_length < 0) {
         return -1.0;
     }
-    return (double)music->total_length / (double)music->sample_rate;
+    return (double)music->total_length / music->sample_rate;
 }
 
 static const char* MPG123_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
