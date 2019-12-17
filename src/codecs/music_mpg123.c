@@ -191,14 +191,12 @@ static char const* mpg_err(mpg123_handle* mpg, int result)
 /* we're gonna override mpg123's I/O with these wrappers for RWops */
 static ssize_t rwops_read(void* p, void* dst, size_t n)
 {
-    struct mp3file_t *t = (struct mp3file_t *)p;
-    return (ssize_t)MP3_RWread(t, dst, 1, n);
+    return (ssize_t)MP3_RWread((struct mp3file_t *)p, dst, 1, n);
 }
 
 static off_t rwops_seek(void* p, off_t offset, int whence)
 {
-    struct mp3file_t *t = (struct mp3file_t *)p;
-    return (off_t)MP3_RWseek(t, (Sint64)offset, whence);
+    return (off_t)MP3_RWseek((struct mp3file_t *)p, (Sint64)offset, whence);
 }
 
 static void rwops_cleanup(void* p)
@@ -308,7 +306,6 @@ static void *MPG123_CreateFromRW(SDL_RWops *src, int freesrc)
         Mix_SetError("mpg123_getformat: %s", mpg_err(music->handle, result));
         return NULL;
     }
-/*printf("MPG123 format: %s, channels = %d, rate = %ld\n", mpg123_format_str(encoding), channels, rate);*/
 
     format = mpg123_format_to_sdl(encoding);
     SDL_assert(format != -1);
