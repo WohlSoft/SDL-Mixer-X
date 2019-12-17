@@ -298,7 +298,7 @@ static void *MPG123_CreateFromRW(SDL_RWops *src, int freesrc)
     music->total_length = mpg123.mpg123_length(music->handle);
     if (music->total_length < 0) {
         MPG123_Delete(music);
-        Mix_SetError("mpg123_length: %s", mpg_err(music->handle, (int)-music->total_length));
+        Mix_SetError("mpg123_length: Error value has been returned");
         return NULL;
     }
 
@@ -507,7 +507,7 @@ Mix_MusicInterface Mix_MusicInterface_MPG123 =
     MPG123_GetAudio,
     MPG123_Seek,
     MPG123_Tell, /* Tell [MIXER-X]*/
-    MPG123_Duration,
+    MPG123_Duration, /* FullLength [MIXER-X]*/
     NULL,   /* Set Tempo multiplier [MIXER-X] */
     NULL,   /* Get Tempo multiplier [MIXER-X] */
     NULL,   /* LoopStart [MIXER-X]*/
