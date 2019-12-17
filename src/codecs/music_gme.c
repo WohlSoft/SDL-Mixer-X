@@ -464,14 +464,14 @@ static const char* GME_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
 }
 
 /* Jump (seek) to a given position (time is in seconds) */
-static int GME_jump_to_time(void *music_p, double time)
+static int GME_Seek(void *music_p, double time)
 {
     GME_Music *music = (GME_Music*)music_p;
     gme.gme_seek(music->game_emu, (int)(SDL_floor((time * 1000.0) + 0.5)));
     return 0;
 }
 
-static double GME_get_cur_time(void *music_p)
+static double GME_Tell(void *music_p)
 {
     GME_Music *music = (GME_Music*)music_p;
     return (double)(gme.gme_tell(music->game_emu)) / 1000.0;
@@ -488,7 +488,7 @@ static double GME_Duration(void *music_p)
     }
 }
 
-static int GME_setTempo(void *music_p, double tempo)
+static int GME_SetTempo(void *music_p, double tempo)
 {
     GME_Music *music = (GME_Music *)music_p;
     if (music && (tempo > 0.0)) {
@@ -499,7 +499,7 @@ static int GME_setTempo(void *music_p, double tempo)
     return -1;
 }
 
-static double GME_getTempo(void *music_p)
+static double GME_GetTempo(void *music_p)
 {
     GME_Music *music = (GME_Music *)music_p;
     if (music) {
@@ -527,11 +527,11 @@ Mix_MusicInterface Mix_MusicInterface_GME =
     GME_play,
     NULL,   /* IsPlaying */
     GME_playAudio,
-    GME_jump_to_time,   /* Seek */
-    GME_get_cur_time,   /* Tell [MIXER-X]*/
+    GME_Seek,   /* Seek */
+    GME_Tell,   /* Tell [MIXER-X]*/
     GME_Duration,
-    GME_setTempo,   /* Set Tempo multiplier [MIXER-X] */
-    GME_getTempo,   /* Get Tempo multiplier [MIXER-X] */
+    GME_SetTempo,   /* Set Tempo multiplier [MIXER-X] */
+    GME_GetTempo,   /* Get Tempo multiplier [MIXER-X] */
     NULL,   /* LoopStart [MIXER-X]*/
     NULL,   /* LoopEnd [MIXER-X]*/
     NULL,   /* LoopLength [MIXER-X]*/

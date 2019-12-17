@@ -671,27 +671,27 @@ static const char* OPNMIDI_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
 }
 
 /* Jump (seek) to a given position (time is in seconds) */
-static int OPNMIDI_jump_to_time(void *music_p, double time)
+static int OPNMIDI_Seek(void *music_p, double time)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music*)music_p;
     OPNMIDI.opn2_positionSeek(music->opnmidi, time);
     return 0;
 }
 
-static double OPNMIDI_currentPosition(void* music_p)
+static double OPNMIDI_Tell(void* music_p)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music *)music_p;
     return OPNMIDI.opn2_positionTell(music->opnmidi);
 }
 
 
-static double OPNMIDI_songLength(void* music_p)
+static double OPNMIDI_Duration(void* music_p)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music *)music_p;
     return OPNMIDI.opn2_totalTimeLength(music->opnmidi);
 }
 
-static int OPNMIDI_setTempo(void *music_p, double tempo)
+static int OPNMIDI_SetTempo(void *music_p, double tempo)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music *)music_p;
     if (music && (tempo > 0.0)) {
@@ -702,7 +702,7 @@ static int OPNMIDI_setTempo(void *music_p, double tempo)
     return -1;
 }
 
-static double OPNMIDI_getTempo(void *music_p)
+static double OPNMIDI_GetTempo(void *music_p)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music *)music_p;
     if (music) {
@@ -711,19 +711,19 @@ static double OPNMIDI_getTempo(void *music_p)
     return -1.0;
 }
 
-static double OPNMIDI_loopStart(void* music_p)
+static double OPNMIDI_LoopStart(void* music_p)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music *)music_p;
     return OPNMIDI.opn2_loopStartTime(music->opnmidi);
 }
 
-static double OPNMIDI_loopEnd(void* music_p)
+static double OPNMIDI_LoopEnd(void* music_p)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music *)music_p;
     return OPNMIDI.opn2_loopEndTime(music->opnmidi);
 }
 
-static double OPNMIDI_loopLength(void* music_p)
+static double OPNMIDI_LoopLength(void* music_p)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music *)music_p;
     if (music) {
@@ -756,14 +756,14 @@ Mix_MusicInterface Mix_MusicInterface_OPNMIDI =
     OPNMIDI_play,
     NULL,   /* IsPlaying */
     OPNMIDI_playAudio,
-    OPNMIDI_jump_to_time,
-    OPNMIDI_currentPosition,   /* Tell [MIXER-X]*/
-    OPNMIDI_songLength,   /* FullLength [MIXER-X]*/
-    OPNMIDI_setTempo,   /* Set Tempo multiplier [MIXER-X] */
-    OPNMIDI_getTempo,   /* Get Tempo multiplier [MIXER-X] */
-    OPNMIDI_loopStart,   /* LoopStart [MIXER-X]*/
-    OPNMIDI_loopEnd,   /* LoopEnd [MIXER-X]*/
-    OPNMIDI_loopLength,   /* LoopLength [MIXER-X]*/
+    OPNMIDI_Seek,
+    OPNMIDI_Tell,   /* Tell [MIXER-X]*/
+    OPNMIDI_Duration,
+    OPNMIDI_SetTempo,   /* Set Tempo multiplier [MIXER-X] */
+    OPNMIDI_GetTempo,   /* Get Tempo multiplier [MIXER-X] */
+    OPNMIDI_LoopStart,   /* LoopStart [MIXER-X]*/
+    OPNMIDI_LoopEnd,   /* LoopEnd [MIXER-X]*/
+    OPNMIDI_LoopLength,   /* LoopLength [MIXER-X]*/
     OPNMIDI_GetMetaTag,   /* GetMetaTag [MIXER-X]*/
     NULL,   /* Pause */
     NULL,   /* Resume */

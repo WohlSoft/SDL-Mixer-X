@@ -313,14 +313,14 @@ static double XMP_Tell(void *context)
     return ((double)music->fi.time) / 1000.0;
 }
 
-static double XMP_Length(void *context)
+static double XMP_Duration(void *context)
 {
     XMP_Music *music = (XMP_Music *)context;
     xmp.xmp_get_frame_info(music->ctx, &music->fi);
     return ((double)music->fi.total_time) / 1000.0;
 }
 
-static int XMP_setTempo(void *music_p, double tempo)
+static int XMP_SetTempo(void *music_p, double tempo)
 {
 #if XMP_VER_MAJOR > 4 || (XMP_VER_MAJOR == 4 && XMP_VER_MINOR >= 5)
     XMP_Music *music = (XMP_Music *)music_p;
@@ -336,7 +336,7 @@ static int XMP_setTempo(void *music_p, double tempo)
     return -1;
 }
 
-static double XMP_getTempo(void *music_p)
+static double XMP_GetTempo(void *music_p)
 {
 #if XMP_VER_MAJOR > 4 || (XMP_VER_MAJOR == 4 && XMP_VER_MINOR >= 5)
     XMP_Music *music = (XMP_Music *)music_p;
@@ -397,9 +397,9 @@ Mix_MusicInterface Mix_MusicInterface_LIBXMP =
     XMP_GetAudio,
     XMP_Seek,
     XMP_Tell, /* Tell [MIXER-X]*/
-    XMP_Length, /* FullLength [MIXER-X]*/
-    XMP_setTempo,   /* Set Tempo multiplier [MIXER-X] */
-    XMP_getTempo,   /* Get Tempo multiplier [MIXER-X] */
+    XMP_Duration,
+    XMP_SetTempo,   /* Set Tempo multiplier [MIXER-X] */
+    XMP_GetTempo,   /* Get Tempo multiplier [MIXER-X] */
     NULL,   /* LoopStart [MIXER-X] */
     NULL,   /* LoopEnd [MIXER-X] */
     NULL,   /* LoopLength [MIXER-X]*/

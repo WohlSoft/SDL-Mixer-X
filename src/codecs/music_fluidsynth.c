@@ -318,7 +318,7 @@ Mix_MusicInterface Mix_MusicInterface_FLUIDSYNTH =
     FLUIDSYNTH_GetAudio,
     NULL,   /* Seek */
     NULL,   /* Tell [MIXER-X]*/
-    NULL,   /* FullLength [MIXER-X]*/
+    NULL,   /* Duration */
     NULL,   /* Set Tempo multiplier [MIXER-X] */
     NULL,   /* Get Tempo multiplier [MIXER-X] */
     NULL,   /* LoopStart [MIXER-X]*/

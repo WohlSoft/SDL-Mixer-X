@@ -499,13 +499,13 @@ static int MAD_Seek(void *context, double position)
     return 0;
 }
 
-static double MAD_tell(void *context)
+static double MAD_Tell(void *context)
 {
     MAD_Music *music = (MAD_Music *)context;
     return (double)music->sample_position / (double)music->sample_rate;
 }
 
-static double MAD_total(void *context)
+static double MAD_Duration(void *context)
 {
     MAD_Music *music = (MAD_Music *)context;
     return music->total_length;
@@ -555,8 +555,8 @@ Mix_MusicInterface Mix_MusicInterface_MAD =
     NULL,   /* IsPlaying */
     MAD_GetAudio,
     MAD_Seek,
-    MAD_tell, /* Tell [MIXER-X]*/
-    MAD_total,/* FullLength [MIXER-X]*/
+    MAD_Tell, /* [MIXER-X]*/
+    MAD_Duration,
     NULL,   /* Set Tempo multiplier [MIXER-X] */
     NULL,   /* Get Tempo multiplier [MIXER-X] */
     NULL,   /* LoopStart [MIXER-X]*/

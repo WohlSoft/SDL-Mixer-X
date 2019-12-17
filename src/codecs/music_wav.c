@@ -1238,7 +1238,7 @@ Mix_MusicInterface Mix_MusicInterface_WAV =
     WAV_GetAudio,
     WAV_Seek,   /* Seek */
     WAV_Tell,   /* Tell [MIXER-X]*/
-    WAV_Duration, /* FullLength [MIXER-X]*/
+    WAV_Duration,
     NULL,   /* Set Tempo multiplier [MIXER-X] */
     NULL,   /* Get Tempo multiplier [MIXER-X] */
     NULL,   /* LoopStart [MIXER-X]*/

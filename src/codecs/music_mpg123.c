@@ -507,7 +507,7 @@ Mix_MusicInterface Mix_MusicInterface_MPG123 =
     MPG123_GetAudio,
     MPG123_Seek,
     MPG123_Tell, /* Tell [MIXER-X]*/
-    MPG123_Duration, /* FullLength [MIXER-X]*/
+    MPG123_Duration,
     NULL,   /* Set Tempo multiplier [MIXER-X] */
     NULL,   /* Get Tempo multiplier [MIXER-X] */
     NULL,   /* LoopStart [MIXER-X]*/

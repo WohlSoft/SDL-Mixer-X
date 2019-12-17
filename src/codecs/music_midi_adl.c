@@ -823,14 +823,14 @@ static const char* ADLMIDI_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
 }
 
 /* Jump (seek) to a given position (time is in seconds) */
-static int ADLMIDI_jump_to_time(void *music_p, double time)
+static int ADLMIDI_Seek(void *music_p, double time)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
     ADLMIDI.adl_positionSeek(music->adlmidi, time);
     return 0;
 }
 
-static double ADLMIDI_currentPosition(void *music_p)
+static double ADLMIDI_Tell(void *music_p)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
     if (music) {
@@ -839,7 +839,7 @@ static double ADLMIDI_currentPosition(void *music_p)
     return -1;
 }
 
-static double ADLMIDI_songLength(void *music_p)
+static double ADLMIDI_Duration(void *music_p)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
     if (music) {
@@ -848,7 +848,7 @@ static double ADLMIDI_songLength(void *music_p)
     return -1;
 }
 
-static int ADLMIDI_setTempo(void *music_p, double tempo)
+static int ADLMIDI_SetTempo(void *music_p, double tempo)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
     if (music && (tempo > 0.0)) {
@@ -859,7 +859,7 @@ static int ADLMIDI_setTempo(void *music_p, double tempo)
     return -1;
 }
 
-static double ADLMIDI_getTempo(void *music_p)
+static double ADLMIDI_GetTempo(void *music_p)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
     if (music) {
@@ -868,7 +868,7 @@ static double ADLMIDI_getTempo(void *music_p)
     return -1.0;
 }
 
-static double ADLMIDI_loopStart(void *music_p)
+static double ADLMIDI_LoopStart(void *music_p)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
     if (music) {
@@ -877,7 +877,7 @@ static double ADLMIDI_loopStart(void *music_p)
     return -1;
 }
 
-static double ADLMIDI_loopEnd(void *music_p)
+static double ADLMIDI_LoopEnd(void *music_p)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
     if (music) {
@@ -886,7 +886,7 @@ static double ADLMIDI_loopEnd(void *music_p)
     return -1;
 }
 
-static double ADLMIDI_loopLength(void *music_p)
+static double ADLMIDI_LoopLength(void *music_p)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
     if (music) {
@@ -919,14 +919,14 @@ Mix_MusicInterface Mix_MusicInterface_ADLMIDI =
     ADLMIDI_play,
     NULL,   /* IsPlaying */
     ADLMIDI_playAudio,
-    ADLMIDI_jump_to_time,
-    ADLMIDI_currentPosition,   /* Tell [MIXER-X]*/
-    ADLMIDI_songLength,   /* FullLength [MIXER-X]*/
-    ADLMIDI_setTempo,   /* Set Tempo multiplier [MIXER-X] */
-    ADLMIDI_getTempo,   /* Get Tempo multiplier [MIXER-X] */
-    ADLMIDI_loopStart,   /* LoopStart [MIXER-X]*/
-    ADLMIDI_loopEnd,   /* LoopEnd [MIXER-X]*/
-    ADLMIDI_loopLength,   /* LoopLength [MIXER-X]*/
+    ADLMIDI_Seek,
+    ADLMIDI_Tell,   /* Tell [MIXER-X]*/
+    ADLMIDI_Duration,
+    ADLMIDI_SetTempo,   /* Set Tempo multiplier [MIXER-X] */
+    ADLMIDI_GetTempo,   /* Get Tempo multiplier [MIXER-X] */
+    ADLMIDI_LoopStart,   /* LoopStart [MIXER-X]*/
+    ADLMIDI_LoopEnd,   /* LoopEnd [MIXER-X]*/
+    ADLMIDI_LoopLength,   /* LoopLength [MIXER-X]*/
     ADLMIDI_GetMetaTag,   /* GetMetaTag [MIXER-X]*/
     NULL,   /* Pause */
     NULL,   /* Resume */
@@ -956,14 +956,14 @@ Mix_MusicInterface Mix_MusicInterface_ADLIMF =
     ADLMIDI_play,
     NULL,   /* IsPlaying */
     ADLMIDI_playAudio,
-    ADLMIDI_jump_to_time,
-    ADLMIDI_currentPosition,   /* Tell [MIXER-X]*/
-    ADLMIDI_songLength,   /* FullLength [MIXER-X]*/
-    ADLMIDI_setTempo,   /* Set Tempo multiplier [MIXER-X] */
-    ADLMIDI_getTempo,   /* Get Tempo multiplier [MIXER-X] */
-    ADLMIDI_loopStart,   /* LoopStart [MIXER-X]*/
-    ADLMIDI_loopEnd,   /* LoopEnd [MIXER-X]*/
-    ADLMIDI_loopLength,   /* LoopLength [MIXER-X]*/
+    ADLMIDI_Seek,
+    ADLMIDI_Tell,   /* Tell [MIXER-X]*/
+    ADLMIDI_Duration,
+    ADLMIDI_SetTempo,   /* Set Tempo multiplier [MIXER-X] */
+    ADLMIDI_GetTempo,   /* Get Tempo multiplier [MIXER-X] */
+    ADLMIDI_LoopStart,   /* LoopStart [MIXER-X]*/
+    ADLMIDI_LoopEnd,   /* LoopEnd [MIXER-X]*/
+    ADLMIDI_LoopLength,   /* LoopLength [MIXER-X]*/
     ADLMIDI_GetMetaTag,   /* GetMetaTag [MIXER-X]*/
     NULL,   /* Pause */
     NULL,   /* Resume */

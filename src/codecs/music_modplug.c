@@ -351,7 +351,7 @@ Mix_MusicInterface Mix_MusicInterface_MODPLUG =
     MODPLUG_GetAudio,
     MODPLUG_Seek,
     MODPLUG_Tell, /* Tell [MIXER-X]*/
-    MODPLUG_Duration, /* FullLength [MIXER-X]*/
+    MODPLUG_Duration,
     NULL,   /* Set Tempo multiplier [MIXER-X] */
     NULL,   /* Get Tempo multiplier [MIXER-X] */
     NULL,   /* LoopStart [MIXER-X]*/
