@@ -130,6 +130,7 @@ typedef struct
 {
     int play_count;
     Music_Emu* game_emu;
+    SDL_bool has_track_length;
     int track_length;
     int intro_length;
     int loop_length;
@@ -238,6 +239,7 @@ GME_Music *GME_LoadSongRW(SDL_RWops *src, const char *args)
     GME_Music *music;
     Gme_Setup setup = gme_setup;
     const char *err;
+    SDL_bool has_loop_length = SDL_TRUE;
 
     Sint64 length = 0;
 
@@ -329,16 +331,14 @@ GME_Music *GME_LoadSongRW(SDL_RWops *src, const char *args)
     music->intro_length = musInfo->intro_length;
     music->loop_length = musInfo->loop_length;
 
+    music->has_track_length = SDL_TRUE;
     if (music->track_length <= 0 ) {
         music->track_length = (int)(2.5 * 60 * 1000);
+        music->has_track_length = SDL_FALSE;
     }
 
-    if (music->intro_length <= 0 ) {
-        if (music->track_length > 0) {
-            music->intro_length = 0;
-        } else {
-            music->intro_length = (int)(0.1 * 60 * 1000);
-        }
+    if (music->intro_length < 0 ) {
+        music->intro_length = 0;
     }
     if (music->loop_length <= 0 ) {
         if (music->track_length > 0) {
@@ -346,6 +346,12 @@ GME_Music *GME_LoadSongRW(SDL_RWops *src, const char *args)
         } else {
             music->loop_length = (int)(2.5 * 60 * 1000);
         }
+        has_loop_length = SDL_FALSE;
+    }
+
+    if (!music->has_track_length && has_loop_length) {
+        music->track_length = music->intro_length + music->loop_length;
+        music->has_track_length = SDL_TRUE;
     }
 
     meta_tags_set(&music->tags, MIX_META_TITLE, musInfo->song);
@@ -471,6 +477,17 @@ static double GME_get_cur_time(void *music_p)
     return (double)(gme.gme_tell(music->game_emu)) / 1000.0;
 }
 
+static double GME_Duration(void *music_p)
+{
+    GME_Music *music = (GME_Music*)music_p;
+    if (music->has_track_length) {
+        return (double)(music->track_length) / 1000.0;
+    } else {
+
+        return -1.0;
+    }
+}
+
 static int GME_setTempo(void *music_p, double tempo)
 {
     GME_Music *music = (GME_Music *)music_p;
@@ -512,7 +529,7 @@ Mix_MusicInterface Mix_MusicInterface_GME =
     GME_playAudio,
     GME_jump_to_time,   /* Seek */
     GME_get_cur_time,   /* Tell [MIXER-X]*/
-    NULL,   /* FullLength [MIXER-X]*/
+    GME_Duration,
     GME_setTempo,   /* Set Tempo multiplier [MIXER-X] */
     GME_getTempo,   /* Get Tempo multiplier [MIXER-X] */
     NULL,   /* LoopStart [MIXER-X]*/
