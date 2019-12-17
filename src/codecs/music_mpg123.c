@@ -144,6 +144,7 @@ typedef struct
 static int MPG123_Seek(void *context, double secs);
 static void MPG123_Delete(void *context);
 
+
 static int mpg123_format_to_sdl(int fmt)
 {
     switch (fmt)
@@ -158,7 +159,8 @@ static int mpg123_format_to_sdl(int fmt)
     }
 }
 
-/*
+/*#define DEBUG_MPG123*/
+#ifdef DEBUG_MPG123
 static const char *mpg123_format_str(int fmt)
 {
     switch (fmt)
@@ -174,7 +176,7 @@ static const char *mpg123_format_str(int fmt)
     }
     return "unknown";
 }
-*/
+#endif
 
 static char const* mpg_err(mpg123_handle* mpg, int result)
 {
@@ -306,6 +308,10 @@ static void *MPG123_CreateFromRW(SDL_RWops *src, int freesrc)
         Mix_SetError("mpg123_getformat: %s", mpg_err(music->handle, result));
         return NULL;
     }
+#ifdef DEBUG_MPG123
+        printf("MPG123 format: %s, channels: %d, rate: %ld\n",
+                mpg123_format_str(encoding), channels, rate);
+#endif
 
     format = mpg123_format_to_sdl(encoding);
     SDL_assert(format != -1);
@@ -377,17 +383,20 @@ static int MPG123_GetSome(void *context, void *data, int bytes, SDL_bool *done)
             Mix_SetError("mpg123_getformat: %s", mpg_err(music->handle, result));
             return -1;
         }
-/*printf("MPG123 format: %s, channels = %d, rate = %ld\n", mpg123_format_str(encoding), channels, rate);*/
+#ifdef DEBUG_MPG123
+        printf("MPG123 format: %s, channels: %d, rate: %ld\n",
+                mpg123_format_str(encoding), channels, rate);
+#endif
 
         format = mpg123_format_to_sdl(encoding);
         SDL_assert(format != -1);
-        music->sample_rate = rate;
 
         music->stream = SDL_NewAudioStream((SDL_AudioFormat)format, (Uint8)channels, (int)rate,
                                            music_spec.format, music_spec.channels, music_spec.freq);
         if (!music->stream) {
             return -1;
         }
+        music->sample_rate = rate;
         break;
 
     case MPG123_DONE:
