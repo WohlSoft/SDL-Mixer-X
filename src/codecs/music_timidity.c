@@ -21,10 +21,12 @@
 
 /* This file supports playing MIDI files with timidity */
 
+#ifdef MUSIC_MID_TIMIDITY
+
 #include "music_timidity.h"
 
-#ifdef MUSIC_MID_TIMIDITY
 #include <timidity.h>
+
 
 typedef struct
 {
