@@ -295,13 +295,6 @@ static void *MPG123_CreateFromRW(SDL_RWops *src, int freesrc)
         return NULL;
     }
 
-    music->total_length = mpg123.mpg123_length(music->handle);
-    if (music->total_length < 0) {
-        MPG123_Delete(music);
-        Mix_SetError("mpg123_length: Error value has been returned");
-        return NULL;
-    }
-
     result = mpg123.mpg123_getformat(music->handle, &rate, &channels, &encoding);
     if (result != MPG123_OK) {
         MPG123_Delete(music);
@@ -323,6 +316,8 @@ static void *MPG123_CreateFromRW(SDL_RWops *src, int freesrc)
         MPG123_Delete(music);
         return NULL;
     }
+
+    music->total_length = mpg123.mpg123_length(music->handle);
 
     music->freesrc = freesrc;
     return music;
@@ -453,7 +448,7 @@ static double MPG123_Tell(void *context)
 static double MPG123_Duration(void *context)
 {
     MPG123_Music *music = (MPG123_Music *)context;
-    if (!music->sample_rate) {
+    if (music->total_length < 0) {
         return -1.0;
     }
     return (double)music->total_length / (double)music->sample_rate;
