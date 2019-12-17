@@ -157,11 +157,11 @@ typedef struct {
     SDL_AudioStream *stream;
     int loop;
     FLAC__uint64 pcm_pos;
+    FLAC__uint64 full_length;
     SDL_bool loop_flag;
     FLAC__uint64 loop_start;
     FLAC__uint64 loop_end;
     FLAC__uint64 loop_len;
-    FLAC__uint64 total_samples;
     Mix_MusicMetaTags tags;
 } FLAC_Music;
 
@@ -426,8 +426,7 @@ static void flac_metadata_music_cb(
         music->sample_rate = metadata->data.stream_info.sample_rate;
         music->channels = metadata->data.stream_info.channels;
         music->bits_per_sample = metadata->data.stream_info.bits_per_sample;
-        music->total_samples = metadata->data.stream_info.total_samples;
-    /*printf("FLAC: Sample rate = %d, channels = %d, bits_per_sample = %d\n", music->sample_rate, music->channels, music->bits_per_sample);*/
+      /*printf("FLAC: Sample rate = %d, channels = %d, bits_per_sample = %d\n", music->sample_rate, music->channels, music->bits_per_sample);*/
 
         /* SDL's channel mapping and FLAC channel mapping are the same,
            except for 3 channels: SDL is FL FR LFE and FLAC is FL FR FC
@@ -449,7 +448,7 @@ static void flac_metadata_music_cb(
         rate = music->sample_rate;
 
         for (i = 0; i < vc->num_comments; ++i) {
-            param = SDL_strdup((const char*) vc->comments[i].entry);
+            param = SDL_strdup((const char *) vc->comments[i].entry);
             argument = param;
             value = SDL_strchr(param, '=');
 
@@ -600,6 +599,7 @@ static void *FLAC_CreateFromRW(SDL_RWops *src, int freesrc)
         music->loop = 1;
     }
 
+    music->full_length = full_length;
     music->freesrc = freesrc;
     return music;
 }
@@ -726,13 +726,11 @@ static double FLAC_Tell(void *context)
     return -1.0;
 }
 
+/* Return music duration in seconds */
 static double FLAC_Duration(void *context)
 {
     FLAC_Music *music = (FLAC_Music *)context;
-    if (music) {
-        return (double)music->total_samples / (double)(music->sample_rate);
-    }
-    return -1.0;
+    return (double)music->full_length / (double)music->sample_rate;
 }
 
 static double FLAC_LoopStart(void *music_p)

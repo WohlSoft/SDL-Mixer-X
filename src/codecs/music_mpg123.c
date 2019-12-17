@@ -102,7 +102,7 @@ static int MPG123_Load(void)
         FUNCTION_LOADER(mpg123_replace_reader_handle, int (*)( mpg123_handle *mh, ssize_t (*r_read) (void *, void *, size_t), off_t (*r_lseek)(void *, off_t, int), void (*cleanup)(void*) ))
         FUNCTION_LOADER(mpg123_seek, off_t (*)( mpg123_handle *mh, off_t sampleoff, int whence ))
         FUNCTION_LOADER(mpg123_tell, off_t (*)( mpg123_handle *mh))
-        FUNCTION_LOADER(mpg123_length, off_t (*)( mpg123_handle *mh))
+        FUNCTION_LOADER(mpg123_length, off_t (*)(mpg123_handle *mh))
         FUNCTION_LOADER(mpg123_strerror, const char* (*)(mpg123_handle *mh))
     }
     ++mpg123.loaded;
@@ -135,8 +135,8 @@ typedef struct
     SDL_AudioStream *stream;
     unsigned char *buffer;
     size_t buffer_size;
-    off_t total_length;
     long sample_rate;
+    off_t total_length;
     Mix_MusicMetaTags tags;
 } MPG123_Music;
 
@@ -449,7 +449,7 @@ static double MPG123_Tell(void *context)
     return (double)offset / (double)music->sample_rate;
 }
 
-
+/* Return music duration in seconds */
 static double MPG123_Duration(void *context)
 {
     MPG123_Music *music = (MPG123_Music *)context;
@@ -458,7 +458,6 @@ static double MPG123_Duration(void *context)
     }
     return (double)music->total_length / (double)music->sample_rate;
 }
-
 
 static const char* MPG123_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
 {
@@ -513,7 +512,7 @@ Mix_MusicInterface Mix_MusicInterface_MPG123 =
     MPG123_GetAudio,
     MPG123_Seek,
     MPG123_Tell, /* Tell [MIXER-X]*/
-    MPG123_Duration, /* FullLength [MIXER-X]*/
+    MPG123_Duration,
     NULL,   /* Set Tempo multiplier [MIXER-X] */
     NULL,   /* Get Tempo multiplier [MIXER-X] */
     NULL,   /* LoopStart [MIXER-X]*/

@@ -482,13 +482,14 @@ static double OPUS_Tell(void *context)
     return (double)(opus.op_pcm_tell(music->of)) / 48000.0;
 }
 
+/* Return music duration in seconds */
 static double OPUS_Duration(void *context)
 {
     OPUS_music *music = (OPUS_music *)context;
     return (double)music->full_length / 48000.0;
 }
 
-static double OPUS_get_loop_start(void *music_p)
+static double OPUS_LoopStart(void *music_p)
 {
     OPUS_music *music = (OPUS_music *)music_p;
     if (music->loop) {
@@ -497,7 +498,7 @@ static double OPUS_get_loop_start(void *music_p)
     return -1.0;
 }
 
-static double OPUS_get_loop_end(void *music_p)
+static double OPUS_LoopEnd(void *music_p)
 {
     OPUS_music *music = (OPUS_music *)music_p;
     if (music->loop) {
@@ -506,7 +507,7 @@ static double OPUS_get_loop_end(void *music_p)
     return -1.0;
 }
 
-static double OPUS_get_loop_length(void *music_p)
+static double OPUS_LoopLength(void *music_p)
 {
     OPUS_music *music = (OPUS_music *)music_p;
     if (music->loop) {
@@ -556,9 +557,9 @@ Mix_MusicInterface Mix_MusicInterface_Opus =
     OPUS_Duration,
     NULL,   /* Set Tempo multiplier [MIXER-X] */
     NULL,   /* Get Tempo multiplier [MIXER-X] */
-    OPUS_get_loop_start, /* LoopStart [MIXER-X]*/
-    OPUS_get_loop_end, /* LoopEnd [MIXER-X]*/
-    OPUS_get_loop_length, /* LoopLength [MIXER-X]*/
+    OPUS_LoopStart, /* LoopStart [MIXER-X]*/
+    OPUS_LoopEnd, /* LoopEnd [MIXER-X]*/
+    OPUS_LoopLength, /* LoopLength [MIXER-X]*/
     OPUS_GetMetaTag, /* GetMetaTag [MIXER-X]*/
     NULL,   /* Pause */
     NULL,   /* Resume */

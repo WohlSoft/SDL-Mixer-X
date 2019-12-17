@@ -206,9 +206,6 @@ static void calculate_total_time(MAD_Music *music)
 }
 
 static int MAD_Seek(void *context, double position);
-#if 0 /* Moved into "music_id3tag.c" */
-static int skip_tags(MAD_Music *music);
-#endif
 
 static void *MAD_CreateFromRW(SDL_RWops *src, int freesrc)
 {

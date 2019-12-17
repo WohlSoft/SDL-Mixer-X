@@ -515,6 +515,7 @@ static double OGG_Tell(void *context)
 #endif
 }
 
+/* Return music duration in seconds */
 static double OGG_Duration(void *context)
 {
     OGG_music *music = (OGG_music *)context;

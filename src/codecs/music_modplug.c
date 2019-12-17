@@ -84,7 +84,7 @@ static int MODPLUG_Load(void)
         FUNCTION_LOADER(ModPlug_Unload, void (*)(ModPlugFile* file))
         FUNCTION_LOADER(ModPlug_Read, int  (*)(ModPlugFile* file, void* buffer, int size))
         FUNCTION_LOADER(ModPlug_Seek, void (*)(ModPlugFile* file, int millisecond))
-        FUNCTION_LOADER(ModPlug_GetLength, int  (*)(ModPlugFile* file))
+        FUNCTION_LOADER(ModPlug_GetLength, int (*)(ModPlugFile* file))
         FUNCTION_LOADER(ModPlug_GetSettings, void (*)(ModPlug_Settings* settings))
         FUNCTION_LOADER(ModPlug_SetSettings, void (*)(const ModPlug_Settings* settings))
         FUNCTION_LOADER(ModPlug_SetMasterVolume, void (*)(ModPlugFile* file,unsigned int cvol))
@@ -301,6 +301,7 @@ static double MODPLUG_Tell(void *context)
     }
 }
 
+/* Return music duration in seconds */
 static double MODPLUG_Duration(void *context)
 {
     MODPLUG_Music *music = (MODPLUG_Music *)context;

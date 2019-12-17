@@ -593,6 +593,7 @@ static double WAV_Tell(void *context)
     return (double)(phys_pos - music->start) / (double)(music->spec.freq * music->samplesize);
 }
 
+/* Return music duration in seconds */
 static double WAV_Duration(void *context)
 {
     WAV_Music *music = (WAV_Music *)context;
