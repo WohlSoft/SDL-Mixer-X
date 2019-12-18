@@ -317,12 +317,12 @@ static void *OPUS_CreateFromRW(SDL_RWops *src, int freesrc)
         }
 
         if (SDL_strcasecmp(argument, "LOOPSTART") == 0)
-            music->loop_start = (ogg_int64_t)parse_time(value, 48000);
+            music->loop_start = parse_time(value, 48000);
         else if (SDL_strcasecmp(argument, "LOOPLENGTH") == 0) {
-            music->loop_len = (ogg_int64_t)SDL_strtoull(value, NULL, 10);
+            music->loop_len = SDL_strtoll(value, NULL, 10);
             is_loop_length = SDL_TRUE;
         } else if (SDL_strcasecmp(argument, "LOOPEND") == 0) {
-            music->loop_end = (ogg_int64_t)parse_time(value, 48000);
+            music->loop_end = parse_time(value, 48000);
             is_loop_length = SDL_FALSE;
         } else if (SDL_strcasecmp(argument, "TITLE") == 0) {
             meta_tags_set(&music->tags, MIX_META_TITLE, value);
@@ -340,6 +340,13 @@ static void *OPUS_CreateFromRW(SDL_RWops *src, int freesrc)
         music->loop_end = music->loop_start + music->loop_len;
     } else {
         music->loop_len = music->loop_end - music->loop_start;
+    }
+
+    /* Ignore invalid loop tag */
+    if (music->loop_start < 0 || music->loop_len < 0 || music->loop_end < 0) {
+        music->loop_start = 0;
+        music->loop_len = 0;
+        music->loop_end = 0;
     }
 
     full_length = opus.op_pcm_total(music->of, -1);
