@@ -82,7 +82,7 @@ static int TIMIDITY_Open(const SDL_AudioSpec *spec)
 #endif
     if (rc < 0) rc = Timidity_Init(NULL); /* library's default cfg. */
 
-    timidity_loaded = SDL_TRUE;
+    timidity_loaded = 1;
 
     return rc;
 }
@@ -222,6 +222,7 @@ static int TIMIDITY_GetSome(void *context, void *data, int bytes, SDL_bool *done
         return amount;
     }
 }
+
 static int TIMIDITY_GetAudio(void *context, void *data, int bytes)
 {
     return music_pcm_getaudio(context, data, bytes, MIX_MAX_VOLUME, TIMIDITY_GetSome);
