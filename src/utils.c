@@ -107,8 +107,6 @@ Sint64 parse_time(char *time, long samplerate_hz)
         if (*p == '.') {
             double val_f = str_to_float(p);
             if (val_f < 0) return -1;
-            printf("ToF: %g from str: %s\n", val_f, p);
-            fflush(stdout);
             return result * samplerate_hz + (Sint64) (val_f * samplerate_hz);
         }
     }
