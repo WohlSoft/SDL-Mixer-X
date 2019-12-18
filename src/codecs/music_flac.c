@@ -574,9 +574,9 @@ static void *FLAC_CreateFromRW(SDL_RWops *src, int freesrc)
     if (was_error) {
         switch (init_stage) {
             case 2:
-                flac.FLAC__stream_decoder_finish(music->flac_decoder);
+                flac.FLAC__stream_decoder_finish(music->flac_decoder); /* Fallthrough */
             case 1:
-                flac.FLAC__stream_decoder_delete(music->flac_decoder);
+                flac.FLAC__stream_decoder_delete(music->flac_decoder); /* Fallthrough */
             case 0:
                 SDL_free(music);
                 break;
