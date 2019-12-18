@@ -64,9 +64,6 @@ extern "C" int main(int argc, char *argv[])
     }
 #endif
 
-    // TODO: Make the setting to allow user switch this
-    Mix_SetSoundFonts(QString(a.applicationDirPath() + "/gm.sf2").toUtf8().data());
-
     PGE_MusicPlayer::loadAudioSettings();
 
     QString mixErr;

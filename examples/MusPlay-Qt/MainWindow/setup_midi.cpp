@@ -73,7 +73,7 @@ void SetupMidi::loadSetup()
     ui->adl_scalableModulation->setCheckState((Qt::CheckState)setup.value("ADLMIDI-Scalable-Modulation", Qt::Unchecked).toInt());
     Mix_ADLMIDI_setScaleMod(tristateToInt(ui->adl_scalableModulation->checkState()));
 
-    ui->adl_bank->setText(setup.value("ADLMIDI-Bank", "").toString());
+    ui->adl_bank->setText(setup.value("ADLMIDI-Bank", QString()).toString());
     ui->adl_use_custom->setChecked(setup.value("ADLMIDI-Bank-UseCustom", true).toBool());
     ui->adl_bank->setModified(true);
     on_adl_bank_editingFinished();
@@ -84,14 +84,18 @@ void SetupMidi::loadSetup()
     ui->opnVolumeModel->setCurrentIndex(setup.value("OPNMIDI-VolumeModel", 0).toInt());
     Mix_OPNMIDI_setVolumeModel(ui->opnVolumeModel->currentIndex());
 
-    ui->opn_bank->setText(setup.value("OPNMIDI-Bank", "").toString());
+    ui->opn_bank->setText(setup.value("OPNMIDI-Bank", QString()).toString());
     ui->opn_use_custom->setChecked(setup.value("OPNMIDI-Bank-UseCustom", true).toBool());
     ui->opn_bank->setModified(true);
     on_opn_bank_editingFinished();
 
-    ui->timidityCfgPath->setText(setup.value("Timidity-Config-Path", "").toString());
+    ui->timidityCfgPath->setText(setup.value("Timidity-Config-Path", QString()).toString());
     ui->timidityCfgPath->setModified(true);
     on_timidityCfgPath_editingFinished();
+
+    ui->fluidSynthSF2Paths->setText(setup.value("FluidSynth-SoundFonts", QString()).toString());
+    ui->fluidSynthSF2Paths->setModified(true);
+    on_fluidSynthSF2Paths_editingFinished();
 #endif
 }
 
@@ -119,6 +123,7 @@ void SetupMidi::saveSetup()
     setup.setValue("OPNMIDI-Bank-UseCustom", ui->opn_use_custom->isChecked());
 
     setup.setValue("Timidity-Config-Path", ui->timidityCfgPath->text());
+    setup.setValue("FluidSynth-SoundFonts", ui->fluidSynthSF2Paths->text());
 
     setup.sync();
 #endif
@@ -398,6 +403,46 @@ void SetupMidi::on_timidityCfgPath_editingFinished()
 #endif
 }
 
+
+void SetupMidi::on_fluidSynthSF2PathsBrowse_clicked()
+{
+#ifdef SDL_MIXER_X
+    QString path = QFileDialog::getOpenFileName(this,
+                   tr("Select SoundFont bank for FluidSynth"),
+                   ui->fluidSynthSF2Paths->text(),
+                   "SoundFont files (*.sf2);;"
+                   "All Files (*.*)");
+    if(!path.isEmpty())
+    {
+        ui->fluidSynthSF2Paths->setText(path);
+        ui->fluidSynthSF2Paths->setModified(true);
+        on_fluidSynthSF2Paths_editingFinished();
+    }
+#endif
+}
+
+void SetupMidi::on_fluidSynthSF2Paths_editingFinished()
+{
+#ifdef SDL_MIXER_X
+    if(m_setupLock)
+        return;
+    if(ui->fluidSynthSF2Paths->isModified())
+    {
+        QString file = ui->fluidSynthSF2Paths->text();
+        if(!file.isEmpty() && QFile::exists(file))
+        {
+            Mix_SetSoundFonts(file.toUtf8().data());
+        }
+        else
+        {
+            Mix_SetSoundFonts(QString(qApp->applicationDirPath() + "/gm.sf2").toUtf8().data());
+        }
+        emit restartForFluidSynth();
+        ui->fluidSynthSF2Paths->setModified(false);
+    }
+#endif
+}
+
 void SetupMidi::on_resetDefaultADLMIDI_clicked()
 {
 #ifdef SDL_MIXER_X
@@ -540,6 +585,19 @@ void SetupMidi::restartForTimidity()
     if(Mix_PlayingMusicStream(PGE_MusicPlayer::s_playMus) &&
       (PGE_MusicPlayer::type == MUS_MID) &&
       (Mix_GetMidiPlayer() == MIDI_Timidity)
+    )
+    {
+        emit songRestartNeeded();
+    }
+#endif
+}
+
+void SetupMidi::restartForFluidSynth()
+{
+#ifdef SDL_MIXER_X
+    if(Mix_PlayingMusicStream(PGE_MusicPlayer::s_playMus) &&
+      (PGE_MusicPlayer::type == MUS_MID) &&
+      (Mix_GetMidiPlayer() == MIDI_Fluidsynth)
     )
     {
         emit songRestartNeeded();
