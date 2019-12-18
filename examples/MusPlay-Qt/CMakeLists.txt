@@ -78,6 +78,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS} $
 qt5_wrap_ui(UIS_HDRS
     MainWindow/mainwindow.ui
     MainWindow/sfx_tester.ui
+    MainWindow/setup_audio.ui
     MainWindow/setup_midi.ui
     AssocFiles/assoc_files.ui
 )
@@ -94,6 +95,7 @@ list(APPEND SDLMixer_MusPlay_SRC
     MainWindow/musplayer_base.cpp
     MainWindow/musplayer_qt.cpp
     MainWindow/seek_bar.cpp
+    MainWindow/setup_audio.cpp
     MainWindow/setup_midi.cpp
     MainWindow/sfx_tester.cpp
     Player/mus_player.cpp

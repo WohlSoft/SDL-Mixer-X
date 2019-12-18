@@ -63,6 +63,21 @@ namespace PGE_MusicPlayer
     extern Mix_MusicType type;
     extern bool reverbEnabled;
 
+    extern void loadAudioSettings();
+    extern void saveAudioSettings();
+
+    extern int      getSampleRate();
+    extern Uint16   getSampleFormat();
+    extern int      getChannels();
+
+    extern void setSpec(int rate, Uint16 format, int channels);
+
+    extern bool openAudio(QString &error);
+    extern bool openAudioWithSpec(QString &error, int rate, Uint16 format, int channels);
+    extern void closeAudio();
+
+    extern bool reloadAudio(QString &error);
+
     extern void initHooks();
 
     extern void setMainWindow(void *mwp);

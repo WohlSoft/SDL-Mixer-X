@@ -17,6 +17,8 @@
 #include "SingleApplication/singleapplication.h"
 #include "SingleApplication/pge_application.h"
 #include "MainWindow/musplayer_qt.h"
+#include "Player/mus_player.h"
+#include "version.h"
 
 static void error(QString msg)
 {
@@ -28,6 +30,10 @@ extern "C" int main(int argc, char *argv[])
     QApplication::addLibraryPath(".");
     QApplication::addLibraryPath(QFileInfo(QString::fromUtf8(argv[0])).dir().path());
     QApplication::addLibraryPath(QFileInfo(QString::fromLocal8Bit(argv[0])).dir().path());
+
+    QApplication::setOrganizationName(V_COMPANY);
+    QApplication::setOrganizationDomain(V_PGE_URL);
+    QApplication::setApplicationName("PGE Music Player");
 
     PGE_Application a(argc, argv);
     QStringList args=a.arguments();
@@ -58,12 +64,14 @@ extern "C" int main(int argc, char *argv[])
     }
 #endif
 
+    // TODO: Make the setting to allow user switch this
     Mix_SetSoundFonts(QString(a.applicationDirPath() + "/gm.sf2").toUtf8().data());
 
-    if(Mix_OpenAudio(44100, AUDIO_S16, 2, 4096) == -1)
-        error(QString("Failed to open audio stream: ") + Mix_GetError());
+    PGE_MusicPlayer::loadAudioSettings();
 
-    Mix_AllocateChannels(16);
+    QString mixErr;
+    if(!PGE_MusicPlayer::openAudio(mixErr))
+        error(mixErr);
 
 #if defined(SDL_MIXER_GE21)
     //Disallow auto-resetting MIDI properties (to allow manipulation with MIDI settings by functions)
@@ -90,6 +98,8 @@ extern "C" int main(int argc, char *argv[])
 #   endif
     int result = a.exec();
     delete as;
+
+    PGE_MusicPlayer::closeAudio();
 
     SDL_Quit();
     return result;

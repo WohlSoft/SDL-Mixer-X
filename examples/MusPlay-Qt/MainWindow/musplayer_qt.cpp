@@ -22,6 +22,7 @@
 
 #include "sfx_tester.h"
 #include "setup_midi.h"
+#include "setup_audio.h"
 #include "seek_bar.h"
 
 
@@ -90,10 +91,6 @@ MusPlayer_Qt::MusPlayer_Qt(QWidget *parent) : QMainWindow(parent),
     });
 
     connect(m_seekBar, &SeekBar::positionSeeked, this, &MusPlayer_Qt::musicPosition_seeked);
-
-    QApplication::setOrganizationName(V_COMPANY);
-    QApplication::setOrganizationDomain(V_PGE_URL);
-    QApplication::setApplicationName("PGE Music Player");
 
     QSettings setup;
     m_seekBar->setEnabled(false);
@@ -564,6 +561,12 @@ void MusPlayer_Qt::on_actionMidiSetup_triggered()
     m_setupMidi->move(g.right(), g.top());
     m_setupMidi->update();
     m_setupMidi->repaint();
+}
+
+void MusPlayer_Qt::on_actionAudioSetup_triggered()
+{
+    SetupAudio as(this);
+    as.exec();
 }
 
 void MusPlayer_Qt::on_actionSfxTesting_triggered()

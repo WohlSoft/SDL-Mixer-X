@@ -58,6 +58,9 @@ public slots:
     //void playListNext();
 
 private slots:
+    void on_actionAudioSetup_triggered();
+
+private slots:
     void restartMusic();
 
     void musicStopped();
