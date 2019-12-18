@@ -78,7 +78,8 @@ static int dumpstring(SDL_RWops *rw, Sint32 len, Uint8 type)
 }
 #else
 static SDL_INLINE int dumpstring(SDL_RWops *rw, Sint32 len, Uint8 type) {
-  return SDL_RWseek(rw, len, RW_SEEK_CUR);
+  (void)type;
+  return (int)SDL_RWseek(rw, len, RW_SEEK_CUR);
 }
 #endif
 
