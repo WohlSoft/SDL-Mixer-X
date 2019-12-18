@@ -76,11 +76,6 @@ static int dumpstring(SDL_RWops *rw, Sint32 len, Uint8 type)
   free(s);
   return 0;
 }
-#else
-static SDL_INLINE int dumpstring(SDL_RWops *rw, Sint32 len, Uint8 type) {
-  (void)type;
-  return (int)SDL_RWseek(rw, len, RW_SEEK_CUR);
-}
 #endif
 
 #define MIDIEVENT(at,t,ch,pa,pb) \
@@ -121,7 +116,8 @@ static MidiEventList *read_midi_event(MidiSong *song)
 	  len=getvl(song->rw);
 	  if (type>0 && type<16)
 	    {
-	      dumpstring(song->rw, len, type);
+	    /*dumpstring(song->rw, len, type);*/ /* see above */
+	      SDL_RWseek(song->rw, len, RW_SEEK_CUR);
 	    }
 	  else
 	    switch(type)
