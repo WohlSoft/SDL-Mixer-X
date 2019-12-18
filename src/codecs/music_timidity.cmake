@@ -1,16 +1,35 @@
 option(USE_MIDI_TIMIDITY   "Build with Timidity wave table MIDI sequencer support" ON)
-if(USE_MIDI_TIMIDITY AND NOT USE_SYSTEM_AUDIO_LIBRARIES)
+if(USE_MIDI_TIMIDITY)
     message("== using Timidity-SDL ==")
 
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
         set(TIMIDITYSDL_LIBRARIES timidity_sdl2)
         set(TIMIDITYSDL_FOUND True)
-    else()
+    elseif(NOT USE_SYSTEM_AUDIO_LIBRARIES)
         find_library(TIMIDITYSDL_LIBRARIES NAMES timidity_sdl2
                      HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
         if(TIMIDITYSDL_LIBRARIES)
             set(TIMIDITYSDL_FOUND True)
         endif()
+    endif()
+
+    if(NOT TIMIDITYSDL_LIBRARIES)
+        message("-- !! Timidity-SDL2 library is not found, using local sources to build it")
+        set(TIMIDITYSDL_LIBRARIES)
+        list(APPEND SDL_MIXER_DEFINITIONS -DHAVE_CONFIG_H=0)
+        list(APPEND SDLMixerX_SOURCES
+            ${CMAKE_CURRENT_LIST_DIR}/timidity/common.c
+            ${CMAKE_CURRENT_LIST_DIR}/timidity/instrum.c
+            ${CMAKE_CURRENT_LIST_DIR}/timidity/mix.c
+            ${CMAKE_CURRENT_LIST_DIR}/timidity/output.c
+            ${CMAKE_CURRENT_LIST_DIR}/timidity/playmidi.c
+            ${CMAKE_CURRENT_LIST_DIR}/timidity/readmidi.c
+            ${CMAKE_CURRENT_LIST_DIR}/timidity/resample.c
+            ${CMAKE_CURRENT_LIST_DIR}/timidity/tables.c
+            ${CMAKE_CURRENT_LIST_DIR}/timidity/timidity.c
+        )
+        list(APPEND SDL_MIXER_INCLUDE_PATHS ${CMAKE_CURRENT_LIST_DIR}/timidity)
+        set(TIMIDITYSDL_FOUND True)
     endif()
 
     if(TIMIDITYSDL_FOUND)
