@@ -301,7 +301,7 @@ static int voc_get_block(SDL_RWops *src, vs_t *v, SDL_AudioSpec *spec)
                 if (SDL_RWread(src, trash, sizeof (Uint8), 2) != 2)
                     return 0;
 
-                /* Fallthrough */
+                /* fallthrough */
 
             default:  /* text block or other krapola. */
                 for(i = 0; i < sblen; i++)
