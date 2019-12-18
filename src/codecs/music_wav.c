@@ -1004,8 +1004,6 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
     Sint64 next_chunk = 0;
     Sint64 file_length;
 
-    file_length = SDL_RWsize(src);
-
     /* AIFF magic header */
     Uint32 AIFFmagic;
     /* SSND chunk        */
@@ -1020,6 +1018,8 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
     Uint32 AIFCVersion1 = 0;
     Uint32 compressionType = 0;
     char *chunk_buffer;
+
+    file_length = SDL_RWsize(src);
 
     /* Check the magic header */
     chunk_length = SDL_ReadBE32(src);

@@ -459,6 +459,8 @@ int SDLCALLCC Mix_InitMixer(const SDL_AudioSpec spec, SDL_bool skip_init_check)
 int SDLCALLCC Mix_OpenAudioDevice(int frequency, Uint16 format, int nchannels, int chunksize,
                         const char* device, int allowed_changes)
 {
+    SDL_AudioSpec desired;
+
     /* This used to call SDL_OpenAudio(), which initializes the audio
        subsystem if necessary. Since SDL_OpenAudioDevice() doesn't,
        we have to handle this case here. */
@@ -468,7 +470,6 @@ int SDLCALLCC Mix_OpenAudioDevice(int frequency, Uint16 format, int nchannels, i
         }
     }
 
-    SDL_AudioSpec desired;
     /* Set the desired format and channel */
     desired.format   = format;
     desired.freq     = frequency;
