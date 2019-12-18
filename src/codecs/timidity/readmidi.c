@@ -109,7 +109,7 @@ static MidiEventList *read_midi_event(MidiSong *song)
 	  SNDDBG(("read_midi_event: SDL_RWread() failure\n"));
 	  return NULL;
 	}
-      
+
       if(me==0xF0 || me == 0xF7) /* SysEx event */
 	{
 	  len=getvl(song->rw);
@@ -134,7 +134,7 @@ static MidiEventList *read_midi_event(MidiSong *song)
 		SDL_RWread(song->rw, &b, 1, 1);
 		SDL_RWread(song->rw, &c, 1, 1);
 		MIDIEVENT(song->at, ME_TEMPO, c, a, b);
-		
+
 	      default:
 		SNDDBG(("(Meta event type 0x%02x, length %d)\n", type, len));
 		SDL_RWseek(song->rw, len, RW_SEEK_CUR);
@@ -204,7 +204,7 @@ static MidiEventList *read_midi_event(MidiSong *song)
 		  case 101: nrpn=0; rpn_lsb[lastchan]=b; break;
 		  case 99: nrpn=1; rpn_msb[lastchan]=b; break;
 		  case 98: nrpn=1; rpn_lsb[lastchan]=b; break;
-		    
+
 		  case 6:
 		    if (nrpn)
 		      {
@@ -212,7 +212,7 @@ static MidiEventList *read_midi_event(MidiSong *song)
 				rpn_msb[lastchan], rpn_lsb[lastchan], b));
 			break;
 		      }
-		    
+
 		    switch((rpn_msb[lastchan]<<8) | rpn_lsb[lastchan])
 		      {
 		      case 0x0000: /* Pitch bend sensitivity */
@@ -229,14 +229,14 @@ static MidiEventList *read_midi_event(MidiSong *song)
 			break;
 		      }
 		    break;
-		    
+
 		  default:
 		    SNDDBG(("(Control %d: %d)\n", a, b));
 		    break;
 		  }
 		if (control != 255)
-		  { 
-		    MIDIEVENT(song->at, control, lastchan, b, 0); 
+		  {
+		    MIDIEVENT(song->at, control, lastchan, b, 0);
 		  }
 	      }
 	      break;
@@ -253,14 +253,14 @@ static MidiEventList *read_midi_event(MidiSong *song)
 	      b &= 0x7F;
 	      MIDIEVENT(song->at, ME_PITCHWHEEL, lastchan, a, b);
 
-	    default: 
+	    default:
 	      SNDDBG(("*** Can't happen: status 0x%02X, channel 0x%02X\n",
 		      laststatus, lastchan));
 	      break;
 	    }
 	}
     }
-  
+
   return new;
 }
 
@@ -288,7 +288,7 @@ static int read_track(MidiSong *song, int append)
     song->at=0;
 
   /* Check the formalities */
-  
+
   if (SDL_RWread(song->rw, tmp, 1, 4) != 4 || SDL_RWread(song->rw, &len, 4, 1) != 1)
     {
       SNDDBG(("Can't read track header.\n"));
@@ -321,7 +321,7 @@ static int read_track(MidiSong *song, int append)
 	  meep=next;
 	  next=meep->next;
 	}
-	  
+
       new->next=next;
       meep->next=new;
 
@@ -356,7 +356,7 @@ static MidiEvent *groom_list(MidiSong *song, Sint32 divisions,Sint32 *eventsp,
   Sint32 i, our_event_count, tempo, skip_this_event, new_value;
   Sint32 sample_cum, samples_to_do, at, st, dt, counting_time;
 
-  int current_bank[MAXCHAN], current_set[MAXCHAN], current_program[MAXCHAN]; 
+  int current_bank[MAXCHAN], current_set[MAXCHAN], current_program[MAXCHAN];
   /* Or should each bank have its own current program? */
 
   for (i=0; i<MAXCHAN; i++)
@@ -401,7 +401,7 @@ static MidiEvent *groom_list(MidiSong *song, Sint32 divisions,Sint32 *eventsp,
 		}
 	      if (current_set[meep->event.channel] != new_value)
 		current_set[meep->event.channel]=new_value;
-	      else 
+	      else
 		skip_this_event=1;
 	    }
 	  else
@@ -447,7 +447,7 @@ static MidiEvent *groom_list(MidiSong *song, Sint32 divisions,Sint32 *eventsp,
 	    }
 	  if (song->tonebank[meep->event.a]) /* Is this a defined tone bank? */
 	    new_value=meep->event.a;
-	  else 
+	  else
 	    {
 	      SNDDBG(("Tone bank %d is undefined\n", meep->event.a));
 	      new_value=meep->event.a=0;
