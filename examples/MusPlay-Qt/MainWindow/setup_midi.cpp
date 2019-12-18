@@ -421,6 +421,16 @@ void SetupMidi::on_fluidSynthSF2PathsBrowse_clicked()
 #endif
 }
 
+static bool sfExists(QString paths)
+{
+    QStringList p = paths.split(";");
+
+    for(QString &file : p)
+        if(!QFile::exists(file))
+            return false;
+    return true;
+}
+
 void SetupMidi::on_fluidSynthSF2Paths_editingFinished()
 {
 #ifdef SDL_MIXER_X
@@ -428,10 +438,10 @@ void SetupMidi::on_fluidSynthSF2Paths_editingFinished()
         return;
     if(ui->fluidSynthSF2Paths->isModified())
     {
-        QString file = ui->fluidSynthSF2Paths->text();
-        if(!file.isEmpty() && QFile::exists(file))
+        QString files = ui->fluidSynthSF2Paths->text();
+        if(!files.isEmpty() && sfExists(files))
         {
-            Mix_SetSoundFonts(file.toUtf8().data());
+            Mix_SetSoundFonts(files.toUtf8().data());
         }
         else
         {
