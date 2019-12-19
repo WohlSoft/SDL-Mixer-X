@@ -122,6 +122,7 @@ int main(int argc, char *argv[])
     const char *tag_artist = NULL;
     const char *tag_album = NULL;
     const char *tag_copyright = NULL;
+    double loop_start, loop_end, loop_length, current_position;
 
     (void) argc;
 
@@ -282,14 +283,27 @@ int main(int argc, char *argv[])
             SDL_Log("Copyright: %s", tag_copyright);
         }
 
+        loop_start = Mix_GetMusicLoopStartTime(music);
+        loop_end = Mix_GetMusicLoopEndTime(music);
+        loop_length = Mix_GetMusicLoopLengthTime(music);
+
         /* Play and then exit */
-        SDL_Log("Playing %s\n", argv[i]);
+        SDL_Log("Playing %s, duration %f\n", argv[i], Mix_MusicDuration(music));
+        if (loop_start > 0.0 && loop_end > 0.0 && loop_length > 0.0) {
+            SDL_Log("Loop points: start %g s, end %g s, length %g s\n", loop_start, loop_end, loop_length);
+        }
         Mix_FadeInMusic(music,looping,2000);
         while (!next_track && (Mix_PlayingMusic() || Mix_PausedMusic())) {
             if(interactive)
                 Menu();
-            else
+            else {
+                current_position = Mix_GetMusicPosition(music);
+                if (current_position >= 0.0) {
+                    printf("Position: %g seconds             \r", current_position);
+                    fflush(stdout);
+                }
                 SDL_Delay(100);
+            }
         }
         Mix_FreeMusic(music);
         music = NULL;
