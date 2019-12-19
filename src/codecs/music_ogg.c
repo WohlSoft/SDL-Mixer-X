@@ -237,11 +237,11 @@ static ogg_int64_t parse_time(char *time, long samplerate_hz)
 {
     char *num_start, *p;
     ogg_int64_t result = 0;
-    char c;
+    char c; int val;
 
     /* Time is directly expressed as a sample position */
     if (SDL_strchr(time, ':') == NULL) {
-        return (ogg_int64_t)SDL_strtoull(time, NULL, 10);
+        return SDL_strtoll(time, NULL, 10);
     }
 
     result = 0;
@@ -250,7 +250,9 @@ static ogg_int64_t parse_time(char *time, long samplerate_hz)
     for (p = time; *p != '\0'; ++p) {
         if (*p == '.' || *p == ':') {
             c = *p; *p = '\0';
-            result = result * 60 + SDL_atoi(num_start);
+            if ((val = SDL_atoi(num_start)) < 0)
+                return -1;
+            result = result * 60 + val;
             num_start = p + 1;
             *p = c;
         }
@@ -261,7 +263,8 @@ static ogg_int64_t parse_time(char *time, long samplerate_hz)
         }
     }
 
-    return (result * 60 + SDL_atoi(num_start)) * samplerate_hz;
+    if ((val = SDL_atoi(num_start)) < 0) return -1;
+    return (result * 60 + val) * samplerate_hz;
 }
 
 static SDL_bool is_loop_tag(const char *tag)
@@ -292,9 +295,6 @@ static void *OGG_CreateFromRW(SDL_RWops *src, int freesrc)
     music->volume = MIX_MAX_VOLUME;
     music->section = -1;
     music->loop = -1;
-    music->loop_start = -1;
-    music->loop_end = 0;
-    music->loop_len = 0;
 
     SDL_zero(callbacks);
     callbacks.read_func = sdl_read_func;
@@ -326,7 +326,6 @@ static void *OGG_CreateFromRW(SDL_RWops *src, int freesrc)
 
         /* Want to match LOOP-START, LOOP_START, etc. Remove - or _ from
          * string if it is present at position 4. */
-
         if (is_loop_tag(argument) && ((argument[4] == '_') || (argument[4] == '-'))) {
             SDL_memmove(argument + 4, argument + 5, SDL_strlen(argument) - 4);
         }
@@ -365,12 +364,8 @@ static void *OGG_CreateFromRW(SDL_RWops *src, int freesrc)
     }
 
     full_length = vorbis.ov_pcm_total(&music->vf, -1);
-    if (((music->loop_start >= 0) || (music->loop_end > 0)) &&
-        ((music->loop_start < music->loop_end) || (music->loop_end > 0)) &&
-         (music->loop_start < full_length) &&
-         (music->loop_end <= full_length)) {
-        if (music->loop_start < 0) music->loop_start = 0;
-        if (music->loop_end == 0)  music->loop_end = full_length;
+    if ((music->loop_end > 0) && (music->loop_end <= full_length) &&
+        (music->loop_start < music->loop_end)) {
         music->loop = 1;
     }
 
@@ -524,7 +519,7 @@ static double OGG_Duration(void *context)
 #endif
 }
 
-static double   OGG_get_loop_start(void *music_p)
+static double   OGG_LoopStart(void *music_p)
 {
     OGG_music *music = (OGG_music *)music_p;
     if (music->loop) {
@@ -533,7 +528,7 @@ static double   OGG_get_loop_start(void *music_p)
     return -1.0;
 }
 
-static double   OGG_get_loop_end(void *music_p)
+static double   OGG_LoopEnd(void *music_p)
 {
     OGG_music *music = (OGG_music *)music_p;
     if (music->loop) {
@@ -542,7 +537,7 @@ static double   OGG_get_loop_end(void *music_p)
     return -1.0;
 }
 
-static double   OGG_get_loop_length(void *music_p)
+static double   OGG_LoopLength(void *music_p)
 {
     OGG_music *music = (OGG_music *)music_p;
     if (music->loop) {
@@ -594,9 +589,9 @@ Mix_MusicInterface Mix_MusicInterface_OGG =
     OGG_Duration,
     NULL,   /* Set Tempo multiplier [MIXER-X] */
     NULL,   /* Get Tempo multiplier [MIXER-X] */
-    OGG_get_loop_start,   /* LoopStart [MIXER-X]*/
-    OGG_get_loop_end,   /* LoopEnd [MIXER-X]*/
-    OGG_get_loop_length,   /* LoopLength [MIXER-X]*/
+    OGG_LoopStart,   /* LoopStart [MIXER-X]*/
+    OGG_LoopEnd,   /* LoopEnd [MIXER-X]*/
+    OGG_LoopLength,   /* LoopLength [MIXER-X]*/
     OGG_GetMetaTag,   /* GetMetaTag [MIXER-X]*/
     NULL,   /* Pause */
     NULL,   /* Resume */

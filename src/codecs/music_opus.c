@@ -217,11 +217,11 @@ static ogg_int64_t parse_time(char *time)
     const ogg_int64_t samplerate_hz = 48000;
     char *num_start, *p;
     ogg_int64_t result = 0;
-    char c;
+    char c; int val;
 
     /* Time is directly expressed as a sample position */
     if (SDL_strchr(time, ':') == NULL) {
-        return (ogg_int64_t)SDL_strtoull(time, NULL, 10);
+        return SDL_strtoll(time, NULL, 10);
     }
 
     result = 0;
@@ -230,18 +230,22 @@ static ogg_int64_t parse_time(char *time)
     for (p = time; *p != '\0'; ++p) {
         if (*p == '.' || *p == ':') {
             c = *p; *p = '\0';
-            result = result * 60 + SDL_atoi(num_start);
+            if ((val = SDL_atoi(num_start)) < 0)
+                return -1;
+            result = result * 60 + val;
             num_start = p + 1;
             *p = c;
         }
 
         if (*p == '.') {
-            return result * samplerate_hz
-                + (ogg_int64_t) (SDL_atof(p) * samplerate_hz);
+            double val_f = SDL_atof(p);
+            if (val_f < 0) return -1;
+            return result * samplerate_hz + (ogg_int64_t) (val_f * samplerate_hz);
         }
     }
 
-    return (result * 60 + SDL_atoi(num_start)) * samplerate_hz;
+    if ((val = SDL_atoi(num_start)) < 0) return -1;
+    return (result * 60 + val) * samplerate_hz;
 }
 
 static SDL_bool is_loop_tag(const char *tag)
@@ -271,9 +275,6 @@ static void *OPUS_CreateFromRW(SDL_RWops *src, int freesrc)
     music->volume = MIX_MAX_VOLUME;
     music->section = -1;
     music->loop = -1;
-    music->loop_start = -1;
-    music->loop_end = 0;
-    music->loop_len = 0;
 
     SDL_zero(callbacks);
     callbacks.read = sdl_read_func;
@@ -350,12 +351,8 @@ static void *OPUS_CreateFromRW(SDL_RWops *src, int freesrc)
     }
 
     full_length = opus.op_pcm_total(music->of, -1);
-    if (((music->loop_start >= 0) || (music->loop_end > 0)) &&
-        ((music->loop_start < music->loop_end) || (music->loop_end > 0)) &&
-         (music->loop_start < full_length) &&
-         (music->loop_end <= full_length)) {
-        if (music->loop_start < 0) music->loop_start = 0;
-        if (music->loop_end == 0)  music->loop_end = full_length;
+    if ((music->loop_end > 0) && (music->loop_end <= full_length) &&
+        (music->loop_start < music->loop_end)) {
         music->loop = 1;
     }
 
