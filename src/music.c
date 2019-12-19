@@ -1506,8 +1506,7 @@ double SDLCALLCC Mix_GetMusicPosition(Mix_Music *music)
     return(retval);
 }
 
-/* Get a music duration in seconds */
-static double music_internal_duration(Mix_Music *music)
+static double music_duration_int(Mix_Music *music)
 {
     if (music->interface->Duration) {
         return music->interface->Duration(music->context);
@@ -1516,17 +1515,18 @@ static double music_internal_duration(Mix_Music *music)
         return -1;
     }
 }
+
 double SDLCALLCC Mix_MusicDuration(Mix_Music *music)
 {
     double retval;
 
     Mix_LockAudio();
     if (music) {
-        retval = music_internal_duration(music);
+        retval = music_duration_int(music);
     } else if (music_playing) {
-        retval = music_internal_duration(music_playing);
+        retval = music_duration_int(music_playing);
     } else {
-        Mix_SetError("Music isn't playing");
+        Mix_SetError("music is NULL and no playing music");
         retval = -1.0;
     }
     Mix_UnlockAudio();

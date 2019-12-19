@@ -592,13 +592,9 @@ static void *FLAC_CreateFromRW(SDL_RWops *src, int freesrc)
     /* loop_start, loop_end and loop_len get set by metadata callback if tags
      * are present in metadata.
      */
-
-    full_length = (FLAC__int64)flac.FLAC__stream_decoder_get_total_samples(music->flac_decoder);
-    if (((music->loop_start > 0) || (music->loop_end > 0)) &&
-        ((music->loop_start < music->loop_end) || (music->loop_end > 0)) &&
-         (music->loop_start < full_length) &&
-         (music->loop_end <= full_length)) {
-        if (music->loop_end == 0) music->loop_end = full_length;
+    full_length = (FLAC__int64) flac.FLAC__stream_decoder_get_total_samples(music->flac_decoder);
+    if ((music->loop_end > 0) && (music->loop_end <= full_length) &&
+        (music->loop_start < music->loop_end)) {
         music->loop = 1;
     }
 
@@ -706,7 +702,7 @@ static int FLAC_Seek(void *context, double position)
     FLAC__uint64 seek_sample = (FLAC__uint64) (music->sample_rate * position);
 
     SDL_AudioStreamClear(music->stream);
-    music->pcm_pos = (FLAC__int64)seek_sample;
+    music->pcm_pos = (FLAC__int64) seek_sample;
     if (!flac.FLAC__stream_decoder_seek_absolute(music->flac_decoder, seek_sample)) {
         if (flac.FLAC__stream_decoder_get_state(music->flac_decoder) == FLAC__STREAM_DECODER_SEEK_ERROR) {
             flac.FLAC__stream_decoder_flush(music->flac_decoder);
