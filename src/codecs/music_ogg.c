@@ -522,7 +522,7 @@ static double OGG_Duration(void *context)
 static double   OGG_LoopStart(void *music_p)
 {
     OGG_music *music = (OGG_music *)music_p;
-    if (music->loop) {
+    if (music->loop > 0) {
         return (double)music->loop_start / music->vi.rate;
     }
     return -1.0;
@@ -531,7 +531,7 @@ static double   OGG_LoopStart(void *music_p)
 static double   OGG_LoopEnd(void *music_p)
 {
     OGG_music *music = (OGG_music *)music_p;
-    if (music->loop) {
+    if (music->loop > 0) {
         return (double)music->loop_end / music->vi.rate;
     }
     return -1.0;
@@ -540,7 +540,7 @@ static double   OGG_LoopEnd(void *music_p)
 static double   OGG_LoopLength(void *music_p)
 {
     OGG_music *music = (OGG_music *)music_p;
-    if (music->loop) {
+    if (music->loop > 0) {
         return (double)music->loop_len / music->vi.rate;
     }
     return -1.0;

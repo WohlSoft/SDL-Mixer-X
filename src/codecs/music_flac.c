@@ -739,7 +739,7 @@ static double FLAC_Duration(void *context)
 static double FLAC_LoopStart(void *music_p)
 {
     FLAC_Music *music = (FLAC_Music *)music_p;
-    if (music->loop) {
+    if (music->loop > 0) {
         return (double)music->loop_start / music->sample_rate;
     }
     return -1.0;
@@ -748,7 +748,7 @@ static double FLAC_LoopStart(void *music_p)
 static double FLAC_LoopEnd(void *music_p)
 {
     FLAC_Music *music = (FLAC_Music *)music_p;
-    if (music->loop) {
+    if (music->loop > 0) {
         return (double)music->loop_end / music->sample_rate;
     }
     return -1.0;
@@ -757,7 +757,7 @@ static double FLAC_LoopEnd(void *music_p)
 static double FLAC_LoopLength(void *music_p)
 {
     FLAC_Music *music = (FLAC_Music *)music_p;
-    if (music->loop) {
+    if (music->loop > 0) {
         return (double)music->loop_len / music->sample_rate;
     }
     return -1.0;

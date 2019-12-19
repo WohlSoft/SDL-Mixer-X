@@ -496,7 +496,7 @@ static double OPUS_Duration(void *context)
 static double OPUS_LoopStart(void *music_p)
 {
     OPUS_music *music = (OPUS_music *)music_p;
-    if (music->loop) {
+    if (music->loop > 0) {
         return (double)music->loop_start / 48000.0;
     }
     return -1.0;
@@ -505,7 +505,7 @@ static double OPUS_LoopStart(void *music_p)
 static double OPUS_LoopEnd(void *music_p)
 {
     OPUS_music *music = (OPUS_music *)music_p;
-    if (music->loop) {
+    if (music->loop > 0) {
         return (double)music->loop_end / 48000.0;
     }
     return -1.0;
@@ -514,7 +514,7 @@ static double OPUS_LoopEnd(void *music_p)
 static double OPUS_LoopLength(void *music_p)
 {
     OPUS_music *music = (OPUS_music *)music_p;
-    if (music->loop) {
+    if (music->loop > 0) {
         return (double)music->loop_len / 48000.0;
     }
     return -1.0;
