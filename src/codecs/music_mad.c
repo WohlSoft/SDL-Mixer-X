@@ -241,12 +241,14 @@ static double extract_length(struct mad_header *header, struct mad_stream *strea
     return (double)(frames_count * samples_per_frame) / header->samplerate;
 }
 
-static void calculate_total_time(MAD_Music *music)
+static int calculate_total_time(MAD_Music *music)
 {
     mad_timer_t time = mad_timer_zero;
     struct mad_header header;
     struct mad_stream stream;
     SDL_bool is_first_frame = SDL_TRUE;
+    int ret = 0;
+
     mad_header_init(&header);
     mad_stream_init(&stream);
 
@@ -259,15 +261,24 @@ static void calculate_total_time(MAD_Music *music)
                 if ((music->status & MS_input_error) == 0) {
                     continue;
                 }
+                if (is_first_frame) {
+                    ret = -1;
+                }
                 break;
             } else if (stream.error == MAD_ERROR_BUFLEN) {
                 if ((music->status & MS_input_error) == 0) {
                     continue;
                 }
+                if (is_first_frame) {
+                    ret = -1;
+                }
                 break;
             } else {
                 Mix_SetError("mad_frame_decode() failed, corrupt stream?");
                 music->status |= MS_decode_error;
+                if (is_first_frame) {
+                    ret = -1;
+                }
                 break;
             }
         }
@@ -295,6 +306,7 @@ static void calculate_total_time(MAD_Music *music)
     music->status = 0;
 
     MP3_RWseek(&music->mp3file, 0, RW_SEEK_SET);
+    return ret;
 }
 
 static int MAD_Seek(void *context, double position);
@@ -319,7 +331,11 @@ static void *MAD_CreateFromRW(SDL_RWops *src, int freesrc)
         return NULL;
     }
 
-    calculate_total_time(music);
+    if (calculate_total_time(music) < 0) {
+        SDL_free(music);
+        Mix_SetError("music_mad: corrupt mp3 file (bad stream.)");
+        return NULL;
+    }
 
     mad_stream_init(&music->stream);
     mad_frame_init(&music->frame);
