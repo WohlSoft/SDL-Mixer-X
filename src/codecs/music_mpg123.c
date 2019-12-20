@@ -235,7 +235,7 @@ static void *MPG123_CreateFromRW(SDL_RWops *src, int freesrc)
 
     music->mp3file.length = SDL_RWsize(src);
     meta_tags_init(&music->tags);
-    if (mp3_read_tags(&music->tags, music->mp3file.src, &music->mp3file) < 0) {
+    if (mp3_read_tags(&music->tags, music->mp3file.src, &music->mp3file, SDL_TRUE) < 0) {
         SDL_free(music);
         Mix_SetError("music_mpg123: corrupt mp3 file (bad tags.)");
         return NULL;

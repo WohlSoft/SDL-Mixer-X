@@ -937,7 +937,7 @@ static SDL_INLINE long get_musicmatch_len(SDL_RWops *m, Sint64 tail_size, long f
 }
 
 
-int mp3_read_tags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, struct mp3file_t *file_edges)
+int mp3_read_tags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, struct mp3file_t *file_edges, SDL_bool keep_id3v2)
 {
     Uint8 in_buffer[TAGS_INPUT_BUFFER_SIZE];
     long len;
@@ -971,8 +971,10 @@ int mp3_read_tags(Mix_MusicMetaTags *out_tags, SDL_RWops *src, struct mp3file_t 
             return -1;
         }
         tag_handled = parse_id3v2(out_tags, src, begin_pos);
-        begin_offset += len;
-        file_size -= (size_t)len;
+        if (!keep_id3v2) { /* Don't skip ID3v2*/
+            begin_offset += len;
+            file_size -= (size_t)len;
+        }
     }
     /* APE tag _might_ be at the start (discouraged
      * but not forbidden, either.)  read the header. */
