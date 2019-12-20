@@ -1515,7 +1515,6 @@ static double music_internal_duration(Mix_Music *music)
         return -1;
     }
 }
-
 double SDLCALLCC Mix_MusicDuration(Mix_Music *music)
 {
     double retval;

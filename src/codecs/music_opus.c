@@ -128,7 +128,7 @@ typedef struct {
 
 static int set_op_error(const char *function, int error)
 {
-#define HANDLE_ERROR_CASE(X)    case X: Mix_SetError("%s: %s", function, #X); break;
+#define HANDLE_ERROR_CASE(X) case X: Mix_SetError("%s: %s", function, #X); break;
     switch (error) {
     HANDLE_ERROR_CASE(OP_FALSE)
     HANDLE_ERROR_CASE(OP_EOF)
