@@ -1,8 +1,10 @@
 2.0.5:
-Vitaly Novichkov - Thu Dec 17 15:50:02 2019
+Matthias Gatto - Tue Dec 17 21:55:00 2019
+ * Add Mix_MusicDuration() to return music duration in seconds.
+Vitaly Novichkov - Tue Dec 17 15:50:02 2019
  * Fixed music_mpg123 seek bug when sample rate of the file and
    the stream don't match
-Ozkan Sezer - Thu Dec 17 14:56:04 2019
+Ozkan Sezer - Tue Dec 17 14:56:04 2019
  * Timidity improvements. New Mix_SetTimidityCfg() public api.
 Ozkan Sezer - Sun Dec 08 10:20:40 2019
  * Improved mp3 tag detection/skipping
