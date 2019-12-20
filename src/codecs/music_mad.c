@@ -159,11 +159,94 @@ typedef struct {
 
 static void read_update_buffer(struct mad_stream *stream, MAD_Music *music);
 
+static double extract_length(struct mad_header *header, struct mad_stream *stream, Sint64 file_size)
+{
+    int mpeg_version = 0;
+    int xing_offset = 0;
+    Uint32 samples_per_frame = 0;
+    Uint32 frames_count = 0;
+    unsigned char const *frames_count_raw;
+
+    /* There are two methods to compute duration:
+     * - Using Xing/Info/VBRI headers
+     * - Rely on filesize and first size of frame in condition of CRB
+     * https://www.codeproject.com/Articles/8295/MPEG-Audio-Frame-Header#VBRHeaders
+     */
+
+    if (!stream->this_frame || !stream->next_frame ||
+        stream->next_frame <= stream->this_frame ||
+        (stream->next_frame - stream->this_frame) < 48) {
+        return -1.0; /* Too small buffer to get any necessary headers */
+    }
+
+    mpeg_version = (stream->this_frame[1] >> 3) & 0x03;
+
+    switch(mpeg_version) {
+    case 0x03: /* MPEG1 */
+        if (header->mode == MAD_MODE_SINGLE_CHANNEL) {
+            xing_offset = 4 + 17;
+        } else {
+            xing_offset = 4 + 32;
+        }
+        break;
+    default:  /* MPEG2 and MPEG2.5 */
+        if (header->mode == MAD_MODE_SINGLE_CHANNEL) {
+            xing_offset = 4 + 17;
+        } else {
+            xing_offset = 4 + 9;
+        }
+        break;
+    }
+
+    switch(header->layer)
+    {
+    case MAD_LAYER_I:
+        samples_per_frame = 384;
+        break;
+    case MAD_LAYER_II:
+        samples_per_frame = 1152;
+        break;
+    case MAD_LAYER_III:
+        if (mpeg_version == 0x03) {
+            samples_per_frame = 1152;
+        } else {
+            samples_per_frame = 576;
+        }
+        break;
+    default:
+        return -1.0;
+    }
+
+    if (SDL_memcmp(stream->this_frame + xing_offset, "Xing", 4) == 0 ||
+        SDL_memcmp(stream->this_frame + xing_offset, "Info", 4) == 0) {
+        /* Xing header to get the count of frames for VBR */
+        frames_count_raw = stream->this_frame + xing_offset + 8;
+        frames_count = ((Uint32)frames_count_raw[0] << 24) +
+                       ((Uint32)frames_count_raw[1] << 16) +
+                       ((Uint32)frames_count_raw[2] << 8) +
+                       ((Uint32)frames_count_raw[3]);
+    }
+    else if (SDL_memcmp(stream->this_frame + xing_offset, "VBRI", 4) == 0) {
+        /* VBRI header to get the count of frames for VBR */
+        frames_count_raw = stream->this_frame + xing_offset + 14;
+        frames_count = ((Uint32)frames_count_raw[0] << 24) +
+                       ((Uint32)frames_count_raw[1] << 16) +
+                       ((Uint32)frames_count_raw[2] << 8) +
+                       ((Uint32)frames_count_raw[3]);
+    } else {
+        /* To get a count of frames for CBR, divide the file size with a size of one frame */
+        frames_count = (Uint32)(file_size / (stream->next_frame - stream->this_frame));
+    }
+
+    return (double)(frames_count * samples_per_frame) / header->samplerate;
+}
+
 static void calculate_total_time(MAD_Music *music)
 {
     mad_timer_t time = mad_timer_zero;
     struct mad_header header;
     struct mad_stream stream;
+    SDL_bool is_first_frame = SDL_TRUE;
     mad_header_init(&header);
     mad_stream_init(&stream);
 
@@ -193,9 +276,20 @@ static void calculate_total_time(MAD_Music *music)
 
         music->sample_rate = (int)header.samplerate;
         mad_timer_add(&time, header.duration);
+
+        if (is_first_frame) {
+            music->total_length = extract_length(&header, &stream, music->mp3file.length);
+            if (music->total_length > 0.0) {
+                break; /* Duration has been recognized */
+            }
+            is_first_frame = SDL_FALSE;
+            /* Otherwise, do the full scan of MP3 file to retrieve a duration */
+        }
     }
 
-    music->total_length = (double)(mad_timer_count(time, (enum mad_units)music->sample_rate)) / (double)music->sample_rate;
+    if (!is_first_frame) {
+        music->total_length = (double)(mad_timer_count(time, (enum mad_units)music->sample_rate)) / (double)music->sample_rate;
+    }
     mad_stream_finish(&stream);
     mad_header_finish(&header);
     SDL_memset(music->input_buffer, 0, sizeof(music->input_buffer));
