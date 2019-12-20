@@ -250,8 +250,6 @@ static void calculate_total_time(MAD_Music *music)
     mad_header_init(&header);
     mad_stream_init(&stream);
 
-    MP3_RWseek(&music->mp3file, 0, RW_SEEK_SET);
-
     while (1)
     {
         read_update_buffer(&stream, music);
