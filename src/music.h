@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_mixer_ext.h"
+#include "SDL_mixer.h"
 
 #ifndef MUSIC_H_
 #define MUSIC_H_

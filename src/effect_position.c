@@ -30,7 +30,7 @@
 
 #include "SDL.h"
 #include "SDL_endian.h"
-#include "SDL_mixer_ext.h"
+#include "SDL_mixer.h"
 #include "mixer.h"
 
 #define MIX_INTERNAL_EFFECT__

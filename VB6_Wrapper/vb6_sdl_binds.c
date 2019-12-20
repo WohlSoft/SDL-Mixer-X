@@ -33,7 +33,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "SDL_mixer_ext.h"
+#include "SDL_mixer.h"
 #include "SDL_rwops.h"
 
 /* Needed for ADLMIDI_getBankNames() */

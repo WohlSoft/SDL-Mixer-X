@@ -29,7 +29,7 @@
 */
 
 #include "SDL_endian.h"
-#include "SDL_mixer_ext.h"
+#include "SDL_mixer.h"
 #include "load_aiff.h"
 
 /*********************************************/

@@ -49,6 +49,7 @@ endif()
 include_directories(
     ${Qt5Widgets_INCLUDES}
     ${Qt5Network_INCLUDES}
+    ${SDLMixerX_SOURCE_DIR}/include/SDL_mixer_ext
     ${SDL2_INCLUDE_DIRS}
 )
 

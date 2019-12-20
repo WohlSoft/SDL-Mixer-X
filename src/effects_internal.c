@@ -28,7 +28,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "SDL_mixer_ext.h"
+#include "SDL_mixer.h"
 
 #define MIX_INTERNAL_EFFECT__
 #include "effects_internal.h"

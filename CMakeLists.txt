@@ -318,13 +318,13 @@ if(SDL_MIXER_X_STATIC AND NOT BUILD_AS_VB6_BINDING)
     target_link_libraries(SDL2_mixer_ext_Static PUBLIC ${SDLMixerX_LINK_LIBS})
     target_compile_definitions(SDL2_mixer_ext_Static PRIVATE ${SDL_MIXER_DEFINITIONS})
     target_include_directories(SDL2_mixer_ext_Static PRIVATE
+        ${SDLMixerX_SOURCE_DIR}/include
         ${SDLMixerX_SOURCE_DIR}/src
         ${SDLMixerX_SOURCE_DIR}/src/codecs
         ${AUDIO_CODECS_INSTALL_DIR}/include/SDL2
         ${SDL_MIXER_INCLUDE_PATHS}
     )
     target_include_directories(SDL2_mixer_ext_Static PUBLIC
-        ${SDLMixerX_SOURCE_DIR}/include/SDL_mixer_ext
         ${SDLMixerX_SOURCE_DIR}/include
     )
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY AND AUDIO_CODECS_INSTALL_PATH)
@@ -342,8 +342,8 @@ if(SDL_MIXER_X_STATIC AND NOT BUILD_AS_VB6_BINDING)
         add_custom_command(
             TARGET SDL2_mixer_ext_Static POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy
-                    ${CMAKE_SOURCE_DIR}/include/SDL_mixer_ext/SDL_mixer_ext.h
-                    ${AUDIO_CODECS_INSTALL_DIR}/include/SDL2)
+                    ${CMAKE_SOURCE_DIR}/include/SDL_mixer.h
+                    ${AUDIO_CODECS_INSTALL_DIR}/include/SDL2/SDL_mixer_ext.h)
     endif()
     list(APPEND SDLMixerX_INSTALLS SDL2_mixer_ext_Static)
 endif()
@@ -361,13 +361,13 @@ if(SDL_MIXER_X_SHARED AND NOT BUILD_AS_VB6_BINDING)
     target_link_libraries(SDL2_mixer_ext PRIVATE ${SDLMixerX_LINK_LIBS})
     target_compile_definitions(SDL2_mixer_ext PRIVATE ${SDL_MIXER_DEFINITIONS})
     target_include_directories(SDL2_mixer_ext PRIVATE
+        ${SDLMixerX_SOURCE_DIR}/include
         ${SDLMixerX_SOURCE_DIR}/src
         ${SDLMixerX_SOURCE_DIR}/src/codecs
         ${AUDIO_CODECS_INSTALL_DIR}/include/SDL2
         ${SDL_MIXER_INCLUDE_PATHS}
     )
     target_include_directories(SDL2_mixer_ext PUBLIC
-        ${SDLMixerX_SOURCE_DIR}/include/SDL_mixer_ext
         ${SDLMixerX_SOURCE_DIR}/include
     )
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY AND AUDIO_CODECS_INSTALL_PATH)
@@ -385,8 +385,8 @@ if(SDL_MIXER_X_SHARED AND NOT BUILD_AS_VB6_BINDING)
         add_custom_command(
             TARGET SDL2_mixer_ext POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy
-                    ${CMAKE_SOURCE_DIR}/include/SDL_mixer_ext/SDL_mixer_ext.h
-                    ${AUDIO_CODECS_INSTALL_DIR}/include/SDL2)
+                    ${CMAKE_SOURCE_DIR}/include/SDL_mixer.h
+                    ${AUDIO_CODECS_INSTALL_DIR}/include/SDL2/SDL_mixer_ext.h)
     endif()
     list(APPEND SDLMixerX_INSTALLS SDL2_mixer_ext)
 endif()
@@ -398,7 +398,7 @@ if(BUILD_AS_VB6_BINDING)
     target_compile_definitions(SDL2_mixer_ext_VB6 PRIVATE ${SDL_MIXER_DEFINITIONS} -DFORCE_STDCALLS)
     target_link_libraries(SDL2_mixer_ext_VB6 ${SDLMixerX_LINK_LIBS})
     target_include_directories(SDL2_mixer_ext_VB6 PUBLIC
-        ${SDLMixerX_SOURCE_DIR}/include/SDL_mixer_ext
+        ${SDLMixerX_SOURCE_DIR}/include
         ${SDLMixerX_SOURCE_DIR}/src
         ${SDLMixerX_SOURCE_DIR}/src/codecs
         ${AUDIO_CODECS_INSTALL_DIR}/include/SDL2
@@ -451,8 +451,9 @@ if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
 endif()
 
 install(FILES
-    include/SDL_mixer_ext/SDL_mixer_ext.h
+    include/SDL_mixer.h
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/SDL2"
+    RENAME SDL_mixer_ext.h
 )
 
 if(NOT ANDROID)

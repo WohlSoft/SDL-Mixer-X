@@ -57,15 +57,15 @@ endfunction()
 
 add_executable(playmus playmus.c)
 pge_set_nopie(playmus)
-target_include_directories(playmus PRIVATE ${SDL2_INCLUDE_DIRS})
 target_link_libraries(playmus PRIVATE libSDLMixerX)
+target_include_directories(playmus PRIVATE ${SDLMixerX_SOURCE_DIR}/include ${SDL2_INCLUDE_DIRS})
 console_app(playmus)
 
 
 add_executable(playwave playwave.c)
 pge_set_nopie(playwave)
-target_include_directories(playwave PRIVATE ${SDL2_INCLUDE_DIRS})
 target_link_libraries(playwave PRIVATE libSDLMixerX)
+target_include_directories(playwave PRIVATE ${SDLMixerX_SOURCE_DIR}/include ${SDL2_INCLUDE_DIRS})
 console_app(playwave)
 
 set(PLAYWAVE_TEST_MACROS)

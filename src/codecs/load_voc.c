@@ -29,7 +29,7 @@
         (http://www.freshmeat.net/projects/sox/)
 */
 
-#include "SDL_mixer_ext.h"
+#include "SDL_mixer.h"
 #include "load_voc.h"
 
 /* Private data for VOC file */

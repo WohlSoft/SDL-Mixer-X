@@ -27,7 +27,7 @@
 
 #include "SDL.h"
 
-#include "SDL_mixer_ext.h"
+#include "SDL_mixer.h"
 #include "mixer.h"
 #include "music.h"
 #include "load_aiff.h"
@@ -917,7 +917,7 @@ void SDLCALLCC Mix_SetPostMix(void (SDLCALL *mix_func)
 /* returns a pointer to the music mixer that can be used as a callback */
 common_mixer SDLCALLCC Mix_GetMusicMixer()
 {
-	return mix_music;
+    return mix_music;
 }
 
 /* Add your own music player or mixer function.
