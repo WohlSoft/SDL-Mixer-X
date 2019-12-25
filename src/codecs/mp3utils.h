@@ -21,6 +21,9 @@
 
 /* This file supports reading of ID3 tags of MP3 files with libID3Tag */
 
+#ifndef MIX_MP3UTILS_H
+#define MIX_MP3UTILS_H
+
 #include "music.h"
 
 #if defined(MUSIC_MP3_MAD) || defined(MUSIC_MP3_MPG123)
@@ -49,5 +52,7 @@ extern size_t MP3_RWread(struct mp3file_t *fil, void *ptr, size_t size, size_t m
 extern Sint64 MP3_RWseek(struct mp3file_t *fil, Sint64 offset, int whence);
 extern Sint64 MP3_RWtell(struct mp3file_t *fil);
 #endif /* ENABLE_ALL_MP3_TAGS */
+
+#endif /* MIX_MP3UTILS_H */
 
 /* vi: set ts=4 sw=4 expandtab: */
