@@ -38,12 +38,12 @@ size_t MP3_RWread(struct mp3file_t *fil, void *ptr, size_t size, size_t maxnum) 
 
 Sint64 MP3_RWseek(struct mp3file_t *fil, Sint64 offset, int whence) {
     Sint64 ret;
-    switch (whence) { /* assumes a legal whence value */
+    switch (whence) {
     case RW_SEEK_CUR:
         offset += fil->pos;
         break;
     case RW_SEEK_END:
-        offset = fil->length + offset;
+        offset += fil->length;
         break;
     }
     if (offset < 0) return -1;
