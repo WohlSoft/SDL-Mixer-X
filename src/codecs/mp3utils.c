@@ -931,10 +931,10 @@ static long get_musicmatch_len(struct mp3file_t *m)
 
 
 #define TAG_FOUND       1
-#define TAG_INVALID     -1
+#define TAG_INVALID    -1
 #define TAG_NOT_FOUND   0
 
-static int probe_id3v1(Mix_MusicMetaTags *out_tags, struct mp3file_t *fil, Uint8 *buf, SDL_bool tag_handled)
+static int probe_id3v1(Mix_MusicMetaTags *out_tags, struct mp3file_t *fil, Uint8 *buf, SDL_bool tag_handled, int atend)
 {
     size_t readsize;
 
@@ -947,6 +947,13 @@ static int probe_id3v1(Mix_MusicMetaTags *out_tags, struct mp3file_t *fil, Uint8
 
         /* ID3v1 tag is at the end */
         if (is_id3v1(buf, readsize)) {
+            if (!atend) { /* possible false positive? */
+                if (is_musicmatch(buf + 128 - 48, 48) ||
+                    is_apetag    (buf + 128 - 32, 32) ||
+                    is_lyrics3tag(buf + 128 - 15, 15)) {
+                    return TAG_NOT_FOUND;
+                }
+            }
             if (!tag_handled) {
                 parse_id3v1(out_tags, buf);
             }
@@ -1071,7 +1078,7 @@ int mp3_read_tags(Mix_MusicMetaTags *out_tags, struct mp3file_t *fil, SDL_bool k
 {
     Uint8 in_buffer[TAGS_INPUT_BUFFER_SIZE];
     long len; size_t readsize;
-    int rc = -1, c = 0;
+    int rc = -1, c = 0, c_any = 0;
     SDL_bool tag_handled = SDL_FALSE;
 
     /* MP3 standard has no metadata format, so everyone invented
@@ -1109,29 +1116,37 @@ int mp3_read_tags(Mix_MusicMetaTags *out_tags, struct mp3file_t *fil, SDL_bool k
     }
 
     while(1) { /*Handle tags at end of the file */
-        c = probe_id3v1(out_tags, fil, in_buffer, tag_handled);
+        c = probe_id3v1(out_tags, fil, in_buffer, tag_handled, !c_any);
         if (c == TAG_INVALID)
             goto fail;
-        else if (c == TAG_FOUND)
+        else if (c == TAG_FOUND) {
+            c_any = 1;
             continue;
+        }
 
         c = probe_lyrics3(fil, in_buffer);
         if (c == TAG_INVALID)
             goto fail;
-        else if (c == TAG_FOUND)
+        else if (c == TAG_FOUND) {
+            c_any = 1;
             continue;
+        }
 
         c = probe_mmtag(out_tags, fil, in_buffer);
         if (c == TAG_INVALID)
             goto fail;
-        else if (c == TAG_FOUND)
+        else if (c == TAG_FOUND) {
+            c_any = 1;
             continue;
+        }
 
         c = probe_apetag(out_tags, fil, in_buffer, tag_handled);
         if (c == TAG_INVALID)
             goto fail;
-        else if (c == TAG_FOUND)
+        else if (c == TAG_FOUND) {
+            c_any = 1;
             continue;
+        }
 
         break; /* There is no more tags found */
     }
