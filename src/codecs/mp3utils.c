@@ -64,10 +64,10 @@ Sint64 MP3_RWtell(struct mp3file_t *fil)
 #ifdef ENABLE_ALL_MP3_TAGS
 static SDL_INLINE Sint32 read_sint32le(const Uint8 *data)
 {
-    Uint32 result = (Uint32)data[3];
-    result |= (Uint32)data[2] << 8;
-    result |= (Uint32)data[1] << 16;
-    result |= (Uint32)data[0] << 24;
+    Uint32 result = (Uint32)data[0];
+    result |= (Uint32)data[1] << 8;
+    result |= (Uint32)data[2] << 16;
+    result |= (Uint32)data[3] << 24;
     return (Sint32)result;
 }
 #endif /* ENABLE_ALL_MP3_TAGS */
@@ -75,18 +75,18 @@ static SDL_INLINE Sint32 read_sint32le(const Uint8 *data)
 #ifdef ENABLE_ID3V2_TAG
 static SDL_INLINE Sint32 read_sint24be(const Uint8 *data)
 {
-    Uint32 result = (Uint32)data[0];
+    Uint32 result = (Uint32)data[2];
     result |= (Uint32)data[1] << 8;
-    result |= (Uint32)data[2] << 16;
+    result |= (Uint32)data[0] << 16;
     return (Sint32)result;
 }
 
 static SDL_INLINE Sint32 read_sint32be(const Uint8 *data)
 {
-    Uint32 result = (Uint32)data[0];
-    result |= (Uint32)data[1] << 8;
-    result |= (Uint32)data[2] << 16;
-    result |= (Uint32)data[3] << 24;
+    Uint32 result = (Uint32)data[3];
+    result |= (Uint32)data[2] << 8;
+    result |= (Uint32)data[1] << 16;
+    result |= (Uint32)data[0] << 24;
     return (Sint32)result;
 }
 #endif /* ENABLE_ID3V2_TAG */
@@ -123,6 +123,9 @@ static char *parse_id3v1_ansi_string(const Uint8 *buffer, size_t src_len)
 {
     char *src_buffer = (char*)SDL_malloc(src_len + 1);
     char *ret;
+    if (!src_buffer) {
+        return NULL; /* Out of memory */
+    }
     SDL_memset(src_buffer, 0, src_len + 1);
     SDL_memcpy(src_buffer, buffer, src_len);
     ret = SDL_iconv_string("UTF-8", "ISO-8859-1", src_buffer, src_len + 1);
@@ -245,6 +248,9 @@ static char *id3v2_decode_string(const Uint8 *string, size_t size)
 
         copy_size = size - 3 + 2; /* exclude 3 bytes of encoding hint, append 2 bytes for a NULL termination */
         src_buffer = (char*)SDL_malloc(copy_size);
+        if (!src_buffer) {
+            return NULL; /* Out of memory */
+        }
         SDL_memset(src_buffer, 0, copy_size);
         SDL_memcpy(src_buffer, (string + 3), copy_size - 2);
 
@@ -265,6 +271,9 @@ static char *id3v2_decode_string(const Uint8 *string, size_t size)
 
         copy_size = size - 1 + 2; /* exclude 1 byte of encoding hint, append 2 bytes for a NULL termination */
         src_buffer = (char*)SDL_malloc(copy_size);
+        if (!src_buffer) {
+            return NULL; /* Out of memory */
+        }
         SDL_memset(src_buffer, 0, copy_size);
         SDL_memcpy(src_buffer, (string + 1), copy_size - 2);
 
@@ -276,6 +285,9 @@ static char *id3v2_decode_string(const Uint8 *string, size_t size)
             return NULL; /* Blank string*/
         }
         str_buffer = (char*)SDL_malloc(size);
+        if (!src_buffer) {
+            return NULL; /* Out of memory */
+        }
         SDL_strlcpy(str_buffer, (const char*)(string + 1), size);
 
     } else if (string[0] == '\x00') { /* Latin-1 string */
@@ -1083,7 +1095,8 @@ int mp3_read_tags(Mix_MusicMetaTags *out_tags, struct mp3file_t *fil, SDL_bool k
 {
     Uint8 in_buffer[TAGS_INPUT_BUFFER_SIZE];
     long len; size_t readsize;
-    int rc = -1, c = 0, c_any = 0;
+    int c_id3, c_ape, c_lyr, c_mm;
+    int rc = -1;
     SDL_bool tag_handled = SDL_FALSE;
 
     /* MP3 standard has no metadata format, so everyone invented
@@ -1120,43 +1133,40 @@ int mp3_read_tags(Mix_MusicMetaTags *out_tags, struct mp3file_t *fil, SDL_bool k
         fil->length -= len;
     }
 
-    while(1) { /*Handle tags at end of the file */
-        c = probe_id3v1(out_tags, fil, in_buffer, tag_handled, !c_any);
-        if (c == TAG_INVALID)
-            goto fail;
-        else if (c == TAG_FOUND) {
-            c_any = 1;
-            continue;
-        }
-
-        c = probe_lyrics3(fil, in_buffer);
-        if (c == TAG_INVALID)
-            goto fail;
-        else if (c == TAG_FOUND) {
-            c_any = 1;
-            continue;
-        }
-
-        c = probe_mmtag(out_tags, fil, in_buffer);
-        if (c == TAG_INVALID)
-            goto fail;
-        else if (c == TAG_FOUND) {
-            c_any = 1;
-            continue;
-        }
-
-        c = probe_apetag(out_tags, fil, in_buffer, tag_handled);
-        if (c == TAG_INVALID)
-            goto fail;
-        else if (c == TAG_FOUND) {
-            c_any = 1;
-            continue;
-        }
-
-        break; /* There is no more tags found */
+    /* it's not impossible that _old_ MusicMatch tag
+     * placing itself after ID3v1. */
+    if ((c_mm = probe_mmtag(out_tags, fil, in_buffer)) < 0) {
+        goto fail;
     }
 
-    rc = (fil->length > 0) ? 0 :-1;
+    /* ID3v1 tag is at the end */
+    if ((c_id3 = probe_id3v1(out_tags, fil, in_buffer, tag_handled, !c_mm)) < 0) {
+        goto fail;
+    }
+
+    /* we do not know the order of ape or lyrics3
+     * or musicmatch tags, hence the loop here.. */
+    c_ape = 0;
+    c_lyr = 0;
+    for (;;) {
+        if (!c_lyr) {
+            if ((c_lyr = probe_lyrics3(fil, in_buffer)) == TAG_INVALID)
+                goto fail;
+        }
+
+        if (!c_mm) {
+            if ((c_mm = probe_mmtag(out_tags, fil, in_buffer)) == TAG_INVALID)
+                goto fail;
+        }
+
+        if (!c_ape) {
+            if ((c_ape = probe_apetag(out_tags, fil, in_buffer, tag_handled)) == TAG_INVALID)
+                goto fail;
+        }
+        break; /* There is no more tags found */
+    } /* for (;;) */
+
+    rc = (fil->length > 0) ? 0 : -1;
     fail:
     MP3_RWseek(fil, 0, RW_SEEK_SET);
     return rc;
