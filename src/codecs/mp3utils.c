@@ -695,130 +695,54 @@ static SDL_bool parse_ape(Mix_MusicMetaTags *out_tags, struct mp3file_t *src, Si
 
 #define LYRICS3v1_HEAD_SIZE         11
 #define LYRICS3v1_TAIL_SIZE         9
-#define LYRICS3v2_BUFFER_SIZE       12
 #define LYRICS3v2_TAG_SIZE_VALUE    6
+#define LYRICS3_FOOTER_SIZE         15
 
-static SDL_INLINE SDL_bool is_lyrics3tag(const Uint8 *data, size_t length)
+static SDL_INLINE int is_lyrics3tag(const Uint8 *data, size_t length)
 {
     /* http://id3.org/Lyrics3
      * http://id3.org/Lyrics3v2 */
-    if (length < LYRICS3v1_TAIL_SIZE) return SDL_FALSE;
-    if (SDL_memcmp(data,"LYRICSEND", 9) != 0 &&
-        SDL_memcmp(data,"LYRICS200", 9) != 0) {
-        return SDL_FALSE;
-    }
-    return SDL_TRUE;
+    if (length < LYRICS3_FOOTER_SIZE) return SDL_FALSE;
+    if (SDL_memcmp(data + LYRICS3v2_TAG_SIZE_VALUE, "LYRICS200", 9) == 0) return 2;
+    if (SDL_memcmp(data + LYRICS3v2_TAG_SIZE_VALUE, "LYRICSEND", 9) == 0) return 1;
+    return 0;
 }
 
-static long get_lyrics3v1_len(struct mp3file_t *src)
+static long get_lyrics3v1_len(struct mp3file_t *m)
 {
-    /* Lyrics3 v1.00 tag
-     * http://id3.org/Lyrics3 */
-    Sint64 pos_begin, pos_end;
-    size_t read_size;
-    char buffer[LYRICS3v1_SEARCH_BUFFER + 1];
-    char *cur, *end = (buffer + LYRICS3v1_SEARCH_BUFFER) - 11;
-    long len = 0;
-
+    const char *p; long i, len;
+    char buf[LYRICS3v1_SEARCH_BUFFER + 1];
     /* needs manual search:  http://id3.org/Lyrics3 */
-    pos_end = MP3_RWtell(src);
-    if (pos_end > LYRICS3v1_SEARCH_BUFFER) {
-        MP3_RWseek(src, -LYRICS3v1_SEARCH_BUFFER, RW_SEEK_CUR);
-    } else {
-        MP3_RWseek(src, 0, RW_SEEK_SET);
-    }
-    pos_begin = MP3_RWtell(src);
-
-    read_size = MP3_RWread(src, buffer, 1, (size_t)(pos_end - pos_begin));
-    end = (buffer + read_size - LYRICS3v1_TAIL_SIZE);
-
-    /* Find the lyrics begin tag... */
+    if (m->length < 20) return -1;
+    len = (m->length > LYRICS3v1_SEARCH_BUFFER)? LYRICS3v1_SEARCH_BUFFER : (long)m->length;
+    MP3_RWseek(m, -len, RW_SEEK_END);
+    MP3_RWread(m, buf, 1, (size_t)(len -= LYRICS3v1_TAIL_SIZE)); /* exclude footer */
     /* strstr() won't work here. */
-    for (cur = buffer; cur != end; cur++) {
-        if (SDL_memcmp(cur, "LYRICSBEGIN", LYRICS3v1_HEAD_SIZE) == 0) {
-            /* Calculate a full length of a tag */
-            len = (long)(end - cur) + LYRICS3v1_TAIL_SIZE;
+    p = buf;
+    for (i = len - LYRICS3v1_HEAD_SIZE; i >= 0; --i, ++p)
+    {
+        if (SDL_memcmp(p, "LYRICSBEGIN", LYRICS3v1_HEAD_SIZE) == 0)
             break;
-        }
     }
-
-    if (cur == end) {
-        return -1; /* Invalid tag */
-    }
-
-    return len;
+    if (i < 0) return -1;
+    return len - (long)(p - buf) + LYRICS3v1_TAIL_SIZE /* footer */;
 }
 
-static SDL_INLINE long get_lyrics3v2_len(struct mp3file_t *src)
+static SDL_INLINE long get_lyrics3v2_len(const Uint8 *data, size_t length)
 {
-    /* Lyrics3 v2.00 tag
-     * http://id3.org/Lyrics3v2 */
-    Sint64 pos_end;
-    size_t read_size;
-    char buffer[LYRICS3v2_BUFFER_SIZE + 1];
-    long len = 0;
-
-    pos_end = MP3_RWtell(src);
-    if (pos_end > LYRICS3v2_TAG_SIZE_VALUE + LYRICS3v1_TAIL_SIZE) {
-        MP3_RWseek(src, -(LYRICS3v2_TAG_SIZE_VALUE + LYRICS3v1_TAIL_SIZE), RW_SEEK_CUR);
-    } else {
-        return -1; /* Invalid tag */
-    }
-
-    read_size = MP3_RWread(src, buffer, 1, LYRICS3v2_TAG_SIZE_VALUE);
-    if (read_size < LYRICS3v2_TAG_SIZE_VALUE) {
-        return -1; /* Invalid tag */
-    }
-    buffer[read_size] = '\0';
-
-    len = SDL_strtol(buffer, NULL, 10);
-    if (len == 0) {
-        return -1; /* Invalid tag */
-    }
-
-    len += LYRICS3v2_TAG_SIZE_VALUE + LYRICS3v1_TAIL_SIZE;
-
-    if (pos_end > len) {
-        MP3_RWseek(src, (pos_end - len), RW_SEEK_SET);
-        read_size = MP3_RWread(src, buffer, 1, LYRICS3v1_HEAD_SIZE);
-        if (read_size < LYRICS3v1_HEAD_SIZE) {
-            return -1; /* Invalid tag */
-        }
-
-        if (SDL_memcmp(buffer, "LYRICSBEGIN", LYRICS3v1_HEAD_SIZE) != 0) {
-            return -1; /* Invalid tag */
-        }
-    }
-
-    return len;
+    /* 6 bytes before the end marker is size in decimal format -
+     * does not include the 9 bytes end marker and size field. */
+    if (length != LYRICS3v2_TAG_SIZE_VALUE) return 0;
+    return SDL_strtol((const char *)data, NULL, 10) + LYRICS3_FOOTER_SIZE;
 }
 
-static long get_lyrics3_len(struct mp3file_t *src)
+static SDL_INLINE SDL_bool verify_lyrics3v2(const Uint8 *data, size_t length)
 {
-    size_t read_size;
-    char buffer[LYRICS3v1_TAIL_SIZE + 1];
-
-    if (src->length < 0) {
-        MP3_RWseek(src, 0, RW_SEEK_SET);
-        return -1; /* Invalid tag */
-    }
-
-    MP3_RWseek(src, -LYRICS3v1_TAIL_SIZE, RW_SEEK_END);
-    read_size = MP3_RWread(src, buffer, 1, LYRICS3v1_TAIL_SIZE);
-    if (read_size < LYRICS3v1_TAIL_SIZE) {
-        return -1; /* Invalid tag */
-    }
-
-    /* Find and validate borders of the lyrics tag */
-    if (SDL_memcmp(buffer, "LYRICSEND", LYRICS3v1_TAIL_SIZE) == 0) { /* v1 */
-        return get_lyrics3v1_len(src);
-    } else if (SDL_memcmp(buffer, "LYRICS200", LYRICS3v1_TAIL_SIZE) == 0) { /* v2 */
-        return get_lyrics3v2_len(src);
-    }
-
-    MP3_RWseek(src, 0, RW_SEEK_SET);
-    return -1; /* Invalid tag */
+    if (length < LYRICS3v1_HEAD_SIZE) return SDL_FALSE;
+    if (SDL_memcmp(data,"LYRICSBEGIN",LYRICS3v1_HEAD_SIZE) == 0) return SDL_TRUE;
+    return SDL_FALSE;
 }
+
 
 
 /********************************************************
@@ -1066,28 +990,32 @@ static int probe_apetag(Mix_MusicMetaTags *out_tags, struct mp3file_t *fil, Uint
 
 static int probe_lyrics3(struct mp3file_t *fil, Uint8 *buf)
 {
-    size_t readsize;
     long len;
+    int ver;
 
-    /* Lyrics3 tag may be at the end: read the ending marker string */
-    if (fil->length >= (LYRICS3v1_HEAD_SIZE + LYRICS3v1_TAIL_SIZE)) {
-        MP3_RWseek(fil, -LYRICS3v1_TAIL_SIZE, RW_SEEK_END);
-        readsize = MP3_RWread(fil, buf, 1, LYRICS3v1_TAIL_SIZE);
-        if (readsize != LYRICS3v1_TAIL_SIZE) {
+    if (fil->length >= LYRICS3_FOOTER_SIZE) {
+        MP3_RWseek(fil, -LYRICS3_FOOTER_SIZE, RW_SEEK_END);
+        if (MP3_RWread(fil, buf, 1, LYRICS3_FOOTER_SIZE) != LYRICS3_FOOTER_SIZE)
             return TAG_INVALID;
-        }
-
-        /* Lyrics3 tag may be at end or before ID3v1 tag */
-        if (is_lyrics3tag(buf, readsize)) {
-            len = get_lyrics3_len(fil);
-            if (len < 0) {
+        ver = is_lyrics3tag(buf, LYRICS3_FOOTER_SIZE);
+        if (ver == 2) {
+            len = get_lyrics3v2_len(buf, LYRICS3v2_TAG_SIZE_VALUE);
+            if (len >= fil->length) return TAG_INVALID;
+            if (len < LYRICS3_FOOTER_SIZE) return TAG_INVALID;
+            MP3_RWseek(fil, -len, RW_SEEK_END);
+            if (MP3_RWread(fil, buf, 1, LYRICS3v1_HEAD_SIZE) != LYRICS3v1_HEAD_SIZE)
                 return TAG_INVALID;
-            }
+            if (!verify_lyrics3v2(buf, LYRICS3v1_HEAD_SIZE)) return -1;
+            fil->length -= len;
+            return TAG_FOUND;
+        }
+        else if (ver == 1) {
+            len = get_lyrics3v1_len(fil);
+            if (len < 0) return TAG_INVALID;
             fil->length -= len;
             return TAG_FOUND;
         }
     }
-
     return TAG_NOT_FOUND;
 }
 
