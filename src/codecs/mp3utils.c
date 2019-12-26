@@ -62,32 +62,32 @@ Sint64 MP3_RWtell(struct mp3file_t *fil)
 #endif /* ENABLE_ID3V2_TAG */
 
 #ifdef ENABLE_ALL_MP3_TAGS
-static SDL_INLINE long read_sint32le(const Uint8 *data)
+static SDL_INLINE Sint32 read_sint32le(const Uint8 *data)
 {
     Uint32 result = (Uint32)data[3];
     result |= (Uint32)data[2] << 8;
     result |= (Uint32)data[1] << 16;
     result |= (Uint32)data[0] << 24;
-    return (long)result;
+    return (Sint32)result;
 }
 #endif /* ENABLE_ALL_MP3_TAGS */
 
 #ifdef ENABLE_ID3V2_TAG
-static SDL_INLINE long read_sint24be(const Uint8 *data)
+static SDL_INLINE Sint32 read_sint24be(const Uint8 *data)
 {
     Uint32 result = (Uint32)data[0];
     result |= (Uint32)data[1] << 8;
     result |= (Uint32)data[2] << 16;
-    return (long)result;
+    return (Sint32)result;
 }
 
-static SDL_INLINE long read_sint32be(const Uint8 *data)
+static SDL_INLINE Sint32 read_sint32be(const Uint8 *data)
 {
     Uint32 result = (Uint32)data[0];
     result |= (Uint32)data[1] << 8;
     result |= (Uint32)data[2] << 16;
     result |= (Uint32)data[3] << 24;
-    return (long)result;
+    return (Sint32)result;
 }
 #endif /* ENABLE_ID3V2_TAG */
 
