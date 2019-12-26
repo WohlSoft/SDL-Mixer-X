@@ -32,14 +32,13 @@
 
 #if defined(MUSIC_WAV) || defined(ENABLE_ALL_MP3_TAGS)
 #define ENABLE_ID3V2_TAG
-#endif
-
-#ifdef ENABLE_ALL_MP3_TAGS
 struct mp3file_t {
     SDL_RWops *src;
     Sint64 start, length, pos;
 };
+#endif
 
+#ifdef ENABLE_ALL_MP3_TAGS
 extern int mp3_read_tags(Mix_MusicMetaTags *out_tags, struct mp3file_t *fil, SDL_bool keep_id3v2);
 #endif /* ENABLE_ALL_MP3_TAGS */
 

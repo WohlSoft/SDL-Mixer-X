@@ -23,7 +23,7 @@
 
 #include "SDL_log.h"
 
-#ifdef ENABLE_ALL_MP3_TAGS
+#ifdef ENABLE_ID3V2_TAG
 /*********************** SDL_RW WITH BOOKKEEPING ************************/
 
 size_t MP3_RWread(struct mp3file_t *fil, void *ptr, size_t size, size_t maxnum) {
@@ -55,13 +55,42 @@ Sint64 MP3_RWseek(struct mp3file_t *fil, Sint64 offset, int whence) {
     return (fil->pos - fil->start);
 }
 
-
 Sint64 MP3_RWtell(struct mp3file_t *fil)
 {
     return fil->pos;
 }
+#endif /* ENABLE_ID3V2_TAG */
 
+#ifdef ENABLE_ALL_MP3_TAGS
+static SDL_INLINE long read_sint32le(const Uint8 *data)
+{
+    Uint32 result = (Uint32)data[3];
+    result |= (Uint32)data[2] << 8;
+    result |= (Uint32)data[1] << 16;
+    result |= (Uint32)data[0] << 24;
+    return (long)result;
+}
 #endif /* ENABLE_ALL_MP3_TAGS */
+
+#ifdef ENABLE_ID3V2_TAG
+static SDL_INLINE long read_sint24be(const Uint8 *data)
+{
+    Uint32 result = (Uint32)data[0];
+    result |= (Uint32)data[1] << 8;
+    result |= (Uint32)data[2] << 16;
+    return (long)result;
+}
+
+static SDL_INLINE long read_sint32be(const Uint8 *data)
+{
+    Uint32 result = (Uint32)data[0];
+    result |= (Uint32)data[1] << 8;
+    result |= (Uint32)data[2] << 16;
+    result |= (Uint32)data[3] << 24;
+    return (long)result;
+}
+#endif /* ENABLE_ID3V2_TAG */
+
 
 #ifdef ENABLE_ALL_MP3_TAGS
 #define TAGS_INPUT_BUFFER_SIZE (5 * 8192)
@@ -166,23 +195,10 @@ static SDL_bool is_id3v2(const Uint8 *data, size_t length)
     return SDL_TRUE;
 }
 
-static long id3v2_synchsafe_decode(const Uint8 *data)
+static SDL_INLINE long id3v2_synchsafe_decode(const Uint8 *data)
 {
     /* size is a 'synchsafe' integer (see above) */
     return (long)((data[0] << 21) + (data[1] << 14) + (data[2] << 7) + data[3]);
-}
-
-static long id3v2_byteint_decode(const Uint8 *data, size_t size)
-{
-    Uint32 result = 0;
-    size_t i;
-
-    for (i = 0; i < size; i++) {
-        result <<= 8;
-        result = result | (Uint8)data[i];
-    }
-
-    return (long)result;
 }
 
 static long get_id3v2_len(const Uint8 *data, long length)
@@ -341,7 +357,7 @@ static size_t id3v22_parse_frame(Mix_MusicMetaTags *out_tags, struct mp3file_t *
 
     SDL_memcpy(key, buffer, 3); /* Tag title (key) */
 
-    size = (size_t)id3v2_byteint_decode(buffer + ID3v2_FIELD_FRAME_SIZEv2, 3);
+    size = (size_t)read_sint24be(buffer + ID3v2_FIELD_FRAME_SIZEv2);
 
     if (size < ID3v2_BUFFER_SIZE) {
         read_size = MP3_RWread(src, buffer, 1, size);
@@ -382,7 +398,7 @@ static size_t id3v2x_parse_frame(Mix_MusicMetaTags *out_tags, struct mp3file_t *
     if (version == 4) {
         size = (size_t)id3v2_synchsafe_decode(buffer + ID3v2_FIELD_FRAME_SIZE);
     } else {
-        size = (size_t)id3v2_byteint_decode(buffer + ID3v2_FIELD_FRAME_SIZE, 4);
+        size = (size_t)read_sint32be(buffer + ID3v2_FIELD_FRAME_SIZE);
     }
 
     SDL_memcpy(flags, buffer + ID3v2_FIELD_FLAGS, 2);
@@ -469,6 +485,196 @@ static SDL_bool parse_id3v2(Mix_MusicMetaTags *out_tags, struct mp3file_t *src)
 
 #ifdef ENABLE_ALL_MP3_TAGS
 /********************************************************
+ *                  APE v1 and v2                       *
+ ********************************************************/
+
+#define APE_BUFFER_SIZE     256
+
+#define APE_V1              1000U
+#define APE_V2              2000U
+#define APE_HEADER_SIZE     32
+
+#define APE_HEAD_FIELD_VERSION      8
+#define APE_HEAD_FIELD_TAGSIZE      12
+#define APE_HEAD_FIELD_ITEMS_COUNT  16
+#define APE_HEAD_FIELD_FLAGS        20
+#define APE_HEAD_FIELD_RESERVED     24
+
+#define APE_FRAME_TAG_KEY       4
+
+static SDL_bool is_apetag(const Uint8 *data, size_t length)
+{
+   /* http://wiki.hydrogenaud.io/index.php?title=APEv2_specification
+    * Header/footer is 32 bytes: bytes 0-7 ident, bytes 8-11 version,
+    * bytes 12-17 size. bytes 24-31 are reserved: must be all zeroes. */
+    Uint32 v;
+
+    if (length < 32 || SDL_memcmp(data,"APETAGEX",8) != 0) {
+        return SDL_FALSE;
+    }
+
+    v = (Uint32)(read_sint32le(data + 8)); /* version */
+    if (v != APE_V2 && v != APE_V1) {
+        return SDL_FALSE;
+    }
+    v = 0; /* reserved bits : */
+    if (SDL_memcmp(&data[24],&v,4) != 0 || SDL_memcmp(&data[28],&v,4) != 0) {
+        return SDL_FALSE;
+    }
+    return SDL_TRUE;
+}
+
+static long get_ape_len(const Uint8 *data, Uint32 *version)
+{
+    Uint32 flags;
+    long size = (long)(read_sint32le(data + APE_HEAD_FIELD_TAGSIZE));
+    *version = (Uint32)(read_sint32le(data + APE_HEAD_FIELD_VERSION));
+    flags = (Uint32)(read_sint32le(data + APE_HEAD_FIELD_FLAGS));
+    if (*version == APE_V2 && (flags & (1U<<31))) {
+        size += APE_HEADER_SIZE; /* header present. */
+    }
+    return size;
+}
+
+static char *ape_find_value(char *key)
+{
+    char *end = (key + APE_BUFFER_SIZE - 4);
+
+    while (*key && key != end) {
+        key++;
+    }
+
+    if (key >= end) {
+        return NULL;
+    }
+
+    return key + 1;
+}
+
+static Uint32 ape_handle_tag(Mix_MusicMetaTags *out_tags, Uint8 *data, size_t valsize)
+{
+    /* http://wiki.hydrogenaud.io/index.php?title=APE_Tag_Item
+     * Tag entry has unclear size because of no size value for a key field
+     * However, we only know next sizes:
+     * - 4 bytes is a [length] of value field
+     * - 4 bytes of value-specific flags
+     * - unknown lenght of a key field. To detect it's size
+     *   it's need to find a zero byte looking at begin of the key field
+     * - 1 byte of a null-terminator
+     * - [length] bytes a value content
+     */
+    char *key = (char*)(data + APE_FRAME_TAG_KEY);
+    char *value = NULL;
+    Uint32 key_len; /* Length of the key field */
+
+    value = ape_find_value(key);
+
+    if (!value) {
+        return 0;
+    }
+
+    key_len = (Uint32)(value - key);
+
+    if (valsize > APE_BUFFER_SIZE - key_len) {
+        data[APE_BUFFER_SIZE] = '\0';
+    } else {
+        value[valsize] = '\0';
+    }
+
+    if (SDL_strncasecmp(key, "Title", 6) == 0) {
+        meta_tags_set(out_tags, MIX_META_TITLE, (const char*)(value));
+    } else if (SDL_strncasecmp(key, "Album", 6) == 0) {
+        meta_tags_set(out_tags, MIX_META_ARTIST, (const char*)(value));
+    } else if (SDL_strncasecmp(key, "Artist", 7) == 0) {
+        meta_tags_set(out_tags, MIX_META_ALBUM, (const char*)(value));
+    } else if (SDL_strncasecmp(key, "Copyright", 10) == 0) {
+        meta_tags_set(out_tags, MIX_META_COPYRIGHT, (const char*)(value));
+    }
+
+    return 4 + (Uint32)valsize + key_len;
+}
+
+/* Parse content of APE tag  */
+static SDL_bool parse_ape(Mix_MusicMetaTags *out_tags, struct mp3file_t *src, Sint64 ape_head_pos, Uint32 version)
+{
+    Uint8 buffer[APE_BUFFER_SIZE + 1];
+    Uint32 v, i, tag_size, tag_items_count, tag_item_size;
+    Uint32 zero8[2] = {0, 0};
+    Sint64 file_size, cur_tag;
+    size_t read_size;
+
+    file_size = src->length;
+    MP3_RWseek(src, ape_head_pos, RW_SEEK_SET);
+    read_size = MP3_RWread(src, buffer, 1, APE_HEADER_SIZE); /* Retrieve the header */
+
+    if (read_size < APE_HEADER_SIZE) {
+        MP3_RWseek(src, ape_head_pos, RW_SEEK_SET);
+        return SDL_FALSE;
+    }
+
+    v = (Uint32)read_sint32le(buffer + APE_HEAD_FIELD_VERSION); /* version */
+    if (v != APE_V2 && v != APE_V1) {
+        return SDL_FALSE;
+    }
+
+    tag_size = (Uint32)read_sint32le(buffer + APE_HEAD_FIELD_TAGSIZE); /* tag size */
+
+    if (version == APE_V1) { /* If version 1, we are at footer */
+        if (ape_head_pos - (tag_size - APE_HEADER_SIZE) < 0) {
+            MP3_RWseek(src, ape_head_pos, RW_SEEK_SET);
+            return SDL_FALSE;
+        }
+        MP3_RWseek(src, ape_head_pos - (tag_size - APE_HEADER_SIZE), RW_SEEK_SET);
+    } else if ((ape_head_pos + tag_size + APE_HEADER_SIZE) > file_size) {
+        MP3_RWseek(src, ape_head_pos, RW_SEEK_SET);
+        return SDL_FALSE;
+    }
+
+    tag_items_count = (Uint32)read_sint32le(buffer + APE_HEAD_FIELD_ITEMS_COUNT); /* count tag items */
+
+    /*flags = (Uint32)read_sint32be(buffer + APE_HEAD_FIELD_FLAGS);*/ /* global flags, unused */
+
+    /* reserved bits : */
+    if (SDL_memcmp(buffer + APE_HEAD_FIELD_RESERVED, zero8, 8) != 0) {
+        return SDL_FALSE;
+    }
+
+    for(i = 0; i < tag_items_count; i++) {
+        cur_tag = MP3_RWtell(src);
+        if (cur_tag < 0) {
+            break;
+        }
+        read_size = MP3_RWread(src, buffer, 1, 4); /* Retrieve the size */
+        if (read_size < 4) {
+            MP3_RWseek(src, ape_head_pos, RW_SEEK_SET);
+            return SDL_FALSE;
+        }
+
+        v = (Uint32)read_sint32le(buffer); /* size of the tag's value field */
+        /* (we still need to find key size by a null termination) */
+
+        /* Retrieve the tag's data with an aproximal size as we can */
+        if (v + 40 < APE_BUFFER_SIZE) {
+            read_size = MP3_RWread(src, buffer, 1, v + 40);
+        } else {
+            read_size = MP3_RWread(src, buffer, 1, APE_BUFFER_SIZE);
+        }
+        buffer[read_size] = '\0';
+
+        tag_item_size = ape_handle_tag(out_tags, buffer, v);
+        if (tag_item_size == 0) {
+            break;
+        }
+        MP3_RWseek(src, cur_tag + tag_item_size + 4, RW_SEEK_SET);
+    }
+
+    MP3_RWseek(src, ape_head_pos, RW_SEEK_SET);
+
+    return SDL_TRUE;
+}
+
+
+/********************************************************
  *                   Lyrics3 skip                       *
  ********************************************************/
 
@@ -486,7 +692,8 @@ static SDL_INLINE SDL_bool is_lyrics3tag(const Uint8 *data, size_t length)
      * http://id3.org/Lyrics3v2 */
     if (length < LYRICS3v1_TAIL_SIZE) return SDL_FALSE;
     if (SDL_memcmp(data,"LYRICSEND", 9) != 0 &&
-        SDL_memcmp(data,"LYRICS200", 9) != 0) {return SDL_FALSE;
+        SDL_memcmp(data,"LYRICS200", 9) != 0) {
+        return SDL_FALSE;
     }
     return SDL_TRUE;
 }
@@ -603,215 +810,13 @@ static long get_lyrics3_len(struct mp3file_t *src)
 
 
 /********************************************************
- *                  APE v1 and v2                       *
- ********************************************************/
-
-#define APE_BUFFER_SIZE     256
-
-#define APE_V1              1000U
-#define APE_V2              2000U
-#define APE_HEADER_SIZE     32
-
-#define APE_HEAD_FIELD_VERSION      8
-#define APE_HEAD_FIELD_TAGSIZE      12
-#define APE_HEAD_FIELD_ITEMS_COUNT  16
-#define APE_HEAD_FIELD_FLAGS        20
-#define APE_HEAD_FIELD_RESERVED     24
-
-#define APE_FRAME_TAG_KEY       4
-
-static long ape_byteint_decode(const Uint8 *data, size_t size)
-{
-    Uint32 result = 0;
-    Sint32 i;
-
-    for (i = (Sint32)size - 1; i >= 0; i--) {
-        result <<= 8;
-        result = result | (Uint8)data[i];
-    }
-
-    return (long)result;
-}
-
-static SDL_bool is_apetag(const Uint8 *data, size_t length)
-{
-   /* http://wiki.hydrogenaud.io/index.php?title=APEv2_specification
-    * Header/footer is 32 bytes: bytes 0-7 ident, bytes 8-11 version,
-    * bytes 12-17 size. bytes 24-31 are reserved: must be all zeroes. */
-    Uint32 v;
-
-    if (length < 32 || SDL_memcmp(data,"APETAGEX",8) != 0) {
-        return SDL_FALSE;
-    }
-
-    v = (Uint32)(ape_byteint_decode(data + 8, 4)); /* version */
-    if (v != APE_V2 && v != APE_V1) {
-        return SDL_FALSE;
-    }
-    v = 0; /* reserved bits : */
-    if (SDL_memcmp(&data[24],&v,4) != 0 || SDL_memcmp(&data[28],&v,4) != 0) {
-        return SDL_FALSE;
-    }
-    return SDL_TRUE;
-}
-
-static long get_ape_len(const Uint8 *data, Uint32 *version)
-{
-    Uint32 flags;
-    long size = (long)(ape_byteint_decode(data + APE_HEAD_FIELD_TAGSIZE, 4));
-    *version = (Uint32)(ape_byteint_decode(data + APE_HEAD_FIELD_VERSION, 4));
-    flags = (Uint32)(ape_byteint_decode(data + APE_HEAD_FIELD_FLAGS, 4));
-    if (*version == APE_V2 && (flags & (1U<<31))) {
-        size += APE_HEADER_SIZE; /* header present. */
-    }
-    return size;
-}
-
-static char *ape_find_value(char *key)
-{
-    char *end = (key + APE_BUFFER_SIZE - 4);
-
-    while (*key && key != end) {
-        key++;
-    }
-
-    if (key >= end) {
-        return NULL;
-    }
-
-    return key + 1;
-}
-
-static Uint32 ape_handle_tag(Mix_MusicMetaTags *out_tags, Uint8 *data, size_t valsize)
-{
-    /* http://wiki.hydrogenaud.io/index.php?title=APE_Tag_Item
-     * Tag entry has unclear size because of no size value for a key field
-     * However, we only know next sizes:
-     * - 4 bytes is a [length] of value field
-     * - 4 bytes of value-specific flags
-     * - unknown lenght of a key field. To detect it's size
-     *   it's need to find a zero byte looking at begin of the key field
-     * - 1 byte of a null-terminator
-     * - [length] bytes a value content
-     */
-    char *key = (char*)(data + APE_FRAME_TAG_KEY);
-    char *value = NULL;
-    Uint32 key_len; /* Length of the key field */
-
-    value = ape_find_value(key);
-
-    if (!value) {
-        return 0;
-    }
-
-    key_len = (Uint32)(value - key);
-
-    if (valsize > APE_BUFFER_SIZE - key_len) {
-        data[APE_BUFFER_SIZE] = '\0';
-    } else {
-        value[valsize] = '\0';
-    }
-
-    if (SDL_strncasecmp(key, "Title", 6) == 0) {
-        meta_tags_set(out_tags, MIX_META_TITLE, (const char*)(value));
-    } else if (SDL_strncasecmp(key, "Album", 6) == 0) {
-        meta_tags_set(out_tags, MIX_META_ARTIST, (const char*)(value));
-    } else if (SDL_strncasecmp(key, "Artist", 7) == 0) {
-        meta_tags_set(out_tags, MIX_META_ALBUM, (const char*)(value));
-    } else if (SDL_strncasecmp(key, "Copyright", 10) == 0) {
-        meta_tags_set(out_tags, MIX_META_COPYRIGHT, (const char*)(value));
-    }
-
-    return 4 + (Uint32)valsize + key_len;
-}
-
-/* Parse content of APE tag  */
-static SDL_bool parse_ape(Mix_MusicMetaTags *out_tags, struct mp3file_t *src, Sint64 ape_head_pos, Uint32 version)
-{
-    Uint8 buffer[APE_BUFFER_SIZE + 1];
-    Uint32 v, i, tag_size, tag_items_count, tag_item_size;
-    Uint32 zero8[2] = {0, 0};
-    Sint64 file_size, cur_tag;
-    size_t read_size;
-
-    file_size = src->length;
-    MP3_RWseek(src, ape_head_pos, RW_SEEK_SET);
-    read_size = MP3_RWread(src, buffer, 1, APE_HEADER_SIZE); /* Retrieve the header */
-
-    if (read_size < APE_HEADER_SIZE) {
-        MP3_RWseek(src, ape_head_pos, RW_SEEK_SET);
-        return SDL_FALSE;
-    }
-
-    v = (Uint32)ape_byteint_decode(buffer + APE_HEAD_FIELD_VERSION, 4); /* version */
-    if (v != APE_V2 && v != APE_V1) {
-        return SDL_FALSE;
-    }
-
-    tag_size = (Uint32)ape_byteint_decode(buffer + APE_HEAD_FIELD_TAGSIZE, 4); /* tag size */
-
-    if (version == APE_V1) { /* If version 1, we are at footer */
-        if (ape_head_pos - (tag_size - APE_HEADER_SIZE) < 0) {
-            MP3_RWseek(src, ape_head_pos, RW_SEEK_SET);
-            return SDL_FALSE;
-        }
-        MP3_RWseek(src, ape_head_pos - (tag_size - APE_HEADER_SIZE), RW_SEEK_SET);
-    } else if ((ape_head_pos + tag_size + APE_HEADER_SIZE) > file_size) {
-        MP3_RWseek(src, ape_head_pos, RW_SEEK_SET);
-        return SDL_FALSE;
-    }
-
-    tag_items_count = (Uint32)ape_byteint_decode(buffer + APE_HEAD_FIELD_ITEMS_COUNT, 4); /* count tag items */
-
-    /*flags = (Uint32)ape_byteint_decode(buffer + APE_HEAD_FIELD_FLAGS, 4);*/ /* global flags, unused */
-
-    /* reserved bits : */
-    if (SDL_memcmp(buffer + APE_HEAD_FIELD_RESERVED, zero8, 8) != 0) {
-        return SDL_FALSE;
-    }
-
-    for(i = 0; i < tag_items_count; i++) {
-        cur_tag = MP3_RWtell(src);
-        if (cur_tag < 0) {
-            break;
-        }
-        read_size = MP3_RWread(src, buffer, 1, 4); /* Retrieve the size */
-        if (read_size < 4) {
-            MP3_RWseek(src, ape_head_pos, RW_SEEK_SET);
-            return SDL_FALSE;
-        }
-
-        v = (Uint32)ape_byteint_decode(buffer, 4); /* size of the tag's value field */
-        /* (we still need to find key size by a null termination) */
-
-        /* Retrieve the tag's data with an aproximal size as we can */
-        if (v + 40 < APE_BUFFER_SIZE) {
-            read_size = MP3_RWread(src, buffer, 1, v + 40);
-        } else {
-            read_size = MP3_RWread(src, buffer, 1, APE_BUFFER_SIZE);
-        }
-        buffer[read_size] = '\0';
-
-        tag_item_size = ape_handle_tag(out_tags, buffer, v);
-        if (tag_item_size == 0) {
-            break;
-        }
-        MP3_RWseek(src, cur_tag + tag_item_size + 4, RW_SEEK_SET);
-    }
-
-    MP3_RWseek(src, ape_head_pos, RW_SEEK_SET);
-
-    return SDL_TRUE;
-}
-
-
-/********************************************************
  *                    MusicMatch                        *
  ********************************************************/
 
 #define MUSICMATCH_HEADER_SIZE          256
 #define MUSICMATCH_VERSION_INFO_SIZE    256
 #define MUSICMATCH_FOOTER_SIZE          48
+#define MUSICMATCH_OFFSETS_SIZE         20
 
 #define MMTAG_PARANOID
 static SDL_bool is_musicmatch(const Uint8 *data, long length)
@@ -850,12 +855,12 @@ static SDL_bool is_musicmatch(const Uint8 *data, long length)
         !SDL_isdigit(data[34]) ||!SDL_isdigit(data[35])) {
         return SDL_FALSE;
     }
-#ifdef MMTAG_PARANOID
+    #ifdef MMTAG_PARANOID
     /* [36..47]: 12 bytes trailing space */
     for (length = 36; length < MUSICMATCH_FOOTER_SIZE; ++length) {
         if (data[length] != ' ') return SDL_FALSE;
     }
-#endif
+    #endif
     return SDL_TRUE;
 }
 
@@ -865,7 +870,7 @@ static long get_musicmatch_len(struct mp3file_t *m)
     const unsigned char syncstr[10] = {'1','8','2','7','3','6','4','5',0,0};
     unsigned char buf[256];
     Sint32 i, j, imgext_ofs, version_ofs;
-    long len = 0;
+    long len;
 
     MP3_RWseek(m, -68, RW_SEEK_END);
     MP3_RWread(m, buf, 1, 20);
@@ -880,28 +885,28 @@ static long get_musicmatch_len(struct mp3file_t *m)
      * section. */
     for (i = 0; i < 4; ++i) {
     /* 48: footer, 20: offsets, 256: version info */
-        len = metasizes[i] + MUSICMATCH_FOOTER_SIZE + 20 + MUSICMATCH_VERSION_INFO_SIZE;
+        len = metasizes[i] + MUSICMATCH_FOOTER_SIZE + MUSICMATCH_OFFSETS_SIZE + MUSICMATCH_VERSION_INFO_SIZE;
         if (m->length < len) return -1;
         MP3_RWseek(m, -len, RW_SEEK_END);
         MP3_RWread(m, buf, 1, MUSICMATCH_VERSION_INFO_SIZE);
         /* [0..9]: sync string, [30..255]: 0x20 */
-#ifdef MMTAG_PARANOID
+        #ifdef MMTAG_PARANOID
         for (j = 30; j < MUSICMATCH_VERSION_INFO_SIZE; ++j) {
             if (buf[j] != ' ') break;
         }
         if (j < MUSICMATCH_VERSION_INFO_SIZE) continue;
-#endif
+        #endif
         if (SDL_memcmp(buf, syncstr, 10) == 0) {
             break;
         }
     }
     if (i == 4) return -1; /* no luck. */
-#ifdef MMTAG_PARANOID
+    #ifdef MMTAG_PARANOID
     /* unused section: (4 bytes of 0x00) */
-    MP3_RWseek(m, -len + 4, RW_SEEK_END);
+    MP3_RWseek(m, -(len + 4), RW_SEEK_END);
     MP3_RWread(m, buf, 1, 4); j = 0;
     if (SDL_memcmp(buf, &j, 4) != 0) return -1;
-#endif
+    #endif
     len += (version_ofs - imgext_ofs);
     if (m->length < len) return -1;
     MP3_RWseek(m, -len, RW_SEEK_END);
@@ -919,11 +924,11 @@ static long get_musicmatch_len(struct mp3file_t *m)
     if (SDL_memcmp(buf, syncstr, 10) != 0) {
         return len;
     }
-#ifdef MMTAG_PARANOID
+    #ifdef MMTAG_PARANOID
     for (j = 30; j < MUSICMATCH_HEADER_SIZE; ++j) {
         if (buf[j] != ' ') return len;
     }
-#endif
+    #endif
     return len + MUSICMATCH_HEADER_SIZE; /* header is present. */
 }
 
