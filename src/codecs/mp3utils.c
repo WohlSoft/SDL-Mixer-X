@@ -285,7 +285,7 @@ static char *id3v2_decode_string(const Uint8 *string, size_t size)
             return NULL; /* Blank string*/
         }
         str_buffer = (char*)SDL_malloc(size);
-        if (!src_buffer) {
+        if (!str_buffer) {
             return NULL; /* Out of memory */
         }
         SDL_strlcpy(str_buffer, (const char*)(string + 1), size);
