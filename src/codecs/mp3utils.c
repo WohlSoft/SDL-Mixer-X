@@ -93,7 +93,7 @@ static SDL_INLINE Sint32 read_sint32be(const Uint8 *data)
 
 
 #ifdef ENABLE_ALL_MP3_TAGS
-#define TAGS_INPUT_BUFFER_SIZE (5 * 8192)
+#define TAGS_INPUT_BUFFER_SIZE 128
 
 /********************************************************
  *                  ID3v1                               *
