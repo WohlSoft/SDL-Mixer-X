@@ -1080,16 +1080,19 @@ int mp3_read_tags(Mix_MusicMetaTags *out_tags, struct mp3file_t *fil, SDL_bool k
         if (!c_lyr) {
             if ((c_lyr = probe_lyrics3(fil, in_buffer)) == TAG_INVALID)
                 goto fail;
+            if (c_lyr) continue;
         }
 
         if (!c_mm) {
             if ((c_mm = probe_mmtag(out_tags, fil, in_buffer)) == TAG_INVALID)
                 goto fail;
+            if (c_mm) continue;
         }
 
         if (!c_ape) {
             if ((c_ape = probe_apetag(out_tags, fil, in_buffer, tag_handled)) == TAG_INVALID)
                 goto fail;
+            if (c_ape) continue;
         }
         break; /* There is no more tags found */
     } /* for (;;) */
