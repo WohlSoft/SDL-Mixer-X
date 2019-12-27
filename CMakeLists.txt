@@ -470,6 +470,12 @@ if(NOT ANDROID)
             DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 endif()
 
+# === Unit tests ====
+option(WITH_UNIT_TESTS "Enable unit testing" OFF)
+if(WITH_UNIT_TESTS)
+    enable_testing()
+    add_subdirectory(test)
+endif()
 
 function(print_sumary _libName _isEnabled _wasFound _whatFound)
     if(${_isEnabled})
