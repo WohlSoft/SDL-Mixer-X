@@ -722,7 +722,8 @@ static long get_lyrics3v1_len(struct mp3file_t *m)
     MP3_RWseek(m, -len, RW_SEEK_END);
     MP3_RWread(m, buf, 1, (size_t)(len -= LYRICS3v1_TAIL_SIZE)); /* exclude footer */
     /* strstr() won't work here. */
-    for (i = len - LYRICS3v1_HEAD_SIZE, p = buf; i >= 0; --i, ++p) {
+    p = buf;
+    for (i = len - LYRICS3v1_HEAD_SIZE; i >= 0; --i, ++p) {
         if (SDL_memcmp(p, "LYRICSBEGIN", LYRICS3v1_HEAD_SIZE) == 0)
             break;
     }
