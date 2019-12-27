@@ -24,9 +24,6 @@
 
 #include "music.h"
 
-/* Convert string into floating point number */
-extern double str_to_float(const char *str);
-
 /* Parse MIDI string's charset (UTF16 or UTF8 with BOM, or keep as the ISO-8859-1) */
 extern void meta_tags_set_from_midi(Mix_MusicMetaTags *tags,
                                     Mix_MusicMetaTag tag,

@@ -21,20 +21,6 @@
 
 #include "utils.h"
 
-double str_to_float(const char *str)
-{
-    char str_buff[25];
-    char float_buff[4];
-    char *p;
-    /* UGLY WORKAROUND: Replace dot with local character (for example, comma) */
-    SDL_strlcpy(str_buff, str, 25);
-    SDL_snprintf(float_buff, 4, "%.1f", 0.0);
-    for (p = str_buff; (p = SDL_strchr(p, '.')); ++p) {
-        *p = float_buff[1];
-    }
-    return SDL_strtod(str_buff, NULL);
-}
-
 static size_t _utf16_byte_len(const char *str)
 {
     size_t len = 0;
@@ -105,7 +91,7 @@ Sint64 parse_time(char *time, long samplerate_hz)
         }
 
         if (*p == '.') {
-            double val_f = str_to_float(p);
+            double val_f = SDL_strtod(p, NULL);
             if (val_f < 0) return -1;
             return result * samplerate_hz + (Sint64) (val_f * samplerate_hz);
         }

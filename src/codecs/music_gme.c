@@ -24,7 +24,6 @@
 #include "SDL_loadso.h"
 
 #include "music_gme.h"
-#include "utils.h"
 
 #include <gme.h>
 
@@ -196,7 +195,7 @@ static void process_args(const char *args, Gme_Setup *setup)
                     break;
                 case 't':
                     if (arg[0] == '=') {
-                        setup->tempo = str_to_float(arg + 1);
+                        setup->tempo = SDL_strtod(arg + 1, NULL);
                         if (setup->tempo <= 0.0) {
                             setup->tempo = 1.0;
                         }
@@ -204,7 +203,7 @@ static void process_args(const char *args, Gme_Setup *setup)
                     break;
                 case 'g':
                     if (arg[0] == '=') {
-                        setup->gain = str_to_float(arg + 1);
+                        setup->gain = SDL_strtod(arg + 1, NULL);
                         if (setup->gain < 0.0) {
                             setup->gain = 1.0;
                         }
