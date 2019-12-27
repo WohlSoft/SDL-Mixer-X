@@ -596,9 +596,9 @@ static Uint32 ape_handle_tag(Mix_MusicMetaTags *out_tags, Uint8 *data, size_t va
     if (SDL_strncasecmp(key, "Title", 6) == 0) {
         meta_tags_set(out_tags, MIX_META_TITLE, (const char*)(value));
     } else if (SDL_strncasecmp(key, "Album", 6) == 0) {
-        meta_tags_set(out_tags, MIX_META_ARTIST, (const char*)(value));
-    } else if (SDL_strncasecmp(key, "Artist", 7) == 0) {
         meta_tags_set(out_tags, MIX_META_ALBUM, (const char*)(value));
+    } else if (SDL_strncasecmp(key, "Artist", 7) == 0) {
+        meta_tags_set(out_tags, MIX_META_ARTIST, (const char*)(value));
     } else if (SDL_strncasecmp(key, "Copyright", 10) == 0) {
         meta_tags_set(out_tags, MIX_META_COPYRIGHT, (const char*)(value));
     }
