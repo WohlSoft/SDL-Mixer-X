@@ -1094,7 +1094,7 @@ int mp3_read_tags(Mix_MusicMetaTags *out_tags, struct mp3file_t *fil, SDL_bool k
                 goto fail;
             if (c_ape) continue;
         }
-        break; /* There is no more tags found */
+        break;
     } /* for (;;) */
 
     rc = (fil->length > 0) ? 0 : -1;
