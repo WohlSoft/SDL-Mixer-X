@@ -39,21 +39,21 @@ Const RW_SEEK_CUR As Long = 1 '/**< Seek relative to current read point */
 Const RW_SEEK_END As Long = 2 '/**< Seek relative to the end of data */
 
 Public Type SDL_AudioSpec
-        freq As Long
-        format As Long
-        channels As Long
-        silence As Long
-        samples As Long
-        padding As Long
-        size As Long
-        callback As Long
-        userdata As Long
+        Freq As Long
+        Format As Long
+        Channels As Long
+        Silence As Long
+        Samples As Long
+        Padding As Long
+        Size As Long
+        Callback As Long
+        UserData As Long
 End Type
 
 Public Type Mix_Chunk
-        allocated As Long
-        abuf As Long
-        alen As Long
+        Allocated As Long
+        Abuf As Long
+        Alen As Long
         Volume As Long
 End Type
 
@@ -119,10 +119,10 @@ Public Declare Sub Mix_Quit Lib "SDL2MixerVB.dll" ()
 'Open the mixer with a certain audio format
 Public Declare Function Mix_OpenAudio Lib "SDL2MixerVB.dll" _
                 Alias "Mix_OpenAudioVB6" _
-                (ByVal frequency As Long, _
-                 ByVal format As Long, _
-                 ByVal channels As Long, _
-                 ByVal chunksize As Long) As Integer
+                (ByVal Frequency As Long, _
+                 ByVal Format As Long, _
+                 ByVal Channels As Long, _
+                 ByVal ChunkSize As Long) As Integer
 'Public Declare Function Mix_OpenAudio Lib "SDL2MixerVB.dll" (ByVal frequency As Long, ByVal format As Integer, ByVal channels As Long, ByVal chunksize As Long) As Long
 
 'extern DECLSPEC int SDLCALL Mix_AllocateChannels(int numchans);
@@ -142,7 +142,7 @@ Public Declare Function Mix_LoadWAV Lib "SDL2MixerVB.dll" Alias "Mix_LoadWAV_VB6
 'Mix_Chunk * Mix_LoadWAV_RW(SDL_RWops *src, int freesrc);
 '       rwops - an SDL_rwops structure pointer (in VB is a Long value!)
 '       freesrc - close and destroy SDL_rwpos structure (you no need free it after!)
-Public Declare Function Mix_LoadWAV_RW Lib "SDL2MixerVB.dll" (ByVal rwops As Long, ByVal freesrc As Long) As Long
+Public Declare Function Mix_LoadWAV_RW Lib "SDL2MixerVB.dll" (ByVal RWops As Long, ByVal freesrc As Long) As Long
 
 '/* Load a music file from an SDL_RWop object (Ogg and MikMod specific currently)
 ' Matt Campbell (matt@campbellhome.dhs.org) April 2000 */
@@ -150,29 +150,29 @@ Public Declare Function Mix_LoadWAV_RW Lib "SDL2MixerVB.dll" (ByVal rwops As Lon
 '       rwops - an SDL_rwops structure pointer (in VB is a Long value!)
 '       freesrc - close and destroy SDL_rwpos structure (you no need free it after!)
 Public Declare Function Mix_LoadMUS_RW Lib "SDL2MixerVB.dll" _
-                        (ByVal rwops As Long, ByVal freesrc As Long) As Long
+                        (ByVal RWops As Long, ByVal freesrc As Long) As Long
 
 'extern DECLSPEC Mix_Music * SDLCALL Mix_LoadMUS_RW_ARG(SDL_RWops *src, int freesrc, char *args);
 'Load a music file from an SDL_RWop object with custom arguments (trackID for GME or settings for a MIDI playing)
 'Arguments are taking no effect for file formats which are not supports extra arguments.
 Public Declare Function Mix_LoadMUS_RW_ARG Lib "SDL2MixerVB.dll" _
-                        (ByVal rwops As Long, ByVal freesrc As Long, Optional ByVal args As String = "") As Long
+                        (ByVal RWops As Long, ByVal freesrc As Long, Optional ByVal args As String = "") As Long
 
 'extern DECLSPEC Mix_Music * SDLCALL Mix_LoadMUS_RW_GME(SDL_RWops *src, int freesrc, int trackID=0);
 '       rwops - an SDL_rwops structure pointer (in VB is a Long value!)
 '       freesrc - close and destroy SDL_rwpos structure (you no need free it after!)
 '       trackID - ID of a track inside NES,HES,GBM,etc. file. Doesn't takes effect on any other regular formats.
 Public Declare Function Mix_LoadMUS_RW_GME Lib "SDL2MixerVB.dll" _
-                        (ByVal rwops As Long, ByVal freesrc As Long, Optional ByVal trackID As Long = 0) As Long
+                        (ByVal RWops As Long, ByVal freesrc As Long, Optional ByVal trackID As Long = 0) As Long
 
 '/* Load a music file from an SDL_RWop object assuming a specific format */
 'extern DECLSPEC Mix_Music * SDLCALL Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int freesrc);
 Public Declare Function Mix_LoadMUSType_RW Lib "SDL2MixerVB.dll" _
-                        (ByVal rwops As Long, ByVal mustype As Mix_MusicType, ByVal freesrc As Long) As Long
+                        (ByVal RWops As Long, ByVal mustype As Mix_MusicType, ByVal freesrc As Long) As Long
 
 'extern DECLSPEC Mix_Music * SDLCALL Mix_LoadMUSType_RW_ARG(SDL_RWops *src, Mix_MusicType type, int freesrc, const char *args);
 Public Declare Function Mix_LoadMUSType_RW_ARG Lib "SDL2MixerVB.dll" _
-                        (ByVal rwops As Long, ByVal mustype As Mix_MusicType, ByVal freesrc As Long, Optional ByVal args As String = "") As Long
+                        (ByVal RWops As Long, ByVal mustype As Mix_MusicType, ByVal freesrc As Long, Optional ByVal args As String = "") As Long
 
 '/* Load a wave file of the mixer format from a memory buffer */
 'extern DECLSPEC Mix_Chunk * SDLCALL Mix_QuickLoad_WAV(Uint8 *mem);
@@ -183,7 +183,7 @@ Public Declare Function Mix_LoadMUSType_RW_ARG Lib "SDL2MixerVB.dll" _
 
 'Free an audio chunk previously loaded
 'void Mix_FreeChunk(Mix_Chunk *chunk);
-Public Declare Sub Mix_FreeChunk Lib "SDL2MixerVB.dll" (ByVal chunk As Long)
+Public Declare Sub Mix_FreeChunk Lib "SDL2MixerVB.dll" (ByVal Chunk As Long)
 'void Mix_FreeMusic(Mix_Music *music);
 Public Declare Sub Mix_FreeMusic Lib "SDL2MixerVB.dll" (ByVal music As Long)
 
@@ -244,19 +244,19 @@ Public Declare Function Mix_GetMusicCopyrightTag Lib "SDL2MixerVB.dll" (ByVal mu
 
 '/* Set the panning of a channel. The left and right channels are specified
 'int Mix_SetPanning(int channel, Uint8 left, Uint8 right);
-Public Declare Function Mix_SetPanning Lib "SDL2MixerVB.dll" (ByVal channel As Long, ByVal left As Integer, ByVal right As Integer) As Long
+Public Declare Function Mix_SetPanning Lib "SDL2MixerVB.dll" (ByVal Channel As Long, ByVal Left As Integer, ByVal Right As Integer) As Long
 
 '/* Set the position of a channel. (angle) is an integer from 0 to 360
 'int Mix_SetPosition(int channel, Sint16 angle, Uint8 distance);
-Public Declare Function Mix_SetPosition Lib "SDL2MixerVB.dll" (ByVal channel As Long, ByVal angle As Integer, ByVal distance As Integer) As Long
+Public Declare Function Mix_SetPosition Lib "SDL2MixerVB.dll" (ByVal Channel As Long, ByVal Angle As Integer, ByVal Distance As Integer) As Long
 
 '/* Set the "distance" of a channel. (distance) is an integer from 0 to 255
 'int Mix_SetDistance(int channel, Uint8 distance);
-Public Declare Function Mix_SetDistance Lib "SDL2MixerVB.dll" (ByVal channel As Long, ByVal distance As Integer) As Long
+Public Declare Function Mix_SetDistance Lib "SDL2MixerVB.dll" (ByVal Channel As Long, ByVal Distance As Integer) As Long
 
 '/* Causes a channel to reverse its stereo.
 'int Mix_SetReverseStereo(int channel, int flip);
-Public Declare Function Mix_SetReverseStereo Lib "SDL2MixerVB.dll" (ByVal channel As Long, ByVal flip As Long) As Long
+Public Declare Function Mix_SetReverseStereo Lib "SDL2MixerVB.dll" (ByVal Channel As Long, ByVal flip As Long) As Long
 
 
 
@@ -265,7 +265,7 @@ Public Declare Function Mix_SetReverseStereo Lib "SDL2MixerVB.dll" (ByVal channe
 '   Returns the number of reserved channels.
 ' */
 'int Mix_ReserveChannels(int num);
-Public Declare Function Mix_ReserveChannels Lib "SDL2MixerVB.dll" (ByVal num As Long) As Long
+Public Declare Function Mix_ReserveChannels Lib "SDL2MixerVB.dll" (ByVal Num As Long) As Long
 
 '/* Attach a tag to a channel. A tag can be assigned to several mixer
 '   channels, to form groups of channels.
@@ -308,10 +308,10 @@ Public Declare Function Mix_GroupNewer Lib "SDL2MixerVB.dll" (ByVal tag As Long)
 '*/
 '#define Mix_PlayChannel(channel,chunk,loops) Mix_PlayChannelTimed(channel,chunk,loops,-1)
 'int Mix_PlayChannelTimed(int channel, Mix_Chunk *chunk, int loops, int ticks);
-Public Declare Function Mix_PlayChannel Lib "SDL2MixerVB.dll" Alias "Mix_PlayChannelTimed" (ByVal channel As Long, ByVal chunk As Long, ByVal loops As Long, Optional ByVal ticks As Long = -1) As Long
-Public Declare Function Mix_PlayChannelTimed Lib "SDL2MixerVB.dll" (ByVal channel As Long, ByVal chunk As Long, ByVal loops As Long, ByVal ticks As Long) As Long
+Public Declare Function Mix_PlayChannel Lib "SDL2MixerVB.dll" Alias "Mix_PlayChannelTimed" (ByVal Channel As Long, ByVal Chunk As Long, ByVal loops As Long, Optional ByVal ticks As Long = -1) As Long
+Public Declare Function Mix_PlayChannelTimed Lib "SDL2MixerVB.dll" (ByVal Channel As Long, ByVal Chunk As Long, ByVal loops As Long, ByVal ticks As Long) As Long
 'extern DECLSPEC int SDLCALL Mix_PlayChannelTimedVolume(int which, Mix_Chunk *chunk, int loops, int ticks, int volume);/*MIXER-X*/
-Public Declare Function Mix_PlayChannelTimedVolume Lib "SDL2MixerVB.dll" (ByVal channel As Long, ByVal chunk As Long, ByVal loops As Long, ByVal ticks As Long, ByVal Volume As Long) As Long
+Public Declare Function Mix_PlayChannelTimedVolume Lib "SDL2MixerVB.dll" (ByVal Channel As Long, ByVal Chunk As Long, ByVal loops As Long, ByVal ticks As Long, ByVal Volume As Long) As Long
 '#define Mix_PlayChannelVol(channel,chunk,loops,vol) Mix_PlayChannelTimedVolume(channel,chunk,loops,-1,vol)/*MIXER-X*/
 '==== See Function Delcarison of 'Mix_PlayChannelVol' in bottom
 
@@ -325,11 +325,11 @@ Public Declare Function Mix_FadeInMusic Lib "SDL2MixerVB.dll" (ByVal music As Lo
 Public Declare Function Mix_FadeInMusicPos Lib "SDL2MixerVB.dll" (ByVal music As Long, ByVal loops As Long, ByVal milliseconds As Long, ByVal position As Double) As Long
 
 '#define Mix_FadeInChannel(channel,chunk,loops,ms) Mix_FadeInChannelTimed(channel,chunk,loops,ms,-1)
-Public Declare Function Mix_FadeInChannel Lib "SDL2MixerVB.dll" Alias "Mix_FadeInChannelTimed" (ByVal channel As Long, ByVal chunk As Long, ByVal loops As Long, ByVal milliseconds As Long, Optional ByVal ticks As Long = -1) As Long
+Public Declare Function Mix_FadeInChannel Lib "SDL2MixerVB.dll" Alias "Mix_FadeInChannelTimed" (ByVal Channel As Long, ByVal Chunk As Long, ByVal loops As Long, ByVal milliseconds As Long, Optional ByVal ticks As Long = -1) As Long
 'extern DECLSPEC int SDLCALL Mix_FadeInChannelTimed(int channel, Mix_Chunk *chunk, int loops, int ms, int ticks);
-Public Declare Function Mix_FadeInChannelTimed Lib "SDL2MixerVB.dll" (ByVal channel As Long, ByVal chunk As Long, ByVal loops As Long, ByVal milliseconds As Long, ByVal ticks As Long) As Long
+Public Declare Function Mix_FadeInChannelTimed Lib "SDL2MixerVB.dll" (ByVal Channel As Long, ByVal Chunk As Long, ByVal loops As Long, ByVal milliseconds As Long, ByVal ticks As Long) As Long
 'extern DECLSPEC int SDLCALL Mix_FadeInChannelTimedVolume(int which, Mix_Chunk *chunk, int loops, int ms, int ticks, int volume);/*MIXER-X*/
-Public Declare Function Mix_FadeInChannelTimedVolume Lib "SDL2MixerVB.dll" (ByVal channel As Long, ByVal chunk As Long, ByVal loops As Long, ByVal milliseconds As Long, ByVal ticks As Long, ByVal Volume As Long) As Long
+Public Declare Function Mix_FadeInChannelTimedVolume Lib "SDL2MixerVB.dll" (ByVal Channel As Long, ByVal Chunk As Long, ByVal loops As Long, ByVal milliseconds As Long, ByVal ticks As Long, ByVal Volume As Long) As Long
 
 '/* Set the volume in the range of 0-128 of a specific channel or chunk.
 '   If the specified channel is -1, set volume for all channels.
@@ -337,10 +337,10 @@ Public Declare Function Mix_FadeInChannelTimedVolume Lib "SDL2MixerVB.dll" (ByVa
 '   If the specified volume is -1, just return the current volume.
 '*/
 'int Mix_Volume(int channel, int volume);
-Public Declare Function Mix_Volume Lib "SDL2MixerVB.dll" (ByVal channel As Long, ByVal Volume As Long) As Long
+Public Declare Function Mix_Volume Lib "SDL2MixerVB.dll" (ByVal Channel As Long, ByVal Volume As Long) As Long
 
 'int Mix_VolumeChunk(Mix_Chunk *chunk, int volume);
-Public Declare Function Mix_VolumeChunk Lib "SDL2MixerVB.dll" (ByVal chunk As Long, ByVal Volume As Long) As Long
+Public Declare Function Mix_VolumeChunk Lib "SDL2MixerVB.dll" (ByVal Chunk As Long, ByVal Volume As Long) As Long
 
 'int Mix_VolumeMusic(int volume);
 Public Declare Function Mix_VolumeMusic Lib "SDL2MixerVB.dll" (ByVal Volume As Long) As Long
@@ -348,7 +348,7 @@ Public Declare Function Mix_VolumeMusic Lib "SDL2MixerVB.dll" (ByVal Volume As L
 
 '/* Halt playing of a particular channel */
 'extern DECLSPEC int SDLCALL Mix_HaltChannel(int channel);
-Public Declare Function Mix_HaltChannel Lib "SDL2MixerVB.dll" (ByVal channel As Long) As Long
+Public Declare Function Mix_HaltChannel Lib "SDL2MixerVB.dll" (ByVal Channel As Long) As Long
 
 'extern DECLSPEC int SDLCALL Mix_HaltGroup(int tag);
 Public Declare Function Mix_HaltGroup Lib "SDL2MixerVB.dll" (ByVal tag As Long) As Long
@@ -361,7 +361,7 @@ Public Declare Function Mix_HaltMusic Lib "SDL2MixerVB.dll" () As Long
 '   or remove the expiration if 'ticks' is -1
 '*/
 'int Mix_ExpireChannel(int channel, int ticks);
-Public Declare Function Mix_ExpireChannel Lib "SDL2MixerVB.dll" (ByVal channel As Long, ByVal ticks As Long) As Long
+Public Declare Function Mix_ExpireChannel Lib "SDL2MixerVB.dll" (ByVal Channel As Long, ByVal ticks As Long) As Long
 
 '/* Halt a channel, fading it out progressively till it's silent
 '   The ms parameter indicates the number of milliseconds the fading
@@ -386,13 +386,13 @@ Public Declare Function Mix_FadingChannel Lib "SDL2MixerVB.dll" (ByVal which As 
 
 '/* Pause/Resume a particular channel */
 'void Mix_Pause(int channel);
-Public Declare Sub Mix_Pause Lib "SDL2MixerVB.dll" (ByVal channel As Long)
+Public Declare Sub Mix_Pause Lib "SDL2MixerVB.dll" (ByVal Channel As Long)
 
 'void Mix_Resume(int channel);
-Public Declare Sub Mix_Resume Lib "SDL2MixerVB.dll" (ByVal channel As Long)
+Public Declare Sub Mix_Resume Lib "SDL2MixerVB.dll" (ByVal Channel As Long)
 
 'int Mix_Paused(int channel);
-Public Declare Function Mix_Paused Lib "SDL2MixerVB.dll" (ByVal channel As Long) As Long
+Public Declare Function Mix_Paused Lib "SDL2MixerVB.dll" (ByVal Channel As Long) As Long
 
 
 '/* Pause/Resume the music stream */
@@ -423,7 +423,7 @@ Public Declare Function Mix_SetMusicPosition Lib "SDL2MixerVB.dll" (ByVal positi
 '   If the specified channel is -1, check all channels.
 '*/
 'int Mix_Playing(int channel);
-Public Declare Function Mix_Playing Lib "SDL2MixerVB.dll" (ByVal channel As Long) As Long
+Public Declare Function Mix_Playing Lib "SDL2MixerVB.dll" (ByVal Channel As Long) As Long
 
 'int Mix_PlayingMusic(void);
 Public Declare Function Mix_PlayingMusic Lib "SDL2MixerVB.dll" () As Long
@@ -432,7 +432,7 @@ Public Declare Function Mix_PlayingMusic Lib "SDL2MixerVB.dll" () As Long
 '    Returns NULL if it's an invalid channel, or there's no chunk associated.'
 '*/
 'Mix_Chunk * Mix_GetChunk(int channel);
-Public Declare Function Mix_GetChunk Lib "SDL2MixerVB.dll" (ByVal channel As Long) As Long
+Public Declare Function Mix_GetChunk Lib "SDL2MixerVB.dll" (ByVal Channel As Long) As Long
 
 
 'extern DECLSPEC void SDLCALL Mix_CloseAudio(void);
@@ -440,7 +440,7 @@ Public Declare Sub Mix_CloseAudio Lib "SDL2MixerVB.dll" ()
 
 '/* Add additional Timidity bank path */
 'void MIX_Timidity_addToPathList(const char *path);
-Public Declare Sub MIX_Timidity_addToPathList Lib "SDL2MixerVB.dll" (ByVal path As String)
+Public Declare Sub MIX_Timidity_addToPathList Lib "SDL2MixerVB.dll" (ByVal Path As String)
 
 
 '/* ADLMIDI Setup functions */
@@ -509,45 +509,45 @@ Public Declare Function MIX_SetLockMIDIArgs Lib "SDL2MixerVB.dll" (ByVal lockMid
 
 'SDL_RWops * SDL_RWFromFileVB6(const char *file, const char *mode)
 Public Declare Function SDL_RWFromFile Lib "SDL2MixerVB.dll" Alias "SDL_RWFromFileVB6" _
-                    (ByVal filename As String, ByVal mode As String) As Long
+                    (ByVal FileName As String, ByVal Mode As String) As Long
 
 'SDL_RWops * SDL_RWFromMemVB6(void *mem, int size)
 Public Declare Function SDL_RWFromMem Lib "SDL2MixerVB.dll" Alias "SDL_RWFromMemVB6" _
-                    (ByRef mem As Any, ByVal size As Long) As Long
+                    (ByRef Mem As Any, ByVal Size As Long) As Long
                     
 'SDL_RWops * SDL_AllocRWVB6(void)
 Public Declare Function SDL_AllocRW Lib "SDL2MixerVB.dll" Alias "SDL_AllocRWVB6" () As Long
 
 'void SDL_FreeRWVB6(SDL_RWops * area)
 Public Declare Sub SDL_FreeRW Lib "SDL2MixerVB.dll" Alias "SDL_FreeRWVB6" _
-                    (ByVal rwops As Long)
+                    (ByVal RWops As Long)
 
 'int SDL_RWsizeVB6(SDL_RWops * ctx)
 Public Declare Function SDL_RWsize Lib "SDL2MixerVB.dll" Alias "SDL_RWseekVB6" _
-                    (ByVal rwops As Long) As Long
+                    (ByVal RWops As Long) As Long
                     
 'int SDL_RWseekVB6(SDL_RWops * ctx, int offset, int whence)
 Public Declare Function SDL_RWseek Lib "SDL2MixerVB.dll" Alias "SDL_RWseekVB6" _
-                    (ByVal rwops As Long, ByVal offset As Long, ByVal whence As Long) As Long
+                    (ByVal RWops As Long, ByVal Offset As Long, ByVal Whence As Long) As Long
                     
 'int SDL_RWtellVB6(SDL_RWops * ctx)
 Public Declare Function SDL_RWtell Lib "SDL2MixerVB.dll" Alias "SDL_RWtellVB6" _
-                    (ByVal rwops As Long) As Long
+                    (ByVal RWops As Long) As Long
 
 'int SDL_RWreadVB6(SDL_RWops * ctx, void*ptr, int size, int maxnum)
 Public Declare Function SDL_RWread Lib "SDL2MixerVB.dll" Alias "SDL_RWreadVB6" _
-                    (ByVal rwops As Long, ByRef ptr As Any, ByVal size As Long, ByVal max As Long) As Long
+                    (ByVal RWops As Long, ByRef Ptr As Any, ByVal Size As Long, ByVal max As Long) As Long
 
 'int SDL_RWwriteVB6(SDL_RWops * ctx, void* ptr, int size, int maxnum)
 Public Declare Function SDL_RWwrite Lib "SDL2MixerVB.dll" Alias "SDL_RWwriteVB6" _
-                    (ByVal rwops As Long, ByRef ptr As Any, ByVal size As Long, ByVal max As Long) As Long
+                    (ByVal RWops As Long, ByRef Ptr As Any, ByVal Size As Long, ByVal max As Long) As Long
 
 'int SDL_RWcloseVB6(SDL_RWops * ctx)
 Public Declare Function SDL_RWclose Lib "SDL2MixerVB.dll" Alias "SDL_RWcloseVB6" _
-                    (ByVal rwops As Long) As Long
+                    (ByVal RWops As Long) As Long
 
 
-Public Function Mix_PlayChannelVol(ByVal channel As Long, ByVal chunk As Long, ByVal loops As Long, ByVal Volume As Long)
-    Mix_PlayChannelVol = Mix_PlayChannelTimedVolume(channel, chunk, loops, -1, Volume)
+Public Function Mix_PlayChannelVol(ByVal Channel As Long, ByVal Chunk As Long, ByVal loops As Long, ByVal Volume As Long)
+    Mix_PlayChannelVol = Mix_PlayChannelTimedVolume(Channel, Chunk, loops, -1, Volume)
 End Function
 
