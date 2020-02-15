@@ -37,6 +37,7 @@ typedef struct {
     int (*gme_track_ended)( Music_Emu const*);
     void (*gme_set_tempo)(Music_Emu*, double tempo);
     void (*gme_set_fade)(Music_Emu*, int start_msec);
+    void (*gme_set_autoload_playback_limit)(Music_Emu*, int do_autoload_limit);
     gme_err_t (*gme_track_info)(Music_Emu const*, gme_info_t** out, int track);
     void (*gme_free_info)(gme_info_t*);
     gme_err_t (*gme_seek)(Music_Emu*, int msec);
@@ -86,6 +87,13 @@ static int GME_Load(void)
         FUNCTION_LOADER(gme_tell, int (*)(Music_Emu const*))
         FUNCTION_LOADER(gme_play, gme_err_t (*)(Music_Emu*, int, short[]))
         FUNCTION_LOADER(gme_delete, void (*)(Music_Emu*))
+#if defined(GME_DYNAMIC)
+        gme.gme_set_autoload_playback_limit = (void (*)(Music_Emu*,int)) SDL_LoadFunction(gme.handle, "gme_set_autoload_playback_limit");
+#elif defined(GME_HAS_SET_AUTOLOAD_PLAYBACK_LIMIT)
+        gme.gme_set_autoload_playback_limit = gme_set_autoload_playback_limit;
+#else
+        gme.gme_set_autoload_playback_limit = NULL;
+#endif
     }
     ++gme.loaded;
 
@@ -389,7 +397,16 @@ static int GME_play(void *music_p, int play_count)
     GME_Music *music = (GME_Music*)music_p;
     if (music) {
         music->play_count = play_count;
-        gme.gme_set_fade(music->game_emu, play_count > 0 ? music->intro_length + (music->loop_length * play_count) : -1);
+        if (gme.gme_set_autoload_playback_limit) {
+            if (play_count < 0) {
+                gme.gme_set_autoload_playback_limit(music->game_emu, 0);
+            } else {
+                gme.gme_set_autoload_playback_limit(music->game_emu, 1);
+                gme.gme_set_fade(music->game_emu, music->intro_length + (music->loop_length * play_count));
+            }
+        } else {
+            gme.gme_set_fade(music->game_emu, play_count > 0 ? music->intro_length + (music->loop_length * play_count) : -1);
+        }
         gme.gme_seek(music->game_emu, 0);
     }
     return 0;
