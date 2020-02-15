@@ -39,7 +39,7 @@ if(USE_MODPLUG)
         endif()
         set(ModPlug_FOUND 1)
         set(STDCPP_NEEDED 1) # Statically linking ModPlug which is C++ library
-        set(MODPLUG_HAS_TELL True)
+        set(MODPLUG_HAS_TELL TRUE)
         set(ModPlug_INCLUDE_DIRS "${AUDIO_CODECS_PATH}/libmodplug/include")
     endif()
 
