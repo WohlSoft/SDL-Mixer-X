@@ -315,6 +315,10 @@ GME_Music *GME_LoadSongRW(SDL_RWops *src, const char *args)
         setup.track_number = gme.gme_track_count(music->game_emu) - 1;
     }
 
+    /* Set this flag BEFORE calling the gme_start_track() to fix an inability to loop forever */
+    if(gme.gme_set_autoload_playback_limit)
+        gme.gme_set_autoload_playback_limit(music->game_emu, 0);
+
     err = gme.gme_start_track(music->game_emu, setup.track_number);
     if (err != 0) {
         GME_delete(music);
@@ -397,16 +401,7 @@ static int GME_play(void *music_p, int play_count)
     GME_Music *music = (GME_Music*)music_p;
     if (music) {
         music->play_count = play_count;
-        if (gme.gme_set_autoload_playback_limit) {
-            if (play_count < 0) {
-                gme.gme_set_autoload_playback_limit(music->game_emu, 0);
-            } else {
-                gme.gme_set_autoload_playback_limit(music->game_emu, 1);
-                gme.gme_set_fade(music->game_emu, music->intro_length + (music->loop_length * play_count));
-            }
-        } else {
-            gme.gme_set_fade(music->game_emu, play_count > 0 ? music->intro_length + (music->loop_length * play_count) : -1);
-        }
+        gme.gme_set_fade(music->game_emu, play_count > 0 ? music->intro_length + (music->loop_length * play_count) : -1);
         gme.gme_seek(music->game_emu, 0);
     }
     return 0;
