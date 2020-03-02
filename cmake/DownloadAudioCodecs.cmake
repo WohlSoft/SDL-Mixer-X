@@ -41,16 +41,30 @@ else()
     set(AUDIO_CODECS_DOWNLOAD_SDL ON)
 endif()
 
+set(ADLMIDI_FLAGS)
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
+    set(ADLMIDI_FLAGS "${ADLMIDI_FLAGS} -DADLMIDI_USE_DOSBOX_EMULATOR=ON")
+endif()
+
+set(APPLE_FLAGS)
+if(APPLE)
+    set(APPLE_FLAGS "-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}")
+endif()
+
 ExternalProject_Add(
     AudioCodecs
     PREFIX ${CMAKE_BINARY_DIR}/external/AudioCodecs
     GIT_REPOSITORY https://github.com/WohlSoft/AudioCodecs.git
     CMAKE_ARGS
         "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+        "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
+        "-DCMAKE_CONFIGURATION_TYPES=${CMAKE_CONFIGURATION_TYPES}"
         "-DCMAKE_INSTALL_PREFIX=${AUDIO_CODECS_INSTALL_DIR}"
         "-DDOWNLOAD_SDL2_DEPENDENCY=${AUDIO_CODECS_DOWNLOAD_SDL}"
         ${SDL2_WASAPI_FLAG}
         ${SDL2_TAGS}
+        ${ADLMIDI_FLAGS}
+        ${APPLE_FLAGS}
 )
 
 message("AudioCodecs can see SDL2 is stored in ${SDL2_REPO_PATH}...")
