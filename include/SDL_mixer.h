@@ -55,7 +55,7 @@
 #       endif
 #   endif /* defined(_MSC_VER) */
 
-#   ifdef __clang__
+#   elif defined(__clang__)
 #       if __has_extension(attribute_deprecated_with_message)
 #           define MIXERX_DEPRECATED(message) __attribute__((deprecated(message)))
 #       endif
