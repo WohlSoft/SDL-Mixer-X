@@ -55,17 +55,19 @@
 #       endif
 #   endif /* defined(_MSC_VER) */
 
-#   elif defined(__clang__)
-#       if __has_extension(attribute_deprecated_with_message)
-#           define MIXERX_DEPRECATED(message) __attribute__((deprecated(message)))
-#       endif
-#   elif defined __GNUC__ /* not clang (gcc comes later since clang emulates gcc) */
-#       if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5))
-#           define MIXERX_DEPRECATED(message) __attribute__((deprecated(message)))
-#      elif (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 1))
-#           define MIXERX_DEPRECATED(message) __attribute__((__deprecated__))
-#       endif /* GNUC version */
-#   endif /* __clang__ || __GNUC__ */
+#   if !defined(MIXERX_DEPRECATED)
+#       if defined(__clang__)
+#           if __has_extension(attribute_deprecated_with_message)
+#               define MIXERX_DEPRECATED(message) __attribute__((deprecated(message)))
+#           endif
+#       elif defined(__GNUC__) /* not clang (gcc comes later since clang emulates gcc) */
+#           if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5))
+#               define MIXERX_DEPRECATED(message) __attribute__((deprecated(message)))
+#           elif (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 1))
+#               define MIXERX_DEPRECATED(message) __attribute__((__deprecated__))
+#           endif /* GNUC version */
+#       endif /* __clang__ || __GNUC__ */
+#   endif /* !defined(MIXERX_DEPRECATED) */
 #endif
 
 #if !defined(MIXERX_DEPRECATED)
