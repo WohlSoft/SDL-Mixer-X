@@ -20,6 +20,5 @@ ExternalProject_Add(
     SDL2HG
     PREFIX ${CMAKE_BINARY_DIR}/external/SDL2
     URL https://hg.libsdl.org/SDL/archive/default.tar.bz2
-    UPDATE_DISCONNECTED 1
     CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${SDL2_INSTALL_DIR}" -DSNDIO=OFF
 )
