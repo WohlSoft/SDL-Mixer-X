@@ -9,12 +9,14 @@ environment:
       COMPILER_FAMILY: MinGW
       GENERATOR: "MinGW Makefiles"
       PLATFORM: Win32-VB6-Binding
+      IS_VB6_BINDING: YES
       EXTRA_CMAKE_FLAGS: "-DBUILD_AS_VB6_BINDING=ON -DAUDIO_CODECS_SDL2_HG_BRANCH=release-2.0.12 -DAUDIO_CODECS_SDL2_GIT_BRANCH=origin/release-2.0.12 -DWITH_SDL2_WASAPI=OFF"
     - BUILD_TYPE: MinSizeRel
       COMPILER: MinGW-w32
       COMPILER_FAMILY: MinGW
       GENERATOR: "MinGW Makefiles"
       PLATFORM: Win32-VB6-Binding-SDL-2.0.8
+      IS_VB6_BINDING: YES
       EXTRA_CMAKE_FLAGS: "-DBUILD_AS_VB6_BINDING=ON -DAUDIO_CODECS_SDL2_HG_BRANCH=release-2.0.8 -DAUDIO_CODECS_SDL2_GIT_BRANCH=origin/release-2.0.8 -DWITH_SDL2_WASAPI=OFF"
     - BUILD_TYPE: Release
       COMPILER: MSVC15
@@ -182,12 +184,12 @@ build_script:
   - if [%COMPILER_FAMILY%]==[MinGW] mingw32-make install
   - if [%COMPILER_FAMILY%]==[MSVC] cmake --build . --config %BUILD_TYPE% --target install
   - if [%COMPILER_FAMILY%]==[MSVC2] cmake --build . --config %BUILD_TYPE% --target install
-  - if NOT [%PLATFORM%]==[Win32-VB6-Binding] 7z a -t7z -mx9 "SDL-Mixer-X-%COMPILER%-%BUILD_TYPE%-%PLATFORM%.7z" "SDL-Mixer-X"
-  - if [%PLATFORM%]==[Win32-VB6-Binding] 7z x ../VB6_Wrapper/SDL_Mixer_vb6_example.clean.7z * -osdl-mixer-vb6
-  - if [%PLATFORM%]==[Win32-VB6-Binding] copy ..\VB6_Wrapper\ReadME.txt sdl-mixer-vb6
-  - if [%PLATFORM%]==[Win32-VB6-Binding] copy ..\SDL2_mixer_ext.License.txt sdl-mixer-vb6\licenses\SDL2MixerVB.License.txt
-  - if [%PLATFORM%]==[Win32-VB6-Binding] copy ..\docs\SDL_mixer_ext.html sdl-mixer-vb6\
-  - if [%PLATFORM%]==[Win32-VB6-Binding] 7z a -t7z -mx9 "SDL-Mixer-X-%COMPILER%-%BUILD_TYPE%-%PLATFORM%.7z" "sdl-mixer-vb6/*"
+  - if NOT [%IS_VB6_BINDING%]==[YES] 7z a -t7z -mx9 "SDL-Mixer-X-%COMPILER%-%BUILD_TYPE%-%PLATFORM%.7z" "SDL-Mixer-X"
+  - if [%IS_VB6_BINDING%]==[YES] 7z x ../VB6_Wrapper/SDL_Mixer_vb6_example.clean.7z * -osdl-mixer-vb6
+  - if [%IS_VB6_BINDING%]==[YES] copy ..\VB6_Wrapper\ReadME.txt sdl-mixer-vb6
+  - if [%IS_VB6_BINDING%]==[YES] copy ..\SDL2_mixer_ext.License.txt sdl-mixer-vb6\licenses\SDL2MixerVB.License.txt
+  - if [%IS_VB6_BINDING%]==[YES] copy ..\docs\SDL_mixer_ext.html sdl-mixer-vb6\
+  - if [%IS_VB6_BINDING%]==[YES] 7z a -t7z -mx9 "SDL-Mixer-X-%COMPILER%-%BUILD_TYPE%-%PLATFORM%.7z" "sdl-mixer-vb6/*"
   - move SDL-Mixer-X-%COMPILER%-%BUILD_TYPE%-%PLATFORM%.7z ..
 
 artifacts:
