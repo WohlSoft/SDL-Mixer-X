@@ -287,13 +287,10 @@ static int voc_get_block(SDL_RWops *src, vs_t *v, SDL_AudioSpec *spec)
                 if (SDL_RWread(src, &uc, sizeof (uc), 1) != 1)
                     return 0;
 
-                if (uc == 255)
-                {
-                    SDL_SetError("VOC Extended has an invalid channels number");
-                    return 0;
-                }
-
-                spec->channels = uc + 1; /* 0 - Mono, 1 - Stereo*/
+                if (uc)
+                    spec->channels = 2;  /* Stereo */
+                /* VOC_EXTENDED may be read before spec->channels inited: */
+                else spec->channels = 1;
 
                 /* Needed number of channels before finishing
                    compute for rate */
