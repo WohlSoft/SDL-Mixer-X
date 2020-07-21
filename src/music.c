@@ -1356,6 +1356,25 @@ const char *SDLCALLCC Mix_GetMusicCopyrightTag(const Mix_Music *music)
     return get_music_tag_internal(music, MIX_META_COPYRIGHT);
 }
 
+const char *SDLCALLCC Mix_GetMetaTag(const Mix_Music *music, const char* tag_name)
+{
+    if (!tag_name)
+        return NULL;
+    
+    const char *tag = NULL;
+
+    Mix_LockAudio();
+    if (music && music->interface->GetUserTag) {
+        tag = music->interface->GetUserTag(music->context, tag_name);
+    } else if (music_playing && music_playing->interface->GetUserTag) {
+        tag = music_playing->interface->GetUserTag(music_playing->context, tag_name);
+    } else {
+        Mix_SetError("Music isn't playing");
+    }
+    Mix_UnlockAudio();
+    return tag;
+}
+
 /* Play a music chunk.  Returns 0, or -1 if there was an error.
  */
 static int music_internal_play(Mix_Music *music, int play_count, double position)

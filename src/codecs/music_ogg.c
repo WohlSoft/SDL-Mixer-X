@@ -329,14 +329,23 @@ static void *OGG_CreateFromRW(SDL_RWops *src, int freesrc)
             SDL_memmove(argument + 4, argument + 5, SDL_strlen(argument) - 4);
         }
 
-        if (SDL_strcasecmp(argument, "LOOPSTART") == 0)
+        if (SDL_strcasecmp(argument, "LOOPSTART") == 0) {
             music->loop_start = parse_time(value, rate);
-        else if (SDL_strcasecmp(argument, "LOOPLENGTH") == 0) {
+#if LOOP_DEBUG_PRINTOUT
+            printf("LOOP START SET TO %d\n", (int)music->loop_start);
+#endif
+        } else if (SDL_strcasecmp(argument, "LOOPLENGTH") == 0) {
             music->loop_len = SDL_strtoll(value, NULL, 10);
             is_loop_length = SDL_TRUE;
+#if LOOP_DEBUG_PRINTOUT
+            printf("LOOP LENGTH SET TO %d\n", (int)music->loop_len);
+#endif
         } else if (SDL_strcasecmp(argument, "LOOPEND") == 0) {
             music->loop_end = parse_time(value, rate);
             is_loop_length = SDL_FALSE;
+#if LOOP_DEBUG_PRINTOUT
+            printf("LOOP END SET TO %d\n", (int)music->loop_end);
+#endif
         } else if (SDL_strcasecmp(argument, "TITLE") == 0) {
             meta_tags_set(&music->tags, MIX_META_TITLE, value);
         } else if (SDL_strcasecmp(argument, "ARTIST") == 0) {
@@ -355,6 +364,11 @@ static void *OGG_CreateFromRW(SDL_RWops *src, int freesrc)
         music->loop_len = music->loop_end - music->loop_start;
     }
 
+#if LOOP_DEBUG_PRINTOUT
+    printf("\n\ts: %d l: %d e: %d\n", (int)music->loop_start, (int)music->loop_len,
+           (int)music->loop_end);
+#endif
+    
     /* Ignore invalid loop tag */
     if (music->loop_start < 0 || music->loop_len < 0 || music->loop_end < 0) {
         music->loop_start = 0;
@@ -363,6 +377,10 @@ static void *OGG_CreateFromRW(SDL_RWops *src, int freesrc)
     }
 
     full_length = vorbis.ov_pcm_total(&music->vf, -1);
+#if LOOP_DEBUG_PRINTOUT
+    printf("\n\nFULLEN: %d, CHECKS:\n%d %d %d\n\n", (int)full_length, (music->loop_end > 0),
+           (music->loop_end <= full_length), (music->loop_start < music->loop_end));
+#endif
     if ((music->loop_end > 0) && (music->loop_end <= full_length) &&
         (music->loop_start < music->loop_end)) {
         music->loop = 1;
@@ -376,6 +394,34 @@ static const char* OGG_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
 {
     OGG_music *music = (OGG_music *)context;
     return meta_tags_get(&music->tags, tag_type);
+}
+
+static const char* OGG_GetUserTag(void *context, const char* tag_name)
+{
+    OGG_music *music = (OGG_music *)context;
+    vorbis_comment *vc;
+    int i;
+    
+    vc = vorbis.ov_comment(&music->vf, -1);
+    for (i = 0; i < vc->comments; i++) {
+        char *param = SDL_strdup(vc->user_comments[i]);
+        char *argument = param;
+        char *value = SDL_strchr(param, '=');
+        if (value == NULL) {
+            value = param + SDL_strlen(param);
+        } else {
+            *(value++) = '\0';
+        }
+
+        if (SDL_strcasecmp(argument, tag_name) == 0) {
+            SDL_memmove(param, value, strlen(value) + 1);
+            return param;
+        }
+        
+        SDL_free(param);
+    }
+    
+    return NULL;
 }
 
 /* Set the volume for an OGG stream */
@@ -592,6 +638,7 @@ Mix_MusicInterface Mix_MusicInterface_OGG =
     OGG_LoopEnd,   /* LoopEnd [MIXER-X]*/
     OGG_LoopLength,   /* LoopLength [MIXER-X]*/
     OGG_GetMetaTag,   /* GetMetaTag [MIXER-X]*/
+    OGG_GetUserTag,   /* GetUserTag [MIXER-X-snstruthers]*/
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */

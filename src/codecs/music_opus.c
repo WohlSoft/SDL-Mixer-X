@@ -316,14 +316,23 @@ static void *OPUS_CreateFromRW(SDL_RWops *src, int freesrc)
             SDL_memmove(argument + 4, argument + 5, SDL_strlen(argument) - 4);
         }
 
-        if (SDL_strcasecmp(argument, "LOOPSTART") == 0)
+        if (SDL_strcasecmp(argument, "LOOPSTART") == 0) {
             music->loop_start = parse_time(value, 48000);
-        else if (SDL_strcasecmp(argument, "LOOPLENGTH") == 0) {
+#if LOOP_DEBUG_PRINTOUT
+            printf("LOOP START SET TO %d\n", (int)music->loop_start);
+#endif
+        } else if (SDL_strcasecmp(argument, "LOOPLENGTH") == 0) {
             music->loop_len = SDL_strtoll(value, NULL, 10);
             is_loop_length = SDL_TRUE;
+#if LOOP_DEBUG_PRINTOUT
+            printf("LOOP LENGTH SET TO %d\n", (int)music->loop_len);
+#endif
         } else if (SDL_strcasecmp(argument, "LOOPEND") == 0) {
             music->loop_end = parse_time(value, 48000);
             is_loop_length = SDL_FALSE;
+#if LOOP_DEBUG_PRINTOUT
+            printf("LOOP END SET TO %d\n", (int)music->loop_end);
+#endif
         } else if (SDL_strcasecmp(argument, "TITLE") == 0) {
             meta_tags_set(&music->tags, MIX_META_TITLE, value);
         } else if (SDL_strcasecmp(argument, "ARTIST") == 0) {
@@ -341,6 +350,11 @@ static void *OPUS_CreateFromRW(SDL_RWops *src, int freesrc)
     } else {
         music->loop_len = music->loop_end - music->loop_start;
     }
+    
+#if LOOP_DEBUG_PRINTOUT
+    printf("\n\ts: %d l: %d e: %d\n", (int)music->loop_start, (int)music->loop_len,
+           (int)music->loop_end);
+#endif
 
     /* Ignore invalid loop tag */
     if (music->loop_start < 0 || music->loop_len < 0 || music->loop_end < 0) {
@@ -350,6 +364,10 @@ static void *OPUS_CreateFromRW(SDL_RWops *src, int freesrc)
     }
 
     full_length = opus.op_pcm_total(music->of, -1);
+#if LOOP_DEBUG_PRINTOUT
+    printf("\n\nFULLEN: %d, CHECKS:\n%d %d %d\n\n", (int)full_length, music->loop_end > 0,
+           (music->loop_end <= full_length), (music->loop_start < music->loop_end));
+#endif
     if ((music->loop_end > 0) && (music->loop_end <= full_length) &&
         (music->loop_start < music->loop_end)) {
         music->loop = 1;
@@ -364,6 +382,34 @@ static const char* OPUS_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
 {
     OPUS_music *music = (OPUS_music *)context;
     return meta_tags_get(&music->tags, tag_type);
+}
+
+static const char* OPUS_GetUserTag(void *context, const char* tag_name)
+{
+    OPUS_music *music = (OPUS_music *)context;
+    const OpusTags* tags = NULL;
+    int ci;
+    
+    tags = opus.op_tags(music->of, -1);
+    for (ci=0; ci < tags->comments; ci++) {
+        char *param = SDL_strdup(tags->user_comments[ci]);
+        char *argument = param;
+        char *value = SDL_strchr(param, '=');
+        if (value == NULL) {
+            value = param + SDL_strlen(param);
+        } else {
+            *(value++) = '\0';
+        }
+
+        if (SDL_strcasecmp(argument, tag_name) == 0) {
+            SDL_memmove(param, value, strlen(value) + 1);
+            return param;
+        }
+        
+        SDL_free(param);
+    }
+    
+    return NULL;
 }
 
 /* Set the volume for an Opus stream */
@@ -563,6 +609,7 @@ Mix_MusicInterface Mix_MusicInterface_Opus =
     OPUS_LoopEnd, /* LoopEnd [MIXER-X]*/
     OPUS_LoopLength, /* LoopLength [MIXER-X]*/
     OPUS_GetMetaTag, /* GetMetaTag [MIXER-X]*/
+    OPUS_GetUserTag, /* GetUserTag [MIXER-X-snstruthers]*/
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */

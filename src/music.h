@@ -23,6 +23,9 @@
 #ifndef MUSIC_H_
 #define MUSIC_H_
 
+#define LOOP_DEBUG_PRINTOUT 1
+/*#define LOOP_DEBUG_PRINTOUT 0*/
+
 /* Supported music APIs, in order of preference */
 
 typedef enum
@@ -57,7 +60,6 @@ typedef enum
     MIX_META_COPYRIGHT,
     MIX_META_LAST
 } Mix_MusicMetaTag;
-
 
 /* MIXER-X: Meta-tags utility structure */
 
@@ -150,6 +152,9 @@ typedef struct
 
     /* MIXER-X: Get a meta-tag string if available */
     const char* (*GetMetaTag)(void *music, Mix_MusicMetaTag tag_type);
+    
+    /* MIXER-X (snstruthers): Get an arbitrary meta-tag string if available */
+    const char* (*GetUserTag)(void *music, const char* tag_name);
 
     /* Pause playing music */
     void (*Pause)(void *music);

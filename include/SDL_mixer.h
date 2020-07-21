@@ -334,6 +334,16 @@ extern DECLSPEC const char *SDLCALL Mix_GetMusicAlbumTag(const Mix_Music *music)
 /* Get music copyright from meta-tag if possible */
 extern DECLSPEC const char *SDLCALL Mix_GetMusicCopyrightTag(const Mix_Music *music);
 
+/*
+    Gets metadata from the given tag name if available
+    returns NULL if this feature is not used for this music or not supported for some codec or
+    on error
+    the returned string must be freed using SDL_free after use
+    
+    This is an extension by snstruthers and is not avialable in the base SDL Mixer X library
+*/
+extern DECLSPEC const char* SDLCALL Mix_GetMetaTag(const Mix_Music *music, const char* tag_name);
+
 /* Set a function that is called after all mixing is performed.
    This can be used to provide real-time visual display of the audio stream
    or add a custom mixer filter for the stream data.

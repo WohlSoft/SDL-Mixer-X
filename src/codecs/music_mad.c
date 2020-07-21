@@ -676,6 +676,7 @@ Mix_MusicInterface Mix_MusicInterface_MAD =
     NULL,   /* LoopEnd [MIXER-X]*/
     NULL,   /* LoopLength [MIXER-X]*/
     MAD_GetMetaTag, /* GetMetaTag [MIXER-X]*/
+    NULL,   /* GetUserTag [MIXER-X-snstruthers]*/
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */

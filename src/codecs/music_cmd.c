@@ -290,6 +290,7 @@ Mix_MusicInterface Mix_MusicInterface_CMD =
     NULL,   /* LoopEnd [MIXER-X]*/
     NULL,   /* LoopLength [MIXER-X]*/
     NULL,   /* GetMetaTag [MIXER-X]*/
+    NULL,   /* GetUserTag [MIXER-X-snstruthers]*/
     MusicCMD_Pause,
     MusicCMD_Resume,
     MusicCMD_Stop,

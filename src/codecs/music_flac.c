@@ -162,6 +162,7 @@ typedef struct {
     FLAC__int64 loop_start;
     FLAC__int64 loop_end;
     FLAC__int64 loop_len;
+    FLAC__StreamMetadata_VorbisComment *comments;
     Mix_MusicMetaTags tags;
 } FLAC_Music;
 
@@ -448,7 +449,8 @@ static void flac_metadata_music_cb(
     } else if (metadata->type == FLAC__METADATA_TYPE_VORBIS_COMMENT) {
         FLAC__uint32 i;
 
-        vc  = &metadata->data.vorbis_comment;
+        music->comments = &metadata->data.vorbis_comment;
+        vc  = music->comments;
         rate = music->sample_rate;
 
         for (i = 0; i < vc->num_comments; ++i) {
@@ -468,14 +470,24 @@ static void flac_metadata_music_cb(
                 SDL_memmove(argument + 4, argument + 5, SDL_strlen(argument) - 4);
             }
 
-            if (SDL_strcasecmp(argument, "LOOPSTART") == 0)
+            if (SDL_strcasecmp(argument, "LOOPSTART") == 0) {
                 music->loop_start = parse_time(value, rate);
+#if LOOP_DEBUG_PRINTOUT
+                printf("LOOP START SET TO %d\n", (int)music->loop_start);
+#endif
+            }
             else if (SDL_strcasecmp(argument, "LOOPLENGTH") == 0) {
                 music->loop_len = SDL_strtoll(value, NULL, 10);
                 is_loop_length = SDL_TRUE;
+#if LOOP_DEBUG_PRINTOUT
+                printf("LOOP LENGTH SET TO %d\n", (int)music->loop_len);
+#endif
             } else if (SDL_strcasecmp(argument, "LOOPEND") == 0) {
                 music->loop_end = parse_time(value, rate);
                 is_loop_length = SDL_FALSE;
+#if LOOP_DEBUG_PRINTOUT
+                printf("LOOP END SET TO %d\n", (int)music->loop_end);
+#endif
             } else if (SDL_strcasecmp(argument, "TITLE") == 0) {
                 meta_tags_set(&music->tags, MIX_META_TITLE, value);
             } else if (SDL_strcasecmp(argument, "ARTIST") == 0) {
@@ -500,6 +512,11 @@ static void flac_metadata_music_cb(
             music->loop_len = 0;
             music->loop_end = 0;
         }
+        
+#if LOOP_DEBUG_PRINTOUT
+        printf("\n\ts: %d l: %d e: %d\n", (int)music->loop_start, (int)music->loop_len,
+               (int)music->loop_end);
+#endif
     }
 }
 
@@ -591,6 +608,10 @@ static void *FLAC_CreateFromRW(SDL_RWops *src, int freesrc)
      * are present in metadata.
      */
     full_length = (FLAC__int64) flac.FLAC__stream_decoder_get_total_samples(music->flac_decoder);
+#if LOOP_DEBUG_PRINTOUT
+    printf("\n\nFULLEN: %d, CHECKS:\n%d %d %d\n\n", (int)full_length, (music->loop_end > 0),
+           (music->loop_end <= full_length), (music->loop_start < music->loop_end));
+#endif
     if ((music->loop_end > 0) && (music->loop_end <= full_length) &&
         (music->loop_start < music->loop_end)) {
         music->loop = 1;
@@ -605,6 +626,34 @@ static const char* FLAC_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
 {
     FLAC_Music *music = (FLAC_Music *)context;
     return meta_tags_get(&music->tags, tag_type);
+}
+
+static const char* FLAC_GetUserTag(void *context, const char* tag_name)
+{
+    FLAC_Music *music = (FLAC_Music *)context;
+    const FLAC__StreamMetadata_VorbisComment *vc = music->comments;
+    int i;
+    
+    for (i = 0; i < vc->num_comments; ++i) {
+        char *param = SDL_strdup((const char *) vc->comments[i].entry);
+        char *argument = param;
+        char *value = SDL_strchr(param, '=');
+
+        if (value == NULL) {
+            value = param + SDL_strlen(param);
+        } else {
+            *(value++) = '\0';
+        }
+
+        if (SDL_strcasecmp(param, tag_name) == 0) {
+            SDL_memmove(param, value, strlen(value) + 1);
+            return param;
+        }
+        
+        SDL_free(param);
+    }
+    
+    return NULL;
 }
 
 
@@ -800,6 +849,7 @@ Mix_MusicInterface Mix_MusicInterface_FLAC =
     FLAC_LoopEnd,/* LoopEnd [MIXER-X]*/
     FLAC_LoopLength,/* LoopLength [MIXER-X]*/
     FLAC_GetMetaTag,/* GetMetaTag [MIXER-X]*/
+    FLAC_GetUserTag,/* GetUserTag [MIXER-X-snstruthers]*/
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */
