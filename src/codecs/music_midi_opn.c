@@ -765,7 +765,7 @@ Mix_MusicInterface Mix_MusicInterface_OPNMIDI =
     OPNMIDI_LoopEnd,   /* LoopEnd [MIXER-X]*/
     OPNMIDI_LoopLength,   /* LoopLength [MIXER-X]*/
     OPNMIDI_GetMetaTag,   /* GetMetaTag [MIXER-X]*/
-    NULL,   /* GetUserTag [MIXER-X-snstruthers]*/
+    NULL,   /* GetUserTag [MIXER-X]*/
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */

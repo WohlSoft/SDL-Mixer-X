@@ -638,7 +638,7 @@ Mix_MusicInterface Mix_MusicInterface_OGG =
     OGG_LoopEnd,   /* LoopEnd [MIXER-X]*/
     OGG_LoopLength,   /* LoopLength [MIXER-X]*/
     OGG_GetMetaTag,   /* GetMetaTag [MIXER-X]*/
-    OGG_GetUserTag,   /* GetUserTag [MIXER-X-snstruthers]*/
+    OGG_GetUserTag,   /* GetUserTag [MIXER-X]*/
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */

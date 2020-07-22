@@ -337,10 +337,8 @@ extern DECLSPEC const char *SDLCALL Mix_GetMusicCopyrightTag(const Mix_Music *mu
 /*
     Gets metadata from the given tag name if available
     returns NULL if this feature is not used for this music or not supported for some codec or
-    on error
-    the returned string must be freed using SDL_free after use
-    
-    This is an extension by snstruthers and is not avialable in the base SDL Mixer X library
+    on error.
+    the returned string must be freed using SDL_free after use.
 */
 extern DECLSPEC const char* SDLCALL Mix_GetMetaTag(const Mix_Music *music, const char* tag_name);
 

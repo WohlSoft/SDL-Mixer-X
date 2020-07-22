@@ -849,7 +849,7 @@ Mix_MusicInterface Mix_MusicInterface_FLAC =
     FLAC_LoopEnd,/* LoopEnd [MIXER-X]*/
     FLAC_LoopLength,/* LoopLength [MIXER-X]*/
     FLAC_GetMetaTag,/* GetMetaTag [MIXER-X]*/
-    FLAC_GetUserTag,/* GetUserTag [MIXER-X-snstruthers]*/
+    FLAC_GetUserTag,/* GetUserTag [MIXER-X]*/
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */

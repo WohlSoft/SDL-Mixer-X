@@ -609,7 +609,7 @@ Mix_MusicInterface Mix_MusicInterface_Opus =
     OPUS_LoopEnd, /* LoopEnd [MIXER-X]*/
     OPUS_LoopLength, /* LoopLength [MIXER-X]*/
     OPUS_GetMetaTag, /* GetMetaTag [MIXER-X]*/
-    OPUS_GetUserTag, /* GetUserTag [MIXER-X-snstruthers]*/
+    OPUS_GetUserTag, /* GetUserTag [MIXER-X]*/
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */

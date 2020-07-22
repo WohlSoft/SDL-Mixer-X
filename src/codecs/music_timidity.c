@@ -286,7 +286,7 @@ Mix_MusicInterface Mix_MusicInterface_TIMIDITY =
     NULL,   /* LoopEnd [MIXER-X]*/
     NULL,   /* LoopLength [MIXER-X]*/
     NULL,   /* GetMetaTag [MIXER-X]*/
-    NULL,   /* GetUserTag [MIXER-X-snstruthers]*/
+    NULL,   /* GetUserTag [MIXER-X]*/
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */

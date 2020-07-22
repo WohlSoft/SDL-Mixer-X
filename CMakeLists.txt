@@ -72,6 +72,8 @@ set(AUDIO_CODECS_INSTALL_PATH "" CACHE PATH "Path to installed AudioCodecs prefi
 
 option(USE_SYSTEM_SDL2   "Use SDL2 from system" OFF)
 
+option(ENABLE_METATAG_DEBUG_PRINTOUT    "Enables printout for meta tags when loading Mix_Music" OFF)
+
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     # Turn on warnings and legacy C/C++ standards to support more compilers
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wno-long-long -Wno-missing-field-initializers -std=c89")
@@ -198,6 +200,11 @@ endif()
 
 set(SDLMixerX_SOURCES)
 set(SDLMixerX_LINK_LIBS)
+
+if(ENABLE_METATAG_DEBUG_PRINTOUT)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DLOOP_DEBUG_PRINTOUT=1")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DLOOP_DEBUG_PRINTOUT=1")
+endif()
 
 include(music_wav)
 
