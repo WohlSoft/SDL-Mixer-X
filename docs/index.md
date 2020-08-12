@@ -50,7 +50,6 @@ and providing support for more supported audio formats.
   * one of these MP3 libraries on your choice:
     * [libmpg123](https://www.mpg123.de/)
     * libmad (working build with using of CMake is [here](https://github.com/WohlSoft/AudioCodecs/tree/master/libmad), original automake build is too old broken and unmodified since 2004'th year)
-    * Optionally, modified [ID3Tag-SDL](https://github.com/WohlSoft/AudioCodecs/tree/master/libid3tag-sdl) library for complete ID3 meta-tags support (for all formats, not only for MP3: some WAV files also using ID3 tags inside their chunks)
   * Tracker music modules
     * [XMP](https://github.com/cmatsuoka/libxmp)
     * [ModPlug](https://github.com/WohlSoft/AudioCodecs/tree/master/libmodplug)
