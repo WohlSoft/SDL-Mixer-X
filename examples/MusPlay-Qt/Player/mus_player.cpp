@@ -396,9 +396,9 @@ namespace PGE_MusicPlayer
     {
         if(!s_wavCtx)
             return;
+        Mix_SetPostMix(nullptr, nullptr);
         ctx_wave_close(s_wavCtx);
         s_wavCtx = nullptr;
-        Mix_SetPostMix(nullptr, nullptr);
     }
 
     bool isWavRecordingWorks()
