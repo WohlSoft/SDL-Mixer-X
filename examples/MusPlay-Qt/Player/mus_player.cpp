@@ -311,8 +311,7 @@ namespace PGE_MusicPlayer
         if(!s_playMus)
             return;
 
-        /* Record 20 seconds to wave file */
-        s_wavCtx = ctx_wave_open(44100, target.toLocal8Bit().data());
+        s_wavCtx = ctx_wave_open(g_sample_rate, target.toLocal8Bit().data());
         ctx_wave_enable_stereo(s_wavCtx);
         Mix_SetPostMix(myMusicPlayer, s_wavCtx);
     }
