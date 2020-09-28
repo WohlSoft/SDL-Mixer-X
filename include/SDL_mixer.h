@@ -208,7 +208,8 @@ typedef enum {
     ADLMIDI_VM_APOGEE_FIXED,
     ADLMIDI_VM_AIL,
     ADLMIDI_VM_9X_GENERIC_FM,
-    ADLMIDI_VM_HMI
+    ADLMIDI_VM_HMI,
+    ADLMIDI_VM_HMI_OLD
 } Mix_ADLMIDI_VolumeModel;
 
 /* OPL3 chip emulators for ADLMIDI */
