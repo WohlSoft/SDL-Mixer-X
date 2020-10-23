@@ -738,7 +738,8 @@ static int detect_mp3(Uint8 *magic, SDL_RWops *src, Sint64 start)
     SDL_memcpy(magic2, magic, 9);
 
     if (SDL_strncmp((char *)magic2, "ID3", 3) == 0 ||
-       (magic[0] == 0xFF && (magic[1] & 0xFE) == 0xFA)) {
+    /* see: https://bugzilla.libsdl.org/show_bug.cgi?id=5322 */
+       (magic[0] == 0xFF && (magic[1] & 0xE6) == 0xE2)) {
         SDL_RWseek(src, start, RW_SEEK_SET);
         return 1;
     }
