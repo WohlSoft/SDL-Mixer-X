@@ -24,6 +24,7 @@
 
 #ifdef MUSIC_CMD
 
+#include "SDL_stdinc.h"
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <stdio.h>
