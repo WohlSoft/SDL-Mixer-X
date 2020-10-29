@@ -24,7 +24,9 @@
 
 #ifdef MUSIC_CMD
 
-#include "SDL_stdinc.h"
+#ifdef __APPLE__
+#define _DARWIN_C_SOURCE
+#endif
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <stdio.h>
