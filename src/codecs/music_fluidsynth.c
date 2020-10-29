@@ -24,9 +24,8 @@
 
 #ifdef MUSIC_MID_FLUIDSYNTH
 
-#include <stdio.h>
-
 #include "SDL_loadso.h"
+#include "SDL_rwops.h"
 
 #include "music_fluidsynth.h"
 
@@ -132,11 +131,11 @@ typedef struct {
 
 static int SDLCALL fluidsynth_check_soundfont(const char *path, void *data)
 {
-    FILE *file = fopen(path, "r");
+    SDL_RWops *rw = SDL_RWFromFile(path, "rb");
 
     (void)data;
     if (file) {
-        fclose(file);
+        SDL_RWclose(file);
         return 1;
     } else {
         Mix_SetError("Failed to access the SoundFont %s", path);

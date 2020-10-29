@@ -385,7 +385,7 @@ static void read_update_buffer(struct mad_stream *stream, MAD_Music *music)
            them. */
         if (stream->next_frame != NULL) {
             remaining = (size_t)(stream->bufend - stream->next_frame);
-            memmove(music->input_buffer, stream->next_frame, remaining);
+            SDL_memmove(music->input_buffer, stream->next_frame, remaining);
             read_start = music->input_buffer + remaining;
             read_size = MAD_INPUT_BUFFER_SIZE - remaining;
 

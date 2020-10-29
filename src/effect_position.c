@@ -24,11 +24,6 @@
   effect callback API. They are meant for speed over quality.  :)
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "SDL.h"
 #include "SDL_endian.h"
 #include "SDL_mixer.h"
 #include "mixer.h"
