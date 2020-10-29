@@ -24,6 +24,7 @@
   effect callback API. They are meant for speed over quality.  :)
 */
 
+#include "SDL_stdinc.h"
 #include <stdio.h>
 #include <stdlib.h>
 

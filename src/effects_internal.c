@@ -26,6 +26,7 @@
 
 /* ------ These are used internally only. Don't touch. ------ */
 
+#include "SDL_stdinc.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "SDL_mixer.h"
