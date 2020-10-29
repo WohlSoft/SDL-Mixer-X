@@ -21,6 +21,7 @@
 
 /* This is Mac OS X only, using Core MIDI. */
 
+#include "SDL_stdinc.h"
 #include "SDL_config.h"
 
 #if __MACOSX__
