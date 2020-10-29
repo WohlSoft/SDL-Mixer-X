@@ -169,14 +169,14 @@ NativeMidiSong *native_midi_loadsong_RW(SDL_RWops *src, int freesrc)
     if (SDL_RWseek(src, 0, RW_SEEK_SET) < 0)
         goto fail;
 
-    buf = malloc(len);
+    buf = SDL_malloc(len);
     if (buf == NULL)
         goto fail;
 
     if (SDL_RWread(src, buf, len, 1) != 1)
         goto fail;
 
-    retval = malloc(sizeof(NativeMidiSong));
+    retval = SDL_malloc(sizeof(NativeMidiSong));
     if (retval == NULL)
         goto fail;
 
@@ -232,14 +232,14 @@ fail:
             DisposeMusicSequence(retval->sequence);
         if (retval->player)
             DisposeMusicPlayer(retval->player);
-        free(retval);
+        SDL_free(retval);
     }
 
     if (data)
         CFRelease(data);
 
     if (buf)
-        free(buf);
+        SDL_free(buf);
 
     return NULL;
 }
@@ -256,7 +256,7 @@ void native_midi_freesong(NativeMidiSong *song)
 
         DisposeMusicSequence(song->sequence);
         DisposeMusicPlayer(song->player);
-        free(song);
+        SDL_free(song);
     }
 }
 
