@@ -100,6 +100,6 @@ gcc playmus.c -o playmus -I/usr/local/include -L/usr/local/lib -Wl,-Bstatic -lSD
 ```
 
 # Documentation
-* [Full documentation](SDL_mixer_ext.html)
+* [Full documentation](https://wohlsoft.github.io/SDL-Mixer-X/SDL_mixer_ext.html)
 * [PGE-Wiki description page](http://wohlsoft.ru/pgewiki/SDL_Mixer_X)
 
