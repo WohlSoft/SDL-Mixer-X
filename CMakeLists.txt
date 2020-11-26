@@ -67,6 +67,7 @@ option(SDL_MIXER_X_STATIC   "Build static library of SDL Mixer X" ON)
 option(SDL_MIXER_X_SHARED   "Build shared library of SDL Mixer X" ${SDL_MIXER_X_SHARED_DEFAULT_ON})
 
 option(DOWNLOAD_AUDIO_CODECS_DEPENDENCY "Downloads and compiles AudioCodecs dependencies pack directly" OFF)
+option(AUDIO_CODECS_BUILD_LOCAL_SDL2 "Build SDL2 from local AudioCodecs' copy" OFF)
 set(AUDIO_CODECS_REPO_PATH "" CACHE PATH "Path to the AudioCodecs dependencies pack")
 set(AUDIO_CODECS_INSTALL_PATH "" CACHE PATH "Path to installed AudioCodecs prefix")
 
