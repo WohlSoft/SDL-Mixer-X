@@ -134,8 +134,8 @@ static int SDLCALL fluidsynth_check_soundfont(const char *path, void *data)
     SDL_RWops *rw = SDL_RWFromFile(path, "rb");
 
     (void)data;
-    if (file) {
-        SDL_RWclose(file);
+    if (rw) {
+        SDL_RWclose(rw);
         return 1;
     } else {
         Mix_SetError("Failed to access the SoundFont %s", path);
