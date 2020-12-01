@@ -1,6 +1,6 @@
 option(USE_MIDI_TIMIDITY   "Build with Timidity wave table MIDI sequencer support" ON)
 if(USE_MIDI_TIMIDITY)
-    message("== using Timidity-SDL ==")
+    message("== using Timidity-SDL (Artistic Public License) ==")
 
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
         set(TIMIDITYSDL_LIBRARIES timidity_sdl2)

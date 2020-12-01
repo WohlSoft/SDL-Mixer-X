@@ -26,7 +26,7 @@ if(USE_FLAC)
     endif()
 
     if(FLAC_FOUND)
-        message("== using FLAC ==")
+        message("== using FLAC (BSD 3-clause) ==")
         list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_FLAC -DFLAC__NO_DLL)
         if(NOT USE_SYSTEM_AUDIO_LIBRARIES OR NOT USE_FLAC_DYNAMIC)
             set(LIBOGG_NEEDED ON)

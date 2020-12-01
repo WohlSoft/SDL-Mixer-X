@@ -30,7 +30,7 @@ if(USE_OPUS)
     endif()
 
     if(Opus_FOUND)
-        message("== using Opus ==")
+        message("== using Opus (BSD 3-Clause) ==")
         list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_OPUS)
         if(NOT USE_SYSTEM_AUDIO_LIBRARIES OR NOT USE_OPUS_DYNAMIC)
             list(APPEND SDLMixerX_LINK_LIBS ${Opus_LIBRARIES} ${LIBOPUS_LIB})

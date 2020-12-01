@@ -44,7 +44,7 @@ if(USE_MODPLUG)
     endif()
 
     if(ModPlug_FOUND)
-        message("== using libModPlug ==")
+        message("== using libModPlug (Public Domain) ==")
         list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_MOD_MODPLUG -DMODPLUG_STATIC)
         if(USE_MODPLUG_STATIC)
             list(APPEND SDL_MIXER_DEFINITIONS)

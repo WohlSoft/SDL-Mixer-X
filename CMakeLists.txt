@@ -18,6 +18,7 @@ include(CheckCCompilerFlag)
 set(CMAKE_MODULE_PATH "${SDLMixerX_SOURCE_DIR}/cmake;${SDLMixerX_SOURCE_DIR}/cmake/find;${SDLMixerX_SOURCE_DIR}/src/codecs;${CMAKE_MODULE_PATH}")
 
 include(CppNeedCheck)
+include(WhichLicense)
 
 if(NOT CMAKE_VERSION VERSION_LESS 2.8.12)
     set(CMAKE_MACOSX_RPATH 0)
@@ -516,3 +517,4 @@ print_sumary("libADLMIDI" USE_MIDI_ADLMIDI ADLMIDI_FOUND ADLMIDI_LIBRARIES)
 print_sumary("libOPNMIDI" USE_MIDI_OPNMIDI OPNMIDI_FOUND OPNMIDI_LIBRARIES)
 print_sumary("FluidSynth" USE_MIDI_FLUIDSYNTH FluidSynth_FOUND FluidSynth_LIBRARIES)
 print_sumary("Timidity-SDL" USE_MIDI_TIMIDITY TIMIDITYSDL_FOUND TIMIDITYSDL_LIBRARIES)
+printLicense()
