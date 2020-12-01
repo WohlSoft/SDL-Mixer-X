@@ -36,7 +36,11 @@ typedef struct {
     gme_err_t (*gme_start_track)( Music_Emu*, int index);
     int (*gme_track_ended)( Music_Emu const*);
     void (*gme_set_tempo)(Music_Emu*, double tempo);
+#if GME_VERSION >= 0x000700
+    void (*gme_set_fade)(Music_Emu*, int start_msec, int fade_msec);
+#else
     void (*gme_set_fade)(Music_Emu*, int start_msec);
+#endif
     void (*gme_set_autoload_playback_limit)(Music_Emu*, int do_autoload_limit);
     gme_err_t (*gme_track_info)(Music_Emu const*, gme_info_t** out, int track);
     void (*gme_free_info)(gme_info_t*);
@@ -80,7 +84,11 @@ static int GME_Load(void)
         FUNCTION_LOADER(gme_start_track, gme_err_t (*)( Music_Emu*,int))
         FUNCTION_LOADER(gme_track_ended, int (*)( Music_Emu const*))
         FUNCTION_LOADER(gme_set_tempo, void (*)(Music_Emu*,double))
+#if GME_VERSION >= 0x000700
+        FUNCTION_LOADER(gme_set_fade, void (*)(Music_Emu*,int,int))
+#else
         FUNCTION_LOADER(gme_set_fade, void (*)(Music_Emu*,int))
+#endif
         FUNCTION_LOADER(gme_track_info, gme_err_t (*)(Music_Emu const*, gme_info_t**, int))
         FUNCTION_LOADER(gme_free_info, void (*)(gme_info_t*))
         FUNCTION_LOADER(gme_seek, gme_err_t (*)(Music_Emu*,int))
@@ -399,9 +407,15 @@ static void *GME_new_RW(struct SDL_RWops *src, int freesrc)
 static int GME_play(void *music_p, int play_count)
 {
     GME_Music *music = (GME_Music*)music_p;
+    int fade_start;
     if (music) {
         music->play_count = play_count;
-        gme.gme_set_fade(music->game_emu, play_count > 0 ? music->intro_length + (music->loop_length * play_count) : -1);
+        fade_start = play_count > 0 ? music->intro_length + (music->loop_length * play_count) : -1;
+#if GME_VERSION >= 0x000700
+        gme.gme_set_fade(music->game_emu, fade_start, 8000);
+#else
+        gme.gme_set_fade(music->game_emu, fade_start);
+#endif
         gme.gme_seek(music->game_emu, 0);
     }
     return 0;
