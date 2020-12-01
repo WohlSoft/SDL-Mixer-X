@@ -72,6 +72,13 @@ option(AUDIO_CODECS_BUILD_LOCAL_SDL2 "Build SDL2 from local AudioCodecs' copy" O
 set(AUDIO_CODECS_REPO_PATH "" CACHE PATH "Path to the AudioCodecs dependencies pack")
 set(AUDIO_CODECS_INSTALL_PATH "" CACHE PATH "Path to installed AudioCodecs prefix")
 
+option(SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE   "Disable all GPL/LGPL dependencies to make binary being licensed with ZLib license" OFF)
+option(SDL_MIXER_CLEAR_FOR_LGPL_LICENSE   "Disable all GPL dependencies to make binary being licensed with LGPL license" OFF)
+
+if(SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE AND SDL_MIXER_CLEAR_FOR_LGPL_LICENSE)
+    message(FATAL_ERROR "You shouldn't use SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE and SDL_MIXER_CLEAR_FOR_LGPL_LICENSE flags together!")
+endif()
+
 option(USE_SYSTEM_SDL2   "Use SDL2 from system" OFF)
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER_ID STREQUAL "Clang")

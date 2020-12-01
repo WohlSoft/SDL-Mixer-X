@@ -1,5 +1,5 @@
 option(USE_MIKMOD          "Build with MikMod library" OFF)
-if(USE_MIKMOD)
+if(USE_MIKMOD AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE)
     option(USE_MIKMOD_DYNAMIC "Use dynamical loading of MikMod" OFF)
 
     if(USE_SYSTEM_AUDIO_LIBRARIES)

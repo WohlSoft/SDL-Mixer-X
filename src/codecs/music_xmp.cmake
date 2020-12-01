@@ -1,5 +1,5 @@
 option(USE_XMP         "Build with XMP library" ON)
-if(USE_XMP)
+if(USE_XMP AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE)
     option(USE_XMP_DYNAMIC "Use dynamical loading of XMP library" OFF)
 
     if(USE_SYSTEM_AUDIO_LIBRARIES)

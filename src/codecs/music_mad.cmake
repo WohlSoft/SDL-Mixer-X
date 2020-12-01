@@ -1,7 +1,7 @@
 option(USE_MP3_MAD      "Build with MAD MP3 codec" ON)
 option(USE_MP3_MAD_GPL_DITHERING "Enable GPL-Licensed dithering functions for MAD library" OFF)
 
-if(USE_MP3_MAD)
+if(USE_MP3_MAD AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE AND NOT SDL_MIXER_CLEAR_FOR_LGPL_LICENSE)
     if(USE_SYSTEM_AUDIO_LIBRARIES)
         find_package(MAD QUIET)
         message("MAD: [${MAD_FOUND}] ${MAD_INCLUDE_DIRS} ${MAD_LIBRARIES}")

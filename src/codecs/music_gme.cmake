@@ -1,5 +1,5 @@
 option(USE_GME             "Build with Game Music Emulators library" ON)
-if(USE_GME)
+if(USE_GME AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE AND NOT SDL_MIXER_CLEAR_FOR_LGPL_LICENSE)
     option(USE_GME_DYNAMIC "Use dynamical loading of Game Music Emulators library" OFF)
 
     if(USE_SYSTEM_AUDIO_LIBRARIES)
