@@ -208,7 +208,7 @@ NativeMidiSong *native_midi_loadsong_RW(SDL_RWops *src, int freesrc)
     NativeMidiSong *newsong;
     MIDIEvent       *evntlist = NULL;
 
-    newsong=SDL_malloc(sizeof(NativeMidiSong));
+    newsong = SDL_malloc(sizeof(NativeMidiSong));
     if (!newsong) {
         return NULL;
     }
