@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.8.11)
+cmake_minimum_required (VERSION 2.8.12)
 project(SDLMixerMusPlayer)
 
 include(GNUInstallDirs)
@@ -6,6 +6,8 @@ include(NoPie)
 
 # Version
 include(version.cmake)
+
+set(CMAKE_CXX_STANDARD 11)
 
 # Tell CMake to run moc when necessary:
 set(CMAKE_AUTOMOC ON)
