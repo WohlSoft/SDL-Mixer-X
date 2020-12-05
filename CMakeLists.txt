@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.8.12)
-project(SDLMixerX C)
+project(SDLMixerX C CXX)
 
 set(SDLMixerX_VERSION_MAJOR 2)
 set(SDLMixerX_VERSION_MINOR 5)
@@ -240,6 +240,7 @@ if(USE_MIDI)
     include(music_midi_opn)
     include(music_timidity)
     include(music_fluidsynth)
+    include(music_nativemidi_alt_win32)
     include(music_nativemidi)
 
     if(NOT USE_MIDI_ADLMIDI AND

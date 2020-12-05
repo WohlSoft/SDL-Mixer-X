@@ -627,21 +627,27 @@ SDL_bool has_music(Mix_MusicType type)
 /*
     XMI and MUS are can be played on ADLMIDI or OPNMIDI only. Yet.
  */
-#if defined(MUSIC_MID_ADLMIDI) || defined(MUSIC_MID_OPNMIDI)
+#if defined(MUSIC_MID_ADLMIDI) || defined(MUSIC_MID_OPNMIDI) || defined(MUSIC_MID_NATIVE_ALT)
 static Mix_MusicType xmi_compatible_midi_player()
 {
+#if defined(MUSIC_MID_NATIVE_ALT)
+    if (mididevice_current == MIDI_Native) {
+        return MUS_MID;
+    }
+#endif
+
 #if defined(MUSIC_MID_ADLMIDI) && defined(MUSIC_MID_OPNMIDI)
-    if((mididevice_current != MIDI_ADLMIDI) && (mididevice_current != MIDI_OPNMIDI))
+    if ((mididevice_current != MIDI_ADLMIDI) && (mididevice_current != MIDI_OPNMIDI)) {
         return MUS_ADLMIDI;
-    else
+    } else
 #elif defined(MUSIC_MID_OPNMIDI)
-    if (mididevice_current != MIDI_OPNMIDI)
+    if (mididevice_current != MIDI_OPNMIDI) {
         return MIDI_OPNMIDI;
-    else
+    } else
 #elif defined(MUSIC_MID_ADLMIDI)
-    if (mididevice_current != MIDI_ADLMIDI)
+    if (mididevice_current != MIDI_ADLMIDI) {
         return MUS_ADLMIDI;
-    else
+    } else
 #endif
         return MUS_MID;
 }
@@ -854,7 +860,7 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
     if ((SDL_memcmp(magic, "RIFF", 4) == 0) && (SDL_memcmp(magic + 8, "RMID", 4) == 0)) {
         return MUS_MID;
     }
-#if defined(MUSIC_MID_ADLMIDI) || defined(MUSIC_MID_OPNMIDI)
+#if defined(MUSIC_MID_ADLMIDI) || defined(MUSIC_MID_OPNMIDI) || defined(MUSIC_MID_NATIVE_ALT)
     if (SDL_memcmp(magic, "MUS\x1A", 4) == 0) {
         return xmi_compatible_midi_player();
     }

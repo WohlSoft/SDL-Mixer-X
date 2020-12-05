@@ -6,7 +6,7 @@ else()
 endif()
 
 option(USE_MIDI_NATIVE     "Build with operating system native MIDI output support" ${NATIVE_MIDI_SUPPORTED})
-if(USE_MIDI_NATIVE)
+if(USE_MIDI_NATIVE AND NOT USE_MIDI_NATIVE_ALT)
     list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_MID_NATIVE)
     list(APPEND SDLMixerX_SOURCES
         ${CMAKE_CURRENT_LIST_DIR}/music_nativemidi.c
