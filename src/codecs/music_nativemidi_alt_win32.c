@@ -73,8 +73,7 @@ static int NativeMidiThread(void *context)
     /* Create an unnamed waitable timer.*/
     hTimer = CreateWaitableTimerW(NULL, TRUE, NULL);
     if (NULL == hTimer) {
-        fprintf(stderr, "CreateWaitableTimer failed (%lu)\n", (unsigned long)GetLastError());
-        fflush(stderr);
+        Mix_SetError("Native MIDI Win32-Alt: CreateWaitableTimer failed (%lu)\n", (unsigned long)GetLastError());
         return 1;
     }
 
@@ -101,12 +100,12 @@ static int NativeMidiThread(void *context)
         if ((t - w) > 0.0) {
             liDueTime.QuadPart = (LONGLONG)-((t - w) * 10000000.0);
             if (!SetWaitableTimer(hTimer, &liDueTime, 0, NULL, NULL, 0)) {
-                printf("SetWaitableTimer failed (%lu)\n", (unsigned long)GetLastError());
+                Mix_SetError("Native MIDI Win32-Alt: SetWaitableTimer failed (%lu)\n", (unsigned long)GetLastError());
                 return 2;
             }
 
             if (WaitForSingleObject(hTimer, INFINITE) != WAIT_OBJECT_0) {
-                printf("WaitForSingleObject failed (%lu)\n", (unsigned long)GetLastError());
+                Mix_SetError("Native MIDI Win32-Alt: WaitForSingleObject failed (%lu)\n", (unsigned long)GetLastError());
             }
         }
 
@@ -186,7 +185,7 @@ static void *NATIVEMIDI_CreateFromRW(SDL_RWops *src, int freesrc)
     if (filesize == 0) {
         SDL_free(bytes);
         NATIVEMIDI_Destroy(music);
-        Mix_SetError("ADL-MIDI: wrong file\n");
+        Mix_SetError("NativeMIDI: wrong file\n");
         return NULL;
     }
 
