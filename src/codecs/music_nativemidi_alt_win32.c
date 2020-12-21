@@ -53,6 +53,7 @@ typedef struct _NativeMidiSong
     HMIDIOUT out;
     double volumeFactor;
     int channelVolume[16];
+    HANDLE hTimer;
 
     Mix_MusicMetaTags tags;
 } NativeMidiSong;
@@ -171,8 +172,7 @@ static void rtPitchBend(void *userdata, uint8_t channel, uint8_t msb, uint8_t ls
 {
     NativeMidiSong *seqi = (NativeMidiSong*)(userdata);
     DWORD msg = 0;
-    msg |= ((int)(lsb) << 7) << 8;
-    msg |= ((int)(msb) & 127) << 16;
+    msg |= (((int)(msb) << 8) | (int)(lsb)) << 8;
     msg |= makeEvt(0x0E, channel);
     midiOutShortMsg(seqi->out, msg);
 }
@@ -278,16 +278,15 @@ int native_midi_detect(void)
 static int NativeMidiThread(void *context)
 {
     NativeMidiSong *music = (NativeMidiSong *)context;
-    HANDLE hTimer;
     LARGE_INTEGER liDueTime;
     int start, end;
-    double t = 0.0001, w;
+    double t = 0.0001, w, wait = -1.0;
 
     liDueTime.QuadPart = -10000000LL;
 
     /* Create an unnamed waitable timer.*/
-    hTimer = CreateWaitableTimerW(NULL, TRUE, NULL);
-    if (NULL == hTimer) {
+    music->hTimer = CreateWaitableTimerW(NULL, TRUE, NULL);
+    if (NULL == music->hTimer) {
         Mix_SetError("Native MIDI Win32-Alt: CreateWaitableTimer failed (%lu)\n", (unsigned long)GetLastError());
         return 1;
     }
@@ -310,16 +309,21 @@ static int NativeMidiThread(void *context)
         SDL_UnlockMutex(music->lock);
         end = SDL_GetTicks();
 
-        w = (double)(end - start) / 1000;
+        if (t > 0.01) {
+            t = 0.01;
+        }
 
-        if ((t - w) > 0.0) {
-            liDueTime.QuadPart = (LONGLONG)-((t - w) * 10000000.0);
-            if (!SetWaitableTimer(hTimer, &liDueTime, 0, NULL, NULL, 0)) {
+        w = (double)(end - start) / 1000;
+        wait = t - w;
+
+        if (wait > 0.0) {
+            liDueTime.QuadPart = (LONGLONG)-(wait * 10000000.0);
+            if (!SetWaitableTimer(music->hTimer, &liDueTime, 0, NULL, NULL, 0)) {
                 Mix_SetError("Native MIDI Win32-Alt: SetWaitableTimer failed (%lu)\n", (unsigned long)GetLastError());
                 return 2;
             }
 
-            if (WaitForSingleObject(hTimer, INFINITE) != WAIT_OBJECT_0) {
+            if (WaitForSingleObject(music->hTimer, INFINITE) != WAIT_OBJECT_0) {
                 Mix_SetError("Native MIDI Win32-Alt: WaitForSingleObject failed (%lu)\n", (unsigned long)GetLastError());
             }
         }
@@ -333,7 +337,8 @@ static int NativeMidiThread(void *context)
     SDL_AtomicSet(&music->running, 0);
 
     close_midi_out(music);
-    CloseHandle(hTimer);
+    CloseHandle(music->hTimer);
+    music->hTimer = NULL;
 
     return 0;
 }
@@ -531,6 +536,7 @@ static int NATIVEMIDI_Seek(void *context, double time)
 {
     NativeMidiSong *music = (NativeMidiSong *)context;
     SDL_LockMutex(music->lock);
+    all_notes_off(music);
     midi_seq_seek(music->song, time);
     SDL_UnlockMutex(music->lock);
     return 0;
