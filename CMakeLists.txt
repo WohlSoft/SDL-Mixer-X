@@ -243,6 +243,8 @@ if(USE_MIDI)
     include(music_nativemidi_alt_win32)
     include(music_nativemidi)
 
+    include(music_midi_seq)
+
     if(NOT USE_MIDI_ADLMIDI AND
        NOT USE_MIDI_OPNMIDI AND
        NOT USE_MIDI_TIMIDITY AND
