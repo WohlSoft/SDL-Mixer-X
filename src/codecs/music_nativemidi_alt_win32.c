@@ -28,8 +28,14 @@
 #include "SDL_mutex.h"
 #include "utils.h"
 #include "music_nativemidi.h"
-#include "midi_seq/win32_seq.h"
+#include "midi_seq/mix_midi_seq.h"
 #include <windows.h>
+
+
+static SDL_INLINE unsigned int makeEvt(Uint8 t, Uint8 channel)
+{
+    return ((t << 4) & 0xF0) | (channel & 0x0F);
+}
 
 typedef struct _NativeMidiSong
 {
@@ -42,9 +48,218 @@ typedef struct _NativeMidiSong
     double tempo;
     int loops;
     int volume;
+
+    BW_MidiRtInterface seq_if;
+    HMIDIOUT out;
+    double volumeFactor;
+    int channelVolume[16];
+
     Mix_MusicMetaTags tags;
 } NativeMidiSong;
 
+
+static void update_volume(NativeMidiSong *seq)
+{
+    DWORD msg;
+    Uint8 i, value;
+
+    if (!seq->out) {
+        return; /* Nothing to do*/
+    }
+
+    for (i = 0; i < 16; i++) {
+        value = (Uint8)(seq->channelVolume[i] * seq->volumeFactor);
+        msg = 0;
+        msg |= (value << 16) & 0xFF0000;
+        msg |= (7 << 8) & 0x00FF00;
+        msg |= makeEvt(0x0B, i);
+        midiOutShortMsg(seq->out, msg);
+    }
+}
+
+static void all_notes_off(NativeMidiSong *seq)
+{
+    DWORD msg = 0;
+    Uint8 channel, note;
+
+    if (!seq->out) {
+        return; /* Nothing to do */
+    }
+
+    for (channel = 0; channel < 16; channel++) {
+        for (note = 0; note < 127 ; note++) {
+            msg = 0;
+            msg |= (0 << 16) & 0xFF0000;
+            msg |= (note << 8) & 0x00FF00;
+            msg |= makeEvt(0x09, channel);
+            midiOutShortMsg(seq->out, msg);
+        }
+    }
+}
+
+
+
+/****************************************************
+ *           Real-Time MIDI calls proxies           *
+ ****************************************************/
+
+static void rtNoteOn(void *userdata, uint8_t channel, uint8_t note, uint8_t velocity)
+{
+    NativeMidiSong *seqi = (NativeMidiSong*)(userdata);
+    DWORD msg = 0;
+    msg |= (velocity << 16) & 0xFF0000;
+    msg |= (note << 8) & 0x00FF00;
+    msg |= makeEvt(0x09, channel);
+    midiOutShortMsg(seqi->out, msg);
+}
+
+static void rtNoteOff(void *userdata, uint8_t channel, uint8_t note)
+{
+    NativeMidiSong *seqi = (NativeMidiSong*)(userdata);
+    DWORD msg = 0;
+    msg |= (note << 8) & 0x00FF00;
+    msg |= makeEvt(0x08, channel);
+    midiOutShortMsg(seqi->out, msg);
+}
+
+static void rtNoteAfterTouch(void *userdata, uint8_t channel, uint8_t note, uint8_t atVal)
+{
+    NativeMidiSong *seqi = (NativeMidiSong*)(userdata);
+    DWORD msg = 0;
+    msg |= (atVal << 16) & 0xFF0000;
+    msg |= (note << 8) & 0x00FF00;
+    msg |= makeEvt(0x0A, channel);
+    midiOutShortMsg(seqi->out, msg);
+}
+
+static void rtChannelAfterTouch(void *userdata, uint8_t channel, uint8_t atVal)
+{
+    NativeMidiSong *seqi = (NativeMidiSong*)(userdata);
+    DWORD msg = 0;
+    msg |= (atVal << 8) & 0x00FF00;
+    msg |= makeEvt(0x0D, channel);
+    midiOutShortMsg(seqi->out, msg);
+}
+
+static void rtControllerChange(void *userdata, uint8_t channel, uint8_t type, uint8_t value)
+{
+    NativeMidiSong *seqi = (NativeMidiSong*)(userdata);
+    DWORD msg = 0;
+
+    if (type == 7) {
+        seqi->channelVolume[channel] = value;
+        if(seqi->volumeFactor < 1.0) /* Pseudo-volume */
+            value = (Uint8)(value * seqi->volumeFactor);
+    }
+
+    msg |= (value << 16) & 0xFF0000;
+    msg |= (type << 8) & 0x00FF00;
+    msg |= makeEvt(0x0B, channel);
+    midiOutShortMsg(seqi->out, msg);
+}
+
+static void rtPatchChange(void *userdata, uint8_t channel, uint8_t patch)
+{
+    NativeMidiSong *seqi = (NativeMidiSong*)(userdata);
+    DWORD msg = 0;
+    msg |= (patch << 8) & 0x00FF00;
+    msg |= makeEvt(0x0C, channel);
+    midiOutShortMsg(seqi->out, msg);
+}
+
+static void rtPitchBend(void *userdata, uint8_t channel, uint8_t msb, uint8_t lsb)
+{
+    NativeMidiSong *seqi = (NativeMidiSong*)(userdata);
+    DWORD msg = 0;
+    msg |= ((int)(lsb) << 7) << 8;
+    msg |= ((int)(msb) & 127) << 16;
+    msg |= makeEvt(0x0E, channel);
+    midiOutShortMsg(seqi->out, msg);
+}
+
+static void rtSysEx(void *userdata, const uint8_t *msg, size_t size)
+{
+    NativeMidiSong *seqi = (NativeMidiSong*)(userdata);
+    MIDIHDR hd;
+    hd.dwBufferLength = size;
+    hd.dwBytesRecorded = size;
+    hd.lpData = (LPSTR)msg;/*(LPSTR)malloc(size);
+    memcpy(hd.lpData, msg, size);*/
+    midiOutPrepareHeader(seqi->out, &hd, sizeof(hd));
+    midiOutLongMsg(seqi->out, &hd, sizeof(hd));
+}
+
+
+/* NonStandard calls */
+/*
+static void rtDeviceSwitch(void *userdata, size_t track, const char *data, size_t length)
+{
+
+}
+
+static size_t rtCurrentDevice(void *userdata, size_t track)
+{
+    return 0;
+}
+*/
+/* NonStandard calls End */
+
+
+static int init_midi_out(NativeMidiSong *seqi)
+{
+    Uint8 i;
+    MMRESULT err = midiOutOpen(&seqi->out, 0, 0, 0, CALLBACK_NULL);
+
+    if (err != MMSYSERR_NOERROR)
+    {
+        seqi->out = NULL;
+        return -1;
+    }
+
+    for(i = 0; i < 16; i++)
+        seqi->channelVolume[i] = 100;
+
+    update_volume(seqi);
+
+    return 0;
+}
+
+static void close_midi_out(NativeMidiSong *seqi)
+{
+    if(seqi->out)
+        midiOutClose(seqi->out);
+    seqi->out = NULL;
+}
+
+static void init_interface(NativeMidiSong *seqi)
+{
+    SDL_memset(&seqi->seq_if, 0, sizeof(BW_MidiRtInterface));
+
+    /* seq->onDebugMessage             = hooks.onDebugMessage; */
+    /* seq->onDebugMessage_userData    = hooks.onDebugMessage_userData; */
+
+    /* MIDI Real-Time calls */
+    seqi->seq_if.rtUserData = (void *)seqi;
+    seqi->seq_if.rt_noteOn  = rtNoteOn;
+    seqi->seq_if.rt_noteOff = rtNoteOff;
+    seqi->seq_if.rt_noteAfterTouch = rtNoteAfterTouch;
+    seqi->seq_if.rt_channelAfterTouch = rtChannelAfterTouch;
+    seqi->seq_if.rt_controllerChange = rtControllerChange;
+    seqi->seq_if.rt_patchChange = rtPatchChange;
+    seqi->seq_if.rt_pitchBend = rtPitchBend;
+    seqi->seq_if.rt_systemExclusive = rtSysEx;
+
+    /* NonStandard calls */
+    /*seqi->seq_if->rt_deviceSwitch = rtDeviceSwitch; */
+    /* seqi->seq_if->rt_currentDevice = rtCurrentDevice; */
+    /* NonStandard calls End */
+}
+
+static void win32_seq_set_volume(NativeMidiSong *seqi, double volume)
+{
+    seqi->volumeFactor = volume;
+    update_volume(seqi);
+}
 
 int native_midi_detect(void)
 {
@@ -77,21 +292,21 @@ static int NativeMidiThread(void *context)
         return 1;
     }
 
-    win32_seq_init_midi_out(music->song);
+    init_midi_out(music);
 
-    win32_seq_set_loop_enabled(music->song, music->loops < 0 ? 1 : 0);
-    win32_seq_set_tempo_multiplier(music->song, music->tempo);
+    midi_seq_set_loop_enabled(music->song, music->loops < 0 ? 1 : 0);
+    midi_seq_set_tempo_multiplier(music->song, music->tempo);
 
     SDL_AtomicSet(&music->running, 1);
 
     while (SDL_AtomicGet(&music->running)) {
         start = SDL_GetTicks();
         SDL_LockMutex(music->lock);
-        if (win32_seq_at_end(music->song)) {
+        if (midi_seq_at_end(music->song)) {
             SDL_UnlockMutex(music->lock);
             break;
         }
-        t = win32_seq_tick(music->song, t, 0.0001);
+        t = midi_seq_tick(music->song, t, 0.0001);
         SDL_UnlockMutex(music->lock);
         end = SDL_GetTicks();
 
@@ -117,7 +332,7 @@ static int NativeMidiThread(void *context)
 
     SDL_AtomicSet(&music->running, 0);
 
-    win32_seq_close_midi_out(music->song);
+    close_midi_out(music);
     CloseHandle(hTimer);
 
     return 0;
@@ -125,14 +340,21 @@ static int NativeMidiThread(void *context)
 
 static NativeMidiSong *NATIVEMIDI_Create()
 {
+    size_t i;
+
     NativeMidiSong *s = (NativeMidiSong*)SDL_calloc(1, sizeof(NativeMidiSong));
     if (s) {
         s->lock = SDL_CreateMutex();
         s->pause = SDL_CreateMutex();
         SDL_AtomicSet(&s->running, 0);
+        s->out = NULL;
         s->loops = 0;
         s->tempo = 1.0;
         s->volume = MIX_MAX_VOLUME;
+        s->volumeFactor = 1.0;
+        for (i = 0; i < 16; ++i) {
+            s->channelVolume[i] = 100;
+        }
     }
     return s;
 }
@@ -189,7 +411,8 @@ static void *NATIVEMIDI_CreateFromRW(SDL_RWops *src, int freesrc)
         return NULL;
     }
 
-    music->song = win32_seq_init_interface();
+    init_interface(music);
+    music->song = midi_seq_init_interface(&music->seq_if);
     if (!music->song) {
         SDL_OutOfMemory();
         NATIVEMIDI_Destroy(music);
@@ -197,8 +420,8 @@ static void *NATIVEMIDI_CreateFromRW(SDL_RWops *src, int freesrc)
     }
 
 
-    if (win32_seq_openData(music->song, bytes, filesize) < 0) {
-        Mix_SetError("NativeMIDI: %s", win32_seq_get_error(music->song));
+    if (midi_seq_openData(music->song, bytes, filesize) < 0) {
+        Mix_SetError("NativeMIDI: %s", midi_seq_get_error(music->song));
         NATIVEMIDI_Destroy(music);
         return NULL;
     }
@@ -208,8 +431,8 @@ static void *NATIVEMIDI_CreateFromRW(SDL_RWops *src, int freesrc)
     }
 
     meta_tags_init(&music->tags);
-    meta_tags_set_from_midi(&music->tags, MIX_META_TITLE, win32_seq_meta_title(music->song));
-    meta_tags_set_from_midi(&music->tags, MIX_META_COPYRIGHT, win32_seq_meta_copyright(music->song));
+    meta_tags_set_from_midi(&music->tags, MIX_META_TITLE, midi_seq_meta_title(music->song));
+    meta_tags_set_from_midi(&music->tags, MIX_META_COPYRIGHT, midi_seq_meta_copyright(music->song));
     return music;
 }
 
@@ -236,7 +459,7 @@ static void NATIVEMIDI_SetVolume(void *context, int volume)
     double vf = (double)volume / MIX_MAX_VOLUME;
     music->volume = volume;
     SDL_LockMutex(music->lock);
-    win32_seq_set_volume(music->song, vf);
+    win32_seq_set_volume(music, vf);
     SDL_UnlockMutex(music->lock);
 }
 
@@ -258,7 +481,7 @@ static void NATIVEMIDI_Pause(void *context)
     if (!music->paused) {
         SDL_LockMutex(music->pause);
         music->paused = SDL_TRUE;
-        win32_seq_all_notes_off(music->song);
+        all_notes_off(music);
     }
 }
 
@@ -291,7 +514,8 @@ static void NATIVEMIDI_Delete(void *context)
     NativeMidiSong *music = (NativeMidiSong *)context;
     NATIVEMIDI_Stop(music);
     if (music->song) {
-        win32_seq_free(music->song);
+        midi_seq_free(music->song);
+        music->song = NULL;
     }
     NATIVEMIDI_Destroy(music);
 }
@@ -307,7 +531,7 @@ static int NATIVEMIDI_Seek(void *context, double time)
 {
     NativeMidiSong *music = (NativeMidiSong *)context;
     SDL_LockMutex(music->lock);
-    win32_seq_seek(music->song, time);
+    midi_seq_seek(music->song, time);
     SDL_UnlockMutex(music->lock);
     return 0;
 }
@@ -318,7 +542,7 @@ static double NATIVEMIDI_Tell(void *context)
     double ret;
     if (music) {
         SDL_LockMutex(music->lock);
-        ret = win32_seq_tell(music->song);
+        ret = midi_seq_tell(music->song);
         SDL_UnlockMutex(music->lock);
         return ret;
     }
@@ -331,7 +555,7 @@ static double NATIVEMIDI_Duration(void *context)
     NativeMidiSong *music = (NativeMidiSong *)context;
     if (music) {
         SDL_LockMutex(music->lock);
-        ret = win32_seq_length(music->song);
+        ret = midi_seq_length(music->song);
         SDL_UnlockMutex(music->lock);
         return ret;
     }
@@ -343,7 +567,7 @@ static int NATIVEMIDI_SetTempo(void *context, double tempo)
     NativeMidiSong *music = (NativeMidiSong *)context;
     if (music && (tempo > 0.0)) {
         SDL_LockMutex(music->lock);
-        win32_seq_set_tempo_multiplier(music->song, tempo);
+        midi_seq_set_tempo_multiplier(music->song, tempo);
         SDL_UnlockMutex(music->lock);
         music->tempo = tempo;
         return 0;
@@ -367,7 +591,7 @@ static double NATIVEMIDI_LoopStart(void *context)
 
     if (music) {
         SDL_LockMutex(music->lock);
-        ret = win32_seq_loop_start(music->song);
+        ret = midi_seq_loop_start(music->song);
         SDL_UnlockMutex(music->lock);
         return ret;
     }
@@ -381,7 +605,7 @@ static double NATIVEMIDI_LoopEnd(void *context)
 
     if (music) {
         SDL_LockMutex(music->lock);
-        ret = win32_seq_loop_end(music->song);
+        ret = midi_seq_loop_end(music->song);
         SDL_UnlockMutex(music->lock);
         return ret;
     }
@@ -394,8 +618,8 @@ static double NATIVEMIDI_LoopLength(void *context)
     double start, end;
     if (music) {
         SDL_LockMutex(music->lock);
-        start = win32_seq_loop_start(music->song);
-        end = win32_seq_loop_end(music->song);
+        start = midi_seq_loop_start(music->song);
+        end = midi_seq_loop_end(music->song);
         SDL_UnlockMutex(music->lock);
         if (start >= 0 && end >= 0) {
             return (end - start);
