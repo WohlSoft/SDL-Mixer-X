@@ -706,6 +706,7 @@ static SDL_bool ParseFMT(WAV_Music *wave, Uint32 chunk_length)
                 break;
             default: goto unknown_length;
             }
+            break;
         case 32:
             switch(wave->encoding) {
             case PCM_CODE:   spec->format = AUDIO_S32; break;
