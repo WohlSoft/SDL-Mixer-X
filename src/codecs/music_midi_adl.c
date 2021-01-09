@@ -428,6 +428,7 @@ typedef struct
     SDL_AudioStream *stream;
     void *buffer;
     size_t buffer_size;
+    size_t buffer_samples;
     Mix_MusicMetaTags tags;
     struct ADLMIDI_AudioFormat sample_format;
 } AdlMIDI_Music;
@@ -559,7 +560,6 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
     long filesize = 0;
     int err = 0;
     Sint64 length = 0;
-    size_t bytes_l;
     unsigned char byte[1];
     AdlMIDI_Music *music = NULL;
     AdlMidi_Setup setup = adlmidi_setup;
@@ -619,7 +619,8 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
         return NULL;
     }
 
-    music->buffer_size = music_spec.samples * music->sample_format.containerSize * 2/*channels*/ * music_spec.channels;
+    music->buffer_samples = music_spec.samples * 2 /*channels*/;
+    music->buffer_size = music->buffer_samples * music->sample_format.containerSize;
     music->buffer = SDL_malloc(music->buffer_size);
     if (!music->buffer) {
         SDL_OutOfMemory();
@@ -643,7 +644,7 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
     }
 
     filesize = 0;
-    while ((bytes_l = SDL_RWread(src, &byte, sizeof(Uint8), 1)) != 0) {
+    while (SDL_RWread(src, &byte, sizeof(Uint8), 1) != 0) {
         ((Uint8 *)bytes)[filesize] = byte[0];
         filesize++;
     }
@@ -657,6 +658,7 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
 
     music->adlmidi = ADLMIDI.adl_init(music_spec.freq);
     if (!music->adlmidi) {
+        SDL_free(bytes);
         SDL_OutOfMemory();
         ADLMIDI_delete(music);
         return NULL;
@@ -752,13 +754,8 @@ static int ADLMIDI_playSome(void *context, void *data, int bytes, SDL_bool *done
         return 0;
     }
 
-    /* Align bytes length to correctly capture a stereo input */
-    if ((bytes % (int)music->sample_format.sampleOffset) != 0) {
-        bytes += ((int)music->sample_format.sampleOffset - (bytes % (int)music->sample_format.sampleOffset));
-    }
-
     gottenLen = ADLMIDI.adl_playFormat(music->adlmidi,
-                                      (bytes / (int)music->sample_format.containerSize),
+                                      music->buffer_samples,
                                       (ADL_UInt8*)music->buffer,
                                       (ADL_UInt8*)music->buffer + music->sample_format.containerSize,
                                       &music->sample_format);

@@ -130,7 +130,7 @@ namespace PGE_MusicPlayer
             return false;
         }
 
-        if(Mix_OpenAudio(rate, format, channels, 4096) == -1)
+        if(Mix_OpenAudio(rate, format, channels, 512) == -1)
         {
             error = QString("Failed to open audio stream: %1\n\n"
                             "Given spec:\n"

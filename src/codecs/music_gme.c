@@ -438,18 +438,13 @@ static int GME_GetSome(void *context, void *data, int bytes, SDL_bool *done)
         return 0;
     }
 
-    /* Align bytes length to correctly capture a stereo input */
-    if ((bytes % 4) != 0) {
-        bytes += (4 - (bytes % 4));
-    }
-
-    err = gme.gme_play(music->game_emu, (bytes / 2), (short*)music->buffer);
+    err = gme.gme_play(music->game_emu, (music->buffer_size / 2), (short*)music->buffer);
     if (err != NULL) {
         Mix_SetError("GAME-EMU: %s", err);
         return 0;
     }
 
-    if (SDL_AudioStreamPut(music->stream, music->buffer, bytes) < 0) {
+    if (SDL_AudioStreamPut(music->stream, music->buffer, music->buffer_size) < 0) {
         return -1;
     }
     return 0;
