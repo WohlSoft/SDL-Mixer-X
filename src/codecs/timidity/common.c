@@ -79,6 +79,7 @@ SDL_RWops *open_file(const char *name)
       }
   }
 
+
   /* Nothing could be opened. */
   SNDDBG(("Could not open %s\n", name));
   return 0;
