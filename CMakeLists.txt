@@ -302,6 +302,10 @@ if(APPLE)
     list(APPEND SDLMixerX_LINK_LIBS objc)
 endif()
 
+if(ANDROID AND USE_XMP AND NOT USE_XMP_DYNAMIC)
+    list(APPEND SDLMixerX_LINK_LIBS log)
+endif()
+
 # When statically linking some libraries, it's need to link  also
 if(STDCPP_NEEDED AND NOT MSVC)
     message("Note: ${STDCPP_LIBRARY} will be linked!")
