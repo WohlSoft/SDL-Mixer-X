@@ -47,6 +47,7 @@ extern int read_id3v2_from_mem(Mix_MusicMetaTags *out_tags, Uint8 *data, size_t 
 #endif
 
 #ifdef ENABLE_ALL_MP3_TAGS
+extern int MP3_RWinit(struct mp3file_t *fil, SDL_RWops *src);
 extern size_t MP3_RWread(struct mp3file_t *fil, void *ptr, size_t size, size_t maxnum);
 extern Sint64 MP3_RWseek(struct mp3file_t *fil, Sint64 offset, int whence);
 extern Sint64 MP3_RWtell(struct mp3file_t *fil);

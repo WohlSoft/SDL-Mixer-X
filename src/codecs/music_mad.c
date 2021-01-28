@@ -322,10 +322,12 @@ static void *MAD_CreateFromRW(SDL_RWops *src, int freesrc)
         SDL_OutOfMemory();
         return NULL;
     }
-    music->mp3file.src = src;
     music->volume = MIX_MAX_VOLUME;
 
-    music->mp3file.length = SDL_RWsize(src);
+    if (MP3_RWinit(&music->mp3file, src) < 0) {
+        SDL_free(music);
+        return NULL;
+    }
     meta_tags_init(&music->tags);
     if (mp3_read_tags(&music->tags, &music->mp3file, SDL_FALSE) < 0) {
         SDL_free(music);
