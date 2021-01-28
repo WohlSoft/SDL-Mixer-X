@@ -346,19 +346,19 @@ Mix_MusicInterface Mix_MusicInterface_MODPLUG =
     NULL,   /* CreateFromFile */
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     MODPLUG_SetVolume,
-    MODPLUG_GetVolume,   /* GetVolume [MIXER-X]*/
+    MODPLUG_GetVolume,
     MODPLUG_Play,
     NULL,   /* IsPlaying */
     MODPLUG_GetAudio,
     MODPLUG_Seek,
-    MODPLUG_Tell, /* Tell [MIXER-X]*/
+    MODPLUG_Tell,
     MODPLUG_Duration,
     NULL,   /* Set Tempo multiplier [MIXER-X] */
     NULL,   /* Get Tempo multiplier [MIXER-X] */
-    NULL,   /* LoopStart [MIXER-X]*/
-    NULL,   /* LoopEnd [MIXER-X]*/
-    NULL,   /* LoopLength [MIXER-X]*/
-    MODPLUG_GetMetaTag, /* GetMetaTag [MIXER-X]*/
+    NULL,   /* LoopStart */
+    NULL,   /* LoopEnd */
+    NULL,   /* LoopLength */
+    MODPLUG_GetMetaTag,
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */

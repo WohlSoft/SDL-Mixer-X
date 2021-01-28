@@ -579,19 +579,19 @@ Mix_MusicInterface Mix_MusicInterface_OGG =
     NULL,   /* CreateFromFile */
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     OGG_SetVolume,
-    OGG_GetVolume,   /* GetVolume [MIXER-X]*/
+    OGG_GetVolume,
     OGG_Play,
     NULL,   /* IsPlaying */
     OGG_GetAudio,
     OGG_Seek,
-    OGG_Tell,   /* Tell [MIXER-X]*/
+    OGG_Tell,
     OGG_Duration,
     NULL,   /* Set Tempo multiplier [MIXER-X] */
     NULL,   /* Get Tempo multiplier [MIXER-X] */
-    OGG_LoopStart,   /* LoopStart [MIXER-X]*/
-    OGG_LoopEnd,   /* LoopEnd [MIXER-X]*/
-    OGG_LoopLength,   /* LoopLength [MIXER-X]*/
-    OGG_GetMetaTag,   /* GetMetaTag [MIXER-X]*/
+    OGG_LoopStart,
+    OGG_LoopEnd,
+    OGG_LoopLength,
+    OGG_GetMetaTag,   /* GetMetaTag */
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */

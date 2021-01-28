@@ -47,7 +47,7 @@ typedef enum
 } Mix_MusicAPI;
 
 
-/* MIXER-X: Supported meta-tags */
+/* Supported meta-tags */
 
 typedef enum
 {
@@ -127,10 +127,10 @@ typedef struct
     /* Seek to a play position (in seconds) */
     int (*Seek)(void *music, double position);
 
-    /* MIXER-X: Tell a play position (in seconds) */
+    /* Tell a play position (in seconds) */
     double (*Tell)(void *music);
 
-    /* MIXER-X: Get Music duration (in seconds) */
+    /* Get Music duration (in seconds) */
     double (*Duration)(void *music);
 
     /* MIXER-X: Set a tempo multiplier */
@@ -139,16 +139,16 @@ typedef struct
     /* MIXER-X: Get a current tempo multiplier */
     double (*GetTempo)(void *music);
 
-    /* MIXER-X: Tell a loop start position (in seconds) */
+    /* Tell a loop start position (in seconds) */
     double (*LoopStart)(void *music);
 
-    /* MIXER-X: Tell a loop end position (in seconds) */
+    /* Tell a loop end position (in seconds) */
     double (*LoopEnd)(void *music);
 
-    /* MIXER-X: Tell a loop length position (in seconds) */
+    /* Tell a loop length position (in seconds) */
     double (*LoopLength)(void *music);
 
-    /* MIXER-X: Get a meta-tag string if available */
+    /* Get a meta-tag string if available */
     const char* (*GetMetaTag)(void *music, Mix_MusicMetaTag tag_type);
 
     /* Pause playing music */

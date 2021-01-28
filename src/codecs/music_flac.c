@@ -1,6 +1,6 @@
 /*
   SDL_mixer:  An audio mixer library based on the SDL library
-  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2021 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -787,19 +787,19 @@ Mix_MusicInterface Mix_MusicInterface_FLAC =
     NULL,   /* CreateFromFile */
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     FLAC_SetVolume,
-    FLAC_GetVolume,   /* GetVolume [MIXER-X]*/
+    FLAC_GetVolume,
     FLAC_Play,
     NULL,   /* IsPlaying */
     FLAC_GetAudio,
     FLAC_Seek,
-    FLAC_Tell,/* Tell [MIXER-X]*/
+    FLAC_Tell,
     FLAC_Duration,
     NULL,   /* Set Tempo multiplier [MIXER-X] */
     NULL,   /* Get Tempo multiplier [MIXER-X] */
-    FLAC_LoopStart,/* LoopStart [MIXER-X]*/
-    FLAC_LoopEnd,/* LoopEnd [MIXER-X]*/
-    FLAC_LoopLength,/* LoopLength [MIXER-X]*/
-    FLAC_GetMetaTag,/* GetMetaTag [MIXER-X]*/
+    FLAC_LoopStart,
+    FLAC_LoopEnd,
+    FLAC_LoopLength,
+    FLAC_GetMetaTag,/* GetMetaTag */
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */
