@@ -35,6 +35,7 @@ if(USE_OPUS)
         if(NOT USE_SYSTEM_AUDIO_LIBRARIES OR NOT USE_OPUS_DYNAMIC)
             list(APPEND SDLMixerX_LINK_LIBS ${Opus_LIBRARIES} ${LIBOPUS_LIB})
             set(LIBOGG_NEEDED ON)
+            set(LIBMATH_NEEDED ON)
         endif()
         list(APPEND SDL_MIXER_INCLUDE_PATHS ${Opus_INCLUDE_DIRS})
         list(APPEND SDLMixerX_SOURCES

@@ -201,6 +201,7 @@ int SDLCALLCC Mix_ADLMIDI_getTotalBanks()
 
 const char *const * SDLCALLCC Mix_ADLMIDI_getBankNames()
 {
+    static const char *const empty[] = {"<no instruments>", NULL};
 #ifdef MUSIC_MID_ADLMIDI
     /* Calling of this static call requires pre-loaindg of the library */
     if (ADLMIDI.loaded == 0) {
@@ -210,7 +211,7 @@ const char *const * SDLCALLCC Mix_ADLMIDI_getBankNames()
         return ADLMIDI.adl_getBankNames();
     }
 #endif
-    return NULL;
+    return empty;
 }
 
 int SDLCALLCC Mix_ADLMIDI_getBankID()

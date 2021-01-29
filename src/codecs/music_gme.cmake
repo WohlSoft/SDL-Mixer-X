@@ -39,6 +39,7 @@ if(USE_GME AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE AND NOT SDL_MIXER_CLEAR_FOR_
         set(GME_LIBRARIES ${LIBGME_LIB} ${LIBZLIB_LIB})
         set(GME_FOUND 1)
         set(STDCPP_NEEDED 1) # Statically linking GME which is C++ library
+        set(LIBMATH_NEEDED 1)
         set(GME_HAS_SET_AUTOLOAD_PLAYBACK_LIMIT TRUE)
         set(GME_INCLUDE_DIRS
             ${AUDIO_CODECS_INSTALL_PATH}/include/gme
