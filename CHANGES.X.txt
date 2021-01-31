@@ -7,10 +7,10 @@ Vitaly Novichkov - 2021-01-09 21:56:39
 Vitaly Novichkov - 2020-12-21
  * Added an alternative Native MIDI backend for Windows platform:
    it allows to change position, allows reporting the current position, allows
-   loop points like libADLMIDI and libOPNMIDI can, added a volume workaround to
-   prevent the volume changing of entire application.
+   loop points like libADLMIDI and libOPNMIDI can add a volume workaround to
+   prevent the volume changing of the entire application.
 Vitaly Novichkov - 2019-12-17
- * Added an ability to require specific loop counts for GME songs which supports that
+ * Added an ability to require specific loop counts for GME songs which support that
  * Fixed an incorrect MPG123 seek when sample rates of stream and file aren't match
  * Added an ability to change Timidity config on the fly
  * Renamed Mix_GetMusicTotalTime() into Mix_MusicDuration()
@@ -35,7 +35,7 @@ Vitaly Novichkov - 2019-02-24
 
 2.4.0:
 Vitaly Novichkov - 2019
- * DosBox OPL3 emulator will be used by default on libADLMIDI for performance
+ * DOSBox OPL3 emulator will be used by default on libADLMIDI for performance
  * Support for both FluidSynth 1 or 2 when detected any of them
  * Fixed some build configurations and system-wide codecs detection
  * Fixed inability to play some weird AIFF files
@@ -43,9 +43,9 @@ Vitaly Novichkov - 2019
 
 2.3.0:
 Vitaly Novichkov - 2018-11-26
-* Replace volume formula for GME, libADLMIDI and libOPNMIDI
-* New API: Added full-panning stereo support of libADLMIDI and libOPNMIDI
-* New API: Added Neko Project II Kai emulator enum for libOPNMIDI
+ * Replace volume formula for GME, libADLMIDI, and libOPNMIDI
+ * New API: Added full-panning stereo support of libADLMIDI and libOPNMIDI
+ * New API: Added Neko Project II Kai emulator enum for libOPNMIDI
 
 2.2.1:
 Vitaly Novichkov - 2018
