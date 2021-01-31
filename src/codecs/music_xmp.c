@@ -124,7 +124,6 @@ typedef struct
     struct xmp_module_info mi;
     struct xmp_frame_info fi;
     xmp_context ctx;
-    int has_module;
     SDL_AudioStream *stream;
     void *buffer;
     int buffer_size;
@@ -214,14 +213,13 @@ void *XMP_CreateFromRW(SDL_RWops *src, int freesrc)
     }
 
     music->volume = MIX_MAX_VOLUME;
+    music->tempo = 1.0;
+
     music->stream = SDL_NewAudioStream(AUDIO_S16, 2, music_spec.freq,
                                        music_spec.format, music_spec.channels, music_spec.freq);
     if (!music->stream) {
         goto e3;
     }
-
-    music->has_module = 1;
-    music->tempo = 1.0;
 
     meta_tags_init(&music->tags);
     libxmp.xmp_get_module_info(music->ctx, &music->mi);
