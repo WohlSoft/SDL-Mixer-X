@@ -1,6 +1,6 @@
 /*
   SDL_mixer:  An audio mixer library based on the SDL library
-  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2021 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -25,7 +25,11 @@
 
 #include "music_xmp.h"
 
+#ifdef LIBXMP_HEADER
+#include LIBXMP_HEADER
+#else
 #include <xmp.h>
+#endif
 
 typedef struct {
     int loaded;
@@ -34,6 +38,7 @@ typedef struct {
     xmp_context (*xmp_create_context)(void);
     int (*xmp_load_module_from_memory)(xmp_context, void *, long);
     int (*xmp_start_player)(xmp_context, int, int);
+    void (*xmp_end_player)(xmp_context);
     void (*xmp_get_module_info)(xmp_context, struct xmp_module_info *);
     int (*xmp_play_buffer)(xmp_context, void *, int, int);
     int (*xmp_seek_time)(xmp_context, int);
@@ -44,42 +49,43 @@ typedef struct {
     int (*xmp_set_tempo_factor)(xmp_context, double);
 } xmp_loader;
 
-static xmp_loader xmp = {
+static xmp_loader libxmp = {
     0, NULL
 };
 
 #ifdef XMP_DYNAMIC
 #define FUNCTION_LOADER(FUNC, SIG) \
-    xmp.FUNC = (SIG) SDL_LoadFunction(xmp.handle, #FUNC); \
-    if (xmp.FUNC == NULL) { SDL_UnloadObject(xmp.handle); return -1; }
+    libxmp.FUNC = (SIG) SDL_LoadFunction(libxmp.handle, #FUNC); \
+    if (libxmp.FUNC == NULL) { SDL_UnloadObject(libxmp.handle); return -1; }
 #define FUNCTION_LOADER_OPTIONAL(FUNC, SIG) \
-    xmp.FUNC = (SIG) SDL_LoadFunction(xmp.handle, #FUNC);
+    libxmp.FUNC = (SIG) SDL_LoadFunction(libxmp.handle, #FUNC);
 #else
 #define FUNCTION_LOADER(FUNC, SIG) \
-    xmp.FUNC = FUNC;
+    libxmp.FUNC = FUNC;
 #define FUNCTION_LOADER_OPTIONAL(FUNC, SIG) \
-    xmp.FUNC = FUNC;
+    libxmp.FUNC = FUNC;
 #endif
 
 static int XMP_Load(void)
 {
-    if (xmp.loaded == 0) {
+    if (libxmp.loaded == 0) {
 #ifdef XMP_DYNAMIC
-        xmp.handle = SDL_LoadObject(XMP_DYNAMIC);
-        if (xmp.handle == NULL) {
+        libxmp.handle = SDL_LoadObject(XMP_DYNAMIC);
+        if (libxmp.handle == NULL) {
             return -1;
         }
 #elif defined(__MACOSX__)
         extern xmp_context xmp_create_context(void) __attribute__((weak_import));
         if (xmp_create_context == NULL) {
             /* Missing weakly linked framework */
-            Mix_SetError("Missing XMP.framework");
+            Mix_SetError("Missing xmp.framework");
             return -1;
         }
 #endif
         FUNCTION_LOADER(xmp_create_context, xmp_context(*)(void))
         FUNCTION_LOADER(xmp_load_module_from_memory, int(*)(xmp_context,void *,long))
         FUNCTION_LOADER(xmp_start_player, int(*)(xmp_context,int,int))
+        FUNCTION_LOADER(xmp_end_player, void(*)(xmp_context))
         FUNCTION_LOADER(xmp_get_module_info, void(*)(xmp_context,struct xmp_module_info*))
         FUNCTION_LOADER(xmp_play_buffer, int(*)(xmp_context,void*,int,int))
         FUNCTION_LOADER(xmp_seek_time, int(*)(xmp_context,int))
@@ -91,22 +97,22 @@ static int XMP_Load(void)
         FUNCTION_LOADER_OPTIONAL(xmp_set_tempo_factor, int(*)(xmp_context, double))
 #endif
     }
-    ++xmp.loaded;
+    ++libxmp.loaded;
 
     return 0;
 }
 
 static void XMP_Unload(void)
 {
-    if (xmp.loaded == 0) {
+    if (libxmp.loaded == 0) {
         return;
     }
-    if (xmp.loaded == 1) {
+    if (libxmp.loaded == 1) {
 #ifdef XMP_DYNAMIC
-        SDL_UnloadObject(xmp.handle);
+        SDL_UnloadObject(libxmp.handle);
 #endif
     }
-    --xmp.loaded;
+    --libxmp.loaded;
 }
 
 
@@ -126,16 +132,48 @@ typedef struct
 } XMP_Music;
 
 
-static int XMP_Seek(void *context, double position);
-static void XMP_Delete(void *context);
+static int XMP_Seek(void *ctx, double pos);
+static void XMP_Delete(void *ctx);
 
-/* Load a modplug stream from an SDL_RWops object */
+static void libxmp_set_error(int e)
+{
+    const char *msg;
+    switch (e) {
+    case -XMP_ERROR_INTERNAL:
+        msg = "Internal error in libxmp";
+        break;
+    case -XMP_ERROR_FORMAT:
+        msg = "Unrecognized file format";
+        break;
+    case -XMP_ERROR_LOAD:
+        msg = "Error loading file";
+        break;
+    case -XMP_ERROR_DEPACK:
+        msg = "Error depacking file";
+        break;
+    case -XMP_ERROR_SYSTEM:
+        msg = "System error in libxmp";
+        break;
+    case -XMP_ERROR_INVALID:
+        msg = "Invalid parameter";
+        break;
+    case -XMP_ERROR_STATE:
+        msg = "Invalid player state";
+        break;
+    default:
+        msg = "Unknown error";
+        break;
+    }
+    Mix_SetError("XMP: %s", msg);
+}
+
+/* Load a libxmp stream from an SDL_RWops object */
 void *XMP_CreateFromRW(SDL_RWops *src, int freesrc)
 {
     XMP_Music *music;
-    void *buffer;
+    void *mem;
     size_t size;
-    int error;
+    int err;
 
     music = (XMP_Music *)SDL_calloc(1, sizeof(*music));
     if (!music) {
@@ -143,82 +181,50 @@ void *XMP_CreateFromRW(SDL_RWops *src, int freesrc)
         return NULL;
     }
 
-    music->ctx = NULL;
-    music->has_module = SDL_FALSE;
-
-    music->volume = MIX_MAX_VOLUME;
-    music->tempo = 1.0;
-
-    music->stream = SDL_NewAudioStream(AUDIO_S16, 2, music_spec.freq,
-                                       music_spec.format, music_spec.channels, music_spec.freq);
-    if (!music->stream) {
-        XMP_Delete(music);
-        return NULL;
-    }
-
-    music->ctx = xmp.xmp_create_context();
+    music->ctx = libxmp.xmp_create_context();
     if (!music->ctx) {
-        XMP_Delete(music);
-        return NULL;
+        SDL_OutOfMemory();
+        goto e0;
     }
 
     music->buffer_size = music_spec.samples * 2 * 2;
     music->buffer = SDL_malloc((size_t)music->buffer_size);
     if (!music->buffer) {
         SDL_OutOfMemory();
-        XMP_Delete(music);
-        return NULL;
+        goto e1;
     }
 
-    buffer = SDL_LoadFile_RW(src, &size, SDL_FALSE);
-    if (buffer) {
-        error = xmp.xmp_load_module_from_memory(music->ctx, buffer, (long)size);
-        SDL_free(buffer);
-        if (error < 0) {
-            switch(error) {
-            case -XMP_ERROR_FORMAT:
-                Mix_SetError("xmp_load_module: Unsupported file format");
-                break;
-            case -XMP_ERROR_LOAD:
-                Mix_SetError("xmp_load_module: Error loading file");
-                break;
-            case -XMP_ERROR_SYSTEM:
-                Mix_SetError("xmp_load_module: System error has occured");
-                break;
-            default:
-                Mix_SetError("xmp_load_module: Can't load file");
-                break;
-            }
-            XMP_Delete(music);
-            return NULL;
+    mem = SDL_LoadFile_RW(src, &size, SDL_FALSE);
+    if (mem) {
+        err = libxmp.xmp_load_module_from_memory(music->ctx, mem, (long)size);
+        SDL_free(mem);
+        if (err < 0) {
+            libxmp_set_error(err);
+            goto e1;
         }
+    } else {
+        SDL_OutOfMemory();
+        goto e1;
     }
 
-    error = xmp.xmp_start_player(music->ctx, music_spec.freq, 0);
-    if (error < 0) {
-        switch(error) {
-        case -XMP_ERROR_INVALID:
-            Mix_SetError("xmp_start_player: Invalid parameter");
-            break;
-        case -XMP_ERROR_STATE:
-            Mix_SetError("xmp_start_player: Bad state");
-            break;
-        case -XMP_ERROR_SYSTEM:
-            Mix_SetError("xmp_start_player: System error has occured");
-            break;
-        case -XMP_ERROR_INTERNAL:
-        default:
-            Mix_SetError("xmp_start_player: Can't start player");
-            break;
-        }
-        XMP_Delete(music);
-        return NULL;
+    err = libxmp.xmp_start_player(music->ctx, music_spec.freq, 0);
+    if (err < 0) {
+        libxmp_set_error(err);
+        goto e2;
     }
 
-    music->has_module = SDL_TRUE;
+    music->volume = MIX_MAX_VOLUME;
+    music->stream = SDL_NewAudioStream(AUDIO_S16, 2, music_spec.freq,
+                                       music_spec.format, music_spec.channels, music_spec.freq);
+    if (!music->stream) {
+        goto e3;
+    }
+
+    music->has_module = 1;
+    music->tempo = 1.0;
 
     meta_tags_init(&music->tags);
-    xmp.xmp_get_module_info(music->ctx, &music->mi);
+    libxmp.xmp_get_module_info(music->ctx, &music->mi);
     if (music->mi.comment) {
         meta_tags_set(&music->tags, MIX_META_TITLE, music->mi.comment);
     }
@@ -227,31 +233,36 @@ void *XMP_CreateFromRW(SDL_RWops *src, int freesrc)
         SDL_RWclose(src);
     }
     return music;
+e3: libxmp.xmp_end_player(music->ctx);
+e2: libxmp.xmp_release_module(music->ctx);
+e1: libxmp.xmp_free_context(music->ctx);
+e0: SDL_free(music->buffer); SDL_free(music);
+    return NULL;
 }
 
-/* Set the volume for a modplug stream */
+/* Set the volume for a libxmp stream */
 static void XMP_SetVolume(void *context, int volume)
 {
     XMP_Music *music = (XMP_Music *)context;
     music->volume = volume;
 }
 
-/* Get the volume for a modplug stream */
+/* Get the volume for a libxmp stream */
 static int XMP_GetVolume(void *context)
 {
     XMP_Music *music = (XMP_Music *)context;
     return music->volume;
 }
 
-/* Start playback of a given modplug stream */
+/* Start playback of a given libxmp stream */
 static int XMP_Play(void *context, int play_count)
 {
     XMP_Music *music = (XMP_Music *)context;
     music->play_count = play_count;
-    return XMP_Seek(music, 0.0);
+    return XMP_Seek(music, 0);
 }
 
-/* Play some of a stream previously started with modplug_play() */
+/* Play some of a stream previously started with xmp_play() */
 static int XMP_GetSome(void *context, void *data, int bytes, SDL_bool *done)
 {
     XMP_Music *music = (XMP_Music *)context;
@@ -268,7 +279,11 @@ static int XMP_GetSome(void *context, void *data, int bytes, SDL_bool *done)
         return 0;
     }
 
-    ret = xmp.xmp_play_buffer(music->ctx, music->buffer, music->buffer_size, music->play_count < 0 ? -1 : 0);
+    /* if the data write is partial, rest of the buffer will be zero-filled.
+     * the loop param is the max number that the current sequence of song
+     * will be looped, or 0 to disable loop checking:  0 for play_count < 0
+     * for an endless loop, or 1 for our own loop checks to do their job. */
+    ret = libxmp.xmp_play_buffer(music->ctx, music->buffer, music->buffer_size, (music->play_count > 0));
     amount = music->buffer_size;
 
     if (ret == 0) {
@@ -276,6 +291,9 @@ static int XMP_GetSome(void *context, void *data, int bytes, SDL_bool *done)
             return -1;
         }
     } else {
+        if (ret != -XMP_END) {
+            return -1;
+        }
         if (music->play_count == 1) {
             music->play_count = 0;
             SDL_AudioStreamFlush(music->stream);
@@ -298,53 +316,53 @@ static int XMP_GetAudio(void *context, void *data, int bytes)
 }
 
 /* Jump (seek) to a given position */
-static int XMP_Seek(void *context, double position)
+static int XMP_Seek(void *context, double pos)
 {
     XMP_Music *music = (XMP_Music *)context;
-    xmp.xmp_seek_time(music->ctx, (int)(position * 1000));
-    xmp.xmp_play_buffer(music->ctx, NULL, 2, 0);
+    libxmp.xmp_seek_time(music->ctx, (int)(pos * 1000));
+    libxmp.xmp_play_buffer(music->ctx, NULL, 0, 0); /* reset internal state. */
     return 0;
 }
 
 static double XMP_Tell(void *context)
 {
     XMP_Music *music = (XMP_Music *)context;
-    xmp.xmp_get_frame_info(music->ctx, &music->fi);
-    return ((double)music->fi.time) / 1000.0;
+    libxmp.xmp_get_frame_info(music->ctx, &music->fi);
+    return music->fi.time / 1000.0;
 }
 
 static double XMP_Duration(void *context)
 {
     XMP_Music *music = (XMP_Music *)context;
-    xmp.xmp_get_frame_info(music->ctx, &music->fi);
-    return ((double)music->fi.total_time) / 1000.0;
+    libxmp.xmp_get_frame_info(music->ctx, &music->fi);
+    return music->fi.total_time / 1000.0;
 }
 
-static int XMP_SetTempo(void *music_p, double tempo)
+static int XMP_SetTempo(void *context, double tempo)
 {
 #if XMP_VER_MAJOR > 4 || (XMP_VER_MAJOR == 4 && XMP_VER_MINOR >= 5)
-    XMP_Music *music = (XMP_Music *)music_p;
-    if (xmp.xmp_set_tempo_factor && music && (tempo > 0.0)) {
-        xmp.xmp_set_tempo_factor(music->ctx, (1.0 / tempo));
+    XMP_Music *music = (XMP_Music *)context;
+    if (libxmp.xmp_set_tempo_factor && music && (tempo > 0.0)) {
+        libxmp.xmp_set_tempo_factor(music->ctx, (1.0 / tempo));
         music->tempo = tempo;
         return 0;
     }
 #else
-    (void)music_p;
+    (void)context;
     (void)tempo;
 #endif
     return -1;
 }
 
-static double XMP_GetTempo(void *music_p)
+static double XMP_GetTempo(void *context)
 {
 #if XMP_VER_MAJOR > 4 || (XMP_VER_MAJOR == 4 && XMP_VER_MINOR >= 5)
-    XMP_Music *music = (XMP_Music *)music_p;
+    XMP_Music *music = (XMP_Music *)context;
     if (music) {
         return music->tempo;
     }
 #else
-    (void)music_p;
+    (void)context;
 #endif
     return -1.0;
 }
@@ -355,17 +373,16 @@ static const char* XMP_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
     return meta_tags_get(&music->tags, tag_type);
 }
 
-/* Close the given modplug stream */
+/* Close the given libxmp stream */
 static void XMP_Delete(void *context)
 {
     XMP_Music *music = (XMP_Music *)context;
     meta_tags_clear(&music->tags);
     if (music->ctx) {
-        if (music->has_module) {
-            xmp.xmp_stop_module(music->ctx);
-            xmp.xmp_release_module(music->ctx);
-        }
-        xmp.xmp_free_context(music->ctx);
+        libxmp.xmp_stop_module(music->ctx);
+        libxmp.xmp_end_player(music->ctx);
+        libxmp.xmp_release_module(music->ctx);
+        libxmp.xmp_free_context(music->ctx);
     }
     if (music->stream) {
         SDL_FreeAudioStream(music->stream);
@@ -376,34 +393,34 @@ static void XMP_Delete(void *context)
     SDL_free(music);
 }
 
-Mix_MusicInterface Mix_MusicInterface_LIBXMP =
+Mix_MusicInterface Mix_MusicInterface_XMP =
 {
-    "LIBXMP",
+    "XMP",
     MIX_MUSIC_LIBXMP,
     MUS_MOD,
     SDL_FALSE,
     SDL_FALSE,
 
     XMP_Load,
-    NULL, /* Open */
+    NULL,   /* Open */
     XMP_CreateFromRW,
     NULL,   /* CreateFromRWex [MIXER-X]*/
     NULL,   /* CreateFromFile */
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     XMP_SetVolume,
-    XMP_GetVolume,   /* GetVolume [MIXER-X]*/
+    XMP_GetVolume,
     XMP_Play,
     NULL,   /* IsPlaying */
     XMP_GetAudio,
     XMP_Seek,
-    XMP_Tell, /* Tell [MIXER-X]*/
+    XMP_Tell,
     XMP_Duration,
     XMP_SetTempo,   /* Set Tempo multiplier [MIXER-X] */
     XMP_GetTempo,   /* Get Tempo multiplier [MIXER-X] */
-    NULL,   /* LoopStart [MIXER-X] */
-    NULL,   /* LoopEnd [MIXER-X] */
-    NULL,   /* LoopLength [MIXER-X]*/
-    XMP_GetMetaTag, /* GetMetaTag [MIXER-X]*/
+    NULL,   /* LoopStart */
+    NULL,   /* LoopEnd */
+    NULL,   /* LoopLength */
+    XMP_GetMetaTag,
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */
