@@ -1,27 +1,37 @@
 2.5.0:
-Vitaly Novichkov - 2019-02-24
- * Added more OPL/OPN emulators enum fields for libADLMIDI and libOPNMIDI
-Vitaly Novichkov - 2019-03-10
- * Added support for libXMP tracker module music player library
-Vitaly Novichkov - 2019-05-10
- * Use DosBox emulator by default in ADLMIDI
-Vitaly Novichkov - 2019-05-28
- * Fixed MP3 file detection by raw data to don't rely on filename extensions
-Vitaly Novichkov - 2019-07-11
- * Added new path arguments to load custom external banks for libADLMIDI and libOPNMIDI
-Vitaly Novichkov - 2019-07-11
- * Added API to change ADLMIDI and OPNMIDI's chips count to control performance and polyphony
-Vitaly Novichkov - 2019-07-16
- * Added music tempo change API (initially works with MIDI, GME, and XMP)
-Ozkan Sezer - 2019-12-16
- * Reworked config API of Timidity, added new Mix_SetTimidityCfg() and Mix_GetTimidityCfg() calls
-Matthias Gatto - 2019-12-16
- * Added a returning of duration for Timidity (backport of https://bugzilla.libsdl.org/show_bug.cgi?id=4715)
+Vitaly Novichkov - 2021-01-29 11:06:44
+ * Resolved the linking confusion when some libraries got disabled
+Vitaly Novichkov - 2021-01-09 21:56:39
+ * Fixed the improper buffer usage at libADLMIDI and libOPNMIDI modules, the
+   WASAPI support is now better for those libraries.
+Vitaly Novichkov - 2020-12-21
+ * Added an alternative Native MIDI backend for Windows platform:
+   it allows to change position, allows reporting the current position, allows
+   loop points like libADLMIDI and libOPNMIDI can, added a volume workaround to
+   prevent the volume changing of entire application.
 Vitaly Novichkov - 2019-12-17
  * Added an ability to require specific loop counts for GME songs which supports that
  * Fixed an incorrect MPG123 seek when sample rates of stream and file aren't match
  * Added an ability to change Timidity config on the fly
  * Renamed Mix_GetMusicTotalTime() into Mix_MusicDuration()
+Matthias Gatto - 2019-12-16
+ * Added a returning of duration for Timidity (backport of https://bugzilla.libsdl.org/show_bug.cgi?id=4715)
+Ozkan Sezer - 2019-12-16
+ * Reworked config API of Timidity, added new Mix_SetTimidityCfg() and Mix_GetTimidityCfg() calls
+Vitaly Novichkov - 2019-07-16
+ * Added music tempo change API (initially works with MIDI, GME, and XMP)
+Vitaly Novichkov - 2019-07-11
+ * Added API to change ADLMIDI and OPNMIDI's chips count to control performance and polyphony
+Vitaly Novichkov - 2019-07-11
+ * Added new path arguments to load custom external banks for libADLMIDI and libOPNMIDI
+Vitaly Novichkov - 2019-05-28
+ * Fixed MP3 file detection by raw data to don't rely on filename extensions
+Vitaly Novichkov - 2019-05-10
+ * Use DosBox emulator by default in ADLMIDI
+Vitaly Novichkov - 2019-03-10
+ * Added support for libXMP tracker module music player library
+Vitaly Novichkov - 2019-02-24
+ * Added more OPL/OPN emulators enum fields for libADLMIDI and libOPNMIDI
 
 2.4.0:
 Vitaly Novichkov - 2019
@@ -95,4 +105,3 @@ Vitaly Novichkov - 2015
  * Added support of SPC playback
  * Attempt to fix resampling
  * Using QMake instead of autotools to build library
-
