@@ -753,6 +753,7 @@ Mix_MusicInterface Mix_MusicInterface_OPNMIDI =
     OPNMIDI_play,
     NULL,   /* IsPlaying */
     OPNMIDI_playAudio,
+    NULL,       /* Jump */
     OPNMIDI_Seek,
     OPNMIDI_Tell,   /* Tell [MIXER-X]*/
     OPNMIDI_Duration,

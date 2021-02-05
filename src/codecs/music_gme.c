@@ -547,6 +547,7 @@ Mix_MusicInterface Mix_MusicInterface_GME =
     GME_play,
     NULL,   /* IsPlaying */
     GME_playAudio,
+    NULL,       /* Jump */
     GME_Seek,   /* Seek */
     GME_Tell,   /* Tell [MIXER-X]*/
     GME_Duration,

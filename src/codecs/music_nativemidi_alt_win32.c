@@ -653,6 +653,7 @@ Mix_MusicInterface Mix_MusicInterface_NATIVEMIDI =
     NATIVEMIDI_Play,
     NATIVEMIDI_IsPlaying,
     NULL,   /* GetAudio */
+    NULL,   /* Jump */
     NATIVEMIDI_Seek,   /* Seek */
     NATIVEMIDI_Tell,   /* Tell [MIXER-X]*/
     NATIVEMIDI_Duration,   /* Duration */

@@ -707,6 +707,7 @@ extern DECLSPEC int SDLCALL Mix_VolumeMusicStream(Mix_Music *music, int volume);
 /* MIXERX_DEPRECATED("Use Mix_VolumeMusicStream(Mix_Music*,int) instead") */
 extern DECLSPEC int SDLCALL Mix_VolumeMusic(int volume);
 /* Get the current volume value in the range of 0-128 of a music stream */
+extern DECLSPEC int SDLCALL Mix_GetMusicVolume(Mix_Music *music);
 extern DECLSPEC int SDLCALL Mix_GetVolumeMusicStream(Mix_Music *music);
 
 /* Halt playing of a particular channel */
@@ -759,6 +760,11 @@ extern DECLSPEC void SDLCALL Mix_RewindMusic(void);
 /* MIXERX_DEPRECATED("Use Mix_PausedMusicStream(Mix_Music*) instead") */
 extern DECLSPEC int SDLCALL Mix_PausedMusic(void);
 
+/* Jump to a given order in mod music.
+   Returns 0 if successful, or -1 if failed or isn't implemented.
+   Only for MOD music formats.
+ */
+extern DECLSPEC int SDLCALL Mix_ModMusicJumpToOrder(int order);
 /* Set the current position in the music stream.
    This returns 0 if successful, or -1 if it failed or isn't implemented.
    This function is only implemented for MOD music formats (set pattern
@@ -777,9 +783,9 @@ extern DECLSPEC int SDLCALL Mix_SetMusicPosition(double position);
  */
 extern DECLSPEC double SDLCALL Mix_GetMusicPosition(Mix_Music *music);
 
-/* Return music duration in second.
-    if NULL is passed, return current playing music duration.
-    return -1 on error.
+/* Return music duration in seconds.
+   If NULL is passed, returns duration of current playing music.
+   Returns -1 on error.
  */
 extern DECLSPEC double SDLCALL Mix_MusicDuration(Mix_Music *music);
 /*

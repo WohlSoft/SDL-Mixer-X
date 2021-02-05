@@ -917,6 +917,7 @@ Mix_MusicInterface Mix_MusicInterface_ADLMIDI =
     ADLMIDI_play,
     NULL,   /* IsPlaying */
     ADLMIDI_playAudio,
+    NULL,       /* Jump */
     ADLMIDI_Seek,
     ADLMIDI_Tell,   /* Tell [MIXER-X]*/
     ADLMIDI_Duration,
@@ -954,6 +955,7 @@ Mix_MusicInterface Mix_MusicInterface_ADLIMF =
     ADLMIDI_play,
     NULL,   /* IsPlaying */
     ADLMIDI_playAudio,
+    NULL,       /* Jump */
     ADLMIDI_Seek,
     ADLMIDI_Tell,   /* Tell [MIXER-X]*/
     ADLMIDI_Duration,

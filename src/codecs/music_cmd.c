@@ -284,6 +284,7 @@ Mix_MusicInterface Mix_MusicInterface_CMD =
     MusicCMD_Play,
     MusicCMD_IsPlaying,
     NULL,   /* GetAudio */
+    NULL,   /* Jump */
     NULL,   /* Seek */
     NULL,   /* Tell */
     NULL,   /* Duration */
