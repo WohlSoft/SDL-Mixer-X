@@ -2016,9 +2016,8 @@ int SDLCALLCC Mix_SetMusicCMD(const char *command)
 
 int SDLCALLCC Mix_SetSynchroValue(int i)
 {
-    (void)i;
     /* Not supported by any players at this time */
-    return(-1);
+    (void) i; return -1;
 }
 
 int SDLCALLCC Mix_GetSynchroValue(void)
@@ -2167,7 +2166,7 @@ int SDLCALLCC Mix_EachSoundFont(int (SDLCALL *function)(const char*, void*), voi
         return 0;
     }
 
-#if defined(_WIN32)||defined(__OS2__)
+#if defined(_WIN32) || defined(__OS2__)
 #define PATHSEP ";"
 #else
 #define PATHSEP ":;"
