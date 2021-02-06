@@ -320,7 +320,6 @@ if(STDCPP_NEEDED AND NOT MSVC)
 endif()
 
 list(APPEND SDLMixerX_SOURCES
-    ${SDLMixerX_SOURCE_DIR}/src/compat.c
     ${SDLMixerX_SOURCE_DIR}/src/effect_position.c
     ${SDLMixerX_SOURCE_DIR}/src/effects_internal.c
     ${SDLMixerX_SOURCE_DIR}/src/effect_stereoreverse.c

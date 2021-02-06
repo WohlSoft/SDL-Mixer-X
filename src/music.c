@@ -44,7 +44,7 @@
 #include "music_midi_adl.h"
 #include "music_midi_opn.h"
 
-#include "compat.h"
+#include "utils.h"
 
 /* Check to make sure we are building with a new enough SDL */
 #if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 7)

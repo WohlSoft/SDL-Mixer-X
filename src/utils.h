@@ -24,7 +24,16 @@
 
 /* misc helper routines */
 
+#include "SDL_stdinc.h"
+#include "SDL_version.h"
 #include "music.h"
+
+#if SDL_VERSION_ATLEAST(2,0,12)
+#define HAVE_SDL_STRTOKR
+#else
+#define SDL_strtokr _MIX_strtokr
+extern char *SDL_strtokr(char *s1, const char *s2, char **saveptr);
+#endif
 
 /* Parse MIDI string's charset (UTF16 or UTF8 with BOM, or keep as the ISO-8859-1) */
 extern void meta_tags_set_from_midi(Mix_MusicMetaTags *tags,
