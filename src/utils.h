@@ -36,9 +36,9 @@ extern char *SDL_strtokr(char *s1, const char *s2, char **saveptr);
 #endif
 
 /* Parse MIDI string's charset (UTF16 or UTF8 with BOM, or keep as the ISO-8859-1) */
-extern void meta_tags_set_from_midi(Mix_MusicMetaTags *tags,
-                                    Mix_MusicMetaTag tag,
-                                    const char *src);
+extern void _Mix_ParseMidiMetaTag(Mix_MusicMetaTags *dst_tags,
+                                  Mix_MusicMetaTag type,
+                                  const char *src);
 
 /* Parse time string of the form HH:MM:SS.mmm and return equivalent sample
  * position */

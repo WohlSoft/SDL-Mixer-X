@@ -702,8 +702,8 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
     }
 
     meta_tags_init(&music->tags);
-    meta_tags_set_from_midi(&music->tags, MIX_META_TITLE, ADLMIDI.adl_metaMusicTitle(music->adlmidi));
-    meta_tags_set_from_midi(&music->tags, MIX_META_COPYRIGHT, ADLMIDI.adl_metaMusicCopyright(music->adlmidi));
+    _Mix_ParseMidiMetaTag(&music->tags, MIX_META_TITLE, ADLMIDI.adl_metaMusicTitle(music->adlmidi));
+    _Mix_ParseMidiMetaTag(&music->tags, MIX_META_COPYRIGHT, ADLMIDI.adl_metaMusicCopyright(music->adlmidi));
     return music;
 }
 

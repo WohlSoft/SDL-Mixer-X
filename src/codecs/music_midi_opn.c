@@ -550,8 +550,8 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
 
     music->volume                 = MIX_MAX_VOLUME;
     meta_tags_init(&music->tags);
-    meta_tags_set_from_midi(&music->tags, MIX_META_TITLE, OPNMIDI.opn2_metaMusicTitle(music->opnmidi));
-    meta_tags_set_from_midi(&music->tags, MIX_META_COPYRIGHT, OPNMIDI.opn2_metaMusicCopyright(music->opnmidi));
+    _Mix_ParseMidiMetaTag(&music->tags, MIX_META_TITLE, OPNMIDI.opn2_metaMusicTitle(music->opnmidi));
+    _Mix_ParseMidiMetaTag(&music->tags, MIX_META_COPYRIGHT, OPNMIDI.opn2_metaMusicCopyright(music->opnmidi));
     return music;
 }
 

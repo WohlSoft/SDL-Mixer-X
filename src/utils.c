@@ -107,7 +107,7 @@ static size_t _utf16_byte_len(const char *str)
     return len;
 }
 
-void meta_tags_set_from_midi(Mix_MusicMetaTags *tags, Mix_MusicMetaTag tag, const char *src)
+void _Mix_ParseMidiMetaTag(Mix_MusicMetaTags *dst_tags, Mix_MusicMetaTag type, const char *src)
 {
     size_t src_len = SDL_strlen(src);
     char *dst = NULL;
@@ -123,7 +123,7 @@ void meta_tags_set_from_midi(Mix_MusicMetaTags *tags, Mix_MusicMetaTag tag, cons
     }
 
     if (dst) {
-        meta_tags_set(tags, tag, dst);
+        meta_tags_set(dst_tags, type, dst);
         SDL_free(dst);
     }
 }

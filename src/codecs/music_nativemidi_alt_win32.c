@@ -436,8 +436,8 @@ static void *NATIVEMIDI_CreateFromRW(SDL_RWops *src, int freesrc)
     }
 
     meta_tags_init(&music->tags);
-    meta_tags_set_from_midi(&music->tags, MIX_META_TITLE, midi_seq_meta_title(music->song));
-    meta_tags_set_from_midi(&music->tags, MIX_META_COPYRIGHT, midi_seq_meta_copyright(music->song));
+    _Mix_ParseMidiMetaTag(&music->tags, MIX_META_TITLE, midi_seq_meta_title(music->song));
+    _Mix_ParseMidiMetaTag(&music->tags, MIX_META_COPYRIGHT, midi_seq_meta_copyright(music->song));
     return music;
 }
 
