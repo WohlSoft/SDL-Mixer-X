@@ -230,51 +230,6 @@ static int OGG_UpdateSection(OGG_music *music)
     return 0;
 }
 
-#if 0 /* Moved into "utils.c" */
-/* Parse time string of the form HH:MM:SS.mmm and return equivalent sample
- * position */
-static ogg_int64_t parse_time(char *time, long samplerate_hz)
-{
-    char *num_start, *p;
-    ogg_int64_t result = 0;
-    char c; int val;
-
-    /* Time is directly expressed as a sample position */
-    if (SDL_strchr(time, ':') == NULL) {
-        return SDL_strtoll(time, NULL, 10);
-    }
-
-    result = 0;
-    num_start = time;
-
-    for (p = time; *p != '\0'; ++p) {
-        if (*p == '.' || *p == ':') {
-            c = *p; *p = '\0';
-            if ((val = SDL_atoi(num_start)) < 0)
-                return -1;
-            result = result * 60 + val;
-            num_start = p + 1;
-            *p = c;
-        }
-
-        if (*p == '.') {
-            return result * samplerate_hz
-                + (ogg_int64_t) (SDL_atof(p) * samplerate_hz);
-        }
-    }
-
-    if ((val = SDL_atoi(num_start)) < 0) return -1;
-    return (result * 60 + val) * samplerate_hz;
-}
-
-static SDL_bool is_loop_tag(const char *tag)
-{
-    char buf[5];
-    SDL_strlcpy(buf, tag, 5);
-    return SDL_strcasecmp(buf, "LOOP") == 0;
-}
-#endif /* Moved into "utils.c" */
-
 /* Load an OGG stream from an SDL_RWops object */
 static void *OGG_CreateFromRW(SDL_RWops *src, int freesrc)
 {
@@ -325,17 +280,17 @@ static void *OGG_CreateFromRW(SDL_RWops *src, int freesrc)
 
         /* Want to match LOOP-START, LOOP_START, etc. Remove - or _ from
          * string if it is present at position 4. */
-        if (is_loop_tag(argument) && ((argument[4] == '_') || (argument[4] == '-'))) {
+        if (_Mix_IsLoopTag(argument) && ((argument[4] == '_') || (argument[4] == '-'))) {
             SDL_memmove(argument + 4, argument + 5, SDL_strlen(argument) - 4);
         }
 
         if (SDL_strcasecmp(argument, "LOOPSTART") == 0)
-            music->loop_start = parse_time(value, rate);
+            music->loop_start = _Mix_ParseTime(value, rate);
         else if (SDL_strcasecmp(argument, "LOOPLENGTH") == 0) {
             music->loop_len = SDL_strtoll(value, NULL, 10);
             is_loop_length = SDL_TRUE;
         } else if (SDL_strcasecmp(argument, "LOOPEND") == 0) {
-            music->loop_end = parse_time(value, rate);
+            music->loop_end = _Mix_ParseTime(value, rate);
             is_loop_length = SDL_FALSE;
         } else if (SDL_strcasecmp(argument, "TITLE") == 0) {
             meta_tags_set(&music->tags, MIX_META_TITLE, value);

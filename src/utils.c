@@ -1,6 +1,6 @@
 /*
   SDL_mixer:  An audio mixer library based on the SDL library
-  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2021 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,6 +19,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+/* misc helper routines */
 #include "utils.h"
 
 static size_t _utf16_byte_len(const char *str)
@@ -57,7 +58,7 @@ void meta_tags_set_from_midi(Mix_MusicMetaTags *tags, Mix_MusicMetaTag tag, cons
 }
 
 /* Is given tag a loop tag? */
-SDL_bool is_loop_tag(const char *tag)
+SDL_bool _Mix_IsLoopTag(const char *tag)
 {
     char buf[5];
     SDL_strlcpy(buf, tag, 5);
@@ -66,11 +67,12 @@ SDL_bool is_loop_tag(const char *tag)
 
 /* Parse time string of the form HH:MM:SS.mmm and return equivalent sample
  * position */
-Sint64 parse_time(char *time, long samplerate_hz)
+Sint64 _Mix_ParseTime(char *time, long samplerate_hz)
 {
     char *num_start, *p;
-    Sint64 result = 0;
-    char c; int val;
+    Sint64 result;
+    char c;
+    int val;
 
     /* Time is directly expressed as a sample position */
     if (SDL_strchr(time, ':') == NULL) {
@@ -91,7 +93,7 @@ Sint64 parse_time(char *time, long samplerate_hz)
         }
 
         if (*p == '.') {
-            double val_f = SDL_strtod(p, NULL);
+            double val_f = SDL_atof(p);
             if (val_f < 0) return -1;
             return result * samplerate_hz + (Sint64) (val_f * samplerate_hz);
         }

@@ -1,6 +1,6 @@
 /*
   SDL_mixer:  An audio mixer library based on the SDL library
-  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2021 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,6 +22,8 @@
 #ifndef UTILS_H_
 #define UTILS_H_
 
+/* misc helper routines */
+
 #include "music.h"
 
 /* Parse MIDI string's charset (UTF16 or UTF8 with BOM, or keep as the ISO-8859-1) */
@@ -29,11 +31,10 @@ extern void meta_tags_set_from_midi(Mix_MusicMetaTags *tags,
                                     Mix_MusicMetaTag tag,
                                     const char *src);
 
-/* Is given tag a loop tag? */
-extern SDL_bool is_loop_tag(const char *tag);
-
 /* Parse time string of the form HH:MM:SS.mmm and return equivalent sample
  * position */
-extern Sint64 parse_time(char *time, long samplerate_hz);
+extern Sint64 _Mix_ParseTime(char *time, long samplerate_hz);
+
+extern SDL_bool _Mix_IsLoopTag(const char *tag);
 
 #endif /* UTILS_H_ */
