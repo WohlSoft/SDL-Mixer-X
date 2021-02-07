@@ -37,6 +37,7 @@
 #else
 #define LIBXMP_CONST const
 #endif
+
 typedef struct {
     int loaded;
     void *handle;
