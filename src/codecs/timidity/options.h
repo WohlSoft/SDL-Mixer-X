@@ -15,7 +15,7 @@
 #define DEFAULT_PROGRAM 0
 
 /* 9 here is MIDI channel 10, which is the standard percussion channel.
-   Some files (notably C:\WINDOWS\CANYON.MID) think that 16 is one too.
+   Some files (notably C:\WINDOWS\CANYON.MID) think that 16 is one too. 
    On the other hand, some files know that 16 is not a drum channel and
    try to play music on it. This is now a runtime option, so this isn't
    a critical choice anymore. */
@@ -69,8 +69,7 @@
 
 #define MAX_AMPLIFICATION 800
 
-/* You could specify a complete path, e.g. "/etc/timidity.cfg", and
-   then specify the library directory in the configuration file. */
+/* The TiMidity configuration file */
 #ifndef TIMIDITY_CFG
 #define TIMIDITY_CFG "timidity.cfg"
 #endif
@@ -98,4 +97,5 @@
   #define PI 3.14159265358979323846
 #endif
 
+/* for very loud debug output: */
 #define SNDDBG(X)

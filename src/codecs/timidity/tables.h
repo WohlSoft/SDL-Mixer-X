@@ -1,5 +1,4 @@
 /*
-
     TiMidity -- Experimental MIDI to WAVE converter
     Copyright (C) 1995 Tuukka Toivonen <toivonen@clinet.fi>
 
@@ -9,8 +8,10 @@
     tables.h
 */
 
-#include <math.h>
-#define sine(x) (sin((2*PI/1024.0) * (x)))
+#if defined(HAVE_LIBC) && defined(__WATCOMC__) /* Watcom has issues... */
+#define SDL_sin  sin
+#endif
+#define sine(x) (SDL_sin((2*PI/1024.0) * (x)))
 
 #define SINE_CYCLE_LENGTH 1024
 extern const Sint32 freq_table[];

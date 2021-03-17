@@ -1,5 +1,4 @@
 /*
-
     TiMidity -- Experimental MIDI to WAVE converter
     Copyright (C) 1995 Tuukka Toivonen <toivonen@clinet.fi>
 
@@ -10,10 +9,6 @@
 
     Audio output (to file / device) functions.
 */
-
-#if HAVE_CONFIG_H
-#  include <config.h>
-#endif
 
 #include "SDL.h"
 

@@ -9,14 +9,6 @@
     resample.c
 */
 
-#if HAVE_CONFIG_H
-#  include <config.h>
-#endif
-
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "SDL.h"
 
 #include "timidity.h"
@@ -37,12 +29,12 @@ static sample_t *rs_plain(MidiSong *song, int v, Sint32 *countptr)
   /* Play sample until end, then free the voice. */
 
   sample_t v1, v2;
-  Voice
+  Voice 
     *vp=&(song->voice[v]);
-  sample_t
+  sample_t 
     *dest=song->resample_buffer,
     *src=vp->sample->data;
-  Sint32
+  Sint32 
     ofs=vp->sample_offset,
     incr=vp->sample_increment,
     le=vp->sample->data_length,
@@ -84,11 +76,10 @@ static sample_t *rs_plain(MidiSong *song, int v, Sint32 *countptr)
 
 static sample_t *rs_loop(MidiSong *song, Voice *vp, Sint32 count)
 {
-
   /* Play sample until end-of-loop, skip back and continue. */
 
   sample_t v1, v2;
-  Sint32
+  Sint32 
     ofs=vp->sample_offset,
     incr=vp->sample_increment,
     le=vp->sample->loop_end,
@@ -112,9 +103,9 @@ static sample_t *rs_loop(MidiSong *song, Voice *vp, Sint32 count)
       else count -= i;
       for (j = 0; j < i; j++)
 	{
-          v1 = src[ofs >> FRACTION_BITS];
-          v2 = src[(ofs >> FRACTION_BITS)+1];
-          *dest++ = v1 + (((v2 - v1) * (ofs & FRACTION_MASK)) >> FRACTION_BITS);
+	  v1 = src[ofs >> FRACTION_BITS];
+	  v2 = src[(ofs >> FRACTION_BITS)+1];
+	  *dest++ = v1 + (((v2 - v1) * (ofs & FRACTION_MASK)) >> FRACTION_BITS);
 	  ofs += incr;
 	}
     }
@@ -126,12 +117,12 @@ static sample_t *rs_loop(MidiSong *song, Voice *vp, Sint32 count)
 static sample_t *rs_bidir(MidiSong *song, Voice *vp, Sint32 count)
 {
   sample_t v1, v2;
-  Sint32
+  Sint32 
     ofs=vp->sample_offset,
     incr=vp->sample_increment,
     le=vp->sample->loop_end,
     ls=vp->sample->loop_start;
-  sample_t
+  sample_t 
     *dest=song->resample_buffer,
     *src=vp->sample->data;
   Sint32
@@ -154,15 +145,14 @@ static sample_t *rs_bidir(MidiSong *song, Voice *vp, Sint32 count)
       else count -= i;
       for (j = 0; j < i; j++)
 	{
-          v1 = src[ofs >> FRACTION_BITS];
-          v2 = src[(ofs >> FRACTION_BITS)+1];
-          *dest++ = v1 + (((v2 - v1) * (ofs & FRACTION_MASK)) >> FRACTION_BITS);
+	  v1 = src[ofs >> FRACTION_BITS];
+	  v2 = src[(ofs >> FRACTION_BITS)+1];
+	  *dest++ = v1 + (((v2 - v1) * (ofs & FRACTION_MASK)) >> FRACTION_BITS);
 	  ofs += incr;
 	}
     }
 
   /* Then do the bidirectional looping */
-
   while(count)
     {
       /* Precalc how many times we should go through the loop */
@@ -175,9 +165,9 @@ static sample_t *rs_bidir(MidiSong *song, Voice *vp, Sint32 count)
       else count -= i;
       for (j = 0; j < i; j++)
 	{
-          v1 = src[ofs >> FRACTION_BITS];
-          v2 = src[(ofs >> FRACTION_BITS)+1];
-          *dest++ = v1 + (((v2 - v1) * (ofs & FRACTION_MASK)) >> FRACTION_BITS);
+	  v1 = src[ofs >> FRACTION_BITS];
+	  v2 = src[(ofs >> FRACTION_BITS)+1];
+	  *dest++ = v1 + (((v2 - v1) * (ofs & FRACTION_MASK)) >> FRACTION_BITS);
 	  ofs += incr;
 	}
       if (ofs>=le)
@@ -230,7 +220,6 @@ static Sint32 update_vibrato(MidiSong *song, Voice *vp, int sign)
     }
 
   /* Need to compute this sample increment. */
-
   depth=vp->sample->vibrato_depth<<7;
 
   if (vp->vibrato_sweep)
@@ -253,7 +242,7 @@ static Sint32 update_vibrato(MidiSong *song, Voice *vp, int sign)
 	      (double)(song->rate)),
 	     FRACTION_BITS);
 
-  pb=(int)((sine(vp->vibrato_phase *
+  pb=(int)((sine(vp->vibrato_phase * 
 		 (SINE_CYCLE_LENGTH/(2*VIBRATO_SAMPLE_INCREMENTS)))
 	    * (double)(depth) * VIBRATO_AMPLITUDE_TUNING));
 
@@ -277,20 +266,19 @@ static Sint32 update_vibrato(MidiSong *song, Voice *vp, int sign)
 
 static sample_t *rs_vib_plain(MidiSong *song, int v, Sint32 *countptr)
 {
-
   /* Play sample until end, then free the voice. */
 
   sample_t v1, v2;
   Voice *vp=&(song->voice[v]);
-  sample_t
-    *dest=song->resample_buffer,
+  sample_t 
+    *dest=song->resample_buffer, 
     *src=vp->sample->data;
-  Sint32
+  Sint32 
     le=vp->sample->data_length,
-    ofs=vp->sample_offset,
-    incr=vp->sample_increment,
+    ofs=vp->sample_offset, 
+    incr=vp->sample_increment, 
     count=*countptr;
-  int
+  int 
     cc=vp->vibrato_control_counter;
 
   /* This has never been tested */
@@ -326,19 +314,18 @@ static sample_t *rs_vib_plain(MidiSong *song, int v, Sint32 *countptr)
 
 static sample_t *rs_vib_loop(MidiSong *song, Voice *vp, Sint32 count)
 {
-
   /* Play sample until end-of-loop, skip back and continue. */
 
   sample_t v1, v2;
-  Sint32
+  Sint32 
     ofs=vp->sample_offset,
     incr=vp->sample_increment,
     le=vp->sample->loop_end,
     ll=le - vp->sample->loop_start;
-  sample_t
+  sample_t 
     *dest=song->resample_buffer,
     *src=vp->sample->data;
-  int
+  int 
     cc=vp->vibrato_control_counter;
   Sint32 i, j;
   int
@@ -362,9 +349,9 @@ static sample_t *rs_vib_loop(MidiSong *song, Voice *vp, Sint32 count)
       count -= i;
       for (j = 0; j < i; j++)
 	{
-          v1 = src[ofs >> FRACTION_BITS];
-          v2 = src[(ofs >> FRACTION_BITS)+1];
-          *dest++ = v1 + (((v2 - v1) * (ofs & FRACTION_MASK)) >> FRACTION_BITS);
+	  v1 = src[ofs >> FRACTION_BITS];
+	  v2 = src[(ofs >> FRACTION_BITS)+1];
+	  *dest++ = v1 + (((v2 - v1) * (ofs & FRACTION_MASK)) >> FRACTION_BITS);
 	  ofs += incr;
 	}
       if(vibflag)
@@ -384,15 +371,15 @@ static sample_t *rs_vib_loop(MidiSong *song, Voice *vp, Sint32 count)
 static sample_t *rs_vib_bidir(MidiSong *song, Voice *vp, Sint32 count)
 {
   sample_t v1, v2;
-  Sint32
+  Sint32 
     ofs=vp->sample_offset,
     incr=vp->sample_increment,
     le=vp->sample->loop_end,
     ls=vp->sample->loop_start;
-  sample_t
+  sample_t 
     *dest=song->resample_buffer,
     *src=vp->sample->data;
-  int
+  int 
     cc=vp->vibrato_control_counter;
   Sint32
     le2=le<<1,
@@ -415,9 +402,9 @@ static sample_t *rs_vib_bidir(MidiSong *song, Voice *vp, Sint32 count)
       count -= i;
       for (j = 0; j < i; j++)
 	{
-          v1 = src[ofs >> FRACTION_BITS];
-          v2 = src[(ofs >> FRACTION_BITS)+1];
-          *dest++ = v1 + (((v2 - v1) * (ofs & FRACTION_MASK)) >> FRACTION_BITS);
+	  v1 = src[ofs >> FRACTION_BITS];
+	  v2 = src[(ofs >> FRACTION_BITS)+1];
+	  *dest++ = v1 + (((v2 - v1) * (ofs & FRACTION_MASK)) >> FRACTION_BITS);
 	  ofs += incr;
 	}
       if (vibflag)
@@ -429,7 +416,6 @@ static sample_t *rs_vib_bidir(MidiSong *song, Voice *vp, Sint32 count)
     }
 
   /* Then do the bidirectional looping */
-
   while (count)
     {
       /* Precalc how many times we should go through the loop */
@@ -444,9 +430,9 @@ static sample_t *rs_vib_bidir(MidiSong *song, Voice *vp, Sint32 count)
       count -= i;
       while (i--)
 	{
-          v1 = src[ofs >> FRACTION_BITS];
-          v2 = src[(ofs >> FRACTION_BITS)+1];
-          *dest++ = v1 + (((v2 - v1) * (ofs & FRACTION_MASK)) >> FRACTION_BITS);
+	  v1 = src[ofs >> FRACTION_BITS];
+	  v2 = src[(ofs >> FRACTION_BITS)+1];
+	  *dest++ = v1 + (((v2 - v1) * (ofs & FRACTION_MASK)) >> FRACTION_BITS);
 	  ofs += incr;
 	}
       if (vibflag)
@@ -483,7 +469,7 @@ sample_t *resample_voice(MidiSong *song, int v, Sint32 *countptr)
   if (!(vp->sample->sample_rate))
     {
       /* Pre-resampled data -- just update the offset and check if
-         we're out of data. */
+	 we're out of data. */
       ofs=vp->sample_offset >> FRACTION_BITS; /* Kind of silly to use
 						 FRACTION_BITS here... */
       if (*countptr >= (vp->sample->data_length>>FRACTION_BITS) - ofs)
@@ -540,8 +526,7 @@ void pre_resample(MidiSong *song, Sample *sp)
   Sint16 *newdata, *dest, *src = (Sint16 *) sp->data, *vptr;
   Sint32 v, v1, v2, v3, v4, v5, i;
 #ifdef DEBUG_CHATTER
-  static const char note_name[12][3] =
-  {
+  static const char note_name[12][3] = {
     "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"
   };
 
@@ -566,9 +551,11 @@ void pre_resample(MidiSong *song, Sample *sp)
     return;
   }
 
-  dest = newdata = (Sint16 *) safe_malloc((newlen >> (FRACTION_BITS - 1)) + 2);
-  if (!dest)
+  dest = newdata = (Sint16 *) SDL_malloc((newlen >> (FRACTION_BITS - 1)) + 2);
+  if (!dest) {
+    song->oom = 1;
     return;
+  }
 
   if (--count)
     *dest++ = src[0];
@@ -607,7 +594,7 @@ void pre_resample(MidiSong *song, Sample *sp)
   sp->data_length = newlen;
   sp->loop_start = (Sint32)(sp->loop_start * a);
   sp->loop_end = (Sint32)(sp->loop_end * a);
-  free(sp->data);
+  SDL_free(sp->data);
   sp->data = (sample_t *) newdata;
   sp->sample_rate = 0;
 }
