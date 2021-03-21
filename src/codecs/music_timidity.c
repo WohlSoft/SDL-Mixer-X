@@ -171,6 +171,12 @@ static int TIMIDITY_Play(void *context, int play_count)
     return TIMIDITY_Seek(music, 0.0);
 }
 
+static void TIMIDITY_Stop(void *context)
+{
+    TIMIDITY_Music *music = (TIMIDITY_Music *)context;
+    Timidity_Stop(music->song);
+}
+
 static SDL_bool TIMIDITY_IsPlaying(void *context)
 {
     TIMIDITY_Music *music = (TIMIDITY_Music *)context;
@@ -300,7 +306,7 @@ Mix_MusicInterface Mix_MusicInterface_TIMIDITY =
     NULL,   /* GetMetaTag */
     NULL,   /* Pause */
     NULL,   /* Resume */
-    NULL,   /* Stop */
+    TIMIDITY_Stop,
     TIMIDITY_Delete,
     NULL,   /* Close */
     NULL    /* Unload */
