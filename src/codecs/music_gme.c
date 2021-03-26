@@ -269,7 +269,7 @@ GME_Music *GME_LoadSongRW(SDL_RWops *src, const char *args)
     music->tempo = setup.tempo;
     music->gain = setup.gain;
 
-    music->stream = SDL_NewAudioStream(AUDIO_S16, 2, music_spec.freq,
+    music->stream = SDL_NewAudioStream(AUDIO_S16SYS, 2, music_spec.freq,
                                        music_spec.format, music_spec.channels, music_spec.freq);
     if (!music->stream) {
         GME_delete(music);
