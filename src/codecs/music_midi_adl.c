@@ -589,27 +589,34 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
         music->sample_format.containerSize = sizeof(Sint8);
         music->sample_format.sampleOffset = sizeof(Sint8) * 2;
         break;
-    case AUDIO_S16:
+    case AUDIO_S16LSB:
+    case AUDIO_S16MSB:
         music->sample_format.type = ADLMIDI_SampleType_S16;
         music->sample_format.containerSize = sizeof(Sint16);
         music->sample_format.sampleOffset = sizeof(Sint16) * 2;
+        src_format = AUDIO_S16SYS;
         break;
-    case AUDIO_U16:
+    case AUDIO_U16LSB:
+    case AUDIO_U16MSB:
         music->sample_format.type = ADLMIDI_SampleType_U16;
         music->sample_format.containerSize = sizeof(Uint16);
         music->sample_format.sampleOffset = sizeof(Uint16) * 2;
+        src_format = AUDIO_U16SYS;
         break;
-    case AUDIO_S32:
+    case AUDIO_S32LSB:
+    case AUDIO_S32MSB:
         music->sample_format.type = ADLMIDI_SampleType_S32;
         music->sample_format.containerSize = sizeof(Sint32);
         music->sample_format.sampleOffset = sizeof(Sint32) * 2;
+        src_format = AUDIO_S32SYS;
         break;
-    case AUDIO_F32:
+    case AUDIO_F32LSB:
+    case AUDIO_F32MSB:
     default:
         music->sample_format.type = ADLMIDI_SampleType_F32;
         music->sample_format.containerSize = sizeof(float);
         music->sample_format.sampleOffset = sizeof(float) * 2;
-        src_format = AUDIO_F32;
+        src_format = AUDIO_F32SYS;
     }
 
     music->stream = SDL_NewAudioStream(src_format, 2, music_spec.freq,
