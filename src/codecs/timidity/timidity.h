@@ -153,10 +153,10 @@ extern void Timidity_SetVolume(MidiSong *song, int volume);
 extern int Timidity_PlaySome(MidiSong *song, void *stream, Sint32 len);
 extern MidiSong *Timidity_LoadSong(SDL_RWops *rw, SDL_AudioSpec *audio);
 extern void Timidity_Start(MidiSong *song);
-extern void Timidity_Stop(MidiSong *song);
 extern void Timidity_Seek(MidiSong *song, Uint32 ms);
 extern Uint32 Timidity_GetSongLength(MidiSong *song); /* returns millseconds */
 extern Uint32 Timidity_GetSongTime(MidiSong *song);   /* returns millseconds */
+extern void Timidity_Stop(MidiSong *song);
 extern int Timidity_IsActive(MidiSong *song);
 extern void Timidity_FreeSong(MidiSong *song);
 extern void Timidity_Exit(void);
