@@ -316,6 +316,19 @@ static int init_interface(FLUIDSYNTH_Music *seqi, int outFormat)
     return inFormat;
 }
 
+static void all_notes_off(fluid_synth_t *synth)
+{
+    int channel;
+
+    if (!synth) {
+        return; /* Nothing to do */
+    }
+
+    for (channel = 0; channel < 16; channel++) {
+        fluidsynth.fluid_synth_cc(synth, channel, 123, 0);
+    }
+}
+
 
 static void FLUIDSYNTH_Delete(void *context);
 
@@ -643,6 +656,7 @@ static int FLUIDSYNTH_Seek(void *context, double time)
 {
     FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
     midi_seq_seek(music->player, time);
+    all_notes_off(music->synth);
     return 0;
 }
 
@@ -748,6 +762,7 @@ static int FLUIDSYNTH_GetSome(void *context, void *data, int bytes, SDL_bool *do
                 play_count = (music->play_count - 1);
             }
             midi_seq_rewind(music->player);
+            all_notes_off(music->synth);
             music->play_count = play_count;
         }
     }
