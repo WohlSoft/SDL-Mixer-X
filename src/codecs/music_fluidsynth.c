@@ -39,6 +39,9 @@ typedef struct {
 #if (FLUIDSYNTH_VERSION_MAJOR >= 2)
     void (*delete_fluid_player)(fluid_player_t*);
     void (*delete_fluid_synth)(fluid_synth_t*);
+    int (*fluid_player_get_current_tick)(fluid_player_t *);
+    int (*fluid_player_get_total_ticks)(fluid_player_t *);
+    int (*fluid_player_seek)(fluid_player_t *, int);
 #else
     int (*delete_fluid_player)(fluid_player_t*);
     int (*delete_fluid_synth)(fluid_synth_t*);
@@ -86,6 +89,9 @@ static int FLUIDSYNTH_Load()
 #if (FLUIDSYNTH_VERSION_MAJOR >= 2)
         FUNCTION_LOADER(delete_fluid_player, void (*)(fluid_player_t*))
         FUNCTION_LOADER(delete_fluid_synth, void (*)(fluid_synth_t*))
+        FUNCTION_LOADER(fluid_player_get_current_tick, int (*)(fluid_player_t*))
+        FUNCTION_LOADER(fluid_player_get_total_ticks, int (*)(fluid_player_t*))
+        FUNCTION_LOADER(fluid_player_seek, int (*)(fluid_player_t*, int))
 #else
         FUNCTION_LOADER(delete_fluid_player, int (*)(fluid_player_t*))
         FUNCTION_LOADER(delete_fluid_synth, int (*)(fluid_synth_t*))
@@ -301,6 +307,48 @@ static void FLUIDSYNTH_Stop(void *context)
     fluidsynth.fluid_player_stop(music->player);
 }
 
+static int FLUIDSYNTH_Seek(void *context, double time)
+{
+#if (FLUIDSYNTH_VERSION_MAJOR >= 2)
+    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
+    fluidsynth.fluid_player_seek(music->player, (int)(time * 1000));
+    return 0;
+#else
+    (void)time;
+    return -1;
+#endif
+}
+
+static double FLUIDSYNTH_Tell(void *context)
+{
+#if (FLUIDSYNTH_VERSION_MAJOR >= 2)
+    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
+    return (double)fluidsynth.fluid_player_get_current_tick(music->player) / 1000.0;
+#else
+    return -1.0;
+#endif
+}
+
+static double FLUIDSYNTH_Duration(void *context)
+{
+#if (FLUIDSYNTH_VERSION_MAJOR >= 2)
+    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
+    int ret = fluidsynth.fluid_player_get_total_ticks(music->player);
+
+    if (ret == 0) { /* UGLY WORKAROUND: it returns zero until request the buffer block twice  */
+        ret = fluidsynth.fluid_player_get_current_tick(music->player);
+        fluidsynth.fluid_synth_write_s16(music->synth, music_spec.samples, music->buffer, 0, 2, music->buffer, 1, 2);
+        fluidsynth.fluid_synth_write_s16(music->synth, music_spec.samples, music->buffer, 0, 2, music->buffer, 1, 2);
+        fluidsynth.fluid_player_seek(music->player, ret);
+        ret = fluidsynth.fluid_player_get_total_ticks(music->player);
+    }
+
+    return (ret / 1000.0);
+#else
+    return -1.0;
+#endif
+}
+
 static void FLUIDSYNTH_Delete(void *context)
 {
     FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
@@ -334,9 +382,9 @@ Mix_MusicInterface Mix_MusicInterface_FLUIDSYNTH =
     FLUIDSYNTH_IsPlaying,
     FLUIDSYNTH_GetAudio,
     NULL,   /* Jump */
-    NULL,   /* Seek */
-    NULL,   /* Tell */
-    NULL,   /* Duration */
+    FLUIDSYNTH_Seek,   /* Seek */
+    FLUIDSYNTH_Tell,   /* Tell */
+    FLUIDSYNTH_Duration,   /* Duration */
     NULL,   /* Set Tempo multiplier [MIXER-X] */
     NULL,   /* Get Tempo multiplier [MIXER-X] */
     NULL,   /* LoopStart */
