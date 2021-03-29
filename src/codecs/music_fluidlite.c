@@ -417,9 +417,9 @@ static void process_args(const char *args, FluidSynth_Setup *setup)
                         }
                         break;
                     case 'd':
-                        setup->chorus_speed = SDL_atof(arg + 1);
-                        if (setup->chorus_speed < 0.0 || setup->chorus_speed > 21.0) {
-                            setup->chorus_speed = FLUID_CHORUS_DEFAULT_DEPTH;
+                        setup->chorus_depth = SDL_atof(arg + 1);
+                        if (setup->chorus_depth < 0.0 || setup->chorus_depth > 21.0) {
+                            setup->chorus_depth = FLUID_CHORUS_DEFAULT_DEPTH;
                         }
                         break;
                     case 't':
