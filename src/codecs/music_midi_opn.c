@@ -340,7 +340,7 @@ static void process_args(const char *args, OpnMidi_Setup *setup)
         char c = args[i];
         if (value_opened == 1) {
             if ((c == ';') || (c == '\0')) {
-                int value =0 ;
+                int value = 0;
                 arg[j] = '\0';
                 if (type != 'x') {
                     value = SDL_atoi(arg);
