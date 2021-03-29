@@ -636,6 +636,12 @@ static Mix_MusicType xmi_compatible_midi_player()
     }
 #endif
 
+#if defined(MUSIC_MID_FLUIDLITE)
+    if (mididevice_current == MIDI_Fluidsynth) {
+        return MUS_MID;
+    }
+#endif
+
 #if defined(MUSIC_MID_ADLMIDI) && defined(MUSIC_MID_OPNMIDI)
     if ((mididevice_current != MIDI_ADLMIDI) && (mididevice_current != MIDI_OPNMIDI)) {
         return MUS_ADLMIDI;
@@ -860,7 +866,7 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
     if ((SDL_memcmp(magic, "RIFF", 4) == 0) && (SDL_memcmp(magic + 8, "RMID", 4) == 0)) {
         return MUS_MID;
     }
-#if defined(MUSIC_MID_ADLMIDI) || defined(MUSIC_MID_OPNMIDI) || defined(MUSIC_MID_NATIVE_ALT)
+#if defined(MUSIC_MID_ADLMIDI) || defined(MUSIC_MID_OPNMIDI) || defined(MUSIC_MID_NATIVE_ALT) || defined(MUSIC_MID_FLUIDLITE)
     if (SDL_memcmp(magic, "MUS\x1A", 4) == 0) {
         return xmi_compatible_midi_player();
     }
