@@ -190,6 +190,7 @@ typedef struct {
     int volume;
     int play_count;
     double tempo;
+    float gain;
 
     Mix_MusicMetaTags tags;
 } FLUIDSYNTH_Music;
@@ -459,9 +460,9 @@ static void process_args(const char *args, FluidSynth_Setup *setup)
                     break;
                 case 'g':
                     if (arg[0] == '=') {
-                        setup->gain = SDL_atof(arg + 1);
-                        if (setup->gain < 0.0) {
-                            setup->gain = 1.0;
+                        setup->gain = (float)SDL_atof(arg + 1);
+                        if (setup->gain < 0.0f) {
+                            setup->gain = 1.0f;
                         }
                     }
                     break;
@@ -504,7 +505,8 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusicArg(void *data, const char *args)
     if ((music = SDL_calloc(1, sizeof(FLUIDSYNTH_Music)))) {
         Uint8 channels = 2;
         music->volume = MIX_MAX_VOLUME;
-        music->tempo = 1.0;
+        music->tempo = setup.tempo;
+        music->gain = setup.gain;
         music->play_count = 0;
 
         srcFormat = init_interface(music, music_spec.format);
@@ -539,6 +541,8 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusicArg(void *data, const char *args)
                             if (buffer) {
                                 if (midi_seq_openData(music->player, buffer, size) == 0) {
                                     SDL_free(buffer);
+
+                                    midi_seq_set_tempo_multiplier(music->player, music->tempo);
 
                                     if ((music->stream = SDL_NewAudioStream(srcFormat, channels, (int) samplerate,
                                                           music_spec.format, music_spec.channels, music_spec.freq))) {
@@ -602,7 +606,7 @@ static void FLUIDSYNTH_SetVolume(void *context, int volume)
     FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
     /* FluidSynth's default is 0.2. Make 1.2 the maximum. */
     music->volume = volume;
-    fluidsynth.fluid_synth_set_gain(music->synth, (float) (volume * 1.2 / MIX_MAX_VOLUME));
+    fluidsynth.fluid_synth_set_gain(music->synth, (float) (volume * 1.2 / MIX_MAX_VOLUME) * music->gain);
 }
 
 static int FLUIDSYNTH_GetVolume(void *context)
