@@ -720,13 +720,9 @@ static void *ADLMIDI_new_RWex(struct SDL_RWops *src, int freesrc, const char *ar
     AdlMIDI_Music *adlmidiMusic;
 
     adlmidiMusic = ADLMIDI_LoadSongRW(src, args);
-    if (!adlmidiMusic) {
-        return NULL;
-    }
-    if (freesrc) {
+    if (adlmidiMusic && freesrc) {
         SDL_RWclose(src);
     }
-
     return adlmidiMusic;
 }
 

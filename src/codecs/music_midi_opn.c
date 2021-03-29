@@ -568,13 +568,9 @@ static void *OPNMIDI_new_RWex(struct SDL_RWops *src, int freesrc, const char *ar
     OpnMIDI_Music *adlmidiMusic;
 
     adlmidiMusic = OPNMIDI_LoadSongRW(src, args);
-    if (!adlmidiMusic) {
-        return NULL;
-    }
-    if (freesrc) {
+    if (adlmidiMusic && freesrc) {
         SDL_RWclose(src);
     }
-
     return adlmidiMusic;
 }
 
