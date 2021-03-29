@@ -56,6 +56,10 @@ typedef struct {
     int (*fluid_synth_channel_pressure)(fluid_synth_t*, int, int);
     int (*fluid_synth_program_change)(fluid_synth_t*, int, int);
     int (*fluid_synth_sysex)(fluid_synth_t *, const char *, int, char *, int *, int *, int);
+    void (*fluid_synth_set_reverb_on)(fluid_synth_t*, int);
+    void (*fluid_synth_set_reverb)(fluid_synth_t*, double, double, double, double);
+    void (*fluid_synth_set_chorus_on)(fluid_synth_t*, int);
+    void (*fluid_synth_set_chorus)(fluid_synth_t*, int, double, double, double, int);
 } fluidsynth_loader;
 
 static fluidsynth_loader fluidsynth = {
@@ -100,6 +104,10 @@ static int FLUIDSYNTH_Load()
         FUNCTION_LOADER(fluid_synth_channel_pressure, int (*)(fluid_synth_t*, int, int))
         FUNCTION_LOADER(fluid_synth_program_change, int (*)(fluid_synth_t*, int, int))
         FUNCTION_LOADER(fluid_synth_sysex, int (*)(fluid_synth_t *, const char *, int, char *, int *, int *, int))
+        FUNCTION_LOADER(fluid_synth_set_reverb_on, void (*)(fluid_synth_t*, int))
+        FUNCTION_LOADER(fluid_synth_set_reverb, void (*)(fluid_synth_t*, double, double, double, double))
+        FUNCTION_LOADER(fluid_synth_set_chorus_on, void (*)(fluid_synth_t*, int))
+        FUNCTION_LOADER(fluid_synth_set_chorus, void (*)(fluid_synth_t*, int, double, double, double, int))
     }
     ++fluidsynth.loaded;
 
@@ -117,6 +125,58 @@ static void FLUIDSYNTH_Unload()
 #endif
     }
     --fluidsynth.loaded;
+}
+
+/* Global OPNMIDI flags which are applying on initializing of MIDI player with a file */
+typedef struct {
+    char custom_soundfonts[2048];
+    double tempo;
+    double gain;
+
+    SDL_bool chorus;
+    int      chorus_nr;
+    double   chorus_level;
+    double   chorus_speed;
+    double   chorus_depth;
+    int      chorus_type;
+
+    SDL_bool reverb;
+    double   reverb_roomsize;
+    double   reverb_damping;
+    double   reverb_width;
+    double   reverb_level;
+
+    int polyphony;
+} FluidSynth_Setup;
+
+static FluidSynth_Setup fluidsynth_setup = {
+    "", 1.0, 1.0,
+    SDL_TRUE, FLUID_CHORUS_DEFAULT_N, FLUID_CHORUS_DEFAULT_LEVEL,
+    FLUID_CHORUS_DEFAULT_SPEED, FLUID_CHORUS_DEFAULT_DEPTH, FLUID_CHORUS_DEFAULT_TYPE,
+    SDL_TRUE, FLUID_REVERB_DEFAULT_ROOMSIZE, FLUID_REVERB_DEFAULT_DAMP,
+    FLUID_REVERB_DEFAULT_WIDTH, FLUID_REVERB_DEFAULT_LEVEL,
+    256
+};
+
+static void FLUIDSYNTH_SetDefault(FluidSynth_Setup *setup)
+{
+    setup->custom_soundfonts[0] = '\0';
+    setup->tempo = 1.0;
+    setup->gain = 1.0;
+
+    setup->chorus = SDL_TRUE;
+    setup->chorus_nr = FLUID_CHORUS_DEFAULT_N;
+    setup->chorus_level = FLUID_CHORUS_DEFAULT_LEVEL;
+    setup->chorus_speed = FLUID_CHORUS_DEFAULT_SPEED;
+    setup->chorus_depth = FLUID_CHORUS_DEFAULT_DEPTH;
+    setup->chorus_type = FLUID_CHORUS_DEFAULT_TYPE;
+
+    setup->reverb = SDL_TRUE;
+    setup->reverb_roomsize = FLUID_REVERB_DEFAULT_ROOMSIZE;
+    setup->reverb_damping = FLUID_REVERB_DEFAULT_DAMP;
+    setup->reverb_width = FLUID_REVERB_DEFAULT_WIDTH;
+    setup->reverb_level = FLUID_REVERB_DEFAULT_LEVEL;
+    setup->polyphony = 256;
 }
 
 typedef struct {
@@ -286,13 +346,160 @@ static int FLUIDSYNTH_Open(const SDL_AudioSpec *spec)
     return 0;
 }
 
-static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusic(void *data)
+static void process_args(const char *args, FluidSynth_Setup *setup)
+{
+#define ARG_BUFFER_SIZE    4096
+    char arg[ARG_BUFFER_SIZE];
+    char type = '-';
+    size_t maxlen = 0;
+    size_t i, j = 0;
+    int value_opened = 0;
+
+    FLUIDSYNTH_SetDefault(setup);
+
+    if (args == NULL) {
+        return;
+    }
+
+    maxlen = SDL_strlen(args);
+    if (maxlen == 0) {
+        return;
+    }
+
+    maxlen += 1;
+
+    for (i = 0; i < maxlen; i++) {
+        char c = args[i];
+        if (value_opened == 1) {
+            if ((c == ';') || (c == '\0')) {
+                int value = 0;
+                arg[j] = '\0';
+                if (type != 'x') {
+                    value = SDL_atoi(arg);
+                }
+                switch(type)
+                {
+                case 'c':
+                    switch(arg[0])
+                    {
+                    case 'n':
+                        setup->chorus_nr = SDL_atoi(arg + 1);
+                        if (setup->chorus_nr < 0 || setup->chorus_nr > 99) {
+                            setup->chorus_nr = FLUID_CHORUS_DEFAULT_N;
+                        }
+                        break;
+                    case 'l':
+                        setup->chorus_level = SDL_atof(arg + 1);
+                        if (setup->chorus_level < 0.0 || setup->chorus_level > 10.0) {
+                            setup->chorus_level = FLUID_CHORUS_DEFAULT_LEVEL;
+                        }
+                        break;
+                    case 's':
+                        setup->chorus_speed = SDL_atof(arg + 1);
+                        if (setup->chorus_speed < 0.1 || setup->chorus_speed > 5.0) {
+                            setup->chorus_speed = FLUID_CHORUS_DEFAULT_SPEED;
+                        }
+                        break;
+                    case 'd':
+                        setup->chorus_speed = SDL_atof(arg + 1);
+                        if (setup->chorus_speed < 0.0 || setup->chorus_speed > 21.0) {
+                            setup->chorus_speed = FLUID_CHORUS_DEFAULT_DEPTH;
+                        }
+                        break;
+                    case 't':
+                        setup->chorus_type = SDL_atoi(arg + 1);
+                        if (setup->chorus_type < 0 || setup->chorus_type > 1) {
+                            setup->chorus_type = FLUID_CHORUS_DEFAULT_N;
+                        }
+                        break;
+                    default:
+                        setup->chorus = (value != 0);
+                        break;
+                    }
+                    break;
+                case 'r':
+                    switch(arg[0])
+                    {
+                    case 'r':
+                        setup->reverb_roomsize = SDL_atof(arg + 1);
+                        if (setup->reverb_roomsize < 0.0 || setup->reverb_roomsize > 1.0) {
+                            setup->reverb_roomsize = FLUID_REVERB_DEFAULT_ROOMSIZE;
+                        }
+                        break;
+                    case 'd':
+                        setup->reverb_damping = SDL_atof(arg + 1);
+                        if (setup->reverb_damping < 0.0 || setup->reverb_damping > 1.0) {
+                            setup->reverb_damping = FLUID_REVERB_DEFAULT_DAMP;
+                        }
+                        break;
+                    case 'w':
+                        setup->reverb_width = SDL_atof(arg + 1);
+                        if (setup->reverb_width < 0.0 || setup->reverb_width > 100.0) {
+                            setup->reverb_width = FLUID_REVERB_DEFAULT_WIDTH;
+                        }
+                        break;
+                    case 'l':
+                        setup->reverb_level = SDL_atof(arg + 1);
+                        if (setup->reverb_level < 0 || setup->reverb_level > 1.0) {
+                            setup->reverb_level = FLUID_REVERB_DEFAULT_LEVEL;
+                        }
+                        break;
+                    default:
+                        setup->reverb = (value != 0);
+                        break;
+                    }
+                    break;
+                case 't':
+                    if (arg[0] == '=') {
+                        setup->tempo = SDL_atof(arg + 1);
+                        if (setup->tempo <= 0.0) {
+                            setup->tempo = 1.0;
+                        }
+                    }
+                    break;
+                case 'g':
+                    if (arg[0] == '=') {
+                        setup->gain = SDL_atof(arg + 1);
+                        if (setup->gain < 0.0) {
+                            setup->gain = 1.0;
+                        }
+                    }
+                    break;
+                case 'x':
+                    if (arg[0] == '=') {
+                        SDL_strlcpy(setup->custom_soundfonts, arg + 1, (ARG_BUFFER_SIZE - 1));
+                    }
+                    break;
+                case '\0':
+                    break;
+                default:
+                    break;
+                }
+                value_opened = 0;
+            }
+            arg[j++] = c;
+        } else {
+            if (c == '\0') {
+                return;
+            }
+            type = c;
+            value_opened = 1;
+            j = 0;
+        }
+    }
+#undef ARG_BUFFER_SIZE
+}
+
+static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusicArg(void *data, const char *args)
 {
     SDL_RWops *src = (SDL_RWops *)data;
     FLUIDSYNTH_Music *music;
+    FluidSynth_Setup setup = fluidsynth_setup;
     fluid_settings_t *settings;
     double samplerate; /* as set by the lib. */
     int srcFormat;
+
+    process_args(args, &setup);
 
     if ((music = SDL_calloc(1, sizeof(FLUIDSYNTH_Music)))) {
         Uint8 channels = 2;
@@ -315,6 +522,14 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusic(void *data)
 
                 if ((music->synth = fluidsynth.new_fluid_synth(settings))) {
                     if (Mix_EachSoundFont(fluidsynth_load_soundfont, (void*) music->synth)) {
+                        fluidsynth.fluid_synth_set_reverb_on(music->synth, setup.reverb);
+                        fluidsynth.fluid_synth_set_reverb(music->synth,
+                                                          setup.reverb_roomsize, setup.reverb_damping,
+                                                          setup.reverb_width, setup.reverb_level);
+                        fluidsynth.fluid_synth_set_chorus_on(music->synth, setup.chorus);
+                        fluidsynth.fluid_synth_set_chorus(music->synth,
+                                                          setup.chorus_nr, setup.chorus_level,
+                                                          setup.chorus_speed, setup.chorus_depth, setup.chorus_type);
 
                         if ((music->player = midi_seq_init_interface(&music->seq_if))) {
                             void *buffer;
@@ -365,16 +580,22 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusic(void *data)
     return NULL;
 }
 
-static void *FLUIDSYNTH_CreateFromRW(SDL_RWops *src, int freesrc)
+static void *FLUIDSYNTH_CreateFromRWEx(SDL_RWops *src, int freesrc, const char *args)
 {
     FLUIDSYNTH_Music *music;
 
-    music = FLUIDSYNTH_LoadMusic(src);
+    music = FLUIDSYNTH_LoadMusicArg(src, args);
     if (music && freesrc) {
         SDL_RWclose(src);
     }
     return music;
 }
+
+static void *FLUIDSYNTH_CreateFromRW(SDL_RWops *src, int freesrc)
+{
+    return FLUIDSYNTH_CreateFromRWEx(src, freesrc, NULL);
+}
+
 
 static void FLUIDSYNTH_SetVolume(void *context, int volume)
 {
@@ -550,7 +771,7 @@ Mix_MusicInterface Mix_MusicInterface_FLUIDSYNTH =
     FLUIDSYNTH_Load,
     FLUIDSYNTH_Open,
     FLUIDSYNTH_CreateFromRW,
-    NULL,   /* CreateFromRWex [MIXER-X]*/
+    FLUIDSYNTH_CreateFromRWEx,
     NULL,   /* CreateFromFile */
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     FLUIDSYNTH_SetVolume,
