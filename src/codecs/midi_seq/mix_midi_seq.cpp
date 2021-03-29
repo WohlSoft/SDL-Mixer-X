@@ -169,7 +169,12 @@ double midi_seq_tick(void *seq, double s, double granularity)
 {
     MixerSeqInternal *seqi = reinterpret_cast<MixerSeqInternal*>(seq);
     double ret = seqi->seq.Tick(s, granularity);
-
     s *= seqi->seq.getTempoMultiplier();
     return ret;
+}
+
+int midi_seq_play_buffer(void *seq, uint8_t *stream, int len)
+{
+    MixerSeqInternal *seqi = reinterpret_cast<MixerSeqInternal*>(seq);
+    return seqi->seq.playStream(stream, len);
 }

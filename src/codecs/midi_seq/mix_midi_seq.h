@@ -54,6 +54,7 @@ extern void midi_seq_set_tempo_multiplier(void *seq, double tempo);
 extern void midi_seq_set_loop_enabled(void *seq, int loopEn);
 
 extern double midi_seq_tick(void *seq, double s, double granularity);
+extern int midi_seq_play_buffer(void *seq, uint8_t *stream, int len);
 
 #ifdef __cplusplus
 }
