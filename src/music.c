@@ -2210,21 +2210,21 @@ int SDLCALLCC Mix_SetMidiPlayer(int player)
 {
 #ifdef MUSIC_USE_MIDI
     switch (player) {
-        #ifdef MUSIC_MID_ADLMIDI
+#   ifdef MUSIC_MID_ADLMIDI
     case MIDI_ADLMIDI:
-        #endif
-        #ifdef MUSIC_MID_OPNMIDI
+#   endif
+#   ifdef MUSIC_MID_OPNMIDI
     case MIDI_OPNMIDI:
-        #endif
-        #ifdef MUSIC_MID_TIMIDITY
+#   endif
+#   ifdef MUSIC_MID_TIMIDITY
     case MIDI_Timidity:
-        #endif
-        #ifdef MUSIC_MID_NATIVE
+#   endif
+#   ifdef MUSIC_MID_NATIVE
     case MIDI_Native:
-        #endif
-        #ifdef MUSIC_MID_FLUIDSYNTH
+#   endif
+#   ifdef MUSIC_MID_FLUIDSYNTH
     case MIDI_Fluidsynth:
-        #endif
+#   endif
         mididevice_current = player;
         return 0;
     default:
