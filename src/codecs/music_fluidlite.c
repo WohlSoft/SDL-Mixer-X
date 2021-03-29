@@ -60,6 +60,7 @@ typedef struct {
     void (*fluid_synth_set_reverb)(fluid_synth_t*, double, double, double, double);
     void (*fluid_synth_set_chorus_on)(fluid_synth_t*, int);
     void (*fluid_synth_set_chorus)(fluid_synth_t*, int, double, double, double, int);
+    int (*fluid_synth_set_polyphony)(fluid_synth_t*, int);
 } fluidsynth_loader;
 
 static fluidsynth_loader fluidsynth = {
@@ -108,6 +109,7 @@ static int FLUIDSYNTH_Load()
         FUNCTION_LOADER(fluid_synth_set_reverb, void (*)(fluid_synth_t*, double, double, double, double))
         FUNCTION_LOADER(fluid_synth_set_chorus_on, void (*)(fluid_synth_t*, int))
         FUNCTION_LOADER(fluid_synth_set_chorus, void (*)(fluid_synth_t*, int, double, double, double, int))
+        FUNCTION_LOADER(fluid_synth_set_polyphony, int (*)(fluid_synth_t*, int))
     }
     ++fluidsynth.loaded;
 
@@ -450,6 +452,12 @@ static void process_args(const char *args, FluidSynth_Setup *setup)
                         break;
                     }
                     break;
+                case 'p':
+                    setup->polyphony = value;
+                    if (setup->polyphony < 8 || setup->polyphony > 512) {
+                        setup->polyphony = 256;
+                    }
+                    break;
                 case 't':
                     if (arg[0] == '=') {
                         setup->tempo = SDL_atof(arg + 1);
@@ -532,6 +540,7 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusicArg(void *data, const char *args)
                         fluidsynth.fluid_synth_set_chorus(music->synth,
                                                           setup.chorus_nr, setup.chorus_level,
                                                           setup.chorus_speed, setup.chorus_depth, setup.chorus_type);
+                        fluidsynth.fluid_synth_set_polyphony(music->synth, setup.polyphony);
 
                         if ((music->player = midi_seq_init_interface(&music->seq_if))) {
                             void *buffer;
