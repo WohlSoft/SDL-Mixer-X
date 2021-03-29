@@ -362,6 +362,17 @@ static int FLUIDSYNTH_Open(const SDL_AudioSpec *spec)
     return 0;
 }
 
+static void replace_colon_to_semicolon(char *str)
+{
+    size_t i;
+    size_t len = SDL_strlen(str);
+    for (i = 0; str && i < len; ++str, ++i) {
+        if(*str == '&') {
+            *str = ';';
+        }
+    }
+}
+
 static void process_args(const char *args, FluidSynth_Setup *setup)
 {
 #define ARG_BUFFER_SIZE    4096
@@ -490,6 +501,7 @@ static void process_args(const char *args, FluidSynth_Setup *setup)
                 case 'x':
                     if (arg[0] == '=') {
                         SDL_strlcpy(setup->custom_soundfonts, arg + 1, (ARG_BUFFER_SIZE - 1));
+                        replace_colon_to_semicolon(setup->custom_soundfonts);
                     }
                     break;
                 case '\0':
@@ -519,7 +531,8 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusicArg(void *data, const char *args)
     FluidSynth_Setup setup = fluidsynth_setup;
     fluid_settings_t *settings;
     double samplerate; /* as set by the lib. */
-    int srcFormat;
+    int src_format;
+    int ret;
 
     process_args(args, &setup);
 
@@ -530,11 +543,12 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusicArg(void *data, const char *args)
         music->gain = setup.gain;
         music->play_count = 0;
 
-        srcFormat = init_interface(music, music_spec.format);
-        if(srcFormat == AUDIO_S16SYS)
+        src_format = init_interface(music, music_spec.format);
+        if (src_format == AUDIO_S16SYS) {
             music->sample_size = sizeof(Sint16);
-        else
+        } else {
             music->sample_size = sizeof(float);
+        }
 
         music->buffer_size = music_spec.samples * music->sample_size * channels;
         if ((music->buffer = SDL_malloc((size_t)music->buffer_size))) {
@@ -544,7 +558,13 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusicArg(void *data, const char *args)
                 music->seq_if.pcmSampleRate = samplerate;
 
                 if ((music->synth = fluidsynth.new_fluid_synth(settings))) {
-                    if (Mix_EachSoundFont(fluidsynth_load_soundfont, (void*) music->synth)) {
+                    if (setup.custom_soundfonts[0]) {
+                        ret = Mix_EachSoundFontEx(setup.custom_soundfonts, fluidsynth_load_soundfont, (void*) music->synth);
+                    } else {
+                        ret = Mix_EachSoundFont(fluidsynth_load_soundfont, (void*) music->synth);
+                    }
+
+                    if (ret) {
                         fluidsynth.fluid_synth_set_reverb_on(music->synth, setup.reverb);
                         fluidsynth.fluid_synth_set_reverb(music->synth,
                                                           setup.reverb_roomsize, setup.reverb_damping,
@@ -566,7 +586,7 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusicArg(void *data, const char *args)
 
                                     midi_seq_set_tempo_multiplier(music->player, music->tempo);
 
-                                    if ((music->stream = SDL_NewAudioStream(srcFormat, channels, (int) samplerate,
+                                    if ((music->stream = SDL_NewAudioStream(src_format, channels, (int) samplerate,
                                                           music_spec.format, music_spec.channels, music_spec.freq))) {
                                         meta_tags_init(&music->tags);
                                         _Mix_ParseMidiMetaTag(&music->tags, MIX_META_TITLE, midi_seq_meta_title(music->player));

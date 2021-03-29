@@ -2153,8 +2153,12 @@ const char* SDLCALLCC Mix_GetSoundFonts(void)
 
 int SDLCALLCC Mix_EachSoundFont(int (SDLCALL *function)(const char*, void*), void *data)
 {
+    return Mix_EachSoundFontEx(Mix_GetSoundFonts(), function, data);
+}
+
+int SDLCALLCC Mix_EachSoundFontEx(const char* cpaths, int (SDLCALL *function)(const char*, void*), void *data)
+{
     char *context, *path, *paths;
-    const char* cpaths = Mix_GetSoundFonts();
     int soundfonts_found = 0;
 
     if (!cpaths) {

@@ -843,6 +843,7 @@ extern DECLSPEC int SDLCALL Mix_GetSynchroValue(void);
 extern DECLSPEC int SDLCALL Mix_SetSoundFonts(const char *paths);
 extern DECLSPEC const char* SDLCALL Mix_GetSoundFonts(void);
 extern DECLSPEC int SDLCALL Mix_EachSoundFont(int (SDLCALL *function)(const char*, void*), void *data);
+extern DECLSPEC int SDLCALL Mix_EachSoundFontEx(const char* cpaths, int (SDLCALL *function)(const char*, void*), void *data);
 
 /* Set/Get full path of Timidity config file (e.g. /etc/timidity.cfg) */
 extern DECLSPEC int SDLCALL Mix_SetTimidityCfg(const char *path);
