@@ -1,4 +1,6 @@
 2.5.0:
+Vitaly Novichkov - 2021-03-29 15:11:00
+ * Added the support for the FluidLite library
 Vitaly Novichkov - 2021-01-29 11:06:44
  * Resolved the linking confusion when some libraries got disabled
 Vitaly Novichkov - 2021-01-09 21:56:39
