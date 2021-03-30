@@ -1,6 +1,9 @@
 
 if(USE_SYSTEM_AUDIO_LIBRARIES OR USE_SYSTEM_SDL2)
     find_package(SDL2 REQUIRED)
+    if(TARGET SDL2::SDL2)
+        set(SDL2_LIBRARIES SDL2::SDL2 SDL2::SDL2main)
+    endif()
     if(WIN32)
         find_library(SDL2main_LIBRARY NAMES SDL2main${MIX_DEBUG_SUFFIX} SDL2main)
         string(REGEX REPLACE "-mwindows" "" SDL2_LIBRARIES "${SDL2_LIBRARIES}")
