@@ -296,7 +296,11 @@ if(APPLE)
     find_library(APPLE_CORE_FOUNDATION CoreFoundation)
     find_library(APPLE_CARBON Carbon)
     find_library(APPLE_FORCE_FEEDBACK ForceFeedback)
-    find_library(ICONV_LIB iconv)
+    check_library_exists(iconv iconv_open "" HAVE_LIBICONV)
+    if(HAVE_LIBICONV)
+        set(ICONV_LIB iconv)
+    endif()
+
     list(APPEND SDLMixerX_LINK_LIBS
             ${APPLE_CORE_AUDIO}
             ${APPLE_COCOA}
