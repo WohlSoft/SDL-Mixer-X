@@ -185,6 +185,8 @@ typedef struct {
     fluid_synth_t *synth;
     fluid_settings_t *settings;
     BW_MidiRtInterface seq_if;
+    int (*synth_write)(fluid_synth_t*, int, void*, int, int, void*, int, int);
+    int synth_write_ret;
     void *player;
     SDL_AudioStream *stream;
     void *buffer;
@@ -252,22 +254,21 @@ static void rtSysEx(void *userdata, const uint8_t *msg, size_t size)
     fluidsynth.fluid_synth_sysex(music->synth, (const char*)(msg), (int)(size), NULL, NULL, NULL, 0);
 }
 
-static void playSynthS16(void *userdata, uint8_t *stream, size_t length)
+static void playSynthBuffer(void *userdata, uint8_t *stream, size_t length)
 {
     FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music*)(userdata);
-    fluidsynth.fluid_synth_write_s16(music->synth, (int)(length / 4), stream, 0, 2, stream, 1, 2);
+    int samples = (int)length / (music->sample_size * 2);
+
+    if (music->synth_write_ret < 0) {
+        return;
+    }
+
+    music->synth_write_ret = music->synth_write(music->synth, samples, stream, 0, 2, stream, 1, 2);
 }
 
-static void playSynthF32(void *userdata, uint8_t *stream, size_t length)
+static int init_interface(FLUIDSYNTH_Music *music)
 {
-    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music*)(userdata);
-    fluidsynth.fluid_synth_write_float(music->synth, (int)(length / 8), stream, 0, 2, stream, 1, 2);
-}
-
-
-static int init_interface(FLUIDSYNTH_Music *music, int outFormat)
-{
-    int inFormat = outFormat;
+    int in_format = AUDIO_S16SYS;
     SDL_memset(&music->seq_if, 0, sizeof(BW_MidiRtInterface));
 
     /* seq->onDebugMessage             = hooks.onDebugMessage; */
@@ -284,33 +285,28 @@ static int init_interface(FLUIDSYNTH_Music *music, int outFormat)
     music->seq_if.rt_pitchBend = rtPitchBend;
     music->seq_if.rt_systemExclusive = rtSysEx;
 
-    switch(outFormat)
+    music->seq_if.onPcmRender = playSynthBuffer;
+    music->seq_if.pcmSampleRate = music_spec.freq;
+
+    music->synth_write = fluidsynth.fluid_synth_write_s16;
+    music->sample_size = sizeof(Sint16);
+    music->seq_if.pcmFrameSize = 2 * music->sample_size;
+
+    switch(music_spec.format)
     {
-    default:
-    case AUDIO_U8:
-    case AUDIO_S8:
-    case AUDIO_S16LSB:
-    case AUDIO_S16MSB:
-    case AUDIO_U16LSB:
-    case AUDIO_U16MSB:
-        music->seq_if.onPcmRender = playSynthS16;
-        music->seq_if.pcmSampleRate = music_spec.freq;
-        music->seq_if.pcmFrameSize = 2 /*channels*/ * sizeof(Sint16) /*size of one sample*/;
-        inFormat = AUDIO_S16SYS;
-        break;
     case AUDIO_S32LSB:
     case AUDIO_S32MSB:
     case AUDIO_F32LSB:
     case AUDIO_F32MSB:
-        music->seq_if.onPcmRender = playSynthF32;
-        music->seq_if.pcmSampleRate = music_spec.freq;
-        music->seq_if.pcmFrameSize = 2 /*channels*/ * sizeof(float) /*size of one sample*/;
-        inFormat = AUDIO_F32SYS;
+        music->synth_write = fluidsynth.fluid_synth_write_float;
+        music->sample_size <<= 1;
+        music->seq_if.pcmFrameSize <<= 1;
+        in_format = AUDIO_F32SYS;
         break;
     }
     music->seq_if.onPcmRender_userData = music;
 
-    return inFormat;
+    return in_format;
 }
 
 static void all_notes_off(fluid_synth_t *synth)
@@ -527,11 +523,11 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusicArg(void *data, const char *args)
     FLUIDSYNTH_Music *music;
     FluidSynth_Setup setup = fluidsynth_setup;
     double samplerate; /* as set by the lib. */
-    int src_format;
-    int ret;
-    Uint8 channels = 2;
+    int src_format = AUDIO_S16SYS;
+    const Uint8 channels = 2;
     void *rw_mem;
     size_t rw_size;
+    int ret;
 
     process_args(args, &setup);
 
@@ -545,14 +541,9 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusicArg(void *data, const char *args)
     music->gain = setup.gain;
     music->play_count = 0;
 
-    src_format = init_interface(music, music_spec.format);
-    if (src_format == AUDIO_S16SYS) {
-        music->sample_size = sizeof(Sint16);
-    } else {
-        music->sample_size = sizeof(float);
-    }
-
+    src_format = init_interface(music);
     music->buffer_size = music_spec.samples * music->sample_size * channels;
+
     if (!(music->buffer = SDL_malloc((size_t)music->buffer_size))) {
         SDL_OutOfMemory();
         goto fail;
@@ -767,6 +758,11 @@ static int FLUIDSYNTH_GetSome(void *context, void *data, int bytes, SDL_bool *do
     }
 
     gotten_len = midi_seq_play_buffer(music->player, music->buffer, music->buffer_size);
+
+    if (music->synth_write_ret < 0) {
+        Mix_SetError("Error generating FluidSynth audio");
+        return -1;
+    }
 
     if (gotten_len <= 0) {
         *done = SDL_TRUE;
