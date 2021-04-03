@@ -530,8 +530,8 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusicArg(void *data, const char *args)
     int src_format;
     int ret;
     Uint8 channels = 2;
-    void *song_buffer;
-    size_t song_size;
+    void *rw_mem;
+    size_t rw_size;
 
     process_args(args, &setup);
 
@@ -555,14 +555,12 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusicArg(void *data, const char *args)
     music->buffer_size = music_spec.samples * music->sample_size * channels;
     if (!(music->buffer = SDL_malloc((size_t)music->buffer_size))) {
         SDL_OutOfMemory();
-        FLUIDSYNTH_Delete(music);
-        return NULL;
+        goto fail;
     }
 
     if (!(music->settings = fluidsynth.new_fluid_settings())) {
         Mix_SetError("Failed to create FluidSynth settings");
-        FLUIDSYNTH_Delete(music);
-        return NULL;
+        goto fail;
     }
 
     fluidsynth.fluid_settings_setnum(music->settings, "synth.sample-rate", (double) music_spec.freq);
@@ -571,20 +569,18 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusicArg(void *data, const char *args)
 
     if (!(music->synth = fluidsynth.new_fluid_synth(music->settings))) {
         Mix_SetError("Failed to create FluidSynth synthesizer");
-        FLUIDSYNTH_Delete(music);
-        return NULL;
+        goto fail;
     }
 
 
     if (setup.custom_soundfonts[0]) {
-        ret = Mix_EachSoundFontEx(setup.custom_soundfonts, fluidsynth_load_soundfont, (void*) music->synth);
+        ret = Mix_EachSoundFontEx(setup.custom_soundfonts, fluidsynth_load_soundfont, music->synth);
     } else {
-        ret = Mix_EachSoundFont(fluidsynth_load_soundfont, (void*) music->synth);
+        ret = Mix_EachSoundFont(fluidsynth_load_soundfont, music->synth);
     }
 
     if (!ret) {
-        FLUIDSYNTH_Delete(music);
-        return NULL;
+        goto fail;
     }
 
 
@@ -600,32 +596,28 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusicArg(void *data, const char *args)
 
     if (!(music->player = midi_seq_init_interface(&music->seq_if))) {
         Mix_SetError("Failed to create FluidSynth player");
-        FLUIDSYNTH_Delete(music);
-        return NULL;
+        goto fail;
     }
 
-    song_buffer = SDL_LoadFile_RW(src, &song_size, SDL_FALSE);
-    if (!song_buffer) {
+    rw_mem = SDL_LoadFile_RW(src, &rw_size, SDL_FALSE);
+    if (!rw_mem) {
         SDL_OutOfMemory();
-        FLUIDSYNTH_Delete(music);
-        return NULL;
+        goto fail;
     }
 
-    ret = midi_seq_openData(music->player, song_buffer, song_size);
-    SDL_free(song_buffer);
+    ret = midi_seq_openData(music->player, rw_mem, rw_size);
+    SDL_free(rw_mem);
 
     if (ret < 0) {
         Mix_SetError("FluidSynth failed to load in-memory song: %s", midi_seq_get_error(music->player));
-        FLUIDSYNTH_Delete(music);
-        return NULL;
+        goto fail;
     }
 
     midi_seq_set_tempo_multiplier(music->player, music->tempo);
 
     if (!(music->stream = SDL_NewAudioStream(src_format, channels, (int) samplerate,
                           music_spec.format, music_spec.channels, music_spec.freq))) {
-        FLUIDSYNTH_Delete(music);
-        return NULL;
+        goto fail;
     }
 
     meta_tags_init(&music->tags);
@@ -634,6 +626,10 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusicArg(void *data, const char *args)
     _Mix_ParseMidiMetaTag(&music->tags, MIX_META_COPYRIGHT, midi_seq_meta_copyright(music->player));
 
     return music;
+
+fail:
+    FLUIDSYNTH_Delete(music);
+    return NULL;
 }
 
 static void *FLUIDSYNTH_CreateFromRWEx(SDL_RWops *src, int freesrc, const char *args)

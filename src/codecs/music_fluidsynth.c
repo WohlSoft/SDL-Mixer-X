@@ -220,8 +220,8 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusic(void *data)
     int src_format;
     int ret;
     Uint8 channels = 2;
-    void *song_buffer;
-    size_t song_size;
+    void *rw_mem;
+    size_t rw_size;
 
     if (!(music = SDL_calloc(1, sizeof(FLUIDSYNTH_Music)))) {
         SDL_OutOfMemory();
@@ -241,14 +241,12 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusic(void *data)
 
     if (!(music->buffer = SDL_malloc((size_t)music->buffer_size))) {
         SDL_OutOfMemory();
-        FLUIDSYNTH_Delete(music);
-        return NULL;
+        goto fail;
     }
 
     if (!(music->settings = fluidsynth.new_fluid_settings())) {
         Mix_SetError("Failed to create FluidSynth settings");
-        FLUIDSYNTH_Delete(music);
-        return NULL;
+        goto fail;
     }
 
     fluidsynth.fluid_settings_setnum(music->settings, "synth.sample-rate", (double) music_spec.freq);
@@ -256,44 +254,42 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusic(void *data)
 
     if (!(music->synth = fluidsynth.new_fluid_synth(music->settings))) {
         Mix_SetError("Failed to create FluidSynth synthesizer");
-        FLUIDSYNTH_Delete(music);
-        return NULL;
+        goto fail;
     }
 
-    if (!Mix_EachSoundFont(fluidsynth_load_soundfont, (void*) music->synth)) {
-        FLUIDSYNTH_Delete(music);
-        return NULL;
+    if (!Mix_EachSoundFont(fluidsynth_load_soundfont, music->synth)) {
+        goto fail;
     }
 
     if (!(music->player = fluidsynth.new_fluid_player(music->synth))) {
         Mix_SetError("Failed to create FluidSynth player");
-        FLUIDSYNTH_Delete(music);
-        return NULL;
+        goto fail;
     }
 
-    song_buffer = SDL_LoadFile_RW(src, &song_size, SDL_FALSE);
-    if (!song_buffer) {
+    rw_mem = SDL_LoadFile_RW(src, &rw_size, SDL_FALSE);
+    if (!rw_mem) {
         SDL_OutOfMemory();
-        FLUIDSYNTH_Delete(music);
-        return NULL;
+        goto fail;
     }
 
-    ret = (fluidsynth.fluid_player_add_mem(music->player, song_buffer, song_size) == FLUID_OK);
-    SDL_free(song_buffer);
+    ret = (fluidsynth.fluid_player_add_mem(music->player, rw_mem, rw_size) == FLUID_OK);
+    SDL_free(rw_mem);
 
-    if (ret < 0) {
+    if (!ret) {
         Mix_SetError("FluidSynth failed to load in-memory song");
-        FLUIDSYNTH_Delete(music);
-        return NULL;
+        goto fail;
     }
 
     if (!(music->stream = SDL_NewAudioStream(src_format, channels, (int) samplerate,
                           music_spec.format, music_spec.channels, music_spec.freq))) {
-        FLUIDSYNTH_Delete(music);
-        return NULL;
+        goto fail;
     }
 
     return music;
+
+fail:
+    FLUIDSYNTH_Delete(music);
+    return NULL;
 }
 
 static void *FLUIDSYNTH_CreateFromRW(SDL_RWops *src, int freesrc)
