@@ -291,20 +291,14 @@ static int init_interface(FLUIDSYNTH_Music *music)
     music->synth_write = fluidsynth.fluid_synth_write_s16;
     music->sample_size = sizeof(Sint16);
     music->seq_if.pcmFrameSize = 2 * music->sample_size;
+    music->seq_if.onPcmRender_userData = music;
 
-    switch(music_spec.format)
-    {
-    case AUDIO_S32LSB:
-    case AUDIO_S32MSB:
-    case AUDIO_F32LSB:
-    case AUDIO_F32MSB:
+    if (music_spec.format & 0x0020) { /* 32 bit. */
         music->synth_write = fluidsynth.fluid_synth_write_float;
         music->sample_size <<= 1;
         music->seq_if.pcmFrameSize <<= 1;
         in_format = AUDIO_F32SYS;
-        break;
     }
-    music->seq_if.onPcmRender_userData = music;
 
     return in_format;
 }

@@ -193,16 +193,10 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusic(void *data)
 
     src_format = AUDIO_S16SYS;
     music->synth_write = fluidsynth.fluid_synth_write_s16;
-    switch(music_spec.format)
-    {
-    case AUDIO_S32LSB:
-    case AUDIO_S32MSB:
-    case AUDIO_F32LSB:
-    case AUDIO_F32MSB:
+    if (music_spec.format & 0x0020) { /* 32 bit. */
         src_format = AUDIO_F32SYS;
         music->buffer_size <<= 1;
         music->synth_write = fluidsynth.fluid_synth_write_float;
-        break;
     }
 
     if (!(music->buffer = SDL_malloc((size_t)music->buffer_size))) {
