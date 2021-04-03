@@ -813,19 +813,15 @@ static void FLUIDSYNTH_Delete(void *context)
     if (music->synth) {
         fluidsynth.delete_fluid_synth(music->synth);
     }
-
     if (music->settings) {
         fluidsynth.delete_fluid_settings(music->settings);
     }
-
     if (music->stream) {
         SDL_FreeAudioStream(music->stream);
     }
-
     if (music->buffer) {
         SDL_free(music->buffer);
     }
-
     SDL_free(music);
 }
 
