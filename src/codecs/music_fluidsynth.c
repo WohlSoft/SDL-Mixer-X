@@ -56,6 +56,7 @@ typedef struct {
     void (*fluid_synth_set_gain)(fluid_synth_t*, float);
     int (*fluid_synth_sfload)(fluid_synth_t*, const char*, int);
     int (*fluid_synth_write_s16)(fluid_synth_t*, int, void*, int, int, void*, int, int);
+    int (*fluid_synth_write_float)(fluid_synth_t*, int, void*, int, int, void*, int, int);
     fluid_player_t* (*new_fluid_player)(fluid_synth_t*);
     fluid_settings_t* (*new_fluid_settings)(void);
     fluid_synth_t* (*new_fluid_synth)(fluid_settings_t*);
@@ -103,6 +104,7 @@ static int FLUIDSYNTH_Load()
         FUNCTION_LOADER(fluid_synth_set_gain, void (*)(fluid_synth_t*, float))
         FUNCTION_LOADER(fluid_synth_sfload, int(*)(fluid_synth_t*, const char*, int))
         FUNCTION_LOADER(fluid_synth_write_s16, int(*)(fluid_synth_t*, int, void*, int, int, void*, int, int))
+        FUNCTION_LOADER(fluid_synth_write_float, int(*)(fluid_synth_t*, int, void*, int, int, void*, int, int))
         FUNCTION_LOADER(new_fluid_player, fluid_player_t* (*)(fluid_synth_t*))
         FUNCTION_LOADER(new_fluid_settings, fluid_settings_t* (*)(void))
         FUNCTION_LOADER(new_fluid_synth, fluid_synth_t* (*)(fluid_settings_t*))
@@ -130,9 +132,11 @@ typedef struct {
     fluid_synth_t *synth;
     fluid_settings_t *settings;
     fluid_player_t *player;
+    int (*synth_write)(void *userdata, uint8_t *stream, size_t length);
     SDL_AudioStream *stream;
     void *buffer;
     int buffer_size;
+    int sample_size;
     int volume;
 } FLUIDSYNTH_Music;
 
@@ -159,6 +163,46 @@ static int SDLCALL fluidsynth_load_soundfont(const char *path, void *data)
     return 1;
 }
 
+static int playSynthS16(void *userdata, uint8_t *stream, size_t length)
+{
+    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music*)(userdata);
+    return fluidsynth.fluid_synth_write_s16(music->synth, (int)(length / 4), stream, 0, 2, stream, 1, 2);
+}
+
+static int playSynthF32(void *userdata, uint8_t *stream, size_t length)
+{
+    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music*)(userdata);
+    return fluidsynth.fluid_synth_write_float(music->synth, (int)(length / 8), stream, 0, 2, stream, 1, 2);
+}
+
+static int init_interface(FLUIDSYNTH_Music *music, int out_format)
+{
+    int in_format = out_format;
+
+    switch(out_format)
+    {
+    default:
+    case AUDIO_U8:
+    case AUDIO_S8:
+    case AUDIO_S16LSB:
+    case AUDIO_S16MSB:
+    case AUDIO_U16LSB:
+    case AUDIO_U16MSB:
+        music->synth_write = playSynthS16;
+        in_format = AUDIO_S16SYS;
+        break;
+    case AUDIO_S32LSB:
+    case AUDIO_S32MSB:
+    case AUDIO_F32LSB:
+    case AUDIO_F32MSB:
+        music->synth_write = playSynthF32;
+        in_format = AUDIO_F32SYS;
+        break;
+    }
+
+    return in_format;
+}
+
 static int FLUIDSYNTH_Open(const SDL_AudioSpec *spec)
 {
     (void)spec;
@@ -173,6 +217,7 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusic(void *data)
     SDL_RWops *src = (SDL_RWops *)data;
     FLUIDSYNTH_Music *music;
     double samplerate; /* as set by the lib. */
+    int src_format;
     int ret;
     Uint8 channels = 2;
     void *song_buffer;
@@ -184,7 +229,15 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusic(void *data)
     }
 
     music->volume = MIX_MAX_VOLUME;
-    music->buffer_size = music_spec.samples * sizeof(Sint16) * channels;
+
+    src_format = init_interface(music, music_spec.format);
+    if (src_format == AUDIO_S16SYS) {
+        music->sample_size = sizeof(Sint16);
+    } else {
+        music->sample_size = sizeof(float);
+    }
+
+    music->buffer_size = music_spec.samples * music->sample_size * channels;
 
     if (!(music->buffer = SDL_malloc((size_t)music->buffer_size))) {
         SDL_OutOfMemory();
@@ -234,7 +287,7 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusic(void *data)
         return NULL;
     }
 
-    if (!(music->stream = SDL_NewAudioStream(AUDIO_S16SYS, channels, (int) samplerate,
+    if (!(music->stream = SDL_NewAudioStream(src_format, channels, (int) samplerate,
                           music_spec.format, music_spec.channels, music_spec.freq))) {
         FLUIDSYNTH_Delete(music);
         return NULL;
@@ -294,7 +347,7 @@ static int FLUIDSYNTH_GetSome(void *context, void *data, int bytes, SDL_bool *do
         return filled;
     }
 
-    if (fluidsynth.fluid_synth_write_s16(music->synth, music_spec.samples, music->buffer, 0, 2, music->buffer, 1, 2) != FLUID_OK) {
+    if (music->synth_write(music, music->buffer, music_spec.samples * music->sample_size * 2) != FLUID_OK) {
         Mix_SetError("Error generating FluidSynth audio");
         return -1;
     }
