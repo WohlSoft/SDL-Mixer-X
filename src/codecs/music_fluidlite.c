@@ -751,6 +751,8 @@ static int FLUIDSYNTH_GetSome(void *context, void *data, int bytes, SDL_bool *do
         return 0;
     }
 
+    music->synth_write_ret = 0;
+
     gotten_len = midi_seq_play_buffer(music->player, music->buffer, music->buffer_size);
 
     if (music->synth_write_ret < 0) {
