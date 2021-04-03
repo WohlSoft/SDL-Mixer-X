@@ -135,14 +135,14 @@ typedef struct {
     double tempo;
     double gain;
 
-    SDL_bool chorus;
+    int      chorus;
     int      chorus_nr;
     double   chorus_level;
     double   chorus_speed;
     double   chorus_depth;
     int      chorus_type;
 
-    SDL_bool reverb;
+    int      reverb;
     double   reverb_roomsize;
     double   reverb_damping;
     double   reverb_width;
@@ -206,87 +206,83 @@ typedef struct {
 
 static void rtNoteOn(void *userdata, uint8_t channel, uint8_t note, uint8_t velocity)
 {
-    FLUIDSYNTH_Music *seqi = (FLUIDSYNTH_Music*)(userdata);
-    fluidsynth.fluid_synth_noteon(seqi->synth, channel, note, velocity);
+    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music*)(userdata);
+    fluidsynth.fluid_synth_noteon(music->synth, channel, note, velocity);
 }
 
 static void rtNoteOff(void *userdata, uint8_t channel, uint8_t note)
 {
-    FLUIDSYNTH_Music *seqi = (FLUIDSYNTH_Music*)(userdata);
-    fluidsynth.fluid_synth_noteoff(seqi->synth, channel, note);
+    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music*)(userdata);
+    fluidsynth.fluid_synth_noteoff(music->synth, channel, note);
 }
 
 static void rtNoteAfterTouch(void *userdata, uint8_t channel, uint8_t note, uint8_t atVal)
 {
-    FLUIDSYNTH_Music *seqi = (FLUIDSYNTH_Music*)(userdata);
-    fluidsynth.fluid_synth_key_pressure(seqi->synth, channel, note, atVal);
+    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music*)(userdata);
+    fluidsynth.fluid_synth_key_pressure(music->synth, channel, note, atVal);
 }
 
 static void rtChannelAfterTouch(void *userdata, uint8_t channel, uint8_t atVal)
 {
-    FLUIDSYNTH_Music *seqi = (FLUIDSYNTH_Music*)(userdata);
-    fluidsynth.fluid_synth_channel_pressure(seqi->synth, channel, atVal);
+    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music*)(userdata);
+    fluidsynth.fluid_synth_channel_pressure(music->synth, channel, atVal);
 }
 
 static void rtControllerChange(void *userdata, uint8_t channel, uint8_t type, uint8_t value)
 {
-    FLUIDSYNTH_Music *seqi = (FLUIDSYNTH_Music*)(userdata);
-    fluidsynth.fluid_synth_cc(seqi->synth, channel, type, value);
+    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music*)(userdata);
+    fluidsynth.fluid_synth_cc(music->synth, channel, type, value);
 }
 
 static void rtPatchChange(void *userdata, uint8_t channel, uint8_t patch)
 {
-    FLUIDSYNTH_Music *seqi = (FLUIDSYNTH_Music*)(userdata);
-    fluidsynth.fluid_synth_program_change(seqi->synth, channel, patch);
+    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music*)(userdata);
+    fluidsynth.fluid_synth_program_change(music->synth, channel, patch);
 }
 
 static void rtPitchBend(void *userdata, uint8_t channel, uint8_t msb, uint8_t lsb)
 {
-    FLUIDSYNTH_Music *seqi = (FLUIDSYNTH_Music*)(userdata);
-    fluidsynth.fluid_synth_pitch_bend(seqi->synth, channel, (msb << 7) | lsb);
+    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music*)(userdata);
+    fluidsynth.fluid_synth_pitch_bend(music->synth, channel, (msb << 7) | lsb);
 }
 
 static void rtSysEx(void *userdata, const uint8_t *msg, size_t size)
 {
-    FLUIDSYNTH_Music *seqi = (FLUIDSYNTH_Music*)(userdata);
-    fluidsynth.fluid_synth_sysex(seqi->synth, (const char*)(msg), (int)(size), NULL, NULL, NULL, 0);
+    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music*)(userdata);
+    fluidsynth.fluid_synth_sysex(music->synth, (const char*)(msg), (int)(size), NULL, NULL, NULL, 0);
 }
 
 static void playSynthS16(void *userdata, uint8_t *stream, size_t length)
 {
-    FLUIDSYNTH_Music *seqi = (FLUIDSYNTH_Music*)(userdata);
-    fluidsynth.fluid_synth_write_s16(seqi->synth, (int)(length / 4),
-                                     stream, 0, 2,
-                                     stream, 1, 2);
+    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music*)(userdata);
+    fluidsynth.fluid_synth_write_s16(music->synth, (int)(length / 4), stream, 0, 2, stream, 1, 2);
 }
 
 static void playSynthF32(void *userdata, uint8_t *stream, size_t length)
 {
-    FLUIDSYNTH_Music *seqi = (FLUIDSYNTH_Music*)(userdata);
-    fluidsynth.fluid_synth_write_float(seqi->synth, (int)(length / 8),
-                                       stream, 0, 2,
-                                       stream, 1, 2);
+    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music*)(userdata);
+    fluidsynth.fluid_synth_write_float(music->synth, (int)(length / 8), stream, 0, 2, stream, 1, 2);
 }
 
 
-static int init_interface(FLUIDSYNTH_Music *seqi, int outFormat)
+static int init_interface(FLUIDSYNTH_Music *music, int outFormat)
 {
     int inFormat = outFormat;
-    SDL_memset(&seqi->seq_if, 0, sizeof(BW_MidiRtInterface));
+    SDL_memset(&music->seq_if, 0, sizeof(BW_MidiRtInterface));
 
     /* seq->onDebugMessage             = hooks.onDebugMessage; */
     /* seq->onDebugMessage_userData    = hooks.onDebugMessage_userData; */
 
     /* MIDI Real-Time calls */
-    seqi->seq_if.rtUserData = (void *)seqi;
-    seqi->seq_if.rt_noteOn  = rtNoteOn;
-    seqi->seq_if.rt_noteOff = rtNoteOff;
-    seqi->seq_if.rt_noteAfterTouch = rtNoteAfterTouch;
-    seqi->seq_if.rt_channelAfterTouch = rtChannelAfterTouch;
-    seqi->seq_if.rt_controllerChange = rtControllerChange;
-    seqi->seq_if.rt_patchChange = rtPatchChange;
-    seqi->seq_if.rt_pitchBend = rtPitchBend;
-    seqi->seq_if.rt_systemExclusive = rtSysEx;
+    music->seq_if.rtUserData = (void *)music;
+    music->seq_if.rt_noteOn  = rtNoteOn;
+    music->seq_if.rt_noteOff = rtNoteOff;
+    music->seq_if.rt_noteAfterTouch = rtNoteAfterTouch;
+    music->seq_if.rt_channelAfterTouch = rtChannelAfterTouch;
+    music->seq_if.rt_controllerChange = rtControllerChange;
+    music->seq_if.rt_patchChange = rtPatchChange;
+    music->seq_if.rt_pitchBend = rtPitchBend;
+    music->seq_if.rt_systemExclusive = rtSysEx;
 
     switch(outFormat)
     {
@@ -297,22 +293,22 @@ static int init_interface(FLUIDSYNTH_Music *seqi, int outFormat)
     case AUDIO_S16MSB:
     case AUDIO_U16LSB:
     case AUDIO_U16MSB:
-        seqi->seq_if.onPcmRender = playSynthS16;
-        seqi->seq_if.pcmSampleRate = music_spec.freq;
-        seqi->seq_if.pcmFrameSize = 2 /*channels*/ * sizeof(Sint16) /*size of one sample*/;
+        music->seq_if.onPcmRender = playSynthS16;
+        music->seq_if.pcmSampleRate = music_spec.freq;
+        music->seq_if.pcmFrameSize = 2 /*channels*/ * sizeof(Sint16) /*size of one sample*/;
         inFormat = AUDIO_S16SYS;
         break;
     case AUDIO_S32LSB:
     case AUDIO_S32MSB:
     case AUDIO_F32LSB:
     case AUDIO_F32MSB:
-        seqi->seq_if.onPcmRender = playSynthF32;
-        seqi->seq_if.pcmSampleRate = music_spec.freq;
-        seqi->seq_if.pcmFrameSize = 2 /*channels*/ * sizeof(float) /*size of one sample*/;
+        music->seq_if.onPcmRender = playSynthF32;
+        music->seq_if.pcmSampleRate = music_spec.freq;
+        music->seq_if.pcmFrameSize = 2 /*channels*/ * sizeof(float) /*size of one sample*/;
         inFormat = AUDIO_F32SYS;
         break;
     }
-    seqi->seq_if.onPcmRender_userData = seqi;
+    music->seq_if.onPcmRender_userData = music;
 
     return inFormat;
 }
