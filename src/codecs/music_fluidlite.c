@@ -183,6 +183,7 @@ static void FLUIDSYNTH_SetDefault(FluidSynth_Setup *setup)
 
 typedef struct {
     fluid_synth_t *synth;
+    fluid_settings_t *settings;
     BW_MidiRtInterface seq_if;
     void *player;
     SDL_AudioStream *stream;
@@ -529,101 +530,114 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusicArg(void *data, const char *args)
     SDL_RWops *src = (SDL_RWops *)data;
     FLUIDSYNTH_Music *music;
     FluidSynth_Setup setup = fluidsynth_setup;
-    fluid_settings_t *settings;
     double samplerate; /* as set by the lib. */
     int src_format;
     int ret;
+    Uint8 channels = 2;
+    void *song_buffer;
+    size_t song_size;
 
     process_args(args, &setup);
 
-    if ((music = SDL_calloc(1, sizeof(FLUIDSYNTH_Music)))) {
-        Uint8 channels = 2;
-        music->volume = MIX_MAX_VOLUME;
-        music->tempo = setup.tempo;
-        music->gain = setup.gain;
-        music->play_count = 0;
-
-        src_format = init_interface(music, music_spec.format);
-        if (src_format == AUDIO_S16SYS) {
-            music->sample_size = sizeof(Sint16);
-        } else {
-            music->sample_size = sizeof(float);
-        }
-
-        music->buffer_size = music_spec.samples * music->sample_size * channels;
-        if ((music->buffer = SDL_malloc((size_t)music->buffer_size))) {
-            if ((settings = fluidsynth.new_fluid_settings())) {
-                fluidsynth.fluid_settings_setnum(settings, "synth.sample-rate", (double) music_spec.freq);
-                fluidsynth.fluid_settings_getnum(settings, "synth.sample-rate", &samplerate);
-                music->seq_if.pcmSampleRate = samplerate;
-
-                if ((music->synth = fluidsynth.new_fluid_synth(settings))) {
-                    if (setup.custom_soundfonts[0]) {
-                        ret = Mix_EachSoundFontEx(setup.custom_soundfonts, fluidsynth_load_soundfont, (void*) music->synth);
-                    } else {
-                        ret = Mix_EachSoundFont(fluidsynth_load_soundfont, (void*) music->synth);
-                    }
-
-                    if (ret) {
-                        fluidsynth.fluid_synth_set_reverb_on(music->synth, setup.reverb);
-                        fluidsynth.fluid_synth_set_reverb(music->synth,
-                                                          setup.reverb_roomsize, setup.reverb_damping,
-                                                          setup.reverb_width, setup.reverb_level);
-                        fluidsynth.fluid_synth_set_chorus_on(music->synth, setup.chorus);
-                        fluidsynth.fluid_synth_set_chorus(music->synth,
-                                                          setup.chorus_nr, setup.chorus_level,
-                                                          setup.chorus_speed, setup.chorus_depth, setup.chorus_type);
-                        fluidsynth.fluid_synth_set_polyphony(music->synth, setup.polyphony);
-
-                        if ((music->player = midi_seq_init_interface(&music->seq_if))) {
-                            void *buffer;
-                            size_t size;
-
-                            buffer = SDL_LoadFile_RW(src, &size, SDL_FALSE);
-                            if (buffer) {
-                                if (midi_seq_openData(music->player, buffer, size) == 0) {
-                                    SDL_free(buffer);
-
-                                    midi_seq_set_tempo_multiplier(music->player, music->tempo);
-
-                                    if ((music->stream = SDL_NewAudioStream(src_format, channels, (int) samplerate,
-                                                          music_spec.format, music_spec.channels, music_spec.freq))) {
-                                        meta_tags_init(&music->tags);
-                                        _Mix_ParseMidiMetaTag(&music->tags, MIX_META_TITLE, midi_seq_meta_title(music->player));
-                                        _Mix_ParseMidiMetaTag(&music->tags, MIX_META_COPYRIGHT, midi_seq_meta_copyright(music->player));
-                                        return music;
-                                    } else {
-                                        FLUIDSYNTH_Delete(music);
-                                        return NULL;
-                                    }
-                                } else {
-                                    Mix_SetError("FluidSynth failed to load in-memory song: %s", midi_seq_get_error(music->player));
-                                }
-                                SDL_free(buffer);
-                            } else {
-                                SDL_OutOfMemory();
-                            }
-                            midi_seq_free(music->player);
-                        } else {
-                            Mix_SetError("Failed to create FluidSynth player");
-                        }
-                    }
-                    fluidsynth.delete_fluid_synth(music->synth);
-                } else {
-                    Mix_SetError("Failed to create FluidSynth synthesizer");
-                }
-                fluidsynth.delete_fluid_settings(settings);
-            } else {
-                Mix_SetError("Failed to create FluidSynth settings");
-            }
-        } else {
-            SDL_OutOfMemory();
-        }
-        SDL_free(music);
-    } else {
+    if (!(music = SDL_calloc(1, sizeof(FLUIDSYNTH_Music)))) {
         SDL_OutOfMemory();
+        return NULL;
     }
-    return NULL;
+
+    music->volume = MIX_MAX_VOLUME;
+    music->tempo = setup.tempo;
+    music->gain = setup.gain;
+    music->play_count = 0;
+
+    src_format = init_interface(music, music_spec.format);
+    if (src_format == AUDIO_S16SYS) {
+        music->sample_size = sizeof(Sint16);
+    } else {
+        music->sample_size = sizeof(float);
+    }
+
+    music->buffer_size = music_spec.samples * music->sample_size * channels;
+    if (!(music->buffer = SDL_malloc((size_t)music->buffer_size))) {
+        SDL_OutOfMemory();
+        FLUIDSYNTH_Delete(music);
+        return NULL;
+    }
+
+    if (!(music->settings = fluidsynth.new_fluid_settings())) {
+        Mix_SetError("Failed to create FluidSynth settings");
+        FLUIDSYNTH_Delete(music);
+        return NULL;
+    }
+
+    fluidsynth.fluid_settings_setnum(music->settings, "synth.sample-rate", (double) music_spec.freq);
+    fluidsynth.fluid_settings_getnum(music->settings, "synth.sample-rate", &samplerate);
+    music->seq_if.pcmSampleRate = samplerate;
+
+    if (!(music->synth = fluidsynth.new_fluid_synth(music->settings))) {
+        Mix_SetError("Failed to create FluidSynth synthesizer");
+        FLUIDSYNTH_Delete(music);
+        return NULL;
+    }
+
+
+    if (setup.custom_soundfonts[0]) {
+        ret = Mix_EachSoundFontEx(setup.custom_soundfonts, fluidsynth_load_soundfont, (void*) music->synth);
+    } else {
+        ret = Mix_EachSoundFont(fluidsynth_load_soundfont, (void*) music->synth);
+    }
+
+    if (!ret) {
+        FLUIDSYNTH_Delete(music);
+        return NULL;
+    }
+
+
+    fluidsynth.fluid_synth_set_reverb_on(music->synth, setup.reverb);
+    fluidsynth.fluid_synth_set_reverb(music->synth,
+                                      setup.reverb_roomsize, setup.reverb_damping,
+                                      setup.reverb_width, setup.reverb_level);
+    fluidsynth.fluid_synth_set_chorus_on(music->synth, setup.chorus);
+    fluidsynth.fluid_synth_set_chorus(music->synth,
+                                      setup.chorus_nr, setup.chorus_level,
+                                      setup.chorus_speed, setup.chorus_depth, setup.chorus_type);
+    fluidsynth.fluid_synth_set_polyphony(music->synth, setup.polyphony);
+
+    if (!(music->player = midi_seq_init_interface(&music->seq_if))) {
+        Mix_SetError("Failed to create FluidSynth player");
+        FLUIDSYNTH_Delete(music);
+        return NULL;
+    }
+
+    song_buffer = SDL_LoadFile_RW(src, &song_size, SDL_FALSE);
+    if (!song_buffer) {
+        SDL_OutOfMemory();
+        FLUIDSYNTH_Delete(music);
+        return NULL;
+    }
+
+    ret = midi_seq_openData(music->player, song_buffer, song_size);
+    SDL_free(song_buffer);
+
+    if (ret < 0) {
+        Mix_SetError("FluidSynth failed to load in-memory song: %s", midi_seq_get_error(music->player));
+        FLUIDSYNTH_Delete(music);
+        return NULL;
+    }
+
+    midi_seq_set_tempo_multiplier(music->player, music->tempo);
+
+    if (!(music->stream = SDL_NewAudioStream(src_format, channels, (int) samplerate,
+                          music_spec.format, music_spec.channels, music_spec.freq))) {
+        FLUIDSYNTH_Delete(music);
+        return NULL;
+    }
+
+    meta_tags_init(&music->tags);
+
+    _Mix_ParseMidiMetaTag(&music->tags, MIX_META_TITLE, midi_seq_meta_title(music->player));
+    _Mix_ParseMidiMetaTag(&music->tags, MIX_META_COPYRIGHT, midi_seq_meta_copyright(music->player));
+
+    return music;
 }
 
 static void *FLUIDSYNTH_CreateFromRWEx(SDL_RWops *src, int freesrc, const char *args)
@@ -797,15 +811,29 @@ static int FLUIDSYNTH_GetAudio(void *context, void *data, int bytes)
 static void FLUIDSYNTH_Delete(void *context)
 {
     FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
-    fluid_settings_t *settings = fluidsynth.fluid_synth_get_settings(music->synth);
-    midi_seq_free(music->player);
+
+    if (music->player) {
+        midi_seq_free(music->player);
+    }
+
     meta_tags_clear(&music->tags);
-    fluidsynth.delete_fluid_synth(music->synth);
-    fluidsynth.delete_fluid_settings(settings);
+
+    if (music->synth) {
+        fluidsynth.delete_fluid_synth(music->synth);
+    }
+
+    if (music->settings) {
+        fluidsynth.delete_fluid_settings(music->settings);
+    }
+
     if (music->stream) {
         SDL_FreeAudioStream(music->stream);
     }
-    SDL_free(music->buffer);
+
+    if (music->buffer) {
+        SDL_free(music->buffer);
+    }
+
     SDL_free(music);
 }
 
