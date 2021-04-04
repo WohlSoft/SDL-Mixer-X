@@ -176,6 +176,10 @@ void MusPlayer_Qt::moveEvent(QMoveEvent *event)
         QRect g = m_setupMidi->frameGeometry();
         m_setupMidi->move(g.x() + deltaX, g.y() + deltaY);
     }
+    {
+        QRect g = m_echoTune->frameGeometry();
+        m_echoTune->move(g.x() + deltaX, g.y() + deltaY);
+    }
 
     m_oldWindowPos = event->pos();
 }
@@ -621,6 +625,8 @@ void MusPlayer_Qt::on_actionEnableEcho_triggered(bool checked)
     if(PGE_MusicPlayer::echoEnabled)
     {
         echoEffectInit(PGE_MusicPlayer::getSampleRate(), PGE_MusicPlayer::getSampleFormat(), PGE_MusicPlayer::getChannels());
+        m_echoTune->loadSetup();
+        m_echoTune->sendAll();
         Mix_RegisterEffect(MIX_CHANNEL_POST, spcEchoEffect, spcEchoEffectDone, nullptr);
     }
     else

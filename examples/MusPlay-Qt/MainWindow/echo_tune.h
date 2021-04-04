@@ -15,10 +15,16 @@ public:
     explicit EchoTune(QWidget *parent = nullptr);
     ~EchoTune();
 
+    void saveSetup();
+    void loadSetup();
+    void sendAll();
+
 public slots:
     void on_echo_reload_clicked();
 
 private slots:
+    void on_sendAll_clicked();
+    void on_save_clicked();
     void on_reset_clicked();
 
     void on_echo_eon_clicked(bool checked);
