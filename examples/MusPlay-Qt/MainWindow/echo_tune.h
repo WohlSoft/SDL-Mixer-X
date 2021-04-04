@@ -28,14 +28,14 @@ private slots:
     void on_echo_mvolr_valueChanged(int arg1);
     void on_echo_evoll_valueChanged(int arg1);
     void on_echo_evolr_valueChanged(int arg1);
-    void on_echo_fir0_valueChanged(int arg1);
-    void on_echo_fir1_valueChanged(int arg1);
-    void on_echo_fir2_valueChanged(int arg1);
-    void on_echo_fir3_valueChanged(int arg1);
-    void on_echo_fir4_valueChanged(int arg1);
-    void on_echo_fir5_valueChanged(int arg1);
-    void on_echo_fir6_valueChanged(int arg1);
-    void on_echo_fir7_valueChanged(int arg1);
+    void on_echo_fir0_sliderMoved(int arg1);
+    void on_echo_fir1_sliderMoved(int arg1);
+    void on_echo_fir2_sliderMoved(int arg1);
+    void on_echo_fir3_sliderMoved(int arg1);
+    void on_echo_fir4_sliderMoved(int arg1);
+    void on_echo_fir5_sliderMoved(int arg1);
+    void on_echo_fir6_sliderMoved(int arg1);
+    void on_echo_fir7_sliderMoved(int arg1);
 
 private:
     Ui::EchoTune *ui;

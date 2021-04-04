@@ -44,37 +44,14 @@ void EchoTune::on_echo_reload_clicked()
     ui->echo_evolr->setValue(echoEffectGetReg(ECHO_EVOLR));
     ui->echo_evolr->blockSignals(false);
 
-    ui->echo_fir0->blockSignals(true);
     ui->echo_fir0->setValue(echoEffectGetReg(ECHO_FIR0));
-    ui->echo_fir0->blockSignals(false);
-
-    ui->echo_fir1->blockSignals(true);
     ui->echo_fir1->setValue(echoEffectGetReg(ECHO_FIR1));
-    ui->echo_fir1->blockSignals(false);
-
-    ui->echo_fir2->blockSignals(true);
     ui->echo_fir2->setValue(echoEffectGetReg(ECHO_FIR2));
-    ui->echo_fir2->blockSignals(false);
-
-    ui->echo_fir3->blockSignals(true);
     ui->echo_fir3->setValue(echoEffectGetReg(ECHO_FIR3));
-    ui->echo_fir3->blockSignals(false);
-
-    ui->echo_fir4->blockSignals(true);
     ui->echo_fir4->setValue(echoEffectGetReg(ECHO_FIR4));
-    ui->echo_fir4->blockSignals(false);
-
-    ui->echo_fir5->blockSignals(true);
     ui->echo_fir5->setValue(echoEffectGetReg(ECHO_FIR5));
-    ui->echo_fir5->blockSignals(false);
-
-    ui->echo_fir6->blockSignals(true);
     ui->echo_fir6->setValue(echoEffectGetReg(ECHO_FIR6));
-    ui->echo_fir6->blockSignals(false);
-
-    ui->echo_fir7->blockSignals(true);
     ui->echo_fir7->setValue(echoEffectGetReg(ECHO_FIR7));
-    ui->echo_fir7->blockSignals(false);
 }
 
 void EchoTune::on_reset_clicked()
@@ -118,42 +95,42 @@ void EchoTune::on_echo_evolr_valueChanged(int arg1)
     echoEffectSetReg(ECHO_EVOLR, (Uint8)arg1);
 }
 
-void EchoTune::on_echo_fir0_valueChanged(int arg1)
+void EchoTune::on_echo_fir0_sliderMoved(int arg1)
 {
     echoEffectSetReg(ECHO_FIR0, (Uint8)arg1);
 }
 
-void EchoTune::on_echo_fir1_valueChanged(int arg1)
+void EchoTune::on_echo_fir1_sliderMoved(int arg1)
 {
     echoEffectSetReg(ECHO_FIR1, (Uint8)arg1);
 }
 
-void EchoTune::on_echo_fir2_valueChanged(int arg1)
+void EchoTune::on_echo_fir2_sliderMoved(int arg1)
 {
     echoEffectSetReg(ECHO_FIR2, (Uint8)arg1);
 }
 
-void EchoTune::on_echo_fir3_valueChanged(int arg1)
+void EchoTune::on_echo_fir3_sliderMoved(int arg1)
 {
     echoEffectSetReg(ECHO_FIR3, (Uint8)arg1);
 }
 
-void EchoTune::on_echo_fir4_valueChanged(int arg1)
+void EchoTune::on_echo_fir4_sliderMoved(int arg1)
 {
     echoEffectSetReg(ECHO_FIR4, (Uint8)arg1);
 }
 
-void EchoTune::on_echo_fir5_valueChanged(int arg1)
+void EchoTune::on_echo_fir5_sliderMoved(int arg1)
 {
     echoEffectSetReg(ECHO_FIR5, (Uint8)arg1);
 }
 
-void EchoTune::on_echo_fir6_valueChanged(int arg1)
+void EchoTune::on_echo_fir6_sliderMoved(int arg1)
 {
     echoEffectSetReg(ECHO_FIR6, (Uint8)arg1);
 }
 
-void EchoTune::on_echo_fir7_valueChanged(int arg1)
+void EchoTune::on_echo_fir7_sliderMoved(int arg1)
 {
     echoEffectSetReg(ECHO_FIR7, (Uint8)arg1);
 }
