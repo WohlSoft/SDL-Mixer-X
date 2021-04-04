@@ -199,13 +199,18 @@ struct SpcEcho
         setDefaultRegs();
     }
 
+    inline int calc_fir(int i, int in)
+    {
+        return in * static_cast<int8_t>(REG(fir + (i * 0x10)));
+    }
+
     void process(Uint8 *stream, int len)
     {
         int frames = len / (sample_size * channels);
 
         int main_out[max_channels] = {0};
         int echo_out[max_channels] = {0};
-        int c;
+        int c, f;
 
         int mvoll[2] = {(int8_t)REG(mvoll), (int8_t)REG(mvolr)};
         int evoll[2] = {(int8_t)REG(evoll), (int8_t)REG(evolr)};
@@ -244,17 +249,23 @@ struct SpcEcho
             for(c = 0; c < channels; c++)
                 echohist_pos[0][c] = echohist_pos[8][c] = echo_in[c];
 
-
-
-#define CALC_FIR_(i, in)  ((in) * (int8_t) REG(fir + i * 0x10))
+            //--------------- FIR filter--------------
             for(c = 0; c < channels; ++c)
-                echo_in[c] = CALC_FIR_(7, echo_in[c]);
+                echo_in[c] = calc_fir(7, echo_in[c]);
 
+            // FIR filter 8 tabs
+            for(f = 0; f < 8; ++f)
+            {
+                for(c = 0; c < channels; ++c)
+                    echo_in[c] += calc_fir(f, echo_hist_pos[f + 1][c]);
+            }
+            //----------------------------------------
+
+#if 0
 #define CALC_FIR(i, ch)   CALC_FIR_( i, echo_hist_pos [i + 1][ch] )
 #define DO_FIR( i )\
             for(c = 0; c < channels; ++c) \
                 echo_in[c] += CALC_FIR(i, c);
-
             DO_FIR(0);
             DO_FIR(1);
             DO_FIR(2);
@@ -265,8 +276,7 @@ struct SpcEcho
             DO_FIR(4);
             DO_FIR(5);
             DO_FIR(6);
-
-
+#endif
 
 
             // Echo out
@@ -399,32 +409,32 @@ Uint8 echoEffectGetReg(EchoSetup key)
     case ECHO_EDL:
         return s_spc_echo->REG(edl);
     case ECHO_EFB:
-        return s_spc_echo->REG(efb);
+        return (int8_t)s_spc_echo->REG(efb);
     case ECHO_MVOLL:
-        return s_spc_echo->REG(mvoll);
+        return (int8_t)s_spc_echo->REG(mvoll);
     case ECHO_MVOLR:
-        return s_spc_echo->REG(mvolr);
+        return (int8_t)s_spc_echo->REG(mvolr);
     case ECHO_EVOLL:
-        return s_spc_echo->REG(evoll);
+        return (int8_t)s_spc_echo->REG(evoll);
     case ECHO_EVOLR:
-        return s_spc_echo->REG(evolr);
+        return (int8_t)s_spc_echo->REG(evolr);
 
     case ECHO_FIR0:
-        return s_spc_echo->REG(fir + 0x00);
+        return (int8_t)s_spc_echo->REG(fir + 0x00);
     case ECHO_FIR1:
-        return s_spc_echo->REG(fir + 0x10);
+        return (int8_t)s_spc_echo->REG(fir + 0x10);
     case ECHO_FIR2:
-        return s_spc_echo->REG(fir + 0x20);
+        return (int8_t)s_spc_echo->REG(fir + 0x20);
     case ECHO_FIR3:
-        return s_spc_echo->REG(fir + 0x30);
+        return (int8_t)s_spc_echo->REG(fir + 0x30);
     case ECHO_FIR4:
-        return s_spc_echo->REG(fir + 0x40);
+        return (int8_t)s_spc_echo->REG(fir + 0x40);
     case ECHO_FIR5:
-        return s_spc_echo->REG(fir + 0x50);
+        return (int8_t)s_spc_echo->REG(fir + 0x50);
     case ECHO_FIR6:
-        return s_spc_echo->REG(fir + 0x60);
+        return (int8_t)s_spc_echo->REG(fir + 0x60);
     case ECHO_FIR7:
-        return s_spc_echo->REG(fir + 0x70);
+        return (int8_t)s_spc_echo->REG(fir + 0x70);
     }
 
     return 0;
