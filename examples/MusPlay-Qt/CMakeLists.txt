@@ -83,6 +83,7 @@ qt5_wrap_ui(UIS_HDRS
     MainWindow/sfx_tester.ui
     MainWindow/setup_audio.ui
     MainWindow/setup_midi.ui
+    MainWindow/echo_tune.ui
     AssocFiles/assoc_files.ui
 )
 
@@ -94,6 +95,7 @@ set(SDLMixer_MusPlay_SRC)
 list(APPEND SDLMixer_MusPlay_SRC
     AssocFiles/assoc_files.cpp
     Effects/reverb.cpp
+    Effects/spc_echo.cpp
     MainWindow/label_marquee.cpp
     MainWindow/musplayer_base.cpp
     MainWindow/musplayer_qt.cpp
@@ -101,6 +103,7 @@ list(APPEND SDLMixer_MusPlay_SRC
     MainWindow/setup_audio.cpp
     MainWindow/setup_midi.cpp
     MainWindow/sfx_tester.cpp
+    MainWindow/echo_tune.cpp
     Player/mus_player.cpp
     SingleApplication/localserver.cpp
     SingleApplication/pge_application.cpp

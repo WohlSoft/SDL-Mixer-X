@@ -62,6 +62,7 @@ namespace PGE_MusicPlayer
     extern Mix_Music *s_playMus;
     extern Mix_MusicType type;
     extern bool reverbEnabled;
+    extern bool echoEnabled;
 
     extern void loadAudioSettings();
     extern void saveAudioSettings();

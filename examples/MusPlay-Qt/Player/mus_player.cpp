@@ -16,6 +16,7 @@ namespace PGE_MusicPlayer
     Mix_Music *s_playMus = nullptr;
     Mix_MusicType type  = MUS_NONE;
     bool reverbEnabled = false;
+    bool echoEnabled = false;
 
     static bool g_playlistMode = false;
     static int  g_loopsCount = -1;
