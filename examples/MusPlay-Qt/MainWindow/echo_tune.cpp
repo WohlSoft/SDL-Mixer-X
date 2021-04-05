@@ -8,6 +8,31 @@ EchoTune::EchoTune(QWidget *parent) :
     ui(new Ui::EchoTune)
 {
     ui->setupUi(this);
+
+    QObject::connect(ui->echo_fir0, &QSlider::valueChanged, [this](int val)->void{
+        ui->fir0_val->setText(QString("%1").arg(val));
+    });
+    QObject::connect(ui->echo_fir1, &QSlider::valueChanged, [this](int val)->void{
+        ui->fir1_val->setText(QString("%1").arg(val));
+    });
+    QObject::connect(ui->echo_fir2, &QSlider::valueChanged, [this](int val)->void{
+        ui->fir2_val->setText(QString("%1").arg(val));
+    });
+    QObject::connect(ui->echo_fir3, &QSlider::valueChanged, [this](int val)->void{
+        ui->fir3_val->setText(QString("%1").arg(val));
+    });
+    QObject::connect(ui->echo_fir4, &QSlider::valueChanged, [this](int val)->void{
+        ui->fir4_val->setText(QString("%1").arg(val));
+    });
+    QObject::connect(ui->echo_fir5, &QSlider::valueChanged, [this](int val)->void{
+        ui->fir5_val->setText(QString("%1").arg(val));
+    });
+    QObject::connect(ui->echo_fir6, &QSlider::valueChanged, [this](int val)->void{
+        ui->fir6_val->setText(QString("%1").arg(val));
+    });
+    QObject::connect(ui->echo_fir7, &QSlider::valueChanged, [this](int val)->void{
+        ui->fir7_val->setText(QString("%1").arg(val));
+    });
 }
 
 EchoTune::~EchoTune()
@@ -92,21 +117,21 @@ void EchoTune::loadSetup()
 void EchoTune::sendAll()
 {
     echoEffectSetReg(ECHO_EON, ui->echo_eon->isChecked() ? 1 : 0);
-    echoEffectSetReg(ECHO_EDL, (Uint8)ui->echo_edl->value());
-    echoEffectSetReg(ECHO_EFB, (Uint8)ui->echo_efb->value());
-    echoEffectSetReg(ECHO_MVOLL, (Uint8)ui->echo_mvoll->value());
-    echoEffectSetReg(ECHO_MVOLR, (Uint8)ui->echo_mvolr->value());
-    echoEffectSetReg(ECHO_EVOLL, (Uint8)ui->echo_evoll->value());
-    echoEffectSetReg(ECHO_EVOLR, (Uint8)ui->echo_evolr->value());
+    echoEffectSetReg(ECHO_EDL, ui->echo_edl->value());
+    echoEffectSetReg(ECHO_EFB, ui->echo_efb->value());
+    echoEffectSetReg(ECHO_MVOLL, ui->echo_mvoll->value());
+    echoEffectSetReg(ECHO_MVOLR, ui->echo_mvolr->value());
+    echoEffectSetReg(ECHO_EVOLL, ui->echo_evoll->value());
+    echoEffectSetReg(ECHO_EVOLR, ui->echo_evolr->value());
 
-    echoEffectSetReg(ECHO_FIR0, (Uint8)(Sint8)ui->echo_fir0->value());
-    echoEffectSetReg(ECHO_FIR1, (Uint8)(Sint8)ui->echo_fir1->value());
-    echoEffectSetReg(ECHO_FIR2, (Uint8)(Sint8)ui->echo_fir2->value());
-    echoEffectSetReg(ECHO_FIR3, (Uint8)(Sint8)ui->echo_fir3->value());
-    echoEffectSetReg(ECHO_FIR4, (Uint8)(Sint8)ui->echo_fir4->value());
-    echoEffectSetReg(ECHO_FIR5, (Uint8)(Sint8)ui->echo_fir5->value());
-    echoEffectSetReg(ECHO_FIR6, (Uint8)(Sint8)ui->echo_fir6->value());
-    echoEffectSetReg(ECHO_FIR7, (Uint8)(Sint8)ui->echo_fir7->value());
+    echoEffectSetReg(ECHO_FIR0, ui->echo_fir0->value());
+    echoEffectSetReg(ECHO_FIR1, ui->echo_fir1->value());
+    echoEffectSetReg(ECHO_FIR2, ui->echo_fir2->value());
+    echoEffectSetReg(ECHO_FIR3, ui->echo_fir3->value());
+    echoEffectSetReg(ECHO_FIR4, ui->echo_fir4->value());
+    echoEffectSetReg(ECHO_FIR5, ui->echo_fir5->value());
+    echoEffectSetReg(ECHO_FIR6, ui->echo_fir6->value());
+    echoEffectSetReg(ECHO_FIR7, ui->echo_fir7->value());
 }
 
 void EchoTune::on_save_clicked()
@@ -172,71 +197,76 @@ void EchoTune::on_echo_eon_clicked(bool checked)
 
 void EchoTune::on_echo_edl_valueChanged(int arg1)
 {
-    echoEffectSetReg(ECHO_EDL, (Uint8)arg1);
+    echoEffectSetReg(ECHO_EDL, arg1);
 }
 
 void EchoTune::on_echo_efb_valueChanged(int arg1)
 {
-    echoEffectSetReg(ECHO_EFB, (Uint8)(Sint8)arg1);
+    echoEffectSetReg(ECHO_EFB, arg1);
 }
 
 void EchoTune::on_echo_mvoll_valueChanged(int arg1)
 {
-    echoEffectSetReg(ECHO_MVOLL, (Uint8)(Sint8)arg1);
+    echoEffectSetReg(ECHO_MVOLL, arg1);
 }
 
 void EchoTune::on_echo_mvolr_valueChanged(int arg1)
 {
-    echoEffectSetReg(ECHO_MVOLR, (Uint8)(Sint8)arg1);
+    echoEffectSetReg(ECHO_MVOLR, arg1);
 }
 
 void EchoTune::on_echo_evoll_valueChanged(int arg1)
 {
-    echoEffectSetReg(ECHO_EVOLL, (Uint8)(Sint8)arg1);
+    echoEffectSetReg(ECHO_EVOLL, arg1);
 }
 
 void EchoTune::on_echo_evolr_valueChanged(int arg1)
 {
-    echoEffectSetReg(ECHO_EVOLR, (Uint8)(Sint8)arg1);
+    echoEffectSetReg(ECHO_EVOLR, arg1);
 }
 
 void EchoTune::on_echo_fir0_sliderMoved(int arg1)
 {
-    echoEffectSetReg(ECHO_FIR0, (Uint8)(Sint8)arg1);
+    echoEffectSetReg(ECHO_FIR0, arg1);
 }
 
 void EchoTune::on_echo_fir1_sliderMoved(int arg1)
 {
-    echoEffectSetReg(ECHO_FIR1, (Uint8)(Sint8)arg1);
+    echoEffectSetReg(ECHO_FIR1, arg1);
 }
 
 void EchoTune::on_echo_fir2_sliderMoved(int arg1)
 {
-    echoEffectSetReg(ECHO_FIR2, (Uint8)(Sint8)arg1);
+    echoEffectSetReg(ECHO_FIR2, arg1);
 }
 
 void EchoTune::on_echo_fir3_sliderMoved(int arg1)
 {
-    echoEffectSetReg(ECHO_FIR3, (Uint8)(Sint8)arg1);
+    echoEffectSetReg(ECHO_FIR3, arg1);
 }
 
 void EchoTune::on_echo_fir4_sliderMoved(int arg1)
 {
-    echoEffectSetReg(ECHO_FIR4, (Uint8)(Sint8)arg1);
+    echoEffectSetReg(ECHO_FIR4, arg1);
 }
 
 void EchoTune::on_echo_fir5_sliderMoved(int arg1)
 {
-    echoEffectSetReg(ECHO_FIR5, (Uint8)(Sint8)arg1);
+    echoEffectSetReg(ECHO_FIR5, arg1);
 }
 
 void EchoTune::on_echo_fir6_sliderMoved(int arg1)
 {
-    echoEffectSetReg(ECHO_FIR6, (Uint8)(Sint8)arg1);
+    echoEffectSetReg(ECHO_FIR6, arg1);
 }
 
 void EchoTune::on_echo_fir7_sliderMoved(int arg1)
 {
-    echoEffectSetReg(ECHO_FIR7, (Uint8)(Sint8)arg1);
+    echoEffectSetReg(ECHO_FIR7, arg1);
 }
 
+void EchoTune::on_resetFir_clicked()
+{
+    echoEffectResetFir();
+    on_echo_reload_clicked();
+}

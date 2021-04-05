@@ -30,9 +30,10 @@ enum EchoSetup
 extern void spcEchoEffect(int chan, void *stream, int len, void *udata);
 extern void spcEchoEffectDone(int chan, void *udata);
 
+extern void echoEffectResetFir();
 extern void echoEffectResetDefaults();
 
-extern void  echoEffectSetReg(EchoSetup key, Uint8 val);
+extern void  echoEffectSetReg(EchoSetup key, int val);
 extern int  echoEffectGetReg(EchoSetup key);
 
 #endif // SPC_ECHO_HHHH

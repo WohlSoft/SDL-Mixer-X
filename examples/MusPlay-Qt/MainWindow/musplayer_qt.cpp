@@ -193,12 +193,14 @@ void MusPlayer_Qt::contextMenu(const QPoint &pos)
     x.addSeparator();
     QAction *reverb       = x.addAction("Reverb");
     QAction *echo         = x.addAction("Echo");
+    QAction *echoTuner    = x.addAction("Echo tuner...");
     QAction *resetTempo   = x.addAction("Reset tempo");
     resetTempo->setEnabled(ui->tempoFrame->isEnabled());
     reverb->setCheckable(true);
     reverb->setChecked(PGE_MusicPlayer::reverbEnabled);
     echo->setCheckable(true);
     echo->setChecked(PGE_MusicPlayer::echoEnabled);
+    echoTuner->setEnabled(PGE_MusicPlayer::echoEnabled);
     QAction *assoc_files = x.addAction("Associate files");
     QAction *sfx_testing_show = x.addAction("Show SFX testing");
     sfx_testing_show->setEnabled(!m_sfxTester->isVisible());
@@ -233,6 +235,8 @@ void MusPlayer_Qt::contextMenu(const QPoint &pos)
         ui->actionEnableEcho->setChecked(echo->isChecked());
         on_actionEnableEcho_triggered(echo->isChecked());
     }
+    else if(echoTuner == ret)
+        on_actionTuneEcho_triggered();
     else if(resetTempo == ret)
         ui->tempo->setValue(0);
     else if(assoc_files == ret)
