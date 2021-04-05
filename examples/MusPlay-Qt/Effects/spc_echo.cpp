@@ -397,7 +397,7 @@ void echoEffectSetReg(EchoSetup key, Uint8 val)
     SDL_UnlockAudio();
 }
 
-Uint8 echoEffectGetReg(EchoSetup key)
+int echoEffectGetReg(EchoSetup key)
 {
     if(!s_spc_echo)
         return 0;

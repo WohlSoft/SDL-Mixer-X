@@ -33,6 +33,6 @@ extern void spcEchoEffectDone(int chan, void *udata);
 extern void echoEffectResetDefaults();
 
 extern void  echoEffectSetReg(EchoSetup key, Uint8 val);
-extern Uint8 echoEffectGetReg(EchoSetup key);
+extern int  echoEffectGetReg(EchoSetup key);
 
 #endif // SPC_ECHO_HHHH
