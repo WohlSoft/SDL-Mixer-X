@@ -78,7 +78,8 @@ struct SpcEcho
     uint8_t regs[register_count];
     uint8_t echo_ram[64 * 1024 * max_channels];
 
-    int echo_hist[echo_hist_size * max_channels][max_channels];
+    // Echo history keeps most recent 8 samples (twice the size to simplify wrap handling)
+    int echo_hist[echo_hist_size * 2 * max_channels][max_channels];
     int (*echo_hist_pos)[max_channels] = echo_hist; // &echo_hist [0 to 7]
 
     int every_other_sample; // toggles every sample
