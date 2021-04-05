@@ -166,14 +166,14 @@ static void FLUIDSYNTH_SetDefault(FluidSynth_Setup *setup)
     setup->tempo = 1.0;
     setup->gain = 1.0;
 
-    setup->chorus = SDL_TRUE;
+    setup->chorus = SDL_FALSE;
     setup->chorus_nr = FLUID_CHORUS_DEFAULT_N;
     setup->chorus_level = FLUID_CHORUS_DEFAULT_LEVEL;
     setup->chorus_speed = FLUID_CHORUS_DEFAULT_SPEED;
     setup->chorus_depth = FLUID_CHORUS_DEFAULT_DEPTH;
     setup->chorus_type = FLUID_CHORUS_DEFAULT_TYPE;
 
-    setup->reverb = SDL_TRUE;
+    setup->reverb = SDL_FALSE;
     setup->reverb_roomsize = FLUID_REVERB_DEFAULT_ROOMSIZE;
     setup->reverb_damping = FLUID_REVERB_DEFAULT_DAMP;
     setup->reverb_width = FLUID_REVERB_DEFAULT_WIDTH;
