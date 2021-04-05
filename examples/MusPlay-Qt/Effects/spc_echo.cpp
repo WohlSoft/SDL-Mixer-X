@@ -107,14 +107,14 @@ struct SpcEcho
         // Defaults 80 FF 9A FF 67 FF 0F FF
 
         //$xf rw FFCx - Echo FIR Filter Coefficient (FFC) X
-        REG(fir + 0x00) = 0x80; // 0x80
-        REG(fir + 0x10) = 0xff; // 0xff
-        REG(fir + 0x20) = 0x9a; // 0x9a
-        REG(fir + 0x30) = 0xff; // 0xff
-        REG(fir + 0x40) = 0x67; // 0x67
-        REG(fir + 0x50) = 0xff; // 0xff
-        REG(fir + 0x60) = 0x0f; // 0x0f
-        REG(fir + 0x70) = 0xff; // 0xff
+        REG(fir + 0x00) = 0x80;
+        REG(fir + 0x10) = 0xFF;
+        REG(fir + 0x20) = 0x9A;
+        REG(fir + 0x30) = 0xFF;
+        REG(fir + 0x40) = 0x67;
+        REG(fir + 0x50) = 0xFF;
+        REG(fir + 0x60) = 0x0F;
+        REG(fir + 0x70) = 0xFF;
 
         // $0d rw EFB - Echo feedback volume
         REG(efb) = 0x0E;
@@ -246,15 +246,14 @@ struct SpcEcho
                 echohist_pos = echo_hist;
             echo_hist_pos = echohist_pos;
 
+            //--------------- FIR filter--------------
             for(c = 0; c < channels; c++)
                 echohist_pos[0][c] = echohist_pos[8][c] = echo_in[c];
 
-            //--------------- FIR filter--------------
             for(c = 0; c < channels; ++c)
                 echo_in[c] = calc_fir(7, echo_in[c]);
 
-            // FIR filter 8 tabs
-            for(f = 0; f < 8; ++f)
+            for(f = 0; f <= 6; ++f)
             {
                 for(c = 0; c < channels; ++c)
                     echo_in[c] += calc_fir(f, echo_hist_pos[f + 1][c]);
