@@ -1,4 +1,5 @@
 #include <tgmath.h>
+#include "SDL_audio.h"
 #ifdef USE_SDL_MIXER_X
 #   include "SDL_mixer_ext.h"
 #else
@@ -268,6 +269,8 @@ static void setUInt8(Uint8 **raw, int ov)
 ///*      0      1     2     3    4     5     6     7     8      9     A    B     C      D     E     F  */
 //};
 
+//#define RESAMPLED_FIR
+
 struct SpcEcho
 {
     SDL_bool is_valid = SDL_FALSE;
@@ -276,6 +279,11 @@ struct SpcEcho
     // Echo history keeps most recent 8 samples (twice the size to simplify wrap handling)
     int echo_hist[ECHO_HIST_SIZE * 2 * MAX_CHANNELS][MAX_CHANNELS];
     int (*echo_hist_pos)[MAX_CHANNELS] = echo_hist; // &echo_hist [0 to 7]
+
+#ifdef RESAMPLED_FIR
+    int echo_cvt_buffer[MAX_CHANNELS * 1024];
+    float echo_cvt_buffer_buf[MAX_CHANNELS * 1024];
+#endif
 
     //! offset from ESA in echo buffer
     int echo_offset = 0;
@@ -289,6 +297,12 @@ struct SpcEcho
     int     channels = 2;
     int     sample_size = 2;
     Uint16  format = AUDIO_F32SYS;
+
+#ifdef RESAMPLED_FIR
+    SDL_AudioCVT fir_cvt_i;
+    SDL_AudioCVT fir_cvt_o;
+    int fir_cvt_src_size = 0;
+#endif
 
     //! Flags
     Uint8 reg_flg = 0;
@@ -345,9 +359,24 @@ struct SpcEcho
         rate_factor = double(i_rate) / SDSP_RATE;
         channels_factor = double(i_channels) / 2.0;
         common_factor = rate_factor * channels_factor;
+#ifdef RESAMPLED_FIR
+        fir_cvt_src_size = ceil(9.0 * rate_factor);
+#endif
+
+        if(i_rate < 4000)
+            return -1; /* Too small sample rate */
 
         SDL_memset(echo_ram, 0, sizeof(echo_ram));
         SDL_memset(echo_hist, 0, sizeof(echo_hist));
+#ifdef RESAMPLED_FIR
+        SDL_memset(echo_cvt_buffer, 0, sizeof(echo_cvt_buffer));
+        SDL_BuildAudioCVT(&fir_cvt_i,
+                          AUDIO_F32, channels, rate,
+                          AUDIO_F32, channels, SDSP_RATE);
+        SDL_BuildAudioCVT(&fir_cvt_o,
+                          AUDIO_F32, channels, SDSP_RATE,
+                          AUDIO_F32, channels, rate);
+#endif
 
         switch(format)
         {
@@ -461,6 +490,53 @@ struct SpcEcho
             echo_hist_pos = echohist_pos;
 
             /* --------------- FIR filter-------------- */
+#ifdef RESAMPLED_FIR
+            for(f = 0; f <= fir_cvt_src_size; f++)
+            {
+                for(c = 0; c < channels; c++)
+                    echo_cvt_buffer[(f * channels) + c] = echohist_pos[f][c];
+            }
+
+            if(fir_cvt_i.needed)
+            {
+                for(f = 0; f < fir_cvt_src_size * channels; f++)
+                    echo_cvt_buffer_buf[f] = (float)echo_cvt_buffer[f] / 32768.f;
+                fir_cvt_i.buf = (Uint8*)echo_cvt_buffer_buf;
+                fir_cvt_i.len = fir_cvt_src_size * sizeof(int) * channels;
+                SDL_ConvertAudio(&fir_cvt_i);
+                for(f = 0; f < 10 * channels; f++)
+                    echo_cvt_buffer[f] = (int)(echo_cvt_buffer_buf[f] * 32768.f);
+            }
+
+            for(c = 0; c < channels; c++)
+            {
+                echo_cvt_buffer[c] = echo_cvt_buffer[(8 * channels) + c] = echo_in[c];
+                echo_in[c] *= reg_fir[7];
+            }
+
+            for(f = 0; f <= 6; ++f)
+            {
+                for(c = 0; c < channels; ++c)
+                    echo_in[c] += echo_cvt_buffer[((f + 1) * channels) + c] * reg_fir[f];
+            }
+
+            if(fir_cvt_o.needed)
+            {
+                for(f = 0; f < 10 * channels; f++)
+                    echo_cvt_buffer_buf[f] = (float)echo_cvt_buffer[f] / 32768.f;
+                fir_cvt_o.buf = (Uint8*)echo_cvt_buffer_buf;
+                fir_cvt_o.len = 9 * sizeof(int) * channels;
+                SDL_ConvertAudio(&fir_cvt_o);
+                for(f = 0; f < fir_cvt_src_size * channels; f++)
+                    echo_cvt_buffer[f] = (int)(echo_cvt_buffer_buf[f] * 32768.f);
+            }
+
+            for(f = 0; f <= fir_cvt_src_size; f++)
+            {
+                for(c = 0; c < channels; c++)
+                    echohist_pos[f][c] = echo_cvt_buffer[(f * channels) + c];
+            }
+#else
             for(c = 0; c < channels; c++)
                 echohist_pos[0][c] = echohist_pos[8][c] = echo_in[c];
 
@@ -472,6 +548,7 @@ struct SpcEcho
                 for(c = 0; c < channels; ++c)
                     echo_in[c] += echo_hist_pos[f + 1][c] * reg_fir[f];
             }
+#endif
             /* ---------------------------------------- */
 
             /* Echo out */
