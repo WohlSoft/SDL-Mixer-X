@@ -1,4 +1,4 @@
-#include "SDL_stdinc.h"
+#include <tgmath.h>
 #ifdef USE_SDL_MIXER_X
 #   include "SDL_mixer_ext.h"
 #else
@@ -34,18 +34,21 @@ static int getFloatLSBSample(Uint8 *raw, int c)
 {
     Uint32 r;
     float f;
+    void *t;
     raw += (c * sizeof(float));
     r = (((Uint32)raw[0] <<  0) & 0x000000FF) |
         (((Uint32)raw[1] <<  8) & 0x0000FF00) |
         (((Uint32)raw[2] << 16) & 0x00FF0000) |
         (((Uint32)raw[3] << 24) & 0xFF000000);
-    f = *(float*)(&r);
+    t = &r;
+    f = *(float*)t;
     return (int)(f * 32768.f);
 }
 static void setFloatLSBSample(Uint8 **raw, int ov)
 {
     float f = (float(ov) / 32768.f);
-    Uint32 r = *(Uint32*)(&f);
+    void *t = &f;
+    Uint32 r = *(Uint32*)t;
     *(*raw)++ = (Uint8)((r >> 0) & 0xFF);
     *(*raw)++ = (Uint8)((r >> 8) & 0xFF);
     *(*raw)++ = (Uint8)((r >> 16) & 0xFF);
@@ -57,18 +60,21 @@ static int getFloatMSBSample(Uint8 *raw, int c)
 {
     Uint32 r;
     float f;
+    void *t;
     raw += (c * sizeof(float));
     r = (((Uint32)raw[3] <<  0) & 0x000000FF) |
         (((Uint32)raw[2] <<  8) & 0x0000FF00) |
         (((Uint32)raw[1] << 16) & 0x00FF0000) |
         (((Uint32)raw[0] << 24) & 0xFF000000);
-    f = *(float*)(&r);
+    t = &r;
+    f = *(float*)t;
     return (int)(f * 32768.f);
 }
 static void setFloatMSBSample(Uint8 **raw, int ov)
 {
     float f = (float(ov) / 32768.f);
-    Uint32 r = *(Uint32*)(&f);
+    void *t = &f;
+    Uint32 r = *(Uint32*)t;
     *(*raw)++ = (Uint8)((r >> 24) & 0xFF);
     *(*raw)++ = (Uint8)((r >> 16) & 0xFF);
     *(*raw)++ = (Uint8)((r >> 8) & 0xFF);
@@ -439,7 +445,7 @@ struct SpcEcho
             echo_ptr = &echo_ram[echo_offset & 0xFFFF];
 
             if(!echo_offset)
-                echo_length = SDL_round(((reg_edl & 0x0F) * (0x800)) * common_factor);
+                echo_length = (int)round(((reg_edl & 0x0F) * (0x800)) * common_factor);
             e_offset += (2 * channels);
             if(e_offset >= echo_length)
                 e_offset = 0;
