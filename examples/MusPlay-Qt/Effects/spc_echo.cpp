@@ -265,6 +265,7 @@ static void setUInt8(Uint8 **raw, int ov)
 //};
 
 #define RESAMPLED_FIR
+#define CUBE_INTERPOLATION
 
 struct SpcEcho
 {
@@ -305,10 +306,14 @@ struct SpcEcho
     double fir_stream_rateratio = 0;
     double fir_stream_samplecnt = 0;
     int    fir_stream_old_samples[MAX_CHANNELS];
+    int    fir_stream_old_samples2[MAX_CHANNELS];
+    int    fir_stream_old_samples3[MAX_CHANNELS];
     int    fir_stream_samples[MAX_CHANNELS];
     double fir_stream_rateratio_back = 0;
     double fir_stream_samplecnt_back = 0;
     int    fir_stream_old_samples_back[MAX_CHANNELS];
+    int    fir_stream_old_samples_back2[MAX_CHANNELS];
+    int    fir_stream_old_samples_back3[MAX_CHANNELS];
     int    fir_stream_samples_back[MAX_CHANNELS];
     int    fir_stream_midbuffer_in[20][MAX_CHANNELS];
     int    fir_stream_midbuffer_out[20][MAX_CHANNELS];
@@ -323,6 +328,18 @@ struct SpcEcho
     void *debugOutRes;
     void *debugOut;
 #endif
+
+    SDL_INLINE double cubic(double y1, double y2, double y3, double y4, double x)
+    {
+        double p[] = {y1, y2, y3, y4};
+        double x2 = x * x;
+        double x3 = x2 * x;
+
+        return p[1] +
+              (-(0.5 * p[0]) + (0.5 * p[2])) * x +
+              (p[0] - (2.5 * p[1]) + (2.0 * p[2]) - (0.5 * p[3])) * x2 +
+              (-(0.5 * p[0]) + (1.5 * p[1]) - (1.5 * p[2]) + (0.5 * p[3])) * x3;
+    }
 
     //! FIR Defaults: 80 FF 9A FF 67 FF 0F FF
     const Uint8 reg_fir_initial[8] = {0x80, 0xFF, 0x9A, 0xFF, 0x67, 0xFF, 0x0F, 0xFF};
@@ -373,8 +390,13 @@ struct SpcEcho
         fir_stream_samplecnt = 0;
         fir_stream_samplecnt_back = 0;
         SDL_memset(fir_stream_old_samples, 0, sizeof(fir_stream_old_samples));
+        SDL_memset(fir_stream_old_samples2, 0, sizeof(fir_stream_old_samples2));
+        SDL_memset(fir_stream_old_samples3, 0, sizeof(fir_stream_old_samples3));
+
         SDL_memset(fir_stream_samples, 0, sizeof(fir_stream_samples));
         SDL_memset(fir_stream_old_samples_back, 0, sizeof(fir_stream_old_samples_back));
+        SDL_memset(fir_stream_old_samples_back2, 0, sizeof(fir_stream_old_samples_back2));
+        SDL_memset(fir_stream_old_samples_back3, 0, sizeof(fir_stream_old_samples_back3));
         SDL_memset(fir_stream_samples_back, 0, sizeof(fir_stream_samples_back));
 #endif
 
@@ -532,6 +554,8 @@ struct SpcEcho
                 return;
             for(c = 0; c < channels; c++)
             {
+                fir_stream_old_samples3[c] = fir_stream_old_samples2[c];
+                fir_stream_old_samples2[c] = fir_stream_old_samples[c];
                 fir_stream_old_samples[c] = fir_stream_samples[c];
                 fir_stream_samples[c] = echo_out[c];
             }
@@ -544,8 +568,26 @@ struct SpcEcho
         {
             for(c = 0; c < channels; c++)
             {
+#ifdef CUBE_INTERPOLATION
+
+#define         X   (fir_stream_samplecnt)
+#define         D   ((double)fir_stream_samples[c])
+#define         C   ((double)fir_stream_old_samples[c])
+#define         B   ((double)fir_stream_old_samples2[c])
+#define         A   ((double)fir_stream_old_samples3[c])
+
+                fir_stream_midbuffer_in[fir_buffer_size][c] = cubic(A, B, C, D, X);
+
+#undef         X
+#undef         A
+#undef         B
+#undef         C
+#undef         D
+
+#else
                 fir_stream_midbuffer_in[fir_buffer_size][c] = (((double)fir_stream_old_samples[c] * (fir_stream_rateratio - fir_stream_samplecnt)
                                                               + (double)fir_stream_samples[c] * fir_stream_samplecnt) / fir_stream_rateratio);
+#endif
             }
 
             sub_process_echo(fir_stream_midbuffer_out[fir_buffer_size], fir_stream_midbuffer_in[fir_buffer_size]);
@@ -605,6 +647,8 @@ struct SpcEcho
         {
             for(c = 0; c < channels; c++)
             {
+                fir_stream_old_samples_back3[c] = fir_stream_old_samples_back2[c];
+                fir_stream_old_samples_back2[c] = fir_stream_old_samples_back[c];
                 fir_stream_old_samples_back[c] = fir_stream_samples_back[c];
                 fir_stream_samples_back[c] = fir_stream_midbuffer_out[f][c];
             }
@@ -614,8 +658,26 @@ struct SpcEcho
 
         for(c = 0; c < channels; c++)
         {
+#ifdef CUBE_INTERPOLATION
+
+#define         X   (fir_stream_samplecnt_back)
+#define         D   ((double)fir_stream_samples_back[c])
+#define         C   ((double)fir_stream_old_samples_back[c])
+#define         B   ((double)fir_stream_old_samples_back2[c])
+#define         A   ((double)fir_stream_old_samples_back3[c])
+
+                out[c] = cubic(A, B, C, D, X);
+
+#undef         X
+#undef         A
+#undef         B
+#undef         C
+#undef         D
+
+#else
             out[c] = (((double)fir_stream_old_samples_back[c] * (fir_stream_rateratio_back - fir_stream_samplecnt_back)
                      + (double)fir_stream_samples_back[c] * fir_stream_samplecnt_back) / fir_stream_rateratio_back);
+#endif
         }
 
 #ifdef WAVE_DEEP_DEBUG
