@@ -1,12 +1,5 @@
 #include <tgmath.h>
-#include "SDL_audio.h"
-#include "SDL_assert.h"
-#ifdef USE_SDL_MIXER_X
-#   include "SDL_mixer_ext.h"
-#else
-#   include "SDL_mixer.h"
-#endif
-
+#include <string.h>
 #include "spc_echo.h"
 
 //#define WAVE_DEEP_DEBUG
@@ -25,209 +18,209 @@
 
 
 // Float32-LE
-static int getFloatLSBSample(Uint8 *raw, int c)
+static int getFloatLSBSample(uint8_t *raw, int c)
 {
-    Uint32 r;
+    uint32_t r;
     float f;
     void *t;
     raw += (c * sizeof(float));
-    r = (((Uint32)raw[0] <<  0) & 0x000000FF) |
-        (((Uint32)raw[1] <<  8) & 0x0000FF00) |
-        (((Uint32)raw[2] << 16) & 0x00FF0000) |
-        (((Uint32)raw[3] << 24) & 0xFF000000);
+    r = (((uint32_t)raw[0] <<  0) & 0x000000FF) |
+        (((uint32_t)raw[1] <<  8) & 0x0000FF00) |
+        (((uint32_t)raw[2] << 16) & 0x00FF0000) |
+        (((uint32_t)raw[3] << 24) & 0xFF000000);
     t = &r;
     f = *(float*)t;
     return (int)(f * 32768.f);
 }
-static void setFloatLSBSample(Uint8 **raw, int ov)
+static void setFloatLSBSample(uint8_t **raw, int ov)
 {
     float f = (float(ov) / 32768.f);
     void *t = &f;
-    Uint32 r = *(Uint32*)t;
-    *(*raw)++ = (Uint8)((r >> 0) & 0xFF);
-    *(*raw)++ = (Uint8)((r >> 8) & 0xFF);
-    *(*raw)++ = (Uint8)((r >> 16) & 0xFF);
-    *(*raw)++ = (Uint8)((r >> 24) & 0xFF);
+    uint32_t r = *(uint32_t*)t;
+    *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 16) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 24) & 0xFF);
 }
 
 // Float32-BE
-static int getFloatMSBSample(Uint8 *raw, int c)
+static int getFloatMSBSample(uint8_t *raw, int c)
 {
-    Uint32 r;
+    uint32_t r;
     float f;
     void *t;
     raw += (c * sizeof(float));
-    r = (((Uint32)raw[3] <<  0) & 0x000000FF) |
-        (((Uint32)raw[2] <<  8) & 0x0000FF00) |
-        (((Uint32)raw[1] << 16) & 0x00FF0000) |
-        (((Uint32)raw[0] << 24) & 0xFF000000);
+    r = (((uint32_t)raw[3] <<  0) & 0x000000FF) |
+        (((uint32_t)raw[2] <<  8) & 0x0000FF00) |
+        (((uint32_t)raw[1] << 16) & 0x00FF0000) |
+        (((uint32_t)raw[0] << 24) & 0xFF000000);
     t = &r;
     f = *(float*)t;
     return (int)(f * 32768.f);
 }
-static void setFloatMSBSample(Uint8 **raw, int ov)
+static void setFloatMSBSample(uint8_t **raw, int ov)
 {
     float f = (float(ov) / 32768.f);
     void *t = &f;
-    Uint32 r = *(Uint32*)t;
-    *(*raw)++ = (Uint8)((r >> 24) & 0xFF);
-    *(*raw)++ = (Uint8)((r >> 16) & 0xFF);
-    *(*raw)++ = (Uint8)((r >> 8) & 0xFF);
-    *(*raw)++ = (Uint8)((r >> 0) & 0xFF);
+    uint32_t r = *(uint32_t*)t;
+    *(*raw)++ = (uint8_t)((r >> 24) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 16) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
 }
 
-// Sint32-LE
-static int getInt32LSB(Uint8 *raw, int c)
+// int32_t-LE
+static int getInt32LSB(uint8_t *raw, int c)
 {
-    Uint32 r;
-    Sint32 f;
-    raw += (c * sizeof(Sint32));
-    r = (((Uint32)raw[0] <<  0) & 0x000000FF) |
-        (((Uint32)raw[1] <<  8) & 0x0000FF00) |
-        (((Uint32)raw[2] << 16) & 0x00FF0000) |
-        (((Uint32)raw[3] << 24) & 0xFF000000);
-    f = *(Sint32*)(&r);
+    uint32_t r;
+    int32_t f;
+    raw += (c * sizeof(int32_t));
+    r = (((uint32_t)raw[0] <<  0) & 0x000000FF) |
+        (((uint32_t)raw[1] <<  8) & 0x0000FF00) |
+        (((uint32_t)raw[2] << 16) & 0x00FF0000) |
+        (((uint32_t)raw[3] << 24) & 0xFF000000);
+    f = *(int32_t*)(&r);
     return (int)(f / 65536);
 }
-static void setInt32LSB(Uint8 **raw, int ov)
+static void setInt32LSB(uint8_t **raw, int ov)
 {
-    Sint32 f = (Sint32(ov) * 65536);
-    Uint32 r = *(Uint32*)(&f);
-    *(*raw)++ = (Uint8)((r >> 0) & 0xFF);
-    *(*raw)++ = (Uint8)((r >> 8) & 0xFF);
-    *(*raw)++ = (Uint8)((r >> 16) & 0xFF);
-    *(*raw)++ = (Uint8)((r >> 24) & 0xFF);
+    int32_t f = ((int32_t)(ov) * 65536);
+    uint32_t r = *(uint32_t*)(&f);
+    *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 16) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 24) & 0xFF);
 }
 
-// Sint32-BE
-static int getInt32MSB(Uint8 *raw, int c)
+// int32_t-BE
+static int getInt32MSB(uint8_t *raw, int c)
 {
-    Uint32 r;
-    Sint32 f;
-    raw += (c * sizeof(Sint32));
-    r = (((Uint32)raw[3] <<  0) & 0x000000FF) |
-        (((Uint32)raw[2] <<  8) & 0x0000FF00) |
-        (((Uint32)raw[1] << 16) & 0x00FF0000) |
-        (((Uint32)raw[0] << 24) & 0xFF000000);
-    f = *(Sint32*)(&r);
+    uint32_t r;
+    int32_t f;
+    raw += (c * sizeof(int32_t));
+    r = (((uint32_t)raw[3] <<  0) & 0x000000FF) |
+        (((uint32_t)raw[2] <<  8) & 0x0000FF00) |
+        (((uint32_t)raw[1] << 16) & 0x00FF0000) |
+        (((uint32_t)raw[0] << 24) & 0xFF000000);
+    f = *(int32_t*)(&r);
     return (int)(f / 65536);
 }
-static void setInt32MSB(Uint8 **raw, int ov)
+static void setInt32MSB(uint8_t **raw, int ov)
 {
-    Sint32 f = (Sint32(ov) * 65536);
-    Uint32 r = *(Uint32*)(&f);
-    *(*raw)++ = (Uint8)((r >> 24) & 0xFF);
-    *(*raw)++ = (Uint8)((r >> 16) & 0xFF);
-    *(*raw)++ = (Uint8)((r >> 8) & 0xFF);
-    *(*raw)++ = (Uint8)((r >> 0) & 0xFF);
+    int32_t f = (int32_t(ov) * 65536);
+    uint32_t r = *(uint32_t*)(&f);
+    *(*raw)++ = (uint8_t)((r >> 24) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 16) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
 }
 
-// Sint16-LE
-static int getInt16LSB(Uint8 *raw, int c)
+// int16_t-LE
+static int getInt16LSB(uint8_t *raw, int c)
 {
-    Uint16 r;
-    Sint16 f;
-    raw += (c * sizeof(Sint16));
-    r = (((Uint16)raw[0] <<  0) & 0x00FF) |
-        (((Uint16)raw[1] <<  8) & 0xFF00);
-    f = *(Sint16*)(&r);
+    uint16_t r;
+    int16_t f;
+    raw += (c * sizeof(int16_t));
+    r = (((uint16_t)raw[0] <<  0) & 0x00FF) |
+        (((uint16_t)raw[1] <<  8) & 0xFF00);
+    f = *(int16_t*)(&r);
     return f;
 }
-static void setInt16LSB(Uint8 **raw, int ov)
+static void setInt16LSB(uint8_t **raw, int ov)
 {
-    Sint16 f = Sint16(ov);
-    Uint16 r = *(Uint16*)(&f);
-    *(*raw)++ = (Uint8)((r >> 0) & 0xFF);
-    *(*raw)++ = (Uint8)((r >> 8) & 0xFF);
+    int16_t f = int16_t(ov);
+    uint16_t r = *(uint16_t*)(&f);
+    *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
 }
 
-// Sint16-BE
-static int getInt16MSB(Uint8 *raw, int c)
+// int16_t-BE
+static int getInt16MSB(uint8_t *raw, int c)
 {
-    Uint16 r;
-    Sint16 f;
-    raw += (c * sizeof(Sint16));
-    r = (((Uint16)raw[1] <<  0) & 0x00FF) |
-        (((Uint16)raw[0] <<  8) & 0xFF00);
-    f = *(Sint16*)(&r);
+    uint16_t r;
+    int16_t f;
+    raw += (c * sizeof(int16_t));
+    r = (((uint16_t)raw[1] <<  0) & 0x00FF) |
+        (((uint16_t)raw[0] <<  8) & 0xFF00);
+    f = *(int16_t*)(&r);
     return f;
 }
-static void setInt16MSB(Uint8 **raw, int ov)
+static void setInt16MSB(uint8_t **raw, int ov)
 {
-    Sint16 f = Sint16(ov);
-    Uint16 r = *(Uint16*)(&f);
-    *(*raw)++ = (Uint8)((r >> 8) & 0xFF);
-    *(*raw)++ = (Uint8)((r >> 0) & 0xFF);
+    int16_t f = int16_t(ov);
+    uint16_t r = *(uint16_t*)(&f);
+    *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
 }
 
-// Uint16-LE
-static int getUInt16LSB(Uint8 *raw, int c)
+// uint16_t-LE
+static int getuint16_tLSB(uint8_t *raw, int c)
 {
-    Uint16 r;
+    uint16_t r;
     int f;
-    raw += (c * sizeof(Uint16));
-    r = (((Uint16)raw[0] <<  0) & 0x00FF) |
-        (((Uint16)raw[1] <<  8) & 0xFF00);
+    raw += (c * sizeof(uint16_t));
+    r = (((uint16_t)raw[0] <<  0) & 0x00FF) |
+        (((uint16_t)raw[1] <<  8) & 0xFF00);
     f = (int)r + INT16_MIN;
     return f;
 }
-static void setUInt16LSB(Uint8 **raw, int ov)
+static void setuint16_tLSB(uint8_t **raw, int ov)
 {
-    Sint16 f = Sint16(ov - INT16_MIN);
-    Uint16 r = *(Uint16*)(&f);
-    *(*raw)++ = (Uint8)((r >> 0) & 0xFF);
-    *(*raw)++ = (Uint8)((r >> 8) & 0xFF);
+    int16_t f = int16_t(ov - INT16_MIN);
+    uint16_t r = *(uint16_t*)(&f);
+    *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
 }
 
-// Uint16-BE
-static int getUInt16MSB(Uint8 *raw, int c)
+// uint16_t-BE
+static int getuint16_tMSB(uint8_t *raw, int c)
 {
-    Uint16 r;
+    uint16_t r;
     int f;
-    raw += (c * sizeof(Uint16));
-    r = (((Uint16)raw[1] <<  0) & 0x00FF) |
-        (((Uint16)raw[0] <<  8) & 0xFF00);
+    raw += (c * sizeof(uint16_t));
+    r = (((uint16_t)raw[1] <<  0) & 0x00FF) |
+        (((uint16_t)raw[0] <<  8) & 0xFF00);
     f = (int)r + INT16_MIN;
     return f;
 }
-static void setUInt16MSB(Uint8 **raw, int ov)
+static void setuint16_tMSB(uint8_t **raw, int ov)
 {
-    Sint16 f = Sint16(ov - INT16_MIN);
-    Uint16 r = *(Uint16*)(&f);
-    *(*raw)++ = (Uint8)((r >> 8) & 0xFF);
-    *(*raw)++ = (Uint8)((r >> 0) & 0xFF);
+    int16_t f = int16_t(ov - INT16_MIN);
+    uint16_t r = *(uint16_t*)(&f);
+    *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
 }
 
-// Sint8
-static int getInt8(Uint8 *raw, int c)
+// int8_t
+static int getInt8(uint8_t *raw, int c)
 {
     int f;
-    raw += (c * sizeof(Sint8));
-    f = (int)(Sint8)(*raw) * 256;
+    raw += (c * sizeof(int8_t));
+    f = (int)(int8_t)(*raw) * 256;
     return f;
 }
-static void setInt8(Uint8 **raw, int ov)
+static void setInt8(uint8_t **raw, int ov)
 {
-    *(*raw)++ = (Uint8)(ov / 256);
+    *(*raw)++ = (uint8_t)(ov / 256);
 }
 
-// Uint8
-static int getUInt8(Uint8 *raw, int c)
+// uint8_t
+static int getuint8_t(uint8_t *raw, int c)
 {
     int f;
-    raw += (c * sizeof(Sint8));
+    raw += (c * sizeof(int8_t));
     f = ((int)*raw + INT8_MIN) * 256;
     return f;
 }
-static void setUInt8(Uint8 **raw, int ov)
+static void setuint8_t(uint8_t **raw, int ov)
 {
-    *(*raw)++ = (Uint8)((ov / 256) - INT8_MIN);
+    *(*raw)++ = (uint8_t)((ov / 256) - INT8_MIN);
 }
 
 
 #define CLAMP16( io )\
     {\
-        if ( (Sint16) io != io )\
+        if ( (int16_t) io != io )\
             io = (io >> 31) ^ 0x7FFF;\
     }
 
@@ -250,7 +243,7 @@ static void setUInt8(Uint8 **raw, int ov)
 //    r_fir   = 0x0F // 8 coefficients at 0x0F, 0x1F ... 0x7F
 //};
 
-//static uint8_t const initial_regs[register_count] =
+//static uint8_t_t const initial_regs[register_count] =
 //{
 ///*      0      1     2     3    4     5     6     7     8      9     A    B     C      D     E     F  */
 ///*00*/ 0x45, 0x8B, 0x5A, 0x9A, 0xE4, 0x82, 0x1B, 0x78, 0x00, 0x00, 0xAA, 0x96, 0x89, 0x0E, 0xE0, 0x80, /*00*/
@@ -269,7 +262,7 @@ static void setUInt8(Uint8 **raw, int ov)
 
 struct SpcEcho
 {
-    SDL_bool is_valid = SDL_FALSE;
+    int is_valid = 0;
     int echo_ram[ECHO_BUFFER_SIZE];
 
     // Echo history keeps most recent 8 samples (twice the size to simplify wrap handling)
@@ -285,21 +278,21 @@ struct SpcEcho
     int     rate = SDSP_RATE;
     int     channels = 2;
     int     sample_size = 2;
-    Uint16  format = AUDIO_F32SYS;
+    uint16_t format = AUDIO_F32;
 
     //! Flags
-    Uint8 reg_flg = 0;
+    uint8_t reg_flg = 0;
     //! $4d rw EON - Echo enable
-    Uint8 reg_eon = 0;
+    uint8_t reg_eon = 0;
     //! $7d rw EDL - Echo delay (ring buffer size)
-    Uint8 reg_edl = 0;
+    uint8_t reg_edl = 0;
     //! $0d rw EFB - Echo feedback volume
-    Sint8 reg_efb = 0;
+    int8_t reg_efb = 0;
 
-    Sint8 reg_mvoll = 0;
-    Sint8 reg_mvolr = 0;
-    Sint8 reg_evoll = 0;
-    Sint8 reg_evolr = 0;
+    int8_t reg_mvoll = 0;
+    int8_t reg_mvolr = 0;
+    int8_t reg_evoll = 0;
+    int8_t reg_evolr = 0;
 
 #ifdef RESAMPLED_FIR
     //! FIR resampler
@@ -329,7 +322,7 @@ struct SpcEcho
     void *debugOut;
 #endif
 
-    SDL_INLINE double cubic(double y1, double y2, double y3, double y4, double x)
+    inline double cubic(double y1, double y2, double y3, double y4, double x)
     {
         double p[] = {y1, y2, y3, y4};
         double x2 = x * x;
@@ -342,44 +335,44 @@ struct SpcEcho
     }
 
     //! FIR Defaults: 80 FF 9A FF 67 FF 0F FF
-    const Uint8 reg_fir_initial[8] = {0x80, 0xFF, 0x9A, 0xFF, 0x67, 0xFF, 0x0F, 0xFF};
+    const uint8_t reg_fir_initial[8] = {0x80, 0xFF, 0x9A, 0xFF, 0x67, 0xFF, 0x0F, 0xFF};
     //! $xf rw FFCx - Echo FIR Filter Coefficient (FFC) X
-    Sint8 reg_fir[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    int8_t reg_fir[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
     void setDefaultFir()
     {
-        SDL_memcpy(reg_fir, reg_fir_initial, 8);
+        memcpy(reg_fir, reg_fir_initial, 8);
     }
 
     void setDefaultRegs()
     {
         reg_flg = 0;
 
-        reg_mvoll = (Sint8)0x89;
-        reg_mvolr = (Sint8)0x9C;
-        reg_evoll = (Sint8)0x9F;
-        reg_evolr = (Sint8)0x9C;
+        reg_mvoll = (int8_t)0x89;
+        reg_mvolr = (int8_t)0x9C;
+        reg_evoll = (int8_t)0x9F;
+        reg_evolr = (int8_t)0x9C;
 
         setDefaultFir();
 
         // $0d rw EFB - Echo feedback volume
-        reg_efb = (Sint8)0x0E;
+        reg_efb = (int8_t)0x0E;
         // $4d rw EON - Echo enable
         reg_eon = 1;
         // $7d rw EDL - Echo delay (ring buffer size)
         reg_edl = 3;
     }
 
-    int (*readSample)(Uint8 *raw, int channel);
-    void (*writeSample)(Uint8 **raw, int sample);
+    int (*readSample)(uint8_t *raw, int channel);
+    void (*writeSample)(uint8_t **raw, int sample);
 
-    int init(int i_rate, Uint16 i_format, int i_channels)
+    int init(int i_rate, uint16_t i_format, int i_channels)
     {
-        is_valid = SDL_FALSE;
+        is_valid = 0;
         rate = i_rate;
         format = i_format;
         channels = i_channels;
-        rate_factor = double(i_rate) / SDSP_RATE;
+        rate_factor = (double)i_rate / SDSP_RATE;
 
         if(i_rate < 4000)
             return -1; /* Too small sample rate */
@@ -389,19 +382,19 @@ struct SpcEcho
         fir_stream_rateratio_back = (double)i_rate / SDSP_RATE;
         fir_stream_samplecnt = 0;
         fir_stream_samplecnt_back = 0;
-        SDL_memset(fir_stream_old_samples, 0, sizeof(fir_stream_old_samples));
-        SDL_memset(fir_stream_old_samples2, 0, sizeof(fir_stream_old_samples2));
-        SDL_memset(fir_stream_old_samples3, 0, sizeof(fir_stream_old_samples3));
+        memset(fir_stream_old_samples, 0, sizeof(fir_stream_old_samples));
+        memset(fir_stream_old_samples2, 0, sizeof(fir_stream_old_samples2));
+        memset(fir_stream_old_samples3, 0, sizeof(fir_stream_old_samples3));
 
-        SDL_memset(fir_stream_samples, 0, sizeof(fir_stream_samples));
-        SDL_memset(fir_stream_old_samples_back, 0, sizeof(fir_stream_old_samples_back));
-        SDL_memset(fir_stream_old_samples_back2, 0, sizeof(fir_stream_old_samples_back2));
-        SDL_memset(fir_stream_old_samples_back3, 0, sizeof(fir_stream_old_samples_back3));
-        SDL_memset(fir_stream_samples_back, 0, sizeof(fir_stream_samples_back));
+        memset(fir_stream_samples, 0, sizeof(fir_stream_samples));
+        memset(fir_stream_old_samples_back, 0, sizeof(fir_stream_old_samples_back));
+        memset(fir_stream_old_samples_back2, 0, sizeof(fir_stream_old_samples_back2));
+        memset(fir_stream_old_samples_back3, 0, sizeof(fir_stream_old_samples_back3));
+        memset(fir_stream_samples_back, 0, sizeof(fir_stream_samples_back));
 #endif
 
-        SDL_memset(echo_ram, 0, sizeof(echo_ram));
-        SDL_memset(echo_hist, 0, sizeof(echo_hist));
+        memset(echo_ram, 0, sizeof(echo_ram));
+        memset(echo_hist, 0, sizeof(echo_hist));
 
 #ifdef WAVE_DEEP_DEBUG
         debugIn = ctx_wave_open(channels, rate, sizeof(int16_t), WAVE_FORMAT_PCM, 1, 0, WAVE_PATH "in.wav");
@@ -417,44 +410,44 @@ struct SpcEcho
         switch(format)
         {
         case AUDIO_U8:
-            readSample = getUInt8;
-            writeSample = setUInt8;
-            sample_size = sizeof(Uint8);
+            readSample = getuint8_t;
+            writeSample = setuint8_t;
+            sample_size = sizeof(uint8_t);
             break;
         case AUDIO_S8:
             readSample = getInt8;
             writeSample = setInt8;
-            sample_size = sizeof(Sint8);
+            sample_size = sizeof(int8_t);
             break;
         case AUDIO_S16LSB:
             readSample = getInt16LSB;
             writeSample = setInt16LSB;
-            sample_size = sizeof(Sint16);
+            sample_size = sizeof(int16_t);
             break;
         case AUDIO_S16MSB:
             readSample = getInt16MSB;
             writeSample = setInt16MSB;
-            sample_size = sizeof(Sint16);
+            sample_size = sizeof(int16_t);
             break;
         case AUDIO_U16LSB:
-            readSample = getUInt16LSB;
-            writeSample = setUInt16LSB;
-            sample_size = sizeof(Uint16);
+            readSample = getuint16_tLSB;
+            writeSample = setuint16_tLSB;
+            sample_size = sizeof(uint16_t);
             break;
         case AUDIO_U16MSB:
-            readSample = getUInt16MSB;
-            writeSample = setUInt16MSB;
-            sample_size = sizeof(Uint16);
+            readSample = getuint16_tMSB;
+            writeSample = setuint16_tMSB;
+            sample_size = sizeof(uint16_t);
             break;
         case AUDIO_S32LSB:
             readSample = getInt32LSB;
             writeSample = setInt32LSB;
-            sample_size = sizeof(Sint32);
+            sample_size = sizeof(int32_t);
             break;
         case AUDIO_S32MSB:
             readSample = getInt32MSB;
             writeSample = setInt32MSB;
-            sample_size = sizeof(Sint32);
+            sample_size = sizeof(int32_t);
             break;
         case AUDIO_F32LSB:
             readSample = getFloatLSBSample;
@@ -472,7 +465,7 @@ struct SpcEcho
 
         setDefaultRegs();
 
-        is_valid = SDL_TRUE;
+        is_valid = 1;
         return 0;
     }
 
@@ -495,7 +488,6 @@ struct SpcEcho
         int (*echohist_pos)[MAX_CHANNELS];
 
         e_offset = echo_offset;
-        SDL_assert(echo_offset < ECHO_BUFFER_SIZE);
         echo_ptr = echo_ram + echo_offset;
 
         if(!echo_offset)
@@ -593,16 +585,16 @@ struct SpcEcho
             sub_process_echo(fir_stream_midbuffer_out[fir_buffer_size], fir_stream_midbuffer_in[fir_buffer_size]);
 #ifdef WAVE_DEEP_DEBUG
             {
-                Sint16 outw[MAX_CHANNELS];
+                int16_t outw[MAX_CHANNELS];
                 for(c = 0; c < channels; ++c)
                     outw[c] = fir_stream_midbuffer_in[fir_buffer_size][c] / 128;
-                ctx_wave_write(debugInRes, (const Uint8*)outw, channels * sizeof(Sint16));
+                ctx_wave_write(debugInRes, (const uint8_t*)outw, channels * sizeof(int16_t));
             }
             {
-                Sint16 outw[MAX_CHANNELS];
+                int16_t outw[MAX_CHANNELS];
                 for(c = 0; c < channels; ++c)
                     outw[c] = fir_stream_midbuffer_out[fir_buffer_size][c] / 128;
-                ctx_wave_write(debugOutRes, (const Uint8*)outw, channels * sizeof(Sint16));
+                ctx_wave_write(debugOutRes, (const uint8_t*)outw, channels * sizeof(int16_t));
             }
 #endif
 
@@ -617,10 +609,10 @@ struct SpcEcho
 
 #ifdef WAVE_DEEP_DEBUG
         {
-            Sint16 outw[MAX_CHANNELS];
+            int16_t outw[MAX_CHANNELS];
             for(c = 0; c < channels; ++c)
                 outw[c] = echo_out[c] / 128;
-            ctx_wave_write(debugIn, (const Uint8*)outw, channels * sizeof(Sint16));
+            ctx_wave_write(debugIn, (const uint8_t*)outw, channels * sizeof(int16_t));
         }
 #endif
 
@@ -631,10 +623,10 @@ struct SpcEcho
 
 #ifdef WAVE_DEEP_DEBUG
             {
-                Sint16 outw[MAX_CHANNELS];
+                int16_t outw[MAX_CHANNELS];
                 for(c = 0; c < channels; ++c)
                     outw[c] = out[c] / 128;
-                ctx_wave_write(debugOut, (const Uint8*)outw, channels * sizeof(Sint16));
+                ctx_wave_write(debugOut, (const uint8_t*)outw, channels * sizeof(int16_t));
             }
 #endif
             return;
@@ -682,10 +674,10 @@ struct SpcEcho
 
 #ifdef WAVE_DEEP_DEBUG
         {
-            Sint16 outw[MAX_CHANNELS];
+            int16_t outw[MAX_CHANNELS];
             for(c = 0; c < channels; ++c)
                 outw[c] = out[c] / 128;
-            ctx_wave_write(debugOut, (const Uint8*)outw, channels * sizeof(Sint16));
+            ctx_wave_write(debugOut, (const uint8_t*)outw, channels * sizeof(int16_t));
         }
 #endif
 
@@ -694,7 +686,7 @@ struct SpcEcho
     }
 #endif
 
-    void process(Uint8 *stream, int len)
+    void process(uint8_t *stream, int len)
     {
         int frames = len / (sample_size * channels);
 
@@ -715,9 +707,9 @@ struct SpcEcho
         int *echo_ptr;
 #endif
 
-        SDL_memset(main_out, 0, sizeof(main_out));
-        SDL_memset(echo_out, 0, sizeof(echo_out));
-        SDL_memset(echo_in, 0, sizeof(echo_in));
+        memset(main_out, 0, sizeof(main_out));
+        memset(echo_out, 0, sizeof(echo_out));
+        memset(echo_in, 0, sizeof(echo_in));
 
         if(!is_valid)
             return;
@@ -737,7 +729,6 @@ struct SpcEcho
             process_echo(echo_in, echo_out);
 #else
             e_offset = echo_offset;
-            SDL_assert(echo_offset < ECHO_BUFFER_SIZE);
             echo_ptr = echo_ram + echo_offset;
 
             if(!echo_offset)
@@ -795,159 +786,140 @@ struct SpcEcho
     }
 };
 
-static SpcEcho *s_spc_echo = nullptr;
 
-void echoEffectInit(int rate, Uint16 format, int channels)
+SpcEcho *echoEffectInit(int rate, uint16_t format, int channels)
 {
-    echoEffectFree();
-    if(!s_spc_echo)
+    SpcEcho *out = new SpcEcho();
+    out->init(rate, format, channels);
+    return out;
+}
+
+void echoEffectFree(SpcEcho *context)
+{
+    if(context)
     {
-        s_spc_echo = new SpcEcho();
-        s_spc_echo->init(rate, format, channels);
+        context->close();
+        delete context;
     }
 }
 
-void echoEffectFree()
+void spcEchoEffect(int, void *stream, int len, void *context)
 {
-    if(s_spc_echo)
-    {
-        s_spc_echo->close();
-        delete s_spc_echo;
-    }
-    s_spc_echo = nullptr;
-}
-
-void spcEchoEffect(int, void *stream, int len, void *)
-{
-    if(!s_spc_echo)
+    SpcEcho *out = reinterpret_cast<SpcEcho *>(context);
+    if(!out)
         return; // Effect doesn't working
-    s_spc_echo->process((Uint8*)stream, len);
+    out->process((uint8_t*)stream, len);
 }
 
-void spcEchoEffectDone(int, void *)
+void echoEffectSetReg(SpcEcho *out, EchoSetup key, int val)
 {
-    echoEffectFree();
-}
-
-void echoEffectSetReg(EchoSetup key, int val)
-{
-    if(!s_spc_echo)
+    if(!out)
         return;
-
-    SDL_LockAudio();
 
     switch(key)
     {
     case ECHO_EON:
-        s_spc_echo->reg_eon = (Uint8)val;
+        out->reg_eon = (uint8_t)val;
         break;
     case ECHO_EDL:
-        s_spc_echo->reg_edl = (Uint8)val;
+        out->reg_edl = (uint8_t)val;
         break;
     case ECHO_EFB:
-        s_spc_echo->reg_efb = (Sint8)val;
+        out->reg_efb = (int8_t)val;
         break;
     case ECHO_MVOLL:
-        s_spc_echo->reg_mvoll = (Sint8)val;
+        out->reg_mvoll = (int8_t)val;
         break;
     case ECHO_MVOLR:
-        s_spc_echo->reg_mvolr = (Sint8)val;
+        out->reg_mvolr = (int8_t)val;
         break;
     case ECHO_EVOLL:
-        s_spc_echo->reg_evoll = (Sint8)val;
+        out->reg_evoll = (int8_t)val;
         break;
     case ECHO_EVOLR:
-        s_spc_echo->reg_evolr = (Sint8)val;
+        out->reg_evolr = (int8_t)val;
         break;
 
     case ECHO_FIR0:
-        s_spc_echo->reg_fir[0]= (Sint8)val;
+        out->reg_fir[0]= (int8_t)val;
         break;
     case ECHO_FIR1:
-        s_spc_echo->reg_fir[1]= (Sint8)val;
+        out->reg_fir[1]= (int8_t)val;
         break;
     case ECHO_FIR2:
-        s_spc_echo->reg_fir[2]= (Sint8)val;
+        out->reg_fir[2]= (int8_t)val;
         break;
     case ECHO_FIR3:
-        s_spc_echo->reg_fir[3]= (Sint8)val;
+        out->reg_fir[3]= (int8_t)val;
         break;
     case ECHO_FIR4:
-        s_spc_echo->reg_fir[4]= (Sint8)val;
+        out->reg_fir[4]= (int8_t)val;
         break;
     case ECHO_FIR5:
-        s_spc_echo->reg_fir[5]= (Sint8)val;
+        out->reg_fir[5]= (int8_t)val;
         break;
     case ECHO_FIR6:
-        s_spc_echo->reg_fir[6]= (Sint8)val;
+        out->reg_fir[6]= (int8_t)val;
         break;
     case ECHO_FIR7:
-        s_spc_echo->reg_fir[7]= (Sint8)val;
+        out->reg_fir[7]= (int8_t)val;
         break;
     }
-
-    SDL_UnlockAudio();
 }
 
-int echoEffectGetReg(EchoSetup key)
+int echoEffectGetReg(SpcEcho *out, EchoSetup key)
 {
-    if(!s_spc_echo)
+    if(!out)
         return 0;
 
     switch(key)
     {
     case ECHO_EON:
-        return s_spc_echo->reg_eon;
+        return out->reg_eon;
     case ECHO_EDL:
-        return s_spc_echo->reg_edl;
+        return out->reg_edl;
     case ECHO_EFB:
-        return s_spc_echo->reg_efb;
+        return out->reg_efb;
     case ECHO_MVOLL:
-        return s_spc_echo->reg_mvoll;
+        return out->reg_mvoll;
     case ECHO_MVOLR:
-        return s_spc_echo->reg_mvolr;
+        return out->reg_mvolr;
     case ECHO_EVOLL:
-        return s_spc_echo->reg_evoll;
+        return out->reg_evoll;
     case ECHO_EVOLR:
-        return s_spc_echo->reg_evolr;
+        return out->reg_evolr;
 
     case ECHO_FIR0:
-        return s_spc_echo->reg_fir[0];
+        return out->reg_fir[0];
     case ECHO_FIR1:
-        return s_spc_echo->reg_fir[1];
+        return out->reg_fir[1];
     case ECHO_FIR2:
-        return s_spc_echo->reg_fir[2];
+        return out->reg_fir[2];
     case ECHO_FIR3:
-        return s_spc_echo->reg_fir[3];
+        return out->reg_fir[3];
     case ECHO_FIR4:
-        return s_spc_echo->reg_fir[4];
+        return out->reg_fir[4];
     case ECHO_FIR5:
-        return s_spc_echo->reg_fir[5];
+        return out->reg_fir[5];
     case ECHO_FIR6:
-        return s_spc_echo->reg_fir[6];
+        return out->reg_fir[6];
     case ECHO_FIR7:
-        return s_spc_echo->reg_fir[7];
+        return out->reg_fir[7];
     }
 
     return 0;
 }
 
-void echoEffectResetFir()
+void echoEffectResetFir(SpcEcho *out)
 {
-    if(!s_spc_echo)
+    if(!out)
         return;
-
-    SDL_LockAudio();
-    s_spc_echo->setDefaultFir();
-    SDL_UnlockAudio();
+    out->setDefaultFir();
 }
 
-void echoEffectResetDefaults()
+void echoEffectResetDefaults(SpcEcho *out)
 {
-    if(!s_spc_echo)
+    if(!out)
         return;
-
-    SDL_LockAudio();
-    s_spc_echo->setDefaultRegs();
-    SDL_UnlockAudio();
+    out->setDefaultRegs();
 }

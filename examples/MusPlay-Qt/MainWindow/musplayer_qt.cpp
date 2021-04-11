@@ -627,17 +627,12 @@ void MusPlayer_Qt::on_actionEnableReverb_triggered(bool checked)
 void MusPlayer_Qt::on_actionEnableEcho_triggered(bool checked)
 {
     PGE_MusicPlayer::echoEnabled = checked;
+    PGE_MusicPlayer::echoEabled(PGE_MusicPlayer::echoEnabled);
+
     if(PGE_MusicPlayer::echoEnabled)
     {
-        echoEffectInit(PGE_MusicPlayer::getSampleRate(), PGE_MusicPlayer::getSampleFormat(), PGE_MusicPlayer::getChannels());
         m_echoTune->loadSetup();
         m_echoTune->sendAll();
-        Mix_RegisterEffect(MIX_CHANNEL_POST, spcEchoEffect, spcEchoEffectDone, nullptr);
-    }
-    else
-    {
-        Mix_UnregisterEffect(MIX_CHANNEL_POST, spcEchoEffect);
-        echoEffectFree();
     }
 }
 
@@ -687,4 +682,3 @@ void MusPlayer_Qt::on_actionPlay3Times_triggered()
     PGE_MusicPlayer::setMusicLoops(3);
     restartMusic();
 }
-
