@@ -241,6 +241,8 @@ static void setUInt8(Uint8 **raw, int ov)
 #define SDSP_RATE       32000
 #define MAX_CHANNELS    10
 
+#define RSM_FRAC        10
+
 //// Global registers
 //enum
 //{
@@ -280,11 +282,6 @@ struct SpcEcho
     int echo_hist[ECHO_HIST_SIZE * 2 * MAX_CHANNELS][MAX_CHANNELS];
     int (*echo_hist_pos)[MAX_CHANNELS] = echo_hist; // &echo_hist [0 to 7]
 
-#ifdef RESAMPLED_FIR
-    int echo_cvt_buffer[MAX_CHANNELS * 1024];
-    float echo_cvt_buffer_buf[MAX_CHANNELS * 1024];
-#endif
-
     //! offset from ESA in echo buffer
     int echo_offset = 0;
     //! number of bytes that echo_offset will stop at
@@ -297,12 +294,6 @@ struct SpcEcho
     int     channels = 2;
     int     sample_size = 2;
     Uint16  format = AUDIO_F32SYS;
-
-#ifdef RESAMPLED_FIR
-    SDL_AudioCVT fir_cvt_i;
-    SDL_AudioCVT fir_cvt_o;
-    int fir_cvt_src_size = 0;
-#endif
 
     //! Flags
     Uint8 reg_flg = 0;
@@ -317,6 +308,14 @@ struct SpcEcho
     Sint8 reg_mvolr = 0;
     Sint8 reg_evoll = 0;
     Sint8 reg_evolr = 0;
+
+#ifdef RESAMPLED_FIR
+    //! FIR resampler
+    Sint32 fir_stream_rateratio = 0;
+    Sint32 fir_stream_samplecnt = 0;
+    int    fir_stream_old_samples[MAX_CHANNELS];
+    int    fir_stream_samples[MAX_CHANNELS];
+#endif
 
     //! FIR Defaults: 80 FF 9A FF 67 FF 0F FF
     const Uint8 reg_fir_initial[8] = {0x80, 0xFF, 0x9A, 0xFF, 0x67, 0xFF, 0x0F, 0xFF};
@@ -360,7 +359,10 @@ struct SpcEcho
         channels_factor = double(i_channels) / 2.0;
         common_factor = rate_factor * channels_factor;
 #ifdef RESAMPLED_FIR
-        fir_cvt_src_size = ceil(9.0 * rate_factor);
+        fir_stream_rateratio = (i_rate << RSM_FRAC) / SDSP_RATE;
+        fir_stream_samplecnt = 0;
+        SDL_memset(fir_stream_old_samples, 0, sizeof(fir_stream_old_samples));
+        SDL_memset(fir_stream_samples, 0, sizeof(fir_stream_samples));
 #endif
 
         if(i_rate < 4000)
@@ -368,15 +370,6 @@ struct SpcEcho
 
         SDL_memset(echo_ram, 0, sizeof(echo_ram));
         SDL_memset(echo_hist, 0, sizeof(echo_hist));
-#ifdef RESAMPLED_FIR
-        SDL_memset(echo_cvt_buffer, 0, sizeof(echo_cvt_buffer));
-        SDL_BuildAudioCVT(&fir_cvt_i,
-                          AUDIO_F32, channels, rate,
-                          AUDIO_F32, channels, SDSP_RATE);
-        SDL_BuildAudioCVT(&fir_cvt_o,
-                          AUDIO_F32, channels, SDSP_RATE,
-                          AUDIO_F32, channels, rate);
-#endif
 
         switch(format)
         {
@@ -447,6 +440,13 @@ struct SpcEcho
         int main_out[MAX_CHANNELS] = {0};
         int echo_out[MAX_CHANNELS] = {0};
         int echo_in[MAX_CHANNELS];
+#ifdef RESAMPLED_FIR
+        int fir_buffer[10][MAX_CHANNELS];
+        int fir_old_samples[MAX_CHANNELS];
+        int fir_samples[MAX_CHANNELS];
+        Sint32 fir_samplecnt = 0;
+        int fir_hist_offset = 0;
+#endif
         int c, f, e_offset, ov, v;
 
         int mvoll[2] = {reg_mvoll, reg_mvolr};
@@ -457,6 +457,10 @@ struct SpcEcho
 
         if(!is_valid)
             return;
+
+#ifdef RESAMPLED_FIR
+        SDL_memset(fir_buffer, 0, sizeof(fir_buffer));
+#endif
 
         do
         {
@@ -491,57 +495,60 @@ struct SpcEcho
 
             /* --------------- FIR filter-------------- */
 #ifdef RESAMPLED_FIR
-            for(f = 0; f <= fir_cvt_src_size; f++)
-            {
-                for(c = 0; c < channels; c++)
-                    echo_cvt_buffer[(f * channels) + c] = echohist_pos[f][c];
-            }
-
-            if(fir_cvt_i.needed)
-            {
-                for(f = 0; f < fir_cvt_src_size * channels; f++)
-                    echo_cvt_buffer_buf[f] = (float)echo_cvt_buffer[f] / 32768.f;
-                fir_cvt_i.buf = (Uint8*)echo_cvt_buffer_buf;
-                fir_cvt_i.len = fir_cvt_src_size * sizeof(int) * channels;
-                SDL_ConvertAudio(&fir_cvt_i);
-                for(f = 0; f < 10 * channels; f++)
-                    echo_cvt_buffer[f] = (int)(echo_cvt_buffer_buf[f] * 32768.f);
-            }
+            fir_samplecnt = fir_stream_samplecnt; // make the buffer
+            SDL_memcpy(fir_old_samples, fir_stream_old_samples, sizeof(fir_old_samples));
+            SDL_memcpy(fir_samples, fir_stream_samples, sizeof(fir_samples));
+            fir_hist_offset = 0;
 
             for(c = 0; c < channels; c++)
+                echohist_pos[0][c] = echohist_pos[(int)round(8 * rate_factor)][c] = echo_in[c];
+
+            for(f = 0; f < 9; f++)
             {
-                echo_cvt_buffer[c] = echo_cvt_buffer[(8 * channels) + c] = echo_in[c];
-                echo_in[c] *= reg_fir[7];
+                while(fir_samplecnt >= fir_stream_rateratio)
+                {
+                    for(c = 0; c < channels; c++)
+                    {
+                        fir_old_samples[c] = fir_samples[c];
+                        fir_samples[c] = echohist_pos[fir_hist_offset][c];
+                    }
+                    fir_hist_offset++;
+                    fir_samplecnt -= fir_stream_rateratio;
+                }
+
+                for(c = 0; c < channels; c++)
+                {
+                    fir_buffer[f][c] = ((fir_old_samples[c] * (fir_stream_rateratio - fir_samplecnt)
+                                       + fir_samples[c] * fir_samplecnt) / fir_stream_rateratio);
+                }
+
+                fir_samplecnt += 1 << RSM_FRAC;
+
+                if(f == 0)
+                {
+                    SDL_memcpy(fir_stream_old_samples, fir_old_samples, sizeof(fir_old_samples));
+                    SDL_memcpy(fir_stream_samples, fir_samples, sizeof(fir_samples));
+                    fir_stream_samplecnt = fir_samplecnt;
+                }
             }
+
+//            for(c = 0; c < channels; c++)
+//                fir_buffer[0][c] = fir_buffer[8][c] = echo_in[c];
+
+            for(c = 0; c < channels; ++c)
+                echo_in[c] *= reg_fir[7];
 
             for(f = 0; f <= 6; ++f)
             {
                 for(c = 0; c < channels; ++c)
-                    echo_in[c] += echo_cvt_buffer[((f + 1) * channels) + c] * reg_fir[f];
-            }
-
-            if(fir_cvt_o.needed)
-            {
-                for(f = 0; f < 10 * channels; f++)
-                    echo_cvt_buffer_buf[f] = (float)echo_cvt_buffer[f] / 32768.f;
-                fir_cvt_o.buf = (Uint8*)echo_cvt_buffer_buf;
-                fir_cvt_o.len = 9 * sizeof(int) * channels;
-                SDL_ConvertAudio(&fir_cvt_o);
-                for(f = 0; f < fir_cvt_src_size * channels; f++)
-                    echo_cvt_buffer[f] = (int)(echo_cvt_buffer_buf[f] * 32768.f);
-            }
-
-            for(f = 0; f <= fir_cvt_src_size; f++)
-            {
-                for(c = 0; c < channels; c++)
-                    echohist_pos[f][c] = echo_cvt_buffer[(f * channels) + c];
+                    echo_in[c] += fir_buffer[f + 1][c] * reg_fir[f];
             }
 #else
             for(c = 0; c < channels; c++)
                 echohist_pos[0][c] = echohist_pos[8][c] = echo_in[c];
 
             for(c = 0; c < channels; ++c)
-                echo_in[c] = echo_in[c] * reg_fir[7];
+                echo_in[c] *= reg_fir[7];
 
             for(f = 0; f <= 6; ++f)
             {
