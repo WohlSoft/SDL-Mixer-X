@@ -19,6 +19,8 @@ public:
     void loadSetup();
     void saveSetup();
 
+    void sendSetup();
+
     QString getRawMidiArgs();
 
 protected:
