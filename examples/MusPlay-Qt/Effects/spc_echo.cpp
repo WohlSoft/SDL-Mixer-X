@@ -281,7 +281,6 @@ struct SpcEcho
     int echo_length = 0;
 
     double  rate_factor = 1.0;
-    double  channels_factor = 1.0;
     int     rate = SDSP_RATE;
     int     channels = 2;
     int     sample_size = 2;
@@ -302,7 +301,6 @@ struct SpcEcho
     Sint8 reg_evolr = 0;
 
 #ifdef RESAMPLED_FIR
-#define RSM_FRAC        10
     //! FIR resampler
     double fir_stream_rateratio = 0;
     double fir_stream_samplecnt = 0;
@@ -365,7 +363,6 @@ struct SpcEcho
         format = i_format;
         channels = i_channels;
         rate_factor = double(i_rate) / SDSP_RATE;
-        channels_factor = double(i_channels) / 2.0;
 
         if(i_rate < 4000)
             return -1; /* Too small sample rate */
