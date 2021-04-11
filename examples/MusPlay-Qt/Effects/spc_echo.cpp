@@ -23,20 +23,6 @@
 #define INT16_MAX   0x7fff
 #endif
 
-static SDL_INLINE void set_le16(Uint8 *p, Sint16 f)
-{
-    Uint16 n = (Uint16)f;
-    p[1] = (Uint8)((n >> 8) & 0xFF);
-    p[0] = (Uint8)((n >> 0) & 0xFF);
-}
-
-static SDL_INLINE Sint16 get_le16(Uint8 const *p)
-{
-    return (Sint16)(
-               ((Uint16(p[1]) << 8) & 0xFF00) |
-               ((Uint16(p[0]) << 0) & 0x00FF)
-           );
-}
 
 // Float32-LE
 static int getFloatLSBSample(Uint8 *raw, int c)
@@ -248,6 +234,7 @@ static void setUInt8(Uint8 **raw, int ov)
 #define ECHO_HIST_SIZE  8
 #define SDSP_RATE       32000
 #define MAX_CHANNELS    10
+#define ECHO_BUFFER_SIZE (32 * 1024 * MAX_CHANNELS)
 
 //// Global registers
 //enum
@@ -282,7 +269,7 @@ static void setUInt8(Uint8 **raw, int ov)
 struct SpcEcho
 {
     SDL_bool is_valid = SDL_FALSE;
-    Uint8 echo_ram[64 * 1024 * MAX_CHANNELS];
+    int echo_ram[ECHO_BUFFER_SIZE];
 
     // Echo history keeps most recent 8 samples (twice the size to simplify wrap handling)
     int echo_hist[ECHO_HIST_SIZE * 2 * MAX_CHANNELS][MAX_CHANNELS];
@@ -295,7 +282,6 @@ struct SpcEcho
 
     double  rate_factor = 1.0;
     double  channels_factor = 1.0;
-    double  common_factor = 1.0;
     int     rate = SDSP_RATE;
     int     channels = 2;
     int     sample_size = 2;
@@ -380,7 +366,6 @@ struct SpcEcho
         channels = i_channels;
         rate_factor = double(i_rate) / SDSP_RATE;
         channels_factor = double(i_channels) / 2.0;
-        common_factor = rate_factor * channels_factor;
 
         if(i_rate < 4000)
             return -1; /* Too small sample rate */
@@ -486,24 +471,24 @@ struct SpcEcho
     void sub_process_echo(int *out, int *echo_out)
     {
         int echo_in[MAX_CHANNELS];
-        uint8_t *echo_ptr;
+        int *echo_ptr;
         int c, f, e_offset, v;
         int (*echohist_pos)[MAX_CHANNELS];
 
         e_offset = echo_offset;
-        /* echo_ptr = &echo_ram[(reg_esa * 0x100 + echo_offset) & 0xFFFF]; */
-        echo_ptr = &echo_ram[echo_offset & 0xFFFF];
+        SDL_assert(echo_offset < ECHO_BUFFER_SIZE);
+        echo_ptr = echo_ram + echo_offset;
 
         if(!echo_offset)
-            echo_length = (reg_edl & 0x0F) * 0x800;
-        e_offset += (2 * channels);
+            echo_length = ((reg_edl & 0x0F) * 0x400 * channels) / 2;
+        e_offset += channels;
         if(e_offset >= echo_length)
             e_offset = 0;
         echo_offset = e_offset;
 
         /* FIR */
         for(c = 0; c < channels; c++)
-            echo_in[c] = get_le16(echo_ptr + (2 * c));
+            echo_in[c] = echo_ptr[c];
 
         echohist_pos = echo_hist_pos;
         if(++echohist_pos >= &echo_hist[ECHO_HIST_SIZE])
@@ -531,7 +516,7 @@ struct SpcEcho
             {
                 v = (echo_out[c] >> 7) + ((echo_in[c] * reg_efb) >> 14);
                 CLAMP16(v);
-                set_le16(echo_ptr + (2 * c), v);
+                echo_ptr[c] = v;
             }
         }
 
@@ -668,7 +653,7 @@ struct SpcEcho
 
 #ifndef RESAMPLED_FIR
         int (*echohist_pos)[MAX_CHANNELS];
-        uint8_t *echo_ptr;
+        int *echo_ptr;
 #endif
 
         SDL_memset(main_out, 0, sizeof(main_out));
@@ -693,19 +678,19 @@ struct SpcEcho
             process_echo(echo_in, echo_out);
 #else
             e_offset = echo_offset;
-            /* echo_ptr = &echo_ram[(reg_esa * 0x100 + echo_offset) & 0xFFFF]; */
-            echo_ptr = &echo_ram[echo_offset & 0xFFFF];
+            SDL_assert(echo_offset < ECHO_BUFFER_SIZE);
+            echo_ptr = echo_ram + echo_offset;
 
             if(!echo_offset)
-                echo_length = (int)round(((reg_edl & 0x0F) * (0x800)) * common_factor);
-            e_offset += (2 * channels);
+                echo_length = (int)round((((reg_edl & 0x0F) * 0x400 * channels) / 2) * rate_factor);
+            e_offset += channels;
             if(e_offset >= echo_length)
                 e_offset = 0;
             echo_offset = e_offset;
 
             /* FIR */
             for(c = 0; c < channels; c++)
-                echo_in[c] = get_le16(echo_ptr + (2 * c));
+                echo_in[c] = echo_ptr[c];
 
             echohist_pos = echo_hist_pos;
             if(++echohist_pos >= &echo_hist[ECHO_HIST_SIZE])
@@ -733,7 +718,7 @@ struct SpcEcho
                 {
                     v = (echo_out[c] >> 7) + ((echo_in[c] * reg_efb) >> 14);
                     CLAMP16(v);
-                    set_le16(echo_ptr + (2 * c), v);
+                    echo_ptr[c] = v;
                 }
             }
 #endif
