@@ -591,6 +591,7 @@ void MusPlayer_Qt::on_actionAudioSetup_triggered()
     {
         on_actionEnableReverb_triggered(PGE_MusicPlayer::reverbEnabled);
         on_actionEnableEcho_triggered(PGE_MusicPlayer::echoEnabled);
+        m_setupMidi->loadSetup();
     }
 }
 
