@@ -12,13 +12,36 @@
 #ifndef INT8_MIN
 #define INT8_MIN    (-0x7f - 1)
 #endif
+#ifndef INT8_MAX
+#define INT8_MAX    0x7f
+#endif
+
+#ifndef UINT8_MAX
+#define UINT8_MAX   0xff
+#endif
+
+#ifndef INT16_MIN
+#define INT16_MIN   (-0x7fff - 1)
+#endif
 #ifndef INT16_MAX
 #define INT16_MAX   0x7fff
 #endif
 
+#ifndef UINT16_MAX
+#define UINT16_MAX  0xffff
+#endif
+
+#ifndef INT32_MIN
+#define INT32_MIN   (-0x7fffffff - 1)
+#endif
+
+#ifndef INT32_MAX
+#define INT32_MAX   0x7fffffff
+#endif
+
 
 // Float32-LE
-static int getFloatLSBSample(uint8_t *raw, int c)
+static float getFloatLSBSample(uint8_t *raw, int c)
 {
     uint32_t r;
     float f;
@@ -30,12 +53,11 @@ static int getFloatLSBSample(uint8_t *raw, int c)
         (((uint32_t)raw[3] << 24) & 0xFF000000);
     t = &r;
     f = *(float*)t;
-    return (int)(f * 32768.f);
+    return f;
 }
-static void setFloatLSBSample(uint8_t **raw, int ov)
+static void setFloatLSBSample(uint8_t **raw, float ov)
 {
-    float f = (float(ov) / 32768.f);
-    void *t = &f;
+    void *t = &ov;
     uint32_t r = *(uint32_t*)t;
     *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
     *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
@@ -44,7 +66,7 @@ static void setFloatLSBSample(uint8_t **raw, int ov)
 }
 
 // Float32-BE
-static int getFloatMSBSample(uint8_t *raw, int c)
+static float getFloatMSBSample(uint8_t *raw, int c)
 {
     uint32_t r;
     float f;
@@ -56,12 +78,11 @@ static int getFloatMSBSample(uint8_t *raw, int c)
         (((uint32_t)raw[0] << 24) & 0xFF000000);
     t = &r;
     f = *(float*)t;
-    return (int)(f * 32768.f);
+    return f;
 }
-static void setFloatMSBSample(uint8_t **raw, int ov)
+static void setFloatMSBSample(uint8_t **raw, float ov)
 {
-    float f = (float(ov) / 32768.f);
-    void *t = &f;
+    void *t = &ov;
     uint32_t r = *(uint32_t*)t;
     *(*raw)++ = (uint8_t)((r >> 24) & 0xFF);
     *(*raw)++ = (uint8_t)((r >> 16) & 0xFF);
@@ -70,7 +91,7 @@ static void setFloatMSBSample(uint8_t **raw, int ov)
 }
 
 // int32_t-LE
-static int getInt32LSB(uint8_t *raw, int c)
+static float getInt32LSB(uint8_t *raw, int c)
 {
     uint32_t r;
     int32_t f;
@@ -80,11 +101,11 @@ static int getInt32LSB(uint8_t *raw, int c)
         (((uint32_t)raw[2] << 16) & 0x00FF0000) |
         (((uint32_t)raw[3] << 24) & 0xFF000000);
     f = *(int32_t*)(&r);
-    return (int)(f / 65536);
+    return (float)((double)f / INT32_MAX);
 }
-static void setInt32LSB(uint8_t **raw, int ov)
+static void setInt32LSB(uint8_t **raw, float ov)
 {
-    int32_t f = ((int32_t)(ov) * 65536);
+    int32_t f = ((int32_t)(double(ov) * INT32_MAX));
     uint32_t r = *(uint32_t*)(&f);
     *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
     *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
@@ -93,7 +114,7 @@ static void setInt32LSB(uint8_t **raw, int ov)
 }
 
 // int32_t-BE
-static int getInt32MSB(uint8_t *raw, int c)
+static float getInt32MSB(uint8_t *raw, int c)
 {
     uint32_t r;
     int32_t f;
@@ -103,11 +124,11 @@ static int getInt32MSB(uint8_t *raw, int c)
         (((uint32_t)raw[1] << 16) & 0x00FF0000) |
         (((uint32_t)raw[0] << 24) & 0xFF000000);
     f = *(int32_t*)(&r);
-    return (int)(f / 65536);
+    return (float)((double)f / INT32_MAX);
 }
-static void setInt32MSB(uint8_t **raw, int ov)
+static void setInt32MSB(uint8_t **raw, float ov)
 {
-    int32_t f = (int32_t(ov) * 65536);
+    int32_t f = (int32_t(double(ov) * INT32_MAX));
     uint32_t r = *(uint32_t*)(&f);
     *(*raw)++ = (uint8_t)((r >> 24) & 0xFF);
     *(*raw)++ = (uint8_t)((r >> 16) & 0xFF);
@@ -116,7 +137,7 @@ static void setInt32MSB(uint8_t **raw, int ov)
 }
 
 // int16_t-LE
-static int getInt16LSB(uint8_t *raw, int c)
+static float getInt16LSB(uint8_t *raw, int c)
 {
     uint16_t r;
     int16_t f;
@@ -124,18 +145,18 @@ static int getInt16LSB(uint8_t *raw, int c)
     r = (((uint16_t)raw[0] <<  0) & 0x00FF) |
         (((uint16_t)raw[1] <<  8) & 0xFF00);
     f = *(int16_t*)(&r);
-    return f;
+    return (float)f / INT16_MAX;
 }
-static void setInt16LSB(uint8_t **raw, int ov)
+static void setInt16LSB(uint8_t **raw, float ov)
 {
-    int16_t f = int16_t(ov);
+    int16_t f = int16_t(ov * INT16_MAX);
     uint16_t r = *(uint16_t*)(&f);
     *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
     *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
 }
 
 // int16_t-BE
-static int getInt16MSB(uint8_t *raw, int c)
+static float getInt16MSB(uint8_t *raw, int c)
 {
     uint16_t r;
     int16_t f;
@@ -143,86 +164,87 @@ static int getInt16MSB(uint8_t *raw, int c)
     r = (((uint16_t)raw[1] <<  0) & 0x00FF) |
         (((uint16_t)raw[0] <<  8) & 0xFF00);
     f = *(int16_t*)(&r);
-    return f;
+    return (float)f / INT16_MIN;
 }
-static void setInt16MSB(uint8_t **raw, int ov)
+static void setInt16MSB(uint8_t **raw, float ov)
 {
-    int16_t f = int16_t(ov);
+    int16_t f = int16_t(ov * INT16_MAX);
     uint16_t r = *(uint16_t*)(&f);
     *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
     *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
 }
 
 // uint16_t-LE
-static int getuint16_tLSB(uint8_t *raw, int c)
+static float getuint16_tLSB(uint8_t *raw, int c)
 {
     uint16_t r;
-    int f;
+    float f;
     raw += (c * sizeof(uint16_t));
     r = (((uint16_t)raw[0] <<  0) & 0x00FF) |
         (((uint16_t)raw[1] <<  8) & 0xFF00);
-    f = (int)r + INT16_MIN;
+    f = ((float)r + INT16_MIN) / INT16_MAX;
     return f;
 }
-static void setuint16_tLSB(uint8_t **raw, int ov)
+static void setuint16_tLSB(uint8_t **raw, float ov)
 {
-    int16_t f = int16_t(ov - INT16_MIN);
+    int16_t f = int16_t((ov * INT16_MAX) - INT16_MIN);
     uint16_t r = *(uint16_t*)(&f);
     *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
     *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
 }
 
 // uint16_t-BE
-static int getuint16_tMSB(uint8_t *raw, int c)
+static float getuint16_tMSB(uint8_t *raw, int c)
 {
     uint16_t r;
-    int f;
+    float f;
     raw += (c * sizeof(uint16_t));
     r = (((uint16_t)raw[1] <<  0) & 0x00FF) |
         (((uint16_t)raw[0] <<  8) & 0xFF00);
-    f = (int)r + INT16_MIN;
+    f = ((float)r + INT16_MIN) / INT16_MAX;
     return f;
 }
-static void setuint16_tMSB(uint8_t **raw, int ov)
+static void setuint16_tMSB(uint8_t **raw, float ov)
 {
-    int16_t f = int16_t(ov - INT16_MIN);
+    int16_t f = int16_t((ov * INT16_MAX) - INT16_MIN);
     uint16_t r = *(uint16_t*)(&f);
     *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
     *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
 }
 
 // int8_t
-static int getInt8(uint8_t *raw, int c)
+static float getInt8(uint8_t *raw, int c)
 {
-    int f;
+    float f;
     raw += (c * sizeof(int8_t));
-    f = (int)(int8_t)(*raw) * 256;
+    f = (float)(int8_t)(*raw) / INT8_MAX;
     return f;
 }
-static void setInt8(uint8_t **raw, int ov)
+static void setInt8(uint8_t **raw, float ov)
 {
-    *(*raw)++ = (uint8_t)(ov / 256);
+    *(*raw)++ = (uint8_t)(ov * INT8_MAX);
 }
 
 // uint8_t
-static int getuint8_t(uint8_t *raw, int c)
+static float getuint8_t(uint8_t *raw, int c)
 {
-    int f;
+    float f;
     raw += (c * sizeof(int8_t));
-    f = ((int)*raw + INT8_MIN) * 256;
+    f = (float)((int)*raw + INT8_MIN) / INT8_MAX;
     return f;
 }
-static void setuint8_t(uint8_t **raw, int ov)
+static void setuint8_t(uint8_t **raw, float ov)
 {
-    *(*raw)++ = (uint8_t)((ov / 256) - INT8_MIN);
+    *(*raw)++ = (uint8_t)((ov * INT8_MAX) - INT8_MIN);
 }
 
-
-#define CLAMP16( io )\
+#define CLAMP16F( io )\
     {\
-        if ( (int16_t) io != io )\
-            io = (io >> 31) ^ 0x7FFF;\
-    }
+        if(io < -1.f)\
+            io = -1.f;\
+        else if(io > 1.f)\
+            io = 1.f;\
+    }\
 
 #define ECHO_HIST_SIZE  8
 #define SDSP_RATE       32000
@@ -263,11 +285,11 @@ static void setuint8_t(uint8_t **raw, int ov)
 struct SpcEcho
 {
     int is_valid = 0;
-    int echo_ram[ECHO_BUFFER_SIZE];
+    float echo_ram[ECHO_BUFFER_SIZE];
 
     // Echo history keeps most recent 8 samples (twice the size to simplify wrap handling)
-    int echo_hist[ECHO_HIST_SIZE * 2 * MAX_CHANNELS][MAX_CHANNELS];
-    int (*echo_hist_pos)[MAX_CHANNELS] = echo_hist; // &echo_hist [0 to 7]
+    float echo_hist[ECHO_HIST_SIZE * 2 * MAX_CHANNELS][MAX_CHANNELS];
+    float (*echo_hist_pos)[MAX_CHANNELS] = echo_hist; // &echo_hist [0 to 7]
 
     //! offset from ESA in echo buffer
     int echo_offset = 0;
@@ -298,18 +320,18 @@ struct SpcEcho
     //! FIR resampler
     double fir_stream_rateratio = 0;
     double fir_stream_samplecnt = 0;
-    int    fir_stream_old_samples[MAX_CHANNELS];
-    int    fir_stream_old_samples2[MAX_CHANNELS];
-    int    fir_stream_old_samples3[MAX_CHANNELS];
-    int    fir_stream_samples[MAX_CHANNELS];
+    float  fir_stream_old_samples[MAX_CHANNELS];
+    float  fir_stream_old_samples2[MAX_CHANNELS];
+    float  fir_stream_old_samples3[MAX_CHANNELS];
+    float  fir_stream_samples[MAX_CHANNELS];
     double fir_stream_rateratio_back = 0;
     double fir_stream_samplecnt_back = 0;
-    int    fir_stream_old_samples_back[MAX_CHANNELS];
-    int    fir_stream_old_samples_back2[MAX_CHANNELS];
-    int    fir_stream_old_samples_back3[MAX_CHANNELS];
-    int    fir_stream_samples_back[MAX_CHANNELS];
-    int    fir_stream_midbuffer_in[20][MAX_CHANNELS];
-    int    fir_stream_midbuffer_out[20][MAX_CHANNELS];
+    float  fir_stream_old_samples_back[MAX_CHANNELS];
+    float  fir_stream_old_samples_back2[MAX_CHANNELS];
+    float  fir_stream_old_samples_back3[MAX_CHANNELS];
+    float  fir_stream_samples_back[MAX_CHANNELS];
+    float  fir_stream_midbuffer_in[20][MAX_CHANNELS];
+    float  fir_stream_midbuffer_out[20][MAX_CHANNELS];
     int    fir_buffer_size = 0;
     int    fir_buffer_read = 0;
 #endif
@@ -363,8 +385,8 @@ struct SpcEcho
         reg_edl = 3;
     }
 
-    int (*readSample)(uint8_t *raw, int channel);
-    void (*writeSample)(uint8_t **raw, int sample);
+    float (*readSample)(uint8_t *raw, int channel);
+    void (*writeSample)(uint8_t **raw, float sample);
 
     int init(int i_rate, uint16_t i_format, int i_channels)
     {
@@ -480,12 +502,13 @@ struct SpcEcho
     }
 
 #ifdef RESAMPLED_FIR
-    void sub_process_echo(int *out, int *echo_out)
+    void sub_process_echo(float *out, float *echo_out)
     {
-        int echo_in[MAX_CHANNELS];
-        int *echo_ptr;
-        int c, f, e_offset, v;
-        int (*echohist_pos)[MAX_CHANNELS];
+        float echo_in[MAX_CHANNELS];
+        float *echo_ptr;
+        int c, f, e_offset;
+        float v;
+        float (*echohist_pos)[MAX_CHANNELS];
 
         e_offset = echo_offset;
         echo_ptr = echo_ram + echo_offset;
@@ -525,8 +548,9 @@ struct SpcEcho
         {
             for(c = 0; c < channels; c++)
             {
-                v = (echo_out[c] >> 7) + ((echo_in[c] * reg_efb) >> 14);
-                CLAMP16(v);
+                // v = (echo_out[c] >> 7) + ((echo_in[c] * reg_efb) >> 14);
+                v = (echo_out[c] / 128) + ((echo_in[c] * reg_efb) / 16384.f);
+                CLAMP16F(v);
                 echo_ptr[c] = v;
             }
         }
@@ -536,7 +560,7 @@ struct SpcEcho
             out[c] = echo_in[c];
     }
 
-    void pre_process_echo(int *echo_out)
+    void pre_process_echo(float *echo_out)
     {
         int c, q = 0;
 
@@ -603,7 +627,7 @@ struct SpcEcho
         }
     }
 
-    void process_echo(int *out, int *echo_out)
+    void process_echo(float *out, float *echo_out)
     {
         int c, f;
 
@@ -690,21 +714,23 @@ struct SpcEcho
     {
         int frames = len / (sample_size * channels);
 
-        int main_out[MAX_CHANNELS];
-        int echo_out[MAX_CHANNELS];
-        int echo_in[MAX_CHANNELS];
+        float main_out[MAX_CHANNELS];
+        float echo_out[MAX_CHANNELS];
+        float echo_in[MAX_CHANNELS];
 
-        int c, ov;
+        int c;
+        float ov;
 #ifndef RESAMPLED_FIR
-        int f, e_offset, v;
+        int f, e_offset;
+        float v;
 #endif
 
-        int mvoll[2] = {reg_mvoll, reg_mvolr};
-        int evoll[2] = {reg_evoll, reg_evolr};
+        float mvoll[2] = {(float)reg_mvoll, (float)reg_mvolr};
+        float evoll[2] = {(float)reg_evoll, (float)reg_evolr};
 
 #ifndef RESAMPLED_FIR
-        int (*echohist_pos)[MAX_CHANNELS];
-        int *echo_ptr;
+        float (*echohist_pos)[MAX_CHANNELS];
+        float *echo_ptr;
 #endif
 
         memset(main_out, 0, sizeof(main_out));
@@ -766,8 +792,9 @@ struct SpcEcho
             {
                 for(c = 0; c < channels; c++)
                 {
-                    v = (echo_out[c] >> 7) + ((echo_in[c] * reg_efb) >> 14);
-                    CLAMP16(v);
+                    //v = (echo_out[c] >> 7) + ((echo_in[c] * reg_efb) >> 14);
+                    v = (echo_out[c] / 128) + ((echo_in[c] * reg_efb) / 16384.f);
+                    CLAMP16F(v);
                     echo_ptr[c] = v;
                 }
             }
@@ -775,8 +802,8 @@ struct SpcEcho
             /* Sound out */
             for(c = 0; c < channels; c++)
             {
-                ov = (main_out[c] * mvoll[c % 2] + echo_in[c] * evoll[c % 2]) >> 14;
-                CLAMP16(ov);
+                ov = (main_out[c] * mvoll[c % 2] + echo_in[c] * evoll[c % 2]) / 16384;
+                CLAMP16F(ov);
                 if((reg_flg & 0x40))
                     ov = 0;
                 writeSample(&stream, ov);
