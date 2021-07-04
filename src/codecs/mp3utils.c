@@ -484,6 +484,8 @@ static SDL_bool parse_id3v2(Mix_MusicMetaTags *out_tags, struct mp3file_t *src)
     }
 
     if ((version_major > 2) && ((flags & ID3v2_FLAG_HAS_EXTRA_HEAD) == ID3v2_FLAG_HAS_EXTRA_HEAD)) {
+        MP3_RWread(src, buffer + ID3v2_FIELD_EXTRA_HEADER_LENGTH, 1, 4);
+        MP3_RWseek(src, -4, RW_SEEK_CUR);
         tag_extended_len = id3v2_synchsafe_decode(buffer + ID3v2_FIELD_EXTRA_HEADER_LENGTH); /* Length of an extended header */
     }
 
