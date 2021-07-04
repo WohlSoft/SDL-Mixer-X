@@ -880,9 +880,8 @@ static SDL_bool ParseID3(WAV_Music *wave, Uint32 chunk_length)
         loaded = SDL_FALSE;
     }
 
-    if (loaded && read_id3v2_from_mem(&wave->tags, data, chunk_length) < 0) {
-        Mix_SetError("Invalid ID3 chunk");
-        loaded = SDL_FALSE;
+    if (loaded) {
+        read_id3v2_from_mem(&wave->tags, data, chunk_length);
     }
 
     /* done: */
