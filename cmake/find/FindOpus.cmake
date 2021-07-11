@@ -29,5 +29,6 @@ find_package_handle_standard_args(Opus DEFAULT_MSG
 mark_as_advanced(Opus_INCLUDE_DIR Ogg_INCLUDE_DIR Opus_LIBRARY)
 
 set(Opus_LIBRARIES ${OpusFile_LIBRARY} ${Opus_LIBRARY})
+set(LIBOPUS_LIB ${Opus_LIBRARIES})
 set(Opus_INCLUDE_DIRS ${Ogg_INCLUDE_DIR} ${Opus_INCLUDE_DIR})
 

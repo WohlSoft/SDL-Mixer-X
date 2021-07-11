@@ -6,13 +6,13 @@ if(USE_SYSTEM_AUDIO_LIBRARIES OR USE_SYSTEM_SDL2)
         find_path(SDL2_INCLUDE_DIR "SDL.h" PATH_SUFFIXES SDL2)
 
         if(NOT SDL2_INCLUDE_DIR)
-            message(FATAL_ERROR "SDL2 include dir was not found.")
+            message("SDL2 include dir was not found.")
         endif()
 
         if(NOT SDL2_LIBRARY)
             message(FATAL_ERROR "The SDL2 Library was not found!")
         endif()
-        
+
         set(SDL2_INCLUDE_DIRS ${SDL2_INCLUDE_DIR})
         set(SDL2_LIBRARIES ${SDL2_LIBRARY})
     else()
