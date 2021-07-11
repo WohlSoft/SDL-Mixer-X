@@ -1,7 +1,7 @@
 # FIXME: Detect a version of SDL2 for pkg-config script
 
 if(USE_SYSTEM_AUDIO_LIBRARIES OR USE_SYSTEM_SDL2)
-    if(HAIKU)
+    if(HAIKU OR VITA)
         find_library(SDL2_LIBRARY SDL2)
         find_path(SDL2_INCLUDE_DIR "SDL.h" PATH_SUFFIXES SDL2)
         if(NOT SDL2_LIBRARY AND NOT SDL2_INCLUDE_DIR)

@@ -1,4 +1,29 @@
 cmake_minimum_required (VERSION 2.8.12)
+
+if(DEFINED ENV{VITASDK})
+    message("VITASDK Defined!")
+    message("VITA BUILD!")
+    message("VITA BUILD!")
+    message("VITA BUILD!")
+    message("VITA BUILD!")
+    message("VITA BUILD!")
+    message("VITA BUILD!")
+    message("VITA BUILD!")
+    #set(CMAKE_TOOLCHAIN_FILE "$ENV{VITASDK}/share/vita.toolchain.cmake" CACHE PATH "toolchain file")
+    set(CMAKE_TOOLCHAIN_FILE "/usr/local/vitasdk/share/vita.toolchain.cmake" CACHE PATH "toolchain file")
+
+    #include("${VITASDK}/share/vita.cmake" REQUIRED)
+    include ("/usr/local/vitasdk/share/vita.cmake" REQUIRED)
+
+    set(VITA 1)
+    # set(VITA_APP_NAME "TheXTech Vita Edition")
+    # set(VITA_TITLEID  "THEXTECH00001")
+    # set(VITA_VERSION  "01.00")
+
+    # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11")
+    # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+endif()
+
 project(SDLMixerX C CXX)
 
 set(SDLMixerX_VERSION_MAJOR 2)
@@ -57,7 +82,7 @@ option(SSE                 "Use SSE assembly routines" ${OPT_DEF_ASM})
 option(SSE2                "Use SSE2 assembly routines" ${OPT_DEF_SSEMATH})
 option(SSE3                "Use SSE3 assembly routines" ${OPT_DEF_SSEMATH})
 
-if(EMSCRIPTEN)
+if(EMSCRIPTEN OR VITA)
     set(SDL_MIXER_X_SHARED_DEFAULT_ON OFF)
 else()
     set(SDL_MIXER_X_SHARED_DEFAULT_ON ON)
@@ -80,6 +105,18 @@ if(SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE AND SDL_MIXER_CLEAR_FOR_LGPL_LICENSE)
 endif()
 
 option(USE_SYSTEM_SDL2   "Use SDL2 from system" OFF)
+
+if(VITA)
+    message("Vita Build, setting SDL_MIXER_X_SHARED OFF")
+    set(SDL_MIXER_X_SHARED OFF)
+
+    message("Vita Build, setting USE_SYSTEM_SDL2 ON")
+    set(USE_SYSTEM_SDL2 ON)
+
+    message("Vita Build, setting GME & MIDI support off (for now)")
+    set(USE_GME OFF)
+    set(USE_MIDI OFF)
+endif()
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     # Turn on warnings and legacy C/C++ standards to support more compilers
@@ -233,6 +270,9 @@ include(music_gme)
 include(music_cmd)
 
 option(USE_MIDI            "Build with MIDI support" ON)
+if(VITA)
+    set(USE_MIDI OFF)
+endif()
 if(USE_MIDI)
     list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_USE_MIDI)
 
