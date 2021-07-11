@@ -331,6 +331,39 @@ if(WIN32 AND NOT EMSCRIPTEN)
     endif()
 endif()
 
+if(VITA)
+    find_library(SDL2_LIBRARIES SDL2)
+
+    list(APPEND SDLMixerX_LINK_LIBS
+        ${SDL2_LIBRARIES}
+        ogg
+        vorbis
+        vorbisfile
+        opus
+        opusfile
+        mad
+        modplug
+        FLAC
+        debugnet
+        SceRtc_stub
+        SceNetCtl_stub
+        SceNet_stub
+        SceLibKernel_stub
+        ScePvf_stub
+        SceAppMgr_stub
+        SceAppUtil_stub
+        ScePgf_stub
+        SceCommonDialog_stub
+        m
+        z
+        SceGxm_stub
+        SceDisplay_stub
+        SceSysmodule_stub
+        SceTouch_stub
+        vitashark
+    )
+endif()
+
 if(APPLE)
     find_library(APPLE_CORE_AUDIO CoreAudio)
     find_library(APPLE_IOKIT IOKit)
