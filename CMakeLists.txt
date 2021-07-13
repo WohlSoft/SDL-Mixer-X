@@ -99,7 +99,6 @@ if(SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE AND SDL_MIXER_CLEAR_FOR_LGPL_LICENSE)
 endif()
 
 option(USE_SYSTEM_SDL2   "Use SDL2 from system" OFF)
-
 if(VITA)
     message("Vita Build, setting SDL_MIXER_X_SHARED OFF")
     set(SDL_MIXER_X_SHARED OFF)
@@ -264,9 +263,12 @@ include(music_gme)
 include(music_cmd)
 
 option(USE_MIDI            "Build with MIDI support" ON)
+
 if(VITA)
     set(USE_MIDI OFF)
+    set(USE_GME OFF)
 endif()
+
 if(USE_MIDI)
     list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_USE_MIDI)
 
