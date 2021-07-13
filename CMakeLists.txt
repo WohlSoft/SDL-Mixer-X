@@ -1,19 +1,9 @@
 cmake_minimum_required (VERSION 2.8.12)
 
-if(DEFINED ENV{VITASDK})
+if(Vita)
     message("VITASDK Defined!")
-    message("VITA BUILD!")
-    message("VITA BUILD!")
-    message("VITA BUILD!")
-    message("VITA BUILD!")
-    message("VITA BUILD!")
-    message("VITA BUILD!")
-    message("VITA BUILD!")
-    #set(CMAKE_TOOLCHAIN_FILE "$ENV{VITASDK}/share/vita.toolchain.cmake" CACHE PATH "toolchain file")
-    set(CMAKE_TOOLCHAIN_FILE "/usr/local/vitasdk/share/vita.toolchain.cmake" CACHE PATH "toolchain file")
-
-    #include("${VITASDK}/share/vita.cmake" REQUIRED)
-    include ("/usr/local/vitasdk/share/vita.cmake" REQUIRED)
+    set(CMAKE_TOOLCHAIN_FILE "$ENV{VITASDK}/share/vita.toolchain.cmake" CACHE PATH "toolchain file")
+    include("$ENV{VITASDK}/share/vita.cmake" REQUIRED)
 
     set(VITA 1)
     # set(VITA_APP_NAME "TheXTech Vita Edition")
@@ -332,18 +322,11 @@ if(WIN32 AND NOT EMSCRIPTEN)
 endif()
 
 if(VITA)
+    message("VITA, APPENDING LIBS")
     find_library(SDL2_LIBRARIES SDL2)
 
     list(APPEND SDLMixerX_LINK_LIBS
         ${SDL2_LIBRARIES}
-        ogg
-        vorbis
-        vorbisfile
-        opus
-        opusfile
-        mad
-        modplug
-        FLAC
         debugnet
         SceRtc_stub
         SceNetCtl_stub
@@ -362,6 +345,8 @@ if(VITA)
         SceTouch_stub
         vitashark
     )
+
+    message("\n\n${SDLMixerX_LINK_LIBS}\n\n")
 endif()
 
 if(APPLE)
@@ -415,6 +400,8 @@ list(APPEND SDLMixerX_SOURCES
 
 set(SDLMixerX_INSTALLS)
 
+
+
 if(SDL_MIXER_X_STATIC AND NOT BUILD_AS_VB6_BINDING)
     add_library(SDL2_mixer_ext_Static STATIC ${SDLMixerX_SOURCES})
     if(WIN32)
@@ -422,6 +409,12 @@ if(SDL_MIXER_X_STATIC AND NOT BUILD_AS_VB6_BINDING)
     else()
         set_target_properties(SDL2_mixer_ext_Static PROPERTIES OUTPUT_NAME SDL2_mixer_ext)
     endif()
+
+    message("LINK LIBRARIES SDLMIXERX")
+    if(VITA)
+        # target_compile_options(SDL2_mixer_ext_Static PRIVATE --no-pie)
+    endif()
+
     target_link_libraries(SDL2_mixer_ext_Static PUBLIC ${SDLMixerX_LINK_LIBS})
     target_compile_definitions(SDL2_mixer_ext_Static PRIVATE ${SDL_MIXER_DEFINITIONS})
     target_include_directories(SDL2_mixer_ext_Static PRIVATE
