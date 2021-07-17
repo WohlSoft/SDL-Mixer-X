@@ -9,6 +9,28 @@ if(USE_SYSTEM_AUDIO_LIBRARIES OR USE_SYSTEM_SDL2)
         endif()
         set(SDL2_INCLUDE_DIRS ${SDL2_INCLUDE_DIR})
         set(SDL2_LIBRARIES ${SDL2_LIBRARY})
+    elseif(VITA)
+        set(CMAKE_FIND_ROOT_PATH_OLD2 "${CMAKE_FIND_ROOT_PATH}")
+        set(CMAKE_FIND_ROOT_PATH "${CMAKE_FIND_ROOT_PATH_OLD}")
+
+        find_library(SDL2_LIBRARY SDL2)
+        find_path(SDL2_INCLUDE_DIR "SDL.h" PATH_SUFFIXES SDL2)
+        
+        set(SDL2_INCLUDE_DIRS ${SDL2_INCLUDE_DIR})
+        set(SDL2_LIBRARIES ${SDL2_LIBRARY})
+
+        message("libSDL2.cmake")
+        message("SDL2_LIBRARY: ${SDL2_LIBRARY}")
+        message("SDL2_LIBRARIES: ${SDL2_LIBRARIES}")
+        message("SDL2_INCLUDE_DIR: ${SDL2_INCLUDE_DIR}")
+        message("SDL2_INCLUDE_DIRS: ${SDL2_INCLUDE_DIRS}")
+        message("CMAKE_FIND_ROOT_PATH: ${CMAKE_FIND_ROOT_PATH}")
+
+        if(NOT SDL2_LIBRARY AND NOT SDL2_INCLUDE_DIR)
+            message(FATAL_ERROR "The SDL2 Library was not found!")
+        endif()
+
+        set(CMAKE_FIND_ROOT_PATH "${CMAKE_FIND_ROOT_PATH_OLD2}")
     else()
         find_package(SDL2 REQUIRED)
         if(TARGET SDL2::SDL2)
