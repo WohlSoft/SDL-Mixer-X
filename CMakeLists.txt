@@ -57,15 +57,15 @@ option(SSE                 "Use SSE assembly routines" ${OPT_DEF_ASM})
 option(SSE2                "Use SSE2 assembly routines" ${OPT_DEF_SSEMATH})
 option(SSE3                "Use SSE3 assembly routines" ${OPT_DEF_SSEMATH})
 
-if(EMSCRIPTEN)
-    set(SDL_MIXER_X_SHARED_DEFAULT_ON OFF)
+if(NOT EMSCRIPTEN
+   AND NOT VITA
+   AND NOT 3DS)
+    option(SDL_MIXER_X_STATIC   "Build static library of SDL Mixer X" ON)
+    option(SDL_MIXER_X_SHARED   "Build shared library of SDL Mixer X" ON)
 else()
-    set(SDL_MIXER_X_SHARED_DEFAULT_ON ON)
+    set(SDL_MIXER_X_STATIC ON)
+    set(SDL_MIXER_X_SHARED OFF)
 endif()
-
-# Settings
-option(SDL_MIXER_X_STATIC   "Build static library of SDL Mixer X" ON)
-option(SDL_MIXER_X_SHARED   "Build shared library of SDL Mixer X" ${SDL_MIXER_X_SHARED_DEFAULT_ON})
 
 option(DOWNLOAD_AUDIO_CODECS_DEPENDENCY "Downloads and compiles AudioCodecs dependencies pack directly" OFF)
 option(AUDIO_CODECS_BUILD_LOCAL_SDL2 "Build SDL2 from local AudioCodecs' copy" OFF)
@@ -101,8 +101,8 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER_ID ST
     endif()
     
     if(VITA)
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DVITA -DVITA=1")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVITA -DVITA=1")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DVITA -DVITA=1 -fcompare-debug-second")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVITA -DVITA=1 -fcompare-debug-second")
     endif()
 endif()
 
