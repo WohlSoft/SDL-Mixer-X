@@ -25,7 +25,9 @@
 #include "SDL_assert.h"
 
 #define FLAC__ASSERT_H // WORKAROUND
+#ifndef SDL_assert
 #define assert SDL_assert
+#endif
 
 // Rename class to avoid ABI collisions
 #define BW_MidiSequencer MixerMidiSequencer
