@@ -241,7 +241,7 @@ const char *SDLCALLCC Mix_GetMusicDecoder(int index)
     return(music_decoders[index]);
 }
 
-SDL_bool Mix_HasMusicDecoder(const char *name)
+SDL_bool SDLCALLCC Mix_HasMusicDecoder(const char *name)
 {
     int index;
     for (index = 0; index < num_decoders; ++index) {
