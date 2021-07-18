@@ -233,7 +233,7 @@ int SDLCALLCC Mix_GetNumMusicDecoders(void)
     return(num_decoders);
 }
 
-const char * SDLCALLCC Mix_GetMusicDecoder(int index)
+const char *SDLCALLCC Mix_GetMusicDecoder(int index)
 {
     if ((index < 0) || (index >= num_decoders)) {
         return NULL;
