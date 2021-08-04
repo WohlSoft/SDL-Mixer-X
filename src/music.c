@@ -61,6 +61,20 @@ static int music_volume = MIX_MAX_VOLUME;
 static Mix_Music * volatile music_playing = NULL;
 SDL_AudioSpec music_spec;
 
+/* ========== Multi-Music ========== */
+static int           num_streams = 0;
+static Mix_Music    *mix_streams = NULL;
+
+typedef struct _Mix_effectinfo
+{
+    Mix_EffectFunc_t callback;
+    Mix_EffectDone_t done_callback;
+    void *udata;
+    struct _Mix_effectinfo *next;
+} mus_effect_info;
+
+/* ========== Multi-Music =END====== */
+
 struct _Mix_Music {
     Mix_MusicInterface *interface;
     void *context;
@@ -69,6 +83,10 @@ struct _Mix_Music {
     Mix_Fading fading;
     int fade_step;
     int fade_steps;
+
+    void (SDLCALL *music_finished_hook)(void);
+
+    mus_effect_info *effects;
 
     char filename[1024];
 };
@@ -328,6 +346,69 @@ int music_pcm_getaudio(void *context, void *data, int bytes, int volume,
 }
 
 /* Mixing function */
+static SDL_INLINE int music_mix_stream(Mix_Music *music, void *udata, Uint8 *stream, int *len)
+{
+    (void)udata;
+
+    /* Handle fading */
+    if (music->fading != MIX_NO_FADING) {
+        if (music->fade_step++ < music->fade_steps) {
+            int volume;
+            int fade_step = music->fade_step;
+            int fade_steps = music->fade_steps;
+
+            if (music->fading == MIX_FADING_OUT) {
+                volume = (music_volume * (fade_steps-fade_step)) / fade_steps;
+            } else { /* Fading in */
+                volume = (music_volume * fade_step) / fade_steps;
+            }
+            music_internal_volume(music, volume);
+        } else {
+            if (music->fading == MIX_FADING_OUT) {
+                music_internal_halt(music);
+                if (music->music_finished_hook) {
+                    music->music_finished_hook();
+                }
+                return -1;
+            }
+            music->fading = MIX_NO_FADING;
+        }
+    }
+
+    if (music->interface->GetAudio) {
+        int left = music->interface->GetAudio(music->context, stream, *len);
+        if (left != 0) {
+            /* Either an error or finished playing with data left */
+            music->playing = SDL_FALSE;
+        }
+        if (left > 0) {
+            stream += (*len - left);
+            *len = left;
+        } else {
+            *len = 0;
+        }
+    } else {
+        *len = 0;
+    }
+
+    if (!music_internal_playing(music)) {
+        music_internal_halt(music);
+        if (music->music_finished_hook) {
+            music->music_finished_hook();
+        }
+    }
+
+    return 0;
+}
+
+void SDLCALL music_mixer(void *udata, Uint8 *stream, int len)
+{
+    while (music_playing && music_active && len > 0) {
+        music_mix_stream(music_playing, udata, stream, len);
+    }
+}
+
+#if 0
 void SDLCALL music_mixer(void *udata, Uint8 *stream, int len)
 {
     (void)udata;
@@ -382,6 +463,7 @@ void SDLCALL music_mixer(void *udata, Uint8 *stream, int len)
         }
     }
 }
+#endif
 
 /* Load the music interface libraries for a given music type */
 SDL_bool load_music_type(Mix_MusicType type)
@@ -1404,6 +1486,7 @@ static int music_internal_play(Mix_Music *music, int play_count, double position
     }
     music_playing = music;
     music_playing->playing = SDL_TRUE;
+    music_playing->music_finished_hook = music_finished_hook;
 
     /* Set the initial volume */
     music_internal_initialize_volume();
