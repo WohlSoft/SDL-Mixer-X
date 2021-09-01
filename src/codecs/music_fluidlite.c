@@ -343,9 +343,12 @@ static int SDLCALL fluidsynth_load_soundfont(const char *path, void *data)
 static int FLUIDSYNTH_Open(const SDL_AudioSpec *spec)
 {
     (void)spec;
+    /* Don't pre-check SoundFonts here to allow path arguments being used without pre-loaded SoundFonts */
+    /*
     if (!Mix_EachSoundFont(fluidsynth_check_soundfont, NULL)) {
         return -1;
     }
+    */
     return 0;
 }
 
