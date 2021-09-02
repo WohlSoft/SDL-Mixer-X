@@ -81,6 +81,7 @@ static void (SDLCALL *channel_done_callback)(int channel) = NULL;
 
 /* Support for user defined music functions */
 static void (SDLCALL *mix_music)(void *udata, Uint8 *stream, int len) = music_mixer;
+static void (SDLCALL *mix_multi_music)(void *udata, Uint8 *stream, int len) = multi_music_mixer;
 static void *music_data = NULL;
 
 /* rcg06042009 report available decoders at runtime. */
@@ -266,6 +267,7 @@ mix_channels(void *udata, Uint8 *stream, int len)
 
     /* Mix the music (must be done before the channels are added) */
     mix_music(music_data, stream, len);
+    mix_multi_music(music_data, stream, len);
 
     /* Mix any playing channels... */
     sdl_ticks = SDL_GetTicks();

@@ -356,6 +356,8 @@ extern DECLSPEC void SDLCALL Mix_HookMusic(void (SDLCALL *mix_func)(void *udata,
  */
 extern DECLSPEC void SDLCALL Mix_HookMusicFinished(void (SDLCALL *music_finished)(void));
 
+extern DECLSPEC void SDLCALL Mix_HookMusicStreamFinished(Mix_Music *music, void (SDLCALL *music_finished)(Mix_Music*, void*), void *user_data);/*Mixer-X*/
+
 /* Get a pointer to the user data for the current music hook */
 extern DECLSPEC void * SDLCALL Mix_GetMusicHookData(void);
 
@@ -695,6 +697,11 @@ extern DECLSPEC int SDLCALL Mix_FadeInChannelTimed(int channel, Mix_Chunk *chunk
 #define Mix_FadeInChannelVolume(channel,chunk,loops,ms,vol) Mix_FadeInChannelTimedVolume(channel,chunk,loops,ms,-1,vol)/*MIXER-X*/
 extern DECLSPEC int SDLCALL Mix_FadeInChannelTimedVolume(int which, Mix_Chunk *chunk, int loops, int ms, int ticks, int volume);/*MIXER-X*/
 
+/* Multi-Music */
+extern DECLSPEC int SDLCALL Mix_PlayMusicStream(Mix_Music *music, int loops); /*MIXER-X*/
+extern DECLSPEC int SDLCALL Mix_FadeInMusicStream(Mix_Music *music, int loops, int ms); /*MIXER-X*/
+extern DECLSPEC int SDLCALL Mix_FadeInMusicStreamPos(Mix_Music *music, int loops, int ms, double position); /*MIXER-X*/
+
 
 /* Set the volume in the range of 0-128 of a specific channel or chunk.
    If the specified channel is -1, set volume for all channels.
@@ -733,6 +740,9 @@ extern DECLSPEC int SDLCALL Mix_FadeOutMusicStream(Mix_Music *music, int ms);
 /* MIXERX_DEPRECATED("Use Mix_FadeOutMusicStream(Mix_Music*,int) instead") */
 extern DECLSPEC int SDLCALL Mix_FadeOutMusic(int ms);
 
+extern DECLSPEC int SDLCALL Mix_CrossFadeMusicStream(Mix_Music *old_music, Mix_Music *new_music, int loops, int ms, int free_old);
+extern DECLSPEC int SDLCALL Mix_CrossFadeMusicStreamPos(Mix_Music *old_music, Mix_Music *new_music, int loops, int ms, double pos, int free_old);
+
 /* Query the fading status of a channel */
 extern DECLSPEC Mix_Fading SDLCALL Mix_FadingMusicStream(Mix_Music *music);
 /* MIXERX_DEPRECATED("Use Mix_FadingMusicStream(Mix_Music*) instead") */
@@ -749,6 +759,8 @@ extern DECLSPEC void SDLCALL Mix_PauseMusicStream(Mix_Music *music);
 extern DECLSPEC void SDLCALL Mix_ResumeMusicStream(Mix_Music *music);
 extern DECLSPEC void SDLCALL Mix_RewindMusicStream(Mix_Music *music);
 extern DECLSPEC int SDLCALL Mix_PausedMusicStream(Mix_Music *music);
+extern DECLSPEC void SDLCALL Mix_PauseMusicStreamAll();
+extern DECLSPEC void SDLCALL Mix_ResumeMusicStreamAll();
 
 /* Pause/Resume the music stream (Deprecated calls) */
 /* MIXERX_DEPRECATED("Use Mix_PauseMusicStream(Mix_Music*) instead") */
@@ -765,6 +777,7 @@ extern DECLSPEC int SDLCALL Mix_PausedMusic(void);
    Only for MOD music formats.
  */
 extern DECLSPEC int SDLCALL Mix_ModMusicJumpToOrder(int order);
+extern DECLSPEC int SDLCALL Mix_ModMusicStreamJumpToOrder(Mix_Music *music, int order);
 /* Set the current position in the music stream.
    This returns 0 if successful, or -1 if it failed or isn't implemented.
    This function is only implemented for MOD music formats (set pattern
