@@ -105,8 +105,7 @@ static SDL_bool _Mix_MultiMusic_Add(Mix_Music *mus)
             SDL_OutOfMemory();
             return SDL_FALSE;
         }
-
-    } else if (num_streams > num_streams_capacity) {
+    } else if (num_streams >= num_streams_capacity) {
         mix_streams = SDL_realloc(mix_streams, sizeof(Mix_Music *) * (num_streams_capacity + inc));
         SDL_memset(mix_streams + num_streams_capacity, 0, sizeof(Mix_Music*) * inc);
         num_streams_capacity += inc;
@@ -568,10 +567,14 @@ void SDLCALL multi_music_mixer(void *udata, Uint8 *stream, int len)
     int i;
     Mix_Music *m;
 
+    if (!mix_streams) {
+        return; /* Nothing to process */
+    }
+
     /* Mix currently working streams */
     for (i = 0; i < num_streams; ++i) {
         m = mix_streams[i];
-        if (m->music_active) {
+        if (m && m->music_active) {
             SDL_memset(mix_streams_buffer, music_spec.silence, (size_t)len);
             music_mix_stream(m, udata, mix_streams_buffer, len);
             SDL_MixAudioFormat(stream, mix_streams_buffer, music_spec.format, len, MIX_MAX_VOLUME);
@@ -581,9 +584,9 @@ void SDLCALL multi_music_mixer(void *udata, Uint8 *stream, int len)
     /* Clean-up old streams */
     for (i = 0; i < num_streams; ++i) {
         m = mix_streams[i];
-        if (!m->music_active) {
+        if (!m || !m->music_active) {
             _Mix_MultiMusic_Remove(m);
-            if (m->free_on_stop) {
+            if (m && m->free_on_stop) {
                 m->interface->Delete(m->context);
                 SDL_free(m);
             }

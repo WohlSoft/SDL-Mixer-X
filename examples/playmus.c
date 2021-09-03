@@ -249,7 +249,7 @@ int main(int argc, char *argv[])
             for(i = 0; i < multi_music_count; ++i) {
                 current_position = Mix_GetMusicPosition(multi_music[i]);
                 if (current_position >= 0.0) {
-                    printf("  %4.2f  ", current_position);
+                    printf("%5.1f;", current_position);
                 }
             }
 
@@ -258,7 +258,7 @@ int main(int argc, char *argv[])
                 multimusic_actives += Mix_PlayingMusicStream(multi_music[i]) || Mix_PausedMusicStream(multi_music[i]) ? 1 : 0;
             }
 
-            printf("      (%d)    \r", multimusic_actives);
+            printf("--(%d) \r", multimusic_actives);
             fflush(stdout);
             SDL_Delay(100);
 
