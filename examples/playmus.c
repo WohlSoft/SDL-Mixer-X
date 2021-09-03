@@ -356,7 +356,7 @@ int main(int argc, char *argv[])
         }
         if (crossfade) {
             if (music_prev) {
-                Mix_CrossFadeMusicStream(music_prev, music, looping, 2000, 1);
+                Mix_CrossFadeMusicStream(music_prev, music, looping, 5000, 1);
             } else {
                 Mix_FadeInMusicStream(music, looping, 2000);
             }
@@ -378,8 +378,8 @@ int main(int argc, char *argv[])
         }
         if (!crossfade) {
             Mix_FreeMusic(music);
+            music = NULL;
         }
-        music = NULL;
 
         /* If the user presses Ctrl-C more than once, exit. */
         SDL_Delay(500);
@@ -388,9 +388,12 @@ int main(int argc, char *argv[])
         i++;
     }
 
-    if (music) {
+    if (crossfade) {
+        Mix_FadeOutMusicStream(music, 5000);
         Mix_FreeMusic(music);
+        music = NULL;
     }
+
     CleanUp(0);
 
     /* Not reached, but fixes compiler warnings */

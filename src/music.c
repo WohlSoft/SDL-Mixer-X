@@ -527,9 +527,6 @@ static SDL_INLINE int music_mix_stream(Mix_Music *music, void *udata, Uint8 *str
                     if (music_finished_hook) {
                         music_finished_hook();
                     }
-                    if (music->free_on_stop) {
-                        Mix_FreeMusic(music);
-                    }
                     return -1;
                 }
                 music->fading = MIX_NO_FADING;
@@ -569,11 +566,29 @@ static SDL_INLINE int music_mix_stream(Mix_Music *music, void *udata, Uint8 *str
 void SDLCALL multi_music_mixer(void *udata, Uint8 *stream, int len)
 {
     int i;
+    Mix_Music *m;
 
+    /* Mix currently working streams */
     for (i = 0; i < num_streams; ++i) {
-        SDL_memset(mix_streams_buffer, music_spec.silence, (size_t)len);
-        music_mix_stream(mix_streams[i], udata, mix_streams_buffer, len);
-        SDL_MixAudioFormat(stream, mix_streams_buffer, music_spec.format, len, MIX_MAX_VOLUME);
+        m = mix_streams[i];
+        if (m->music_active) {
+            SDL_memset(mix_streams_buffer, music_spec.silence, (size_t)len);
+            music_mix_stream(m, udata, mix_streams_buffer, len);
+            SDL_MixAudioFormat(stream, mix_streams_buffer, music_spec.format, len, MIX_MAX_VOLUME);
+        }
+    }
+
+    /* Clean-up old streams */
+    for (i = 0; i < num_streams; ++i) {
+        m = mix_streams[i];
+        if (!m->music_active) {
+            _Mix_MultiMusic_Remove(m);
+            if (m->free_on_stop) {
+                m->interface->Delete(m->context);
+                SDL_free(m);
+            }
+            i--;
+        }
     }
 }
 
@@ -2199,7 +2214,6 @@ static void music_internal_halt(Mix_Music *music)
     music->fading = MIX_NO_FADING;
 
     if (music->is_multimusic) {
-        _Mix_MultiMusic_Remove(music);
         music->is_multimusic = 0;
         music->music_active = 0;
     }
@@ -2207,7 +2221,6 @@ static void music_internal_halt(Mix_Music *music)
     if (music == music_playing) {
         music_playing = NULL;
     }
-    /*TODO: For MultiMusic case, scan the "playing streams" array and remove the element from it*/
 }
 int SDLCALLCC Mix_HaltMusicStream(Mix_Music *music)
 {
