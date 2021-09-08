@@ -231,6 +231,7 @@ struct _Mix_Music {
     int is_multimusic;
     int music_active;
     int music_volume;
+    int music_halted;
     int free_on_stop;
 
     char filename[1024];
@@ -591,10 +592,10 @@ void SDLCALL multi_music_mixer(void *udata, Uint8 *stream, int len)
         }
     }
 
-    /* Clean-up old streams */
+    /* Clean-up halted streams */
     for (i = 0; i < num_streams; ++i) {
         m = mix_streams[i];
-        if (!m || !m->music_active) {
+        if (!m || m->music_halted) {
             _Mix_MultiMusic_Remove(m);
             if (m && m->free_on_stop) {
                 m->interface->Delete(m->context);
@@ -1846,6 +1847,7 @@ int SDLCALLCC Mix_FadeInMusicStreamPos(Mix_Music *music, int loops, int ms, doub
 
     music->is_multimusic = 1;
     music->music_active = 1;
+    music->music_halted = 0;
 
     /* Play the puppy */
     Mix_LockAudio();
@@ -1856,6 +1858,7 @@ int SDLCALLCC Mix_FadeInMusicStreamPos(Mix_Music *music, int loops, int ms, doub
     retval = music_internal_play_stream(music, loops, position);
     /* Set music as active */
     music->music_active = (retval == 0);
+    music->music_halted = (music->music_active == 0);
     Mix_UnlockAudio();
 
     return(retval);
@@ -2247,6 +2250,7 @@ static void music_internal_halt(Mix_Music *music)
     if (music->is_multimusic) {
         music->is_multimusic = 0;
         music->music_active = 0;
+        music->music_halted = 1;
     }
 
     if (music == music_playing) {
@@ -2389,6 +2393,9 @@ void SDLCALLCC Mix_PauseMusicStream(Mix_Music *music)
     if (music) {
         if (music->interface->Pause) {
             music->interface->Pause(music->context);
+        }
+        if (music->is_multimusic) {
+            music->music_active = SDL_FALSE;
         }
     } else if (music_playing) {
         if (music_playing->interface->Pause) {
