@@ -82,6 +82,7 @@ qt5_wrap_ui(UIS_HDRS
     MainWindow/mainwindow.ui
     MainWindow/multi_music_test.ui
     MainWindow/multi_music_item.ui
+    MainWindow/musicfx.ui
     MainWindow/sfx_tester.ui
     MainWindow/setup_audio.ui
     MainWindow/setup_midi.ui
@@ -103,6 +104,7 @@ list(APPEND SDLMixer_MusPlay_SRC
     MainWindow/multi_music_item.cpp
     MainWindow/musplayer_base.cpp
     MainWindow/musplayer_qt.cpp
+    MainWindow/musicfx.cpp
     MainWindow/seek_bar.cpp
     MainWindow/setup_audio.cpp
     MainWindow/setup_midi.cpp

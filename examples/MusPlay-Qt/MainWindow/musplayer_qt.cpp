@@ -15,6 +15,7 @@
 #include "ui_mainwindow.h"
 #include "musplayer_qt.h"
 #include "multi_music_test.h"
+#include "musicfx.h"
 #include "../Player/mus_player.h"
 #include "../AssocFiles/assoc_files.h"
 #include "../Effects/reverb.h"
@@ -68,6 +69,9 @@ MusPlayer_Qt::MusPlayer_Qt(QWidget *parent) : QMainWindow(parent),
 
     m_multiMusicTest = new MultiMusicTest(this);
     m_multiMusicTest->setModal(false);
+
+    m_musicFx = new MusicFX(this);
+    m_musicFx->setModal(false);
 
     m_setupMidi = new SetupMidi(this);
     m_setupMidi->setModal(false);
@@ -380,6 +384,7 @@ void MusPlayer_Qt::on_play_clicked()
         playSuccess = PGE_MusicPlayer::playMusic();
         ui->play->setToolTip(tr("Pause"));
         ui->play->setIcon(QIcon(":/buttons/pause.png"));
+        m_musicFx->resetAll();
     }
 
     m_positionWatcher.stop();
@@ -632,6 +637,15 @@ void MusPlayer_Qt::on_actionMultiMusicTesting_triggered()
     m_multiMusicTest->move(g.left(), g.bottom());
     m_multiMusicTest->update();
     m_multiMusicTest->repaint();
+}
+
+void MusPlayer_Qt::on_actionMusicFX_triggered()
+{
+    m_musicFx->show();
+    QRect g = this->frameGeometry();
+    m_musicFx->move(g.right(), g.top());
+    m_musicFx->update();
+    m_musicFx->repaint();
 }
 
 void MusPlayer_Qt::on_actionEnableReverb_triggered(bool checked)

@@ -15,6 +15,7 @@ class SfxTester;
 class SetupMidi;
 class EchoTune;
 class MultiMusicTest;
+class MusicFX;
 
 namespace Ui {
 class MainWindow;
@@ -92,6 +93,7 @@ private slots:
     void on_actionMidiSetup_triggered();
     void on_actionSfxTesting_triggered();
     void on_actionMultiMusicTesting_triggered();
+    void on_actionMusicFX_triggered();
     void on_actionEnableReverb_triggered(bool checked);
     void on_actionEnableEcho_triggered(bool checked);
     void on_actionFileAssoc_triggered();
@@ -119,6 +121,7 @@ private:
     SetupMidi *m_setupMidi = nullptr;
     EchoTune  *m_echoTune = nullptr;
     MultiMusicTest *m_multiMusicTest = nullptr;
+    MusicFX *m_musicFx = nullptr;
 };
 
 #endif // MUSPLAYER_QT_H
