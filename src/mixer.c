@@ -911,7 +911,7 @@ void SDLCALLCC Mix_SetPostMix(void (SDLCALL *mix_func)
 
 
 /* returns a pointer to the music mixer that can be used as a callback */
-common_mixer SDLCALLCC Mix_GetMusicMixer()
+common_mixer SDLCALLCC Mix_GetMusicMixer(void)
 {
     return mix_music;
 }

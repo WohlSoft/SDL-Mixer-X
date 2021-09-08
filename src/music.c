@@ -151,7 +151,7 @@ static SDL_bool _Mix_MultiMusic_Remove(Mix_Music *mus)
     return found;
 }
 
-static void _Mix_MultiMusic_CloseAndFree()
+static void _Mix_MultiMusic_CloseAndFree(void)
 {
     int i;
 
@@ -173,7 +173,7 @@ static void _Mix_MultiMusic_CloseAndFree()
     }
 }
 
-static void _Mix_MultiMusic_HaltAll()
+static void _Mix_MultiMusic_HaltAll(void)
 {
     int i;
 
@@ -186,7 +186,7 @@ static void _Mix_MultiMusic_HaltAll()
     }
 }
 
-static void _Mix_MultiMusic_PauseAll()
+static void _Mix_MultiMusic_PauseAll(void)
 {
     int i;
 
@@ -199,7 +199,7 @@ static void _Mix_MultiMusic_PauseAll()
     }
 }
 
-static void _Mix_MultiMusic_ResumeAll()
+static void _Mix_MultiMusic_ResumeAll(void)
 {
     int i;
 
@@ -2239,7 +2239,7 @@ void SDLCALLCC Mix_VolumeMusicGeneral(int volume)
     Mix_UnlockAudio();
 }
 
-int SDLCALLCC Mix_GetVolumeMusicGeneral()
+int SDLCALLCC Mix_GetVolumeMusicGeneral(void)
 {
     return music_general_volume;
 }
@@ -2444,11 +2444,11 @@ void SDLCALLCC Mix_ResumeMusic(void)
 {
     Mix_ResumeMusicStream(NULL);
 }
-void SDLCALLCC Mix_PauseMusicStreamAll()
+void SDLCALLCC Mix_PauseMusicStreamAll(void)
 {
     _Mix_MultiMusic_PauseAll();
 }
-void SDLCALLCC Mix_ResumeMusicStreamAll()
+void SDLCALLCC Mix_ResumeMusicStreamAll(void)
 {
     _Mix_MultiMusic_ResumeAll();
 }
