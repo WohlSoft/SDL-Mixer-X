@@ -2,6 +2,7 @@
 #include <QToolTip>
 #include <QtDebug>
 #include <QDateTime>
+#include <QFileInfo>
 
 #include "multi_music_item.h"
 #include "ui_multi_music_item.h"
@@ -46,8 +47,8 @@ MultiMusicItem::MultiMusicItem(QString music, QWidget *parent) :
     ui(new Ui::MultiMusicItem)
 {
     ui->setupUi(this);
-    ui->musicTitle->setText(QString());
-    ui->musicType->setText(QString::fromUtf8(musicTypeC(nullptr)));
+    ui->musicTitle->setText(QString("[No music]"));
+    ui->musicType->setText(QString(musicTypeC(nullptr)));
 
     m_seekBar = new SeekBar(this);
     ui->gridLayout->removeWidget(ui->musicPosition);
@@ -126,7 +127,7 @@ void MultiMusicItem::closeMusic()
         Mix_FreeMusic(m_curMus);
         m_curMus = nullptr;
 
-        ui->musicTitle->setText(QString());
+        ui->musicTitle->setText(QString("[No music]"));
         ui->playingTimeLabel->setText("--:--:--");
         ui->playingTimeLenghtLabel->setText("/ --:--:--");
         m_seekBar->setPosition(0.0);
@@ -149,8 +150,12 @@ void MultiMusicItem::openMusic()
     else
     {
         Mix_HookMusicStreamFinished(m_curMus, musicStoppedHook, this);
-        ui->musicTitle->setText(QString::fromUtf8(Mix_GetMusicTitle(m_curMus)));
-        ui->musicType->setText(QString::fromUtf8(musicTypeC(m_curMus)));
+        auto *tit = Mix_GetMusicTitle(m_curMus);
+        if(tit)
+            ui->musicTitle->setText(QString(tit));
+        else
+            ui->musicTitle->setText(QFileInfo(m_curMusPath).fileName());
+        ui->musicType->setText(QString(musicTypeC(m_curMus)));
 
         m_positionWatcher.stop();
         m_seekBar->setEnabled(false);
@@ -283,6 +288,21 @@ void MultiMusicItem::musicStoppedSlot()
     ui->playpause->setIcon(QIcon(":/buttons/play.png"));
 }
 
+void MultiMusicItem::updatePositionEffect()
+{
+    Mix_SetMusicEffectPosition(m_curMus, m_angle, m_distance);
+}
+
+void MultiMusicItem::updatePanningEffect()
+{
+    Mix_SetMusicEffectPanning(m_curMus, m_panLeft, m_panRight);
+}
+
+void MultiMusicItem::updateChannelsFlip()
+{
+    Mix_SetMusicEffectReverseStereo(m_curMus, m_channelFlip);
+}
+
 void MultiMusicItem::musicStoppedHook(Mix_Music *, void *self)
 {
     MultiMusicItem *me = reinterpret_cast<MultiMusicItem*>(self);
@@ -316,5 +336,80 @@ void MultiMusicItem::on_stopFadeOut_clicked()
 
     if(Mix_PlayingMusicStream(m_curMus))
         Mix_FadeOutMusicStream(m_curMus, 4000);
+}
+
+
+void MultiMusicItem::on_angle_valueChanged(int value)
+{
+    m_angle = (Sint16)(value);
+    qDebug() << "Angle" << m_angle;
+    updatePositionEffect();
+    m_sendPanning = false;
+}
+
+
+void MultiMusicItem::on_distance_valueChanged(int value)
+{
+    m_distance = (Uint8)value;
+    qDebug() << "Distance" << m_distance;
+    updatePositionEffect();
+    m_sendPanning = false;
+}
+
+
+void MultiMusicItem::on_resetPosition_clicked()
+{
+    m_angle = 0;
+    m_distance = 0;
+    ui->angle->setValue(0);
+    ui->distance->setValue(0);
+    updatePositionEffect();
+    m_sendPanning = false;
+}
+
+
+void MultiMusicItem::on_flipStereo_clicked(bool value)
+{
+    qDebug() << "Flip stereo" << value;
+    m_channelFlip = value ? 1 : 0;
+    updateChannelsFlip();
+}
+
+
+void MultiMusicItem::on_stereoPanLeft_valueChanged(int value)
+{
+    qDebug() << "Pan left" << value;
+    m_panLeft = (Uint8)value;
+    updatePanningEffect();
+    m_sendPanning = true;
+}
+
+
+void MultiMusicItem::on_stereoPanRight_valueChanged(int value)
+{
+    qDebug() << "Pan right" << value;
+    m_panRight = (Uint8)value;
+    updatePanningEffect();
+    m_sendPanning = true;
+}
+
+
+void MultiMusicItem::on_resetPanning_clicked()
+{
+    m_channelFlip = 0;
+    m_panLeft = 255;
+    m_panRight = 255;
+    ui->stereoPanLeft->blockSignals(true);
+    ui->stereoPanLeft->setValue(255);
+    ui->stereoPanLeft->blockSignals(false);
+    ui->stereoPanRight->blockSignals(true);
+    ui->stereoPanRight->setValue(255);
+    ui->stereoPanRight->blockSignals(false);
+    ui->flipStereo->blockSignals(true);
+    ui->flipStereo->setChecked(false);
+    ui->flipStereo->blockSignals(false);
+    updatePanningEffect();
+    updateChannelsFlip();
+    m_sendPanning = true;
 }
 

@@ -38,6 +38,13 @@ protected:
     void changeEvent(QEvent *e);
 
 private slots:
+    void on_resetPanning_clicked();
+    void on_stereoPanRight_valueChanged(int arg1);
+    void on_stereoPanLeft_valueChanged(int arg1);
+    void on_flipStereo_clicked(bool checked);
+    void on_resetPosition_clicked();
+    void on_distance_valueChanged(int arg1);
+    void on_angle_valueChanged(int arg1);
     void on_tempo_sliderMoved(int position);
     void on_musicVolume_sliderMoved(int position);
     void on_pathArgs_editingFinished();
@@ -51,6 +58,10 @@ private slots:
     void musicPosition_seeked(double value);
     void musicStoppedSlot();
 
+    void updatePositionEffect();
+    void updatePanningEffect();
+    void updateChannelsFlip();
+
 private:
     void closeMusic();
     void openMusic();
@@ -62,6 +73,13 @@ private:
 
     QTimer m_positionWatcher;
     bool   m_positionWatcherLock = false;
+
+    bool       m_sendPanning = false;
+    int16_t    m_angle = 0;
+    uint8_t    m_distance = 0;
+    uint8_t    m_panLeft = 255;
+    uint8_t    m_panRight = 255;
+    uint8_t    m_channelFlip = 0;
 };
 
 #endif // MULTI_MUSIC_ITEM_H
