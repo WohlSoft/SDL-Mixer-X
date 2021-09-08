@@ -395,7 +395,6 @@ extern DECLSPEC void SDLCALL Mix_ChannelFinished(void (SDLCALL *channel_finished
  */
 typedef void (SDLCALL *Mix_EffectFunc_t)(int chan, void *stream, int len, void *udata);
 
-
 typedef void (SDLCALL *common_mixer)(void *udata, Uint8 *stream, int len);
 
 /*
@@ -408,6 +407,11 @@ typedef void (SDLCALL *common_mixer)(void *udata, Uint8 *stream, int len);
  * DO NOT EVER call SDL_LockAudio() from your callback function!
  */
 typedef void (SDLCALL *Mix_EffectDone_t)(int chan, void *udata);
+
+/* TODO: Write the documentation */
+typedef void (SDLCALL *Mix_MusicEffectFunc_t)(Mix_Music *mus, void *stream, int len, void *udata);
+/* TODO: Write the documentation */
+typedef void (SDLCALL *Mix_MusicEffectDone_t)(Mix_Music *mus, void *udata);
 
 
 /* Register a special effect function. At mixing time, the channel data is
@@ -482,6 +486,14 @@ extern DECLSPEC int SDLCALL Mix_UnregisterEffect(int channel, Mix_EffectFunc_t f
  *  Error messages can be retrieved from Mix_GetError().
  */
 extern DECLSPEC int SDLCALL Mix_UnregisterAllEffects(int channel);
+
+
+/* TODO: Write the documentation */
+extern DECLSPEC int SDLCALL Mix_RegisterMusicEffect(Mix_Music *mus, Mix_MusicEffectFunc_t f, Mix_MusicEffectDone_t d, void *arg);
+/* TODO: Write the documentation */
+extern DECLSPEC int SDLCALL Mix_UnregisterMusicEffect(Mix_Music *mus, Mix_MusicEffectFunc_t f);
+/* TODO: Write the documentation */
+extern DECLSPEC int SDLCALL Mix_UnregisterAllMusicEffects(Mix_Music *mus);
 
 
 #define MIX_EFFECTSMAXSPEED  "MIX_EFFECTSMAXSPEED"
@@ -640,6 +652,14 @@ extern no_parse_DECLSPEC int SDLCALL Mix_SetReverb(int channel, Uint8 echo);
  */
 extern DECLSPEC int SDLCALL Mix_SetReverseStereo(int channel, int flip);
 
+/* TODO: Write the documentation */
+extern DECLSPEC int SDLCALL Mix_SetMusicEffectPanning(Mix_Music *mus, Uint8 left, Uint8 right);
+/* TODO: Write the documentation */
+extern DECLSPEC int SDLCALL Mix_SetMusicEffectPosition(Mix_Music *mus, Sint16 angle, Uint8 distance);
+/* TODO: Write the documentation */
+extern DECLSPEC int SDLCALL Mix_SetMusicEffectDistance(Mix_Music *mus, Uint8 distance);
+/* TODO: Write the documentation */
+extern DECLSPEC int SDLCALL Mix_SetMusicEffectReverseStereo(Mix_Music *mus, int flip);
 /* end of effects API. --ryan. */
 
 

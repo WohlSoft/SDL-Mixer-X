@@ -70,8 +70,8 @@ static int            music_general_volume = MIX_MAX_VOLUME;
 
 typedef struct _Mix_effectinfo
 {
-    Mix_EffectFunc_t callback;
-    Mix_EffectDone_t done_callback;
+    Mix_MusicEffectFunc_t callback;
+    Mix_MusicEffectDone_t done_callback;
     void *udata;
     struct _Mix_effectinfo *next;
 } mus_effect_info;
@@ -215,6 +215,8 @@ static void _Mix_MultiMusic_ResumeAll(void)
 
 /* ========== Multi-Music =END====== */
 
+typedef struct _Eff_positionargs position_args;
+
 struct _Mix_Music {
     Mix_MusicInterface *interface;
     void *context;
@@ -228,6 +230,7 @@ struct _Mix_Music {
     void *music_finished_hook_user_data;
 
     mus_effect_info *effects;
+    position_args *pos_args;
     int is_multimusic;
     int music_active;
     int music_volume;
@@ -236,6 +239,217 @@ struct _Mix_Music {
 
     char filename[1024];
 };
+
+
+void _Mix_SetMusicPositionArgs(Mix_Music *mus, position_args *args)
+{
+    mus->pos_args = args;
+}
+
+position_args *_Mix_GetMusicPositionArgs(Mix_Music *mus)
+{
+    return mus->pos_args;
+}
+
+/* ========== Multi-Music effects ==========  */
+
+/*
+ * rcg06122001 The special effects exportable API.
+ *  Please see effect_*.c for internally-implemented effects, such
+ *  as Mix_SetPanning().
+ */
+
+/* MAKE SURE you hold the audio lock (Mix_LockAudio()) before calling this! */
+static int _Mix_register_mus_effect(mus_effect_info **e, Mix_MusicEffectFunc_t f,
+                Mix_MusicEffectDone_t d, void *arg)
+{
+    mus_effect_info *new_e;
+
+    if (!e) {
+        Mix_SetError("Internal error");
+        return(0);
+    }
+
+    if (f == NULL) {
+        Mix_SetError("NULL effect callback");
+        return(0);
+    }
+
+    new_e = SDL_malloc(sizeof (mus_effect_info));
+    if (new_e == NULL) {
+        Mix_SetError("Out of memory");
+        return(0);
+    }
+
+    new_e->callback = f;
+    new_e->done_callback = d;
+    new_e->udata = arg;
+    new_e->next = NULL;
+
+    /* add new effect to end of linked list... */
+    if (*e == NULL) {
+        *e = new_e;
+    } else {
+        mus_effect_info *cur = *e;
+        while (1) {
+            if (cur->next == NULL) {
+                cur->next = new_e;
+                break;
+            }
+            cur = cur->next;
+        }
+    }
+
+    return(1);
+}
+
+
+/* MAKE SURE you hold the audio lock (Mix_LockAudio()) before calling this! */
+static int _Mix_remove_mus_effect(Mix_Music *mus, mus_effect_info **e, Mix_MusicEffectFunc_t f)
+{
+    mus_effect_info *cur;
+    mus_effect_info *prev = NULL;
+    mus_effect_info *next = NULL;
+
+    if (!e) {
+        Mix_SetError("Internal error");
+        return(0);
+    }
+
+    for (cur = *e; cur != NULL; cur = cur->next) {
+        if (cur->callback == f) {
+            next = cur->next;
+            if (cur->done_callback != NULL) {
+                cur->done_callback(mus, cur->udata);
+            }
+            SDL_free(cur);
+
+            if (prev == NULL) {   /* removing first item of list? */
+                *e = next;
+            } else {
+                prev->next = next;
+            }
+            return(1);
+        }
+        prev = cur;
+    }
+
+    Mix_SetError("No such effect registered");
+    return(0);
+}
+
+
+/* MAKE SURE you hold the audio lock (Mix_LockAudio()) before calling this! */
+static int _Mix_remove_all_mus_effects(Mix_Music *mus, mus_effect_info **e)
+{
+    mus_effect_info *cur;
+    mus_effect_info *next;
+
+    if (!e) {
+        Mix_SetError("Internal error");
+        return(0);
+    }
+
+    for (cur = *e; cur != NULL; cur = next) {
+        next = cur->next;
+        if (cur->done_callback != NULL) {
+            cur->done_callback(mus, cur->udata);
+        }
+        SDL_free(cur);
+    }
+    *e = NULL;
+
+    return(1);
+}
+
+
+/* MAKE SURE you hold the audio lock (Mix_LockAudio()) before calling this! */
+int _Mix_RegisterMusicEffect_locked(Mix_Music *mus, Mix_MusicEffectFunc_t f,
+            Mix_MusicEffectDone_t d, void *arg)
+{
+    mus_effect_info **e = NULL;
+
+    if (!mus) {
+        Mix_SetError("Invalid music");
+        return(0);
+    }
+    e = &mus->effects;
+
+    return _Mix_register_mus_effect(e, f, d, arg);
+}
+
+int SDLCALLCC Mix_RegisterMusicEffect(Mix_Music *mus, Mix_MusicEffectFunc_t f,
+            Mix_MusicEffectDone_t d, void *arg)
+{
+    int retval;
+    Mix_LockAudio();
+    retval = _Mix_RegisterMusicEffect_locked(mus, f, d, arg);
+    Mix_UnlockAudio();
+    return retval;
+}
+
+
+/* MAKE SURE you hold the audio lock (Mix_LockAudio()) before calling this! */
+int _Mix_UnregisterMusicEffect_locked(Mix_Music *mus, Mix_MusicEffectFunc_t f)
+{
+    mus_effect_info **e = NULL;
+
+    if (!mus) {
+        Mix_SetError("Invalid music");
+        return(0);
+    }
+    e = &mus->effects;
+
+    return _Mix_remove_mus_effect(mus, e, f);
+}
+
+int SDLCALLCC Mix_UnregisterMusicEffect(Mix_Music *mus, Mix_MusicEffectFunc_t f)
+{
+    int retval;
+    Mix_LockAudio();
+    retval = _Mix_UnregisterMusicEffect_locked(mus, f);
+    Mix_UnlockAudio();
+    return(retval);
+}
+
+/* MAKE SURE you hold the audio lock (Mix_LockAudio()) before calling this! */
+int _Mix_UnregisterAllMusicEffects_locked(Mix_Music *mus)
+{
+    mus_effect_info **e = NULL;
+
+    if (!mus) {
+        Mix_SetError("Invalid music");
+        return(0);
+    }
+    e = &mus->effects;
+
+    return _Mix_remove_all_mus_effects(mus, e);
+}
+
+int SDLCALLCC Mix_UnregisterAllMusicEffects(Mix_Music *mus)
+{
+    int retval;
+    Mix_LockAudio();
+    retval = _Mix_UnregisterAllMusicEffects_locked(mus);
+    Mix_UnlockAudio();
+    return(retval);
+}
+
+static void Mix_Music_DoEffects(Mix_Music *mus, void *snd, int len)
+{
+    mus_effect_info *e = mus->effects;
+
+    if (e != NULL) {    /* are there any registered effects? */
+        for (; e != NULL; e = e->next) {
+            if (e->callback != NULL) {
+                e->callback(mus, snd, len, e->udata);
+            }
+        }
+    }
+}
+
+/* ========== Multi-Music effects =END======  */
+
 
 /* Used to calculate fading steps */
 static int ms_per_step;
@@ -588,6 +802,7 @@ void SDLCALL multi_music_mixer(void *udata, Uint8 *stream, int len)
         if (m && m->music_active) {
             SDL_memset(mix_streams_buffer, music_spec.silence, (size_t)len);
             music_mix_stream(m, udata, mix_streams_buffer, len);
+            Mix_Music_DoEffects(m, mix_streams_buffer, len);
             SDL_MixAudioFormat(stream, mix_streams_buffer, music_spec.format, len, music_general_volume);
         }
     }
@@ -598,6 +813,7 @@ void SDLCALL multi_music_mixer(void *udata, Uint8 *stream, int len)
         if (!m || m->music_halted) {
             _Mix_MultiMusic_Remove(m);
             if (m && m->free_on_stop) {
+                _Mix_remove_all_mus_effects(m, &m->effects);
                 m->interface->Delete(m->context);
                 SDL_free(m);
             }
@@ -609,6 +825,7 @@ void SDLCALL multi_music_mixer(void *udata, Uint8 *stream, int len)
 
 void SDLCALL music_mixer(void *udata, Uint8 *stream, int len)
 {
+    Mix_Music *music;
     (void)udata;
 
     while (music_playing && music_active && len > 0) {
@@ -627,9 +844,10 @@ void SDLCALL music_mixer(void *udata, Uint8 *stream, int len)
                 music_internal_volume(music_playing, volume);
             } else {
                 if (music_playing->fading == MIX_FADING_OUT) {
+                    music = music_playing;
                     music_internal_halt(music_playing);
-                    if (music_playing->music_finished_hook) {
-                        music_playing->music_finished_hook(music_playing, music_playing->music_finished_hook_user_data);
+                    if (music && music->music_finished_hook) {
+                        music->music_finished_hook(music, music->music_finished_hook_user_data);
                     }
                     if (music_finished_hook) {
                         music_finished_hook();
@@ -657,9 +875,10 @@ void SDLCALL music_mixer(void *udata, Uint8 *stream, int len)
         }
 
         if (!music_internal_playing(music_playing)) {
+            music = music_playing;
             music_internal_halt(music_playing);
-            if (music_playing->music_finished_hook) {
-                music_playing->music_finished_hook(music_playing, music_playing->music_finished_hook_user_data);
+            if (music->music_finished_hook) {
+                music->music_finished_hook(music, music->music_finished_hook_user_data);
             }
             if (music_finished_hook) {
                 music_finished_hook();
@@ -1598,6 +1817,8 @@ void SDLCALLCC Mix_FreeMusic(Mix_Music *music)
         }
         Mix_UnlockAudio();
 
+        _Mix_remove_all_mus_effects(music, &music->effects);
+
         music->interface->Delete(music->context);
         SDL_free(music);
     }
@@ -2292,9 +2513,10 @@ int SDLCALLCC Mix_HaltMusicStream(Mix_Music *music)
             }
         }
     } else if (music_playing) {
+        music = music_playing;
         music_internal_halt(music_playing);
-        if (music_playing && music_playing->music_finished_hook) {
-            music_playing->music_finished_hook(music_playing, music_playing->music_finished_hook_user_data);
+        if (music->music_finished_hook) {
+            music->music_finished_hook(music, music->music_finished_hook_user_data);
         }
         if (music_finished_hook) {
             music_finished_hook();
