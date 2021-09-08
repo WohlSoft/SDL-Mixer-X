@@ -275,6 +275,7 @@ void MusPlayer_Qt::restartMusic()
     if(Mix_PlayingMusicStream(PGE_MusicPlayer::s_playMus))
     {
         PGE_MusicPlayer::stopMusic();
+        qApp->processEvents();
         on_play_clicked();
     }
 }

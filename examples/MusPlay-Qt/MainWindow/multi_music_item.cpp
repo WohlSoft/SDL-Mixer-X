@@ -210,13 +210,20 @@ void MultiMusicItem::on_playpause_clicked()
     }
     else
     {
+        qDebug() << "Play music" << m_curMusPath;
+        int ret = Mix_PlayMusicStream(m_curMus, -1);
+
+        if(ret < 0)
+        {
+            QMessageBox::warning(this, tr("Can't play song"), tr("Error has occured: %1").arg(Mix_GetError()));
+            return;
+        }
+
         double total = Mix_GetMusicTotalTime(m_curMus);
         double curPos = Mix_GetMusicPosition(m_curMus);
         if(total > 0.0 && curPos >= 0.0)
             m_positionWatcher.start(128);
 
-        qDebug() << "Play music" << m_curMusPath;
-        Mix_PlayMusicStream(m_curMus, -1);
         ui->playpause->setIcon(QIcon(":/buttons/pause.png"));
         ui->playpause->setToolTip(tr("Pause"));
     }
