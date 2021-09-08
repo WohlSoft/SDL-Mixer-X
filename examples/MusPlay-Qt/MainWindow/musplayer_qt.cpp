@@ -190,6 +190,14 @@ void MusPlayer_Qt::moveEvent(QMoveEvent *event)
         QRect g = m_echoTune->frameGeometry();
         m_echoTune->move(g.x() + deltaX, g.y() + deltaY);
     }
+    {
+        QRect g = m_multiMusicTest->frameGeometry();
+        m_multiMusicTest->move(g.x() + deltaX, g.y() + deltaY);
+    }
+    {
+        QRect g = m_musicFx->frameGeometry();
+        m_musicFx->move(g.x() + deltaX, g.y() + deltaY);
+    }
 
     m_oldWindowPos = event->pos();
 }

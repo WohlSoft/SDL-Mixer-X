@@ -23,12 +23,12 @@ public slots:
 
 private slots:
     void on_resetPanning_clicked();
-    void on_stereoPanRight_valueChanged(int arg1);
-    void on_stereoPanLeft_valueChanged(int arg1);
+    void on_stereoPanRight_sliderMoved(int arg1);
+    void on_stereoPanLeft_sliderMoved(int arg1);
     void on_flipStereo_clicked(bool checked);
     void on_resetPosition_clicked();
-    void on_distance_valueChanged(int arg1);
-    void on_angle_valueChanged(int arg1);
+    void on_distance_sliderMoved(int arg1);
+    void on_angle_sliderMoved(int arg1);
 
     void updatePositionEffect();
     void updatePanningEffect();

@@ -1,6 +1,7 @@
 #include "musicfx.h"
 #include "ui_musicfx.h"
 #include "../Player/mus_player.h"
+#include <QToolTip>
 
 
 MusicFX::MusicFX(QWidget *parent) :
@@ -35,12 +36,8 @@ void MusicFX::resetAll()
     m_panRight = 255;
     m_channelFlip = 0;
 
-    ui->stereoPanLeft->blockSignals(true);
     ui->stereoPanLeft->setValue(255);
-    ui->stereoPanLeft->blockSignals(false);
-    ui->stereoPanRight->blockSignals(true);
     ui->stereoPanRight->setValue(255);
-    ui->stereoPanRight->blockSignals(false);
     ui->flipStereo->blockSignals(true);
     ui->flipStereo->setChecked(false);
     ui->flipStereo->blockSignals(false);
@@ -48,20 +45,22 @@ void MusicFX::resetAll()
     ui->distance->setValue(0);
 }
 
-void MusicFX::on_angle_valueChanged(int value)
+void MusicFX::on_angle_sliderMoved(int value)
 {
     m_angle = (Sint16)(value);
     qDebug() << "Angle" << m_angle;
     updatePositionEffect();
     m_sendPanning = false;
+    QToolTip::showText(QCursor::pos(), QString("%1").arg(value), this);
 }
 
-void MusicFX::on_distance_valueChanged(int value)
+void MusicFX::on_distance_sliderMoved(int value)
 {
     m_distance = (Uint8)value;
     qDebug() << "Distance" << m_distance;
     updatePositionEffect();
     m_sendPanning = false;
+    QToolTip::showText(QCursor::pos(), QString("%1").arg(value), this);
 }
 
 
@@ -84,21 +83,23 @@ void MusicFX::on_flipStereo_clicked(bool value)
 }
 
 
-void MusicFX::on_stereoPanLeft_valueChanged(int value)
+void MusicFX::on_stereoPanLeft_sliderMoved(int value)
 {
     qDebug() << "Pan left" << value;
     m_panLeft = (Uint8)value;
     updatePanningEffect();
     m_sendPanning = true;
+    QToolTip::showText(QCursor::pos(), QString("%1").arg(value), this);
 }
 
 
-void MusicFX::on_stereoPanRight_valueChanged(int value)
+void MusicFX::on_stereoPanRight_sliderMoved(int value)
 {
     qDebug() << "Pan right" << value;
     m_panRight = (Uint8)value;
     updatePanningEffect();
     m_sendPanning = true;
+    QToolTip::showText(QCursor::pos(), QString("%1").arg(value), this);
 }
 
 
@@ -107,12 +108,8 @@ void MusicFX::on_resetPanning_clicked()
     m_channelFlip = 0;
     m_panLeft = 255;
     m_panRight = 255;
-    ui->stereoPanLeft->blockSignals(true);
     ui->stereoPanLeft->setValue(255);
-    ui->stereoPanLeft->blockSignals(false);
-    ui->stereoPanRight->blockSignals(true);
     ui->stereoPanRight->setValue(255);
-    ui->stereoPanRight->blockSignals(false);
     ui->flipStereo->blockSignals(true);
     ui->flipStereo->setChecked(false);
     ui->flipStereo->blockSignals(false);
