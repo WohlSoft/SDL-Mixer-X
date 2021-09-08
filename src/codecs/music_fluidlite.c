@@ -319,6 +319,7 @@ static void all_notes_off(fluid_synth_t *synth)
 
 static void FLUIDSYNTH_Delete(void *context);
 
+#if 0
 static int SDLCALL fluidsynth_check_soundfont(const char *path, void *data)
 {
     SDL_RWops *rw = SDL_RWFromFile(path, "rb");
@@ -332,6 +333,7 @@ static int SDLCALL fluidsynth_check_soundfont(const char *path, void *data)
         return 0;
     }
 }
+#endif
 
 static int SDLCALL fluidsynth_load_soundfont(const char *path, void *data)
 {
