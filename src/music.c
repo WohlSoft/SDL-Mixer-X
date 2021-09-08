@@ -66,6 +66,7 @@ static int            num_streams = 0;
 static Mix_Music    **mix_streams = NULL;
 static Uint8         *mix_streams_buffer = NULL;
 static int            num_streams_capacity = 0;
+static int            music_general_volume = MIX_MAX_VOLUME;
 
 typedef struct _Mix_effectinfo
 {
@@ -446,11 +447,20 @@ static void music_internal_halt(Mix_Music *music);
 
 /* Support for hooking when the music has finished */
 static void (SDLCALL *music_finished_hook)(void) = NULL;
+/* Support for hooking when the any multi-music has finished */
+static void (SDLCALL *music_finished_hook_mm)(void) = NULL;
 
 void SDLCALLCC Mix_HookMusicFinished(void (SDLCALL *music_finished)(void))
 {
     Mix_LockAudio();
     music_finished_hook = music_finished;
+    Mix_UnlockAudio();
+}
+
+void SDLCALLCC Mix_HookMusicStreamFinishedAny(void (SDLCALL *music_finished)(void))
+{
+    Mix_LockAudio();
+    music_finished_hook_mm = music_finished;
     Mix_UnlockAudio();
 }
 
@@ -523,8 +533,8 @@ static SDL_INLINE int music_mix_stream(Mix_Music *music, void *udata, Uint8 *str
                     if (music->music_finished_hook) {
                         music->music_finished_hook(music, music->music_finished_hook_user_data);
                     }
-                    if (music_finished_hook) {
-                        music_finished_hook();
+                    if (music_finished_hook_mm) {
+                        music_finished_hook_mm();
                     }
                     return -1;
                 }
@@ -553,8 +563,8 @@ static SDL_INLINE int music_mix_stream(Mix_Music *music, void *udata, Uint8 *str
             if (music->music_finished_hook) {
                 music->music_finished_hook(music, music->music_finished_hook_user_data);
             }
-            if (music_finished_hook) {
-                music_finished_hook();
+            if (music_finished_hook_mm) {
+                music_finished_hook_mm();
             }
         }
     }
@@ -577,7 +587,7 @@ void SDLCALL multi_music_mixer(void *udata, Uint8 *stream, int len)
         if (m && m->music_active) {
             SDL_memset(mix_streams_buffer, music_spec.silence, (size_t)len);
             music_mix_stream(m, udata, mix_streams_buffer, len);
-            SDL_MixAudioFormat(stream, mix_streams_buffer, music_spec.format, len, MIX_MAX_VOLUME);
+            SDL_MixAudioFormat(stream, mix_streams_buffer, music_spec.format, len, music_general_volume);
         }
     }
 
@@ -617,6 +627,9 @@ void SDLCALL music_mixer(void *udata, Uint8 *stream, int len)
             } else {
                 if (music_playing->fading == MIX_FADING_OUT) {
                     music_internal_halt(music_playing);
+                    if (music_playing->music_finished_hook) {
+                        music_playing->music_finished_hook(music_playing, music_playing->music_finished_hook_user_data);
+                    }
                     if (music_finished_hook) {
                         music_finished_hook();
                     }
@@ -644,6 +657,9 @@ void SDLCALL music_mixer(void *udata, Uint8 *stream, int len)
 
         if (!music_internal_playing(music_playing)) {
             music_internal_halt(music_playing);
+            if (music_playing->music_finished_hook) {
+                music_playing->music_finished_hook(music_playing, music_playing->music_finished_hook_user_data);
+            }
             if (music_finished_hook) {
                 music_finished_hook();
             }
@@ -2190,9 +2206,9 @@ int SDLCALLCC Mix_GetMusicVolume(Mix_Music *music)
 {
     int prev_volume;
 
-    if (music && music->interface->GetVolume)
+    if (music && music->interface->GetVolume) {
         prev_volume = music->interface->GetVolume(music->context);
-    else if (music_playing && music_playing->interface->GetVolume) {
+    } else if (music_playing && music_playing->interface->GetVolume) {
         prev_volume = music_playing->interface->GetVolume(music_playing->context);
     } else {
         prev_volume = music_volume;
@@ -2203,7 +2219,19 @@ int SDLCALLCC Mix_GetMusicVolume(Mix_Music *music)
 
 int SDLCALLCC Mix_GetVolumeMusicStream(Mix_Music *music)
 {
-	return Mix_GetMusicVolume(music);
+    return Mix_GetMusicVolume(music);
+}
+
+void SDLCALLCC Mix_VolumeMusicGeneral(int volume)
+{
+    Mix_LockAudio();
+    music_general_volume = volume;
+    Mix_UnlockAudio();
+}
+
+int SDLCALLCC Mix_GetVolumeMusicGeneral()
+{
+    return music_general_volume;
 }
 
 /* Halt playing of music */
@@ -2227,16 +2255,30 @@ static void music_internal_halt(Mix_Music *music)
 }
 int SDLCALLCC Mix_HaltMusicStream(Mix_Music *music)
 {
+    int is_multi_music;
+
     Mix_LockAudio();
     if (music) {
-        if(music->is_multimusic)
+        is_multi_music = music->is_multimusic;
+
+        if (is_multi_music) {
             _Mix_MultiMusic_Remove(music);
+        }
+
         music_internal_halt(music);
+
         if (music->music_finished_hook) {
             music->music_finished_hook(music, music->music_finished_hook_user_data);
         }
-        if (music_finished_hook) {
-            music_finished_hook();
+
+        if(is_multi_music) {
+            if (music_finished_hook_mm) {
+                music_finished_hook_mm();
+            }
+        } else {
+            if (music_finished_hook) {
+                music_finished_hook();
+            }
         }
     } else if (music_playing) {
         music_internal_halt(music_playing);

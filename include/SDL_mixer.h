@@ -355,7 +355,7 @@ extern DECLSPEC void SDLCALL Mix_HookMusic(void (SDLCALL *mix_func)(void *udata,
  * stopped from a call to Mix_HaltMusic.
  */
 extern DECLSPEC void SDLCALL Mix_HookMusicFinished(void (SDLCALL *music_finished)(void));
-
+extern DECLSPEC void SDLCALL Mix_HookMusicStreamFinishedAny(void (SDLCALL *music_finished)(void));
 extern DECLSPEC void SDLCALL Mix_HookMusicStreamFinished(Mix_Music *music, void (SDLCALL *music_finished)(Mix_Music*, void*), void *user_data);/*Mixer-X*/
 
 /* Get a pointer to the user data for the current music hook */
@@ -716,6 +716,9 @@ extern DECLSPEC int SDLCALL Mix_VolumeMusic(int volume);
 /* Get the current volume value in the range of 0-128 of a music stream */
 extern DECLSPEC int SDLCALL Mix_GetMusicVolume(Mix_Music *music);
 extern DECLSPEC int SDLCALL Mix_GetVolumeMusicStream(Mix_Music *music);
+
+extern DECLSPEC void SDLCALL Mix_VolumeMusicGeneral(int volume);
+extern DECLSPEC int SDLCALL Mix_GetVolumeMusicGeneral();
 
 /* Halt playing of a particular channel */
 extern DECLSPEC int SDLCALL Mix_HaltChannel(int channel);
