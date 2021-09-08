@@ -2229,6 +2229,8 @@ int SDLCALLCC Mix_HaltMusicStream(Mix_Music *music)
 {
     Mix_LockAudio();
     if (music) {
+        if(music->is_multimusic)
+            _Mix_MultiMusic_Remove(music);
         music_internal_halt(music);
         if (music->music_finished_hook) {
             music->music_finished_hook(music, music->music_finished_hook_user_data);
