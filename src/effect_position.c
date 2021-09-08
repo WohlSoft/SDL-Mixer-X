@@ -2022,9 +2022,7 @@ static Mix_MusicEffectFunc_t get_music_position_effect_func(Uint16 format, int c
     return(f);
 }
 
-static Uint8 speaker_amplitude[6];
-
-static void set_amplitudes(int channels, int angle, int room_angle)
+static void set_amplitudes(Uint8 *speaker_amplitude, int channels, int angle, int room_angle)
 {
     int left = 255, right = 255;
     int left_rear = 255, right_rear = 255, center = 255;
@@ -2273,6 +2271,7 @@ int SDLCALLCC Mix_SetDistance(int channel, Uint8 distance)
 
 int SDLCALLCC Mix_SetPosition(int channel, Sint16 angle, Uint8 distance)
 {
+    Uint8 speaker_amplitude[6];
     Mix_EffectFunc_t f = NULL;
     Uint16 format;
     int channels;
@@ -2326,7 +2325,7 @@ int SDLCALLCC Mix_SetPosition(int channel, Sint16 angle, Uint8 distance)
 
     distance = 255 - distance;  /* flip it to scale Mix_SetDistance() uses. */
 
-    set_amplitudes(channels, angle, room_angle);
+    set_amplitudes(speaker_amplitude, channels, angle, room_angle);
 
     args->left_u8 = speaker_amplitude[0];
     args->left_f = ((float) speaker_amplitude[0]) / 255.0f;
@@ -2473,6 +2472,7 @@ int SDLCALLCC Mix_SetMusicEffectPosition(Mix_Music *mus, Sint16 angle, Uint8 dis
     position_args *args = NULL;
     Sint16 room_angle = 0;
     int retval = 1;
+    Uint8 speaker_amplitude[6];
 
     Mix_QuerySpec(NULL, &format, &channels);
     f = get_music_position_effect_func(format, channels);
@@ -2520,7 +2520,7 @@ int SDLCALLCC Mix_SetMusicEffectPosition(Mix_Music *mus, Sint16 angle, Uint8 dis
 
     distance = 255 - distance;  /* flip it to scale Mix_SetDistance() uses. */
 
-    set_amplitudes(channels, angle, room_angle);
+    set_amplitudes(speaker_amplitude, channels, angle, room_angle);
 
     args->left_u8 = speaker_amplitude[0];
     args->left_f = ((float) speaker_amplitude[0]) / 255.0f;
