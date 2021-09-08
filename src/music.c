@@ -826,6 +826,9 @@ void SDLCALL multi_music_mixer(void *udata, Uint8 *stream, int len)
 void SDLCALL music_mixer(void *udata, Uint8 *stream, int len)
 {
     Mix_Music *music;
+    Uint8 *src_stream = stream;
+    int src_len = len;
+
     (void)udata;
 
     while (music_playing && music_active && len > 0) {
@@ -884,6 +887,10 @@ void SDLCALL music_mixer(void *udata, Uint8 *stream, int len)
                 music_finished_hook();
             }
         }
+    }
+
+    if (music_playing) {
+        Mix_Music_DoEffects(music_playing, src_stream, src_len);
     }
 }
 
