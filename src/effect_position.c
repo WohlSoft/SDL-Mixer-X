@@ -2309,9 +2309,13 @@ int SDLCALLCC Mix_SetPosition(int channel, Sint16 angle, Uint8 distance)
 
     if (channels == 2)
     {
+#if 0 /* Buggy code, makes position play at right speaker only. Gets been fixed when room_angle is always 0 */
         if (angle > 180)
             room_angle = 180; /* exchange left and right channels */
         else room_angle = 0;
+#endif
+        /*FIXME: Verify this for correctness */
+        room_angle = 0;
     }
 
     if (channels == 4 || channels == 6)
