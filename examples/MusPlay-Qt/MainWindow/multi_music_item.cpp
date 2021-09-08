@@ -291,7 +291,14 @@ void MultiMusicItem::on_playFadeIn_clicked()
         return;
 
     if(!Mix_PlayingMusicStream(m_curMus))
+    {
+        double total = Mix_GetMusicTotalTime(m_curMus);
+        double curPos = Mix_GetMusicPosition(m_curMus);
+        if(total > 0.0 && curPos >= 0.0)
+            m_positionWatcher.start(128);
+
         Mix_FadeInMusicStream(m_curMus, -1, 4000);
+    }
 }
 
 
