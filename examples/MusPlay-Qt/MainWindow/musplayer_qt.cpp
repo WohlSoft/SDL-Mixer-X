@@ -155,6 +155,7 @@ void MusPlayer_Qt::dropEvent(QDropEvent *e)
 
     ui->recordWav->setEnabled(!m_currentMusic.endsWith(".wav", Qt::CaseInsensitive));//Avoid self-trunkling!
     PGE_MusicPlayer::stopMusic();
+    qApp->processEvents();
     on_play_clicked();
     this->raise();
     e->accept();

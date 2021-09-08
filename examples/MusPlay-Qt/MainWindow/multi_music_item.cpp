@@ -148,6 +148,7 @@ void MultiMusicItem::openMusic()
         QMessageBox::warning(this, tr("Can't open music"), tr("Can't open music: %1").arg(Mix_GetError()));
     else
     {
+        Mix_HookMusicStreamFinished(m_curMus, musicStoppedHook, this);
         ui->musicTitle->setText(QString::fromUtf8(Mix_GetMusicTitle(m_curMus)));
         ui->musicType->setText(QString::fromUtf8(musicTypeC(m_curMus)));
 
@@ -183,7 +184,6 @@ void MultiMusicItem::reOpenMusic()
     openMusic();
 }
 
-
 void MultiMusicItem::on_playpause_clicked()
 {
     openMusic();
@@ -210,6 +210,11 @@ void MultiMusicItem::on_playpause_clicked()
     }
     else
     {
+        double total = Mix_GetMusicTotalTime(m_curMus);
+        double curPos = Mix_GetMusicPosition(m_curMus);
+        if(total > 0.0 && curPos >= 0.0)
+            m_positionWatcher.start(128);
+
         qDebug() << "Play music" << m_curMusPath;
         Mix_PlayMusicStream(m_curMus, -1);
         ui->playpause->setIcon(QIcon(":/buttons/pause.png"));
@@ -260,6 +265,22 @@ void MultiMusicItem::musicPosition_seeked(double value)
         Mix_SetMusicStreamPosition(m_curMus, value);
         ui->playingTimeLabel->setText(QDateTime::fromTime_t((uint)value).toUTC().toString("hh:mm:ss"));
     }
+}
+
+void MultiMusicItem::musicStoppedSlot()
+{
+    m_positionWatcher.stop();
+    ui->playingTimeLabel->setText("00:00:00");
+    m_seekBar->setPosition(0.0);
+    ui->playpause->setToolTip(tr("Play"));
+    ui->playpause->setIcon(QIcon(":/buttons/play.png"));
+}
+
+void MultiMusicItem::musicStoppedHook(Mix_Music *, void *self)
+{
+    MultiMusicItem *me = reinterpret_cast<MultiMusicItem*>(self);
+    Q_ASSERT(me);
+    QMetaObject::invokeMethod(me, "musicStoppedSlot", Qt::QueuedConnection);
 }
 
 void MultiMusicItem::on_playFadeIn_clicked()

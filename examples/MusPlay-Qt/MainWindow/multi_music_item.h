@@ -49,11 +49,15 @@ private slots:
 
     void updatePositionSlider();
     void musicPosition_seeked(double value);
+    void musicStoppedSlot();
 
 private:
     void closeMusic();
     void openMusic();
     void reOpenMusic();
+
+    static void musicStoppedHook(Mix_Music *mus, void *self);
+
     Ui::MultiMusicItem *ui;
 
     QTimer m_positionWatcher;

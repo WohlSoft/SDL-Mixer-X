@@ -117,3 +117,8 @@ void MultiMusicTest::on_stopAll_clicked()
         it->on_stop_clicked();
     }
 }
+
+void MultiMusicTest::on_generalVolume_sliderMoved(int position)
+{
+    Mix_VolumeMusicGeneral(position);
+}
