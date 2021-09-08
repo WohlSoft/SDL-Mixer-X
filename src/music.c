@@ -1819,8 +1819,15 @@ int SDLCALLCC Mix_FadeInMusicStreamPos(Mix_Music *music, int loops, int ms, doub
     int retval;
 
 #if defined(MID_MUSIC_NATIVE)
-    if (music->api == MIX_MUSIC_NATIVEMIDI) {
+    if (music->interface->api == MIX_MUSIC_NATIVEMIDI) {
         Mix_SetError("Native MIDI can't be used with Multi-Music API");
+        return(-1);
+    }
+#endif
+
+#if defined(MUSIC_MOD_MIKMOD)
+    if (music->interface->api == MIX_MUSIC_MIKMOD) {
+        Mix_SetError("MikMod can't be used with Multi-Music API");
         return(-1);
     }
 #endif
