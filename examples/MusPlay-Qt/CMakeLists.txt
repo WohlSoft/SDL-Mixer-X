@@ -80,6 +80,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS} $
 
 qt5_wrap_ui(UIS_HDRS
     MainWindow/mainwindow.ui
+    MainWindow/multi_music_test.ui
+    MainWindow/multi_music_item.ui
     MainWindow/sfx_tester.ui
     MainWindow/setup_audio.ui
     MainWindow/setup_midi.ui
@@ -97,6 +99,8 @@ list(APPEND SDLMixer_MusPlay_SRC
     Effects/reverb.cpp
     Effects/spc_echo.cpp
     MainWindow/label_marquee.cpp
+    MainWindow/multi_music_test.cpp
+    MainWindow/multi_music_item.cpp
     MainWindow/musplayer_base.cpp
     MainWindow/musplayer_qt.cpp
     MainWindow/seek_bar.cpp
