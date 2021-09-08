@@ -266,6 +266,7 @@ void MusPlayer_Qt::openMusicByArg(QString musPath)
 
     m_currentMusic = musPath;
     PGE_MusicPlayer::stopMusic();
+    qApp->processEvents();
     on_play_clicked();
 }
 
@@ -312,6 +313,7 @@ void MusPlayer_Qt::on_open_clicked()
 
     m_currentMusic = file;
     PGE_MusicPlayer::stopMusic();
+    qApp->processEvents();
     on_play_clicked();
 }
 
