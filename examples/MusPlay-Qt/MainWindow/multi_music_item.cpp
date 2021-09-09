@@ -53,7 +53,7 @@ MultiMusicItem::MultiMusicItem(QString music, QWidget *parent) :
 
     m_seekBar = new SeekBar(this);
     ui->gridLayout->removeWidget(ui->musicPosition);
-    ui->gridLayout->addWidget(m_seekBar, 1, 0, 1, 8);
+    ui->gridLayout->addWidget(m_seekBar, 1, 0, 1, 9);
     m_seekBar->setLength(100);
     m_seekBar->setVisible(true);
     ui->musicPosition->setVisible(false);
