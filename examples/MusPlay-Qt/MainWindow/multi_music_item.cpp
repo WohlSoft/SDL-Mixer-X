@@ -7,6 +7,7 @@
 #include "multi_music_item.h"
 #include "ui_multi_music_item.h"
 #include "seek_bar.h"
+#include "musicfx.h"
 
 
 static const char *musicTypeC(Mix_Music *mus)
@@ -62,6 +63,8 @@ MultiMusicItem::MultiMusicItem(QString music, QWidget *parent) :
 
     ui->tempo->setVisible(false);
     m_seekBar->setEnabled(false);
+
+    ui->showMusicFX->setEnabled(false);
 }
 
 MultiMusicItem::~MultiMusicItem()
@@ -133,6 +136,12 @@ void MultiMusicItem::closeMusic()
         m_seekBar->setPosition(0.0);
         m_seekBar->setEnabled(false);
     }
+    ui->showMusicFX->setEnabled(false);
+    if(m_musicFX)
+    {
+        m_musicFX->hide();
+        m_musicFX->setDstMusic(m_curMus);
+    }
 }
 
 void MultiMusicItem::openMusic()
@@ -150,11 +159,14 @@ void MultiMusicItem::openMusic()
     else
     {
         Mix_HookMusicStreamFinished(m_curMus, musicStoppedHook, this);
+        Mix_SetMusicFileName(m_curMus, m_curMusPath.toUtf8().data());
+
         auto *tit = Mix_GetMusicTitle(m_curMus);
         if(tit)
             ui->musicTitle->setText(QString(tit));
         else
             ui->musicTitle->setText(QFileInfo(m_curMusPath).fileName());
+
         ui->musicType->setText(QString(musicTypeC(m_curMus)));
 
         m_positionWatcher.stop();
@@ -178,6 +190,14 @@ void MultiMusicItem::openMusic()
             m_seekBar->setLoopPoints(loopStart, loopEnd);
             ui->playingTimeLenghtLabel->setText(QDateTime::fromTime_t((uint)std::floor(total)).toUTC().toString("/ hh:mm:ss"));
             m_positionWatcher.start(128);
+        }
+
+        ui->showMusicFX->setEnabled(true);
+        if(m_musicFX)
+        {
+            m_musicFX->setDstMusic(m_curMus);
+            m_musicFX->setTitle(ui->musicTitle->text());
+            m_musicFX->resetAll();
         }
     }
 }
@@ -243,7 +263,11 @@ void MultiMusicItem::on_closeMusic_clicked()
 
 void MultiMusicItem::on_pathArgs_editingFinished()
 {
-    reOpenMusic();
+    if(ui->pathArgs->isModified())
+    {
+        reOpenMusic();
+        ui->pathArgs->setModified(false);
+    }
 }
 
 void MultiMusicItem::on_musicVolume_sliderMoved(int position)
@@ -288,21 +312,6 @@ void MultiMusicItem::musicStoppedSlot()
     ui->playpause->setIcon(QIcon(":/buttons/play.png"));
 }
 
-void MultiMusicItem::updatePositionEffect()
-{
-    Mix_SetMusicEffectPosition(m_curMus, m_angle, m_distance);
-}
-
-void MultiMusicItem::updatePanningEffect()
-{
-    Mix_SetMusicEffectPanning(m_curMus, m_panLeft, m_panRight);
-}
-
-void MultiMusicItem::updateChannelsFlip()
-{
-    Mix_SetMusicEffectReverseStereo(m_curMus, m_channelFlip);
-}
-
 void MultiMusicItem::musicStoppedHook(Mix_Music *, void *self)
 {
     MultiMusicItem *me = reinterpret_cast<MultiMusicItem*>(self);
@@ -338,78 +347,23 @@ void MultiMusicItem::on_stopFadeOut_clicked()
         Mix_FadeOutMusicStream(m_curMus, 4000);
 }
 
-
-void MultiMusicItem::on_angle_valueChanged(int value)
+void MultiMusicItem::on_showMusicFX_clicked()
 {
-    m_angle = (Sint16)(value);
-    qDebug() << "Angle" << m_angle;
-    updatePositionEffect();
-    m_sendPanning = false;
-}
+    if(!m_curMus)
+        return;
 
+    if(!m_musicFX)
+    {
+        m_musicFX = new MusicFX(this);
+        m_musicFX->setModal(false);
+    }
 
-void MultiMusicItem::on_distance_valueChanged(int value)
-{
-    m_distance = (Uint8)value;
-    qDebug() << "Distance" << m_distance;
-    updatePositionEffect();
-    m_sendPanning = false;
-}
-
-
-void MultiMusicItem::on_resetPosition_clicked()
-{
-    m_angle = 0;
-    m_distance = 0;
-    ui->angle->setValue(0);
-    ui->distance->setValue(0);
-    updatePositionEffect();
-    m_sendPanning = false;
-}
-
-
-void MultiMusicItem::on_flipStereo_clicked(bool value)
-{
-    qDebug() << "Flip stereo" << value;
-    m_channelFlip = value ? 1 : 0;
-    updateChannelsFlip();
-}
-
-
-void MultiMusicItem::on_stereoPanLeft_valueChanged(int value)
-{
-    qDebug() << "Pan left" << value;
-    m_panLeft = (Uint8)value;
-    updatePanningEffect();
-    m_sendPanning = true;
-}
-
-
-void MultiMusicItem::on_stereoPanRight_valueChanged(int value)
-{
-    qDebug() << "Pan right" << value;
-    m_panRight = (Uint8)value;
-    updatePanningEffect();
-    m_sendPanning = true;
-}
-
-
-void MultiMusicItem::on_resetPanning_clicked()
-{
-    m_channelFlip = 0;
-    m_panLeft = 255;
-    m_panRight = 255;
-    ui->stereoPanLeft->blockSignals(true);
-    ui->stereoPanLeft->setValue(255);
-    ui->stereoPanLeft->blockSignals(false);
-    ui->stereoPanRight->blockSignals(true);
-    ui->stereoPanRight->setValue(255);
-    ui->stereoPanRight->blockSignals(false);
-    ui->flipStereo->blockSignals(true);
-    ui->flipStereo->setChecked(false);
-    ui->flipStereo->blockSignals(false);
-    updatePanningEffect();
-    updateChannelsFlip();
-    m_sendPanning = true;
+    m_musicFX->show();
+    auto g = QCursor::pos();
+    m_musicFX->move(g.x(), g.y());
+    m_musicFX->update();
+    m_musicFX->repaint();
+    m_musicFX->setDstMusic(m_curMus);
+    m_musicFX->setTitle(ui->musicTitle->text());
 }
 

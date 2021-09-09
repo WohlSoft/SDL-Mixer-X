@@ -16,6 +16,16 @@ MusicFX::~MusicFX()
     delete ui;
 }
 
+void MusicFX::setDstMusic(Mix_Music *mus)
+{
+    m_dstMusic = mus;
+}
+
+void MusicFX::setTitle(const QString &tit)
+{
+    setWindowTitle(QString("Music FX - %1").arg(tit));
+}
+
 void MusicFX::changeEvent(QEvent *e)
 {
     QDialog::changeEvent(e);
@@ -121,15 +131,23 @@ void MusicFX::on_resetPanning_clicked()
 
 void MusicFX::updatePositionEffect()
 {
-    Mix_SetMusicEffectPosition(PGE_MusicPlayer::s_playMus, m_angle, m_distance);
+    Mix_SetMusicEffectPosition(getMus(), m_angle, m_distance);
 }
 
 void MusicFX::updatePanningEffect()
 {
-    Mix_SetMusicEffectPanning(PGE_MusicPlayer::s_playMus, m_panLeft, m_panRight);
+    Mix_SetMusicEffectPanning(getMus(), m_panLeft, m_panRight);
 }
 
 void MusicFX::updateChannelsFlip()
 {
-    Mix_SetMusicEffectReverseStereo(PGE_MusicPlayer::s_playMus, m_channelFlip);
+    Mix_SetMusicEffectReverseStereo(getMus(), m_channelFlip);
+}
+
+Mix_Music *MusicFX::getMus()
+{
+    if(m_dstMusic)
+        return m_dstMusic;
+    else
+        return PGE_MusicPlayer::s_playMus;
 }

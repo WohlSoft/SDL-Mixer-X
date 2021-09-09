@@ -7,9 +7,13 @@ namespace Ui {
 class MusicFX;
 }
 
+typedef struct _Mix_Music Mix_Music;
+
 class MusicFX : public QDialog
 {
     Q_OBJECT
+
+    Mix_Music *m_dstMusic = nullptr;
 
 public:
     explicit MusicFX(QWidget *parent = nullptr);
@@ -19,6 +23,8 @@ protected:
     void changeEvent(QEvent *e);
 
 public slots:
+    void setDstMusic(Mix_Music *mus);
+    void setTitle(const QString &tit);
     void resetAll();
 
 private slots:
@@ -36,6 +42,8 @@ private slots:
 
 private:
     Ui::MusicFX *ui;
+
+    Mix_Music *getMus();
 
     bool       m_sendPanning = false;
     int16_t    m_angle = 0;
