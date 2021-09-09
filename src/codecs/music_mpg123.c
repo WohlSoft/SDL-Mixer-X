@@ -428,6 +428,7 @@ static int MPG123_Seek(void *context, double secs)
     MPG123_Music *music = (MPG123_Music *)context;
     off_t offset = (off_t)(music->sample_rate * secs);
 
+    SDL_AudioStreamClear(music->stream);
     if ((offset = mpg123.mpg123_seek(music->handle, offset, SEEK_SET)) < 0) {
         return Mix_SetError("mpg123_seek: %s", mpg_err(music->handle, (int)-offset));
     }

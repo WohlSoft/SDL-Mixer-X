@@ -575,6 +575,8 @@ static int MAD_Seek(void *context, double position)
     mad_timer_t target;
     int int_part;
 
+    SDL_AudioStreamClear(music->audiostream);
+
     int_part = (int)position;
     mad_timer_set(&target, (unsigned long)int_part, (unsigned long)((position - int_part) * 1000000), 1000000);
 

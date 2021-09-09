@@ -386,6 +386,7 @@ static int MIKMOD_GetVolume(void *context)
 static int MIKMOD_Play(void *context, int play_count)
 {
     MIKMOD_Music *music = (MIKMOD_Music *)context;
+    SDL_AudioStreamClear(music->stream);
     music->play_count = play_count;
     music->module->initvolume = (UBYTE)music->volume;
     mikmod.Player_Start(music->module);

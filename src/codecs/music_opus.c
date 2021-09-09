@@ -426,6 +426,7 @@ static int OPUS_GetAudio(void *context, void *data, int bytes)
 static int OPUS_Seek(void *context, double time)
 {
     OPUS_music *music = (OPUS_music *)context;
+    SDL_AudioStreamClear(music->stream);
     int result = opus.op_pcm_seek(music->of, (ogg_int64_t)(time * 48000));
     if (result < 0) {
         return set_op_error("op_pcm_seek", result);

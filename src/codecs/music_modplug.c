@@ -296,6 +296,7 @@ static int MODPLUG_Jump(void *context, int order)
 static int MODPLUG_Seek(void *context, double position)
 {
     MODPLUG_Music *music = (MODPLUG_Music *)context;
+    SDL_AudioStreamClear(music->stream);
     modplug.ModPlug_Seek(music->file, (int)(position*1000));
     return 0;
 }

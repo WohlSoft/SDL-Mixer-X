@@ -233,6 +233,8 @@ static int WAV_Play(void *context, int play_count)
 {
     WAV_Music *music = (WAV_Music *)context;
     unsigned int i;
+
+    SDL_AudioStreamClear(music->stream);
     for (i = 0; i < music->numloops; ++i) {
         WAVLoopPoint *loop = &music->loops[i];
         loop->active = SDL_TRUE;
