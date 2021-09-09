@@ -67,6 +67,7 @@ typedef struct {
     UBYTE* md_reverb;
     UBYTE* md_sndfxvolume;
     UBYTE* md_volume;
+    MODULE* cur_module;
 } mikmod_loader;
 
 static mikmod_loader mikmod = {
@@ -230,6 +231,7 @@ static int MIKMOD_Open(const SDL_AudioSpec *spec)
 static void MIKMOD_Close(void)
 {
     if (mikmod.MikMod_Exit) {
+        mikmod.cur_module = NULL;
         mikmod.MikMod_Exit();
     }
 }
@@ -390,14 +392,15 @@ static int MIKMOD_Play(void *context, int play_count)
     music->play_count = play_count;
     music->module->initvolume = (UBYTE)music->volume;
     mikmod.Player_Start(music->module);
+    mikmod.cur_module = music->module;
     return MIKMOD_Seek(music, 0.0);
 }
 
 /* Return non-zero if a stream is currently playing */
 static SDL_bool MIKMOD_IsPlaying(void *context)
 {
-    (void)context;
-    return mikmod.Player_Active() ? SDL_TRUE : SDL_FALSE;
+    MIKMOD_Music *music = (MIKMOD_Music *)context;
+    return (music->module == mikmod.cur_module) && mikmod.Player_Active() ? SDL_TRUE : SDL_FALSE;
 }
 
 /* Play some of a stream previously started with MOD_play() */
@@ -466,8 +469,11 @@ static int MIKMOD_Seek(void *context, double position)
 /* Stop playback of a stream previously started with MOD_play() */
 static void MIKMOD_Stop(void *context)
 {
-    (void)context;
+    MIKMOD_Music *music = (MIKMOD_Music *)context;
     mikmod.Player_Stop();
+    if (music->module == mikmod.cur_module) {
+        mikmod.cur_module = NULL;
+    }
 }
 
 static const char* MIKMOD_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
@@ -483,6 +489,9 @@ static void MIKMOD_Delete(void *context)
 
     meta_tags_clear(&music->tags);
     if (music->module) {
+        if (music->module == mikmod.cur_module) {
+            mikmod.cur_module = NULL;
+        }
         mikmod.Player_Free(music->module);
     }
     if (music->stream) {
