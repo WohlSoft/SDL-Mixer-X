@@ -1685,6 +1685,14 @@ Mix_Music * SDLCALLCC Mix_LoadMUS(const char *file)
     return ret;
 }
 
+void SDLCALLCC Mix_SetMusicFileName(Mix_Music *music, const char *file)
+{
+    if (music) {
+        const char *p = get_last_dirsep(file);
+        SDL_strlcpy(music->filename, (p != NULL)? p + 1 : file, 1024);
+    }
+}
+
 Mix_Music * SDLCALLCC Mix_LoadMUS_RW(SDL_RWops *src, int freesrc)
 {
     return Mix_LoadMUSType_RW(src, MUS_NONE, freesrc);
