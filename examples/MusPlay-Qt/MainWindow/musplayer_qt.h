@@ -99,6 +99,7 @@ private slots:
     void on_actionEnableReverb_triggered(bool checked);
     void on_actionEnableEcho_triggered(bool checked);
     void on_actionFileAssoc_triggered();
+    void on_actionPause_the_audio_stream_triggered(bool checked);
 
     void cleanLoopChecks();
     void on_actionLoopForever_triggered();

@@ -553,6 +553,7 @@ border-bottom-color: rgb(0, 120, 0);
     <addaction name="actionTuneEcho"/>
     <addaction name="separator"/>
     <addaction name="menuMusicLooping"/>
+    <addaction name="actionPause_the_audio_stream"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -681,6 +682,14 @@ border-bottom-color: rgb(0, 120, 0);
   <action name="actionTracksMuter">
    <property name="text">
     <string>Tracks enable/disable</string>
+   </property>
+  </action>
+  <action name="actionPause_the_audio_stream">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Pause the audio stream</string>
    </property>
   </action>
  </widget>

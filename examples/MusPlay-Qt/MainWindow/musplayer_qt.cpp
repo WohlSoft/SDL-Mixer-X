@@ -706,6 +706,11 @@ void MusPlayer_Qt::on_actionFileAssoc_triggered()
     af.exec();
 }
 
+void MusPlayer_Qt::on_actionPause_the_audio_stream_triggered(bool checked)
+{
+    Mix_PauseAudio(checked);
+}
+
 void MusPlayer_Qt::cleanLoopChecks()
 {
     ui->actionLoopForever->setChecked(false);
