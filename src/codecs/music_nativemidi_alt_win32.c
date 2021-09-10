@@ -657,8 +657,8 @@ Mix_MusicInterface Mix_MusicInterface_NATIVEMIDI =
     NATIVEMIDI_Seek,   /* Seek */
     NATIVEMIDI_Tell,   /* Tell [MIXER-X]*/
     NATIVEMIDI_Duration,   /* Duration */
-    NATIVEMIDI_SetTempo,   /* Set Tempo multiplier [MIXER-X] */
-    NATIVEMIDI_GetTempo,   /* Get Tempo multiplier [MIXER-X] */
+    NATIVEMIDI_SetTempo,   /* [MIXER-X] */
+    NATIVEMIDI_GetTempo,   /*[MIXER-X] */
     NATIVEMIDI_LoopStart,   /* LoopStart [MIXER-X]*/
     NATIVEMIDI_LoopEnd,   /* LoopEnd [MIXER-X]*/
     NATIVEMIDI_LoopLength,   /* LoopLength [MIXER-X]*/

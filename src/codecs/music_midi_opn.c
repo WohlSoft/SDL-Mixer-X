@@ -760,8 +760,8 @@ Mix_MusicInterface Mix_MusicInterface_OPNMIDI =
     OPNMIDI_Seek,
     OPNMIDI_Tell,   /* Tell [MIXER-X]*/
     OPNMIDI_Duration,
-    OPNMIDI_SetTempo,   /* Set Tempo multiplier [MIXER-X] */
-    OPNMIDI_GetTempo,   /* Get Tempo multiplier [MIXER-X] */
+    OPNMIDI_SetTempo,   /* [MIXER-X] */
+    OPNMIDI_GetTempo,   /* [MIXER-X] */
     OPNMIDI_LoopStart,   /* LoopStart [MIXER-X]*/
     OPNMIDI_LoopEnd,   /* LoopEnd [MIXER-X]*/
     OPNMIDI_LoopLength,   /* LoopLength [MIXER-X]*/

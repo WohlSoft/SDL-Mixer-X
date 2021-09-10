@@ -288,8 +288,8 @@ Mix_MusicInterface Mix_MusicInterface_CMD =
     NULL,   /* Seek */
     NULL,   /* Tell */
     NULL,   /* Duration */
-    NULL,   /* Set Tempo multiplier [MIXER-X] */
-    NULL,   /* Get Tempo multiplier [MIXER-X] */
+    NULL,   /* SetTempo [MIXER-X] */
+    NULL,   /* GetTempo [MIXER-X] */
     NULL,   /* LoopStart */
     NULL,   /* LoopEnd */
     NULL,   /* LoopLength */

@@ -298,8 +298,8 @@ Mix_MusicInterface Mix_MusicInterface_TIMIDITY =
     TIMIDITY_Seek,
     TIMIDITY_Tell,
     TIMIDITY_Duration,
-    NULL,   /* Set Tempo multiplier [MIXER-X] */
-    NULL,   /* Get Tempo multiplier [MIXER-X] */
+    NULL,   /* SetTempo [MIXER-X] */
+    NULL,   /* GetTempo [MIXER-X] */
     NULL,   /* LoopStart */
     NULL,   /* LoopEnd */
     NULL,   /* LoopLength */

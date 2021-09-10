@@ -551,8 +551,8 @@ Mix_MusicInterface Mix_MusicInterface_GME =
     GME_Seek,   /* Seek */
     GME_Tell,   /* Tell [MIXER-X]*/
     GME_Duration,
-    GME_SetTempo,   /* Set Tempo multiplier [MIXER-X] */
-    GME_GetTempo,   /* Get Tempo multiplier [MIXER-X] */
+    GME_SetTempo,   /* [MIXER-X] */
+    GME_GetTempo,   /* [MIXER-X] */
     NULL,   /* LoopStart [MIXER-X]*/
     NULL,   /* LoopEnd [MIXER-X]*/
     NULL,   /* LoopLength [MIXER-X]*/
