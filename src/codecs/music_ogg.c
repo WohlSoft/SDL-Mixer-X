@@ -546,6 +546,8 @@ Mix_MusicInterface Mix_MusicInterface_OGG =
     OGG_Duration,
     NULL,   /* SetTempo [MIXER-X] */
     NULL,   /* GetTempo [MIXER-X] */
+    NULL,   /* GetTracksCount [MIXER-X] */
+    NULL,   /* SetTrackMute [MIXER-X] */
     OGG_LoopStart,
     OGG_LoopEnd,
     OGG_LoopLength,

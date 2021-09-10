@@ -56,6 +56,9 @@ extern void midi_seq_set_loop_enabled(void *seq, int loopEn);
 extern double midi_seq_tick(void *seq, double s, double granularity);
 extern int midi_seq_play_buffer(void *seq, uint8_t *stream, int len);
 
+extern int midi_get_tracks_number(void *seq);
+extern int midi_set_track_enabled(void *seq, int track, int enabled);
+
 #ifdef __cplusplus
 }
 #endif

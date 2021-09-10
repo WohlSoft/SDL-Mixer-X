@@ -142,6 +142,12 @@ typedef struct
     /* MIXER-X: Get a current tempo multiplier */
     double (*GetTempo)(void *music);
 
+    /* MIXER-X: Get a count of concurrent tracks (MIDI / Tracker / etc.) */
+    int (*GetTracksCount)(void *music);
+
+    /* MIXER-X: Set the track mute state */
+    int (*SetTrackMute)(void *music, int track, int mute);
+
     /* Tell a loop start position (in seconds) */
     double (*LoopStart)(void *music);
 

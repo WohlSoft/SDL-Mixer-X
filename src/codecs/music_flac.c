@@ -751,6 +751,8 @@ Mix_MusicInterface Mix_MusicInterface_FLAC =
     FLAC_Duration,
     NULL,   /* SetTempo [MIXER-X] */
     NULL,   /* GetTempo [MIXER-X] */
+    NULL,   /* GetTracksCount [MIXER-X] */
+    NULL,   /* SetTrackMute [MIXER-X] */
     FLAC_LoopStart,
     FLAC_LoopEnd,
     FLAC_LoopLength,

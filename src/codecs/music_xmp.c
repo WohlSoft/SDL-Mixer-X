@@ -56,6 +56,7 @@ typedef struct {
     void (*xmp_release_module)(xmp_context);
     void (*xmp_free_context)(xmp_context);
     int (*xmp_set_tempo_factor)(xmp_context, double);
+    int (*xmp_channel_mute)(xmp_context, int, int);
 } xmp_loader;
 
 static xmp_loader libxmp = {
@@ -107,6 +108,7 @@ static int XMP_Load(void)
 #if XMP_VER_MAJOR > 4 || (XMP_VER_MAJOR == 4 && XMP_VER_MINOR >= 5)
         FUNCTION_LOADER_OPTIONAL(xmp_set_tempo_factor, int(*)(xmp_context, double))
 #endif
+        FUNCTION_LOADER(xmp_channel_mute, int(*)(xmp_context, int, int))
     }
     ++libxmp.loaded;
 
@@ -131,6 +133,7 @@ typedef struct
 {
     int volume;
     double tempo;
+    int virt_channels;
     int play_count;
     struct xmp_module_info mi;
     struct xmp_frame_info fi;
@@ -245,6 +248,9 @@ void *XMP_CreateFromRW(SDL_RWops *src, int freesrc)
     if (music->mi.comment) {
         meta_tags_set(&music->tags, MIX_META_COPYRIGHT, music->mi.comment);
     }
+
+    libxmp.xmp_get_frame_info(music->ctx, &music->fi);
+    music->virt_channels = music->fi.virt_channels;
 
     if (freesrc) {
         SDL_RWclose(src);
@@ -391,6 +397,25 @@ static double XMP_GetTempo(void *context)
     return -1.0;
 }
 
+static int XMP_GetTracksCount(void *context)
+{
+    XMP_Music *music = (XMP_Music *)context;
+    if (music) {
+        return music->virt_channels;
+    }
+    return -1;
+}
+
+static int XMP_SetTrackMute(void *context, int track, int mute)
+{
+    XMP_Music *music = (XMP_Music *)context;
+    int ret = -1;
+    if (music) {
+        ret = libxmp.xmp_channel_mute(music->ctx, track, mute);
+    }
+    return ret;
+}
+
 static const char* XMP_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
 {
     XMP_Music *music = (XMP_Music *)context;
@@ -442,6 +467,8 @@ Mix_MusicInterface Mix_MusicInterface_XMP =
     XMP_Duration,
     XMP_SetTempo,   /* [MIXER-X] */
     XMP_GetTempo,   /* [MIXER-X] */
+    XMP_GetTracksCount,   /* GetTracksCount [MIXER-X] */
+    XMP_SetTrackMute,   /* SetTrackMute [MIXER-X] */
     NULL,   /* LoopStart */
     NULL,   /* LoopEnd */
     NULL,   /* LoopLength */

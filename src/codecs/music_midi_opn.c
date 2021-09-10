@@ -47,6 +47,8 @@ typedef struct {
     void (*opn2_setSoftPanEnabled)(struct OPN2_MIDIPlayer *device, int softPanEn);
     int (*opn2_setNumChips)(struct OPN2_MIDIPlayer *device, int numChips);
     void (*opn2_setTempo)(struct OPN2_MIDIPlayer *device, double tempo);
+    size_t (*opn2_trackCount)(struct OPN2_MIDIPlayer *device);
+    int (*opn2_setTrackOptions)(struct OPN2_MIDIPlayer *device, size_t trackNumber, unsigned trackOptions);
     int (*opn2_openData)(struct OPN2_MIDIPlayer *device, const void *mem, unsigned long size);
     const char *(*opn2_metaMusicTitle)(struct OPN2_MIDIPlayer *device);
     const char *(*opn2_metaMusicCopyright)(struct OPN2_MIDIPlayer *device);
@@ -103,6 +105,8 @@ static int OPNMIDI_Load(void)
         FUNCTION_LOADER(opn2_setSoftPanEnabled, void(*)(struct OPN2_MIDIPlayer*,int))
         FUNCTION_LOADER(opn2_setNumChips, int(*)(struct OPN2_MIDIPlayer *, int))
         FUNCTION_LOADER(opn2_setTempo, void(*)(struct OPN2_MIDIPlayer*,double))
+        FUNCTION_LOADER(opn2_trackCount, size_t(*)(struct OPN2_MIDIPlayer *))
+        FUNCTION_LOADER(opn2_setTrackOptions, int(*)(struct OPN2_MIDIPlayer *, size_t, unsigned))
         FUNCTION_LOADER(opn2_openData, int(*)(struct OPN2_MIDIPlayer *, const void *, unsigned long))
         FUNCTION_LOADER(opn2_metaMusicTitle, const char*(*)(struct OPN2_MIDIPlayer*))
         FUNCTION_LOADER(opn2_metaMusicCopyright, const char*(*)(struct OPN2_MIDIPlayer*))
@@ -711,6 +715,28 @@ static double OPNMIDI_GetTempo(void *music_p)
     return -1.0;
 }
 
+static int OPNMIDI_GetTracksCount(void *music_p)
+{
+    OpnMIDI_Music *music = (OpnMIDI_Music *)music_p;
+    if (music) {
+        return (int)OPNMIDI.opn2_trackCount(music->opnmidi);
+    }
+    return -1;
+}
+
+static int OPNMIDI_SetTrackMute(void *music_p, int track, int mute)
+{
+    OpnMIDI_Music *music = (OpnMIDI_Music *)music_p;
+    int ret = -1;
+    if (music) {
+        ret = OPNMIDI.opn2_setTrackOptions(music->opnmidi, track, mute ? OPNMIDI_TrackOption_Off : OPNMIDI_TrackOption_On);
+        if (ret < 0) {
+            Mix_SetError("OPNMIDI: %s", opn2_errorInfo(music->opnmidi));
+        }
+    }
+    return ret;
+}
+
 static double OPNMIDI_LoopStart(void* music_p)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music *)music_p;
@@ -762,6 +788,8 @@ Mix_MusicInterface Mix_MusicInterface_OPNMIDI =
     OPNMIDI_Duration,
     OPNMIDI_SetTempo,   /* [MIXER-X] */
     OPNMIDI_GetTempo,   /* [MIXER-X] */
+    OPNMIDI_GetTracksCount,   /* [MIXER-X] */
+    OPNMIDI_SetTrackMute,   /* [MIXER-X] */
     OPNMIDI_LoopStart,   /* LoopStart [MIXER-X]*/
     OPNMIDI_LoopEnd,   /* LoopEnd [MIXER-X]*/
     OPNMIDI_LoopLength,   /* LoopLength [MIXER-X]*/

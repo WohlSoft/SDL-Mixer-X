@@ -181,3 +181,15 @@ int midi_seq_play_buffer(void *seq, uint8_t *stream, int len)
     MixerSeqInternal *seqi = reinterpret_cast<MixerSeqInternal*>(seq);
     return seqi->seq.playStream(stream, len);
 }
+
+int midi_get_tracks_number(void *seq)
+{
+    MixerSeqInternal *seqi = reinterpret_cast<MixerSeqInternal*>(seq);
+    return (int)seqi->seq.getTrackCount();
+}
+
+int midi_set_track_enabled(void *seq, int track, int enabled)
+{
+    MixerSeqInternal *seqi = reinterpret_cast<MixerSeqInternal*>(seq);
+    return (int)seqi->seq.setTrackEnabled(track, enabled);
+}
