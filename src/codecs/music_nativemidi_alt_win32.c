@@ -594,7 +594,7 @@ static int NATIVEMIDI_GetTracksCount(void *context)
 {
     NativeMidiSong *music = (NativeMidiSong *)context;
     if (music) {
-        return midi_get_tracks_number(music->player);
+        return midi_get_tracks_number(music->song);
     }
     return -1;
 }
@@ -603,7 +603,7 @@ static int NATIVEMIDI_SetTrackMuted(void *context, int track, int mute)
 {
     NativeMidiSong *music = (NativeMidiSong *)context;
     if (music) {
-        return midi_set_track_enabled(music->player, track, mute ? 0 : 1);
+        return midi_set_track_enabled(music->song, track, mute ? 0 : 1);
     }
     return -1;
 }
