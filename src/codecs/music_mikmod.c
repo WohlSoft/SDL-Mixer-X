@@ -57,6 +57,8 @@ typedef struct {
     void (*Player_SetVolume)(SWORD);
     void (*Player_Start)(MODULE*);
     void (*Player_Stop)(void);
+    void (*Player_Mute)(SLONG,...);
+    void (*Player_Unmute)(SLONG,...);
     ULONG (*VC_WriteBytes)(SBYTE*,ULONG);
     struct MDRIVER* drv_nos;
     UWORD* md_device;
@@ -134,6 +136,8 @@ static int MIKMOD_Load(void)
         FUNCTION_LOADER(Player_SetVolume, void (*)(SWORD))
         FUNCTION_LOADER(Player_Start, void (*)(MODULE*))
         FUNCTION_LOADER(Player_Stop, void (*)(void))
+        FUNCTION_LOADER(Player_Mute, void (*)(SLONG,...))
+        FUNCTION_LOADER(Player_Unmute, void (*)(SLONG,...))
         FUNCTION_LOADER(VC_WriteBytes, ULONG (*)(SBYTE*,ULONG))
         VARIABLE_LOADER(drv_nos, MDRIVER*)
         VARIABLE_LOADER(md_device, UWORD*)
@@ -168,6 +172,7 @@ typedef struct
 {
     int play_count;
     int volume;
+    int virt_channels;
     MODULE *module;
     SDL_AudioStream *stream;
     SBYTE *buffer;
@@ -354,6 +359,8 @@ void *MIKMOD_CreateFromRW(SDL_RWops *src, int freesrc)
         return NULL;
     }
 
+    music->virt_channels = music->module->numchn;
+
     music->buffer_size = music_spec.samples * (SDL_AUDIO_BITSIZE(format) / 8) * channels;
     music->buffer = (SBYTE *)SDL_malloc(music->buffer_size);
     if (!music->buffer) {
@@ -476,6 +483,29 @@ static void MIKMOD_Stop(void *context)
     }
 }
 
+static int MIKMOD_GetTracksCount(void *context)
+{
+    MIKMOD_Music *music = (MIKMOD_Music *)context;
+    if (music) {
+        return music->virt_channels;
+    }
+    return -1;
+}
+
+static int MIKMOD_SetTrackMute(void *context, int track, int mute)
+{
+    MIKMOD_Music *music = (MIKMOD_Music *)context;
+    int ret = -1;
+    if (music) {
+        if (mute) {
+            mikmod.Player_Mute(track);
+        } else {
+            mikmod.Player_Unmute(track);
+        }
+    }
+    return ret;
+}
+
 static const char* MIKMOD_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
 {
     MIKMOD_Music *music = (MIKMOD_Music *)context;
@@ -528,6 +558,8 @@ Mix_MusicInterface Mix_MusicInterface_MIKMOD =
     NULL,   /* Duration */
     NULL,   /* SetTempo [MIXER-X] */
     NULL,   /* GetTempo [MIXER-X] */
+    MIKMOD_GetTracksCount,   /* [MIXER-X] */
+    MIKMOD_SetTrackMute,   /* [MIXER-X] */
     NULL,   /* LoopStart */
     NULL,   /* LoopEnd */
     NULL,   /* LoopLength */

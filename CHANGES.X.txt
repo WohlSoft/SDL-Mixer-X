@@ -1,7 +1,11 @@
 2.5.0:
+Vitaly Novichkov - 2021-09-10
+ * Added an ability to mute individual channels/tracks of MIDI/Tracker/Chiptune musics, added Mix_GetMusicTracks() and Mix_SetMusicTrackMute() calls
 Vitaly Novichkov - 2021-09-09
  * Added the support for effects on music streams
  * Added an ability to play multiple music streams at the same time include the multi-track and cross-fade ability
+ * Added new calls: Mix_HookMusicStreamFinishedAny(), Mix_HookMusicStreamFinished(), Mix_RegisterMusicEffect(), Mix_UnregisterMusicEffect(), Mix_UnregisterAllMusicEffects(), Mix_SetMusicEffectPanning(), Mix_SetMusicEffectPosition(), Mix_SetMusicEffectDistance(), Mix_SetMusicEffectReverseStereo(), Mix_PlayMusicStream(), Mix_FadeInMusicStream(), Mix_FadeInMusicStreamPos(), Mix_VolumeMusicGeneral(), Mix_GetVolumeMusicGeneral(), Mix_CrossFadeMusicStream(), Mix_CrossFadeMusicStreamPos(), Mix_PauseMusicStreamAll(), Mix_ResumeMusicStreamAll(), and Mix_ModMusicStreamJumpToOrder()
+ * Added the Mix_SetMusicFileName() call to manually set the displayable filename
 Vitaly Novichkov - 2021-03-29 15:11:00
  * Added the support for the FluidLite library
 Vitaly Novichkov - 2021-01-29 11:06:44

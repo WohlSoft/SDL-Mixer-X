@@ -51,6 +51,8 @@ typedef struct {
     int (*adl_setNumChips)(struct ADL_MIDIPlayer *device, int numChips);
     int (*adl_setNumFourOpsChn)(struct ADL_MIDIPlayer *device, int ops4);
     void (*adl_setTempo)(struct ADL_MIDIPlayer *device, double tempo);
+    size_t (*adl_trackCount)(struct ADL_MIDIPlayer *device);
+    int (*adl_setTrackOptions)(struct ADL_MIDIPlayer *device, size_t trackNumber, unsigned trackOptions);
     int (*adl_openData)(struct ADL_MIDIPlayer *device, const void *mem, unsigned long size);
     const char *(*adl_metaMusicTitle)(struct ADL_MIDIPlayer *device);
     const char *(*adl_metaMusicCopyright)(struct ADL_MIDIPlayer *device);
@@ -112,6 +114,8 @@ static int ADLMIDI_Load(void)
         FUNCTION_LOADER(adl_setNumChips, int(*)(struct ADL_MIDIPlayer *, int))
         FUNCTION_LOADER(adl_setNumFourOpsChn, int(*)(struct ADL_MIDIPlayer*,int))
         FUNCTION_LOADER(adl_setTempo, void(*)(struct ADL_MIDIPlayer*,double))
+        FUNCTION_LOADER(adl_trackCount, size_t(*)(struct ADL_MIDIPlayer *))
+        FUNCTION_LOADER(adl_setTrackOptions, int(*)(struct ADL_MIDIPlayer *, size_t, unsigned))
         FUNCTION_LOADER(adl_openData, int(*)(struct ADL_MIDIPlayer *, const void *, unsigned long))
         FUNCTION_LOADER(adl_metaMusicTitle, const char*(*)(struct ADL_MIDIPlayer*))
         FUNCTION_LOADER(adl_metaMusicCopyright, const char*(*)(struct ADL_MIDIPlayer*))
@@ -869,6 +873,28 @@ static double ADLMIDI_GetTempo(void *music_p)
     return -1.0;
 }
 
+static int ADLMIDI_GetTracksCount(void *music_p)
+{
+    AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
+    if (music) {
+        return (int)ADLMIDI.adl_trackCount(music->adlmidi);
+    }
+    return -1;
+}
+
+static int ADLMIDI_SetTrackMute(void *music_p, int track, int mute)
+{
+    AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
+    int ret = -1;
+    if (music) {
+        ret = ADLMIDI.adl_setTrackOptions(music->adlmidi, track, mute ? ADLMIDI_TrackOption_Off : ADLMIDI_TrackOption_On);
+        if (ret < 0) {
+            Mix_SetError("ADLMIDI: %s", adl_errorInfo(music->adlmidi));
+        }
+    }
+    return ret;
+}
+
 static double ADLMIDI_LoopStart(void *music_p)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
@@ -926,6 +952,8 @@ Mix_MusicInterface Mix_MusicInterface_ADLMIDI =
     ADLMIDI_Duration,
     ADLMIDI_SetTempo,   /* [MIXER-X] */
     ADLMIDI_GetTempo,   /* [MIXER-X] */
+    ADLMIDI_GetTracksCount,   /* [MIXER-X] */
+    ADLMIDI_SetTrackMute,   /* [MIXER-X] */
     ADLMIDI_LoopStart,   /* LoopStart [MIXER-X]*/
     ADLMIDI_LoopEnd,   /* LoopEnd [MIXER-X]*/
     ADLMIDI_LoopLength,   /* LoopLength [MIXER-X]*/
@@ -964,6 +992,8 @@ Mix_MusicInterface Mix_MusicInterface_ADLIMF =
     ADLMIDI_Duration,
     ADLMIDI_SetTempo,   /* [MIXER-X] */
     ADLMIDI_GetTempo,   /* [MIXER-X] */
+    NULL,   /* GetTracksCount [MIXER-X] */
+    NULL,   /* SetTrackMute [MIXER-X] */
     ADLMIDI_LoopStart,   /* LoopStart [MIXER-X]*/
     ADLMIDI_LoopEnd,   /* LoopEnd [MIXER-X]*/
     ADLMIDI_LoopLength,   /* LoopLength [MIXER-X]*/

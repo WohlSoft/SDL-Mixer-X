@@ -590,6 +590,24 @@ static double NATIVEMIDI_GetTempo(void *context)
     return -1.0;
 }
 
+static int NATIVEMIDI_GetTracksCount(void *context)
+{
+    NativeMidiSong *music = (NativeMidiSong *)context;
+    if (music) {
+        return midi_get_tracks_number(music->player);
+    }
+    return -1;
+}
+
+static int NATIVEMIDI_SetTrackMuted(void *context, int track, int mute)
+{
+    NativeMidiSong *music = (NativeMidiSong *)context;
+    if (music) {
+        return midi_set_track_enabled(music->player, track, mute ? 0 : 1);
+    }
+    return -1;
+}
+
 static double NATIVEMIDI_LoopStart(void *context)
 {
     NativeMidiSong *music = (NativeMidiSong *)context;
@@ -659,6 +677,8 @@ Mix_MusicInterface Mix_MusicInterface_NATIVEMIDI =
     NATIVEMIDI_Duration,   /* Duration */
     NATIVEMIDI_SetTempo,   /* [MIXER-X] */
     NATIVEMIDI_GetTempo,   /*[MIXER-X] */
+    NATIVEMIDI_GetTracksCount,   /* [MIXER-X] */
+    NATIVEMIDI_SetTrackMuted,   /* [MIXER-X] */
     NATIVEMIDI_LoopStart,   /* LoopStart [MIXER-X]*/
     NATIVEMIDI_LoopEnd,   /* LoopEnd [MIXER-X]*/
     NATIVEMIDI_LoopLength,   /* LoopLength [MIXER-X]*/

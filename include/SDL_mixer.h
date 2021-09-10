@@ -996,6 +996,16 @@ extern DECLSPEC int SDLCALL Mix_SetMusicTempo(Mix_Music *music, double position)
 extern DECLSPEC double SDLCALL Mix_GetMusicTempo(Mix_Music *music);
 
 /*
+    Get the count of concurrently playing tracks at the song (MIDI, Tracker,.etc.)
+ */
+extern DECLSPEC int SDLCALL Mix_GetMusicTracks(Mix_Music *music);
+
+/*
+    Mute one of playing tracks at the song
+ */
+extern DECLSPEC int SDLCALL Mix_SetMusicTrackMute(Mix_Music *music, int track, int mute);
+
+/*
     Get the loop start time position of music stream
     returns -1.0 if this feature is not used for this music or not supported for some codec
  */

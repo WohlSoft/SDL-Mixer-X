@@ -33,9 +33,11 @@ typedef struct {
 
     gme_err_t (*gme_open_data)(void const* data, long size, Music_Emu** out, int sample_rate);
     int (*gme_track_count)(Music_Emu const*);
-    gme_err_t (*gme_start_track)( Music_Emu*, int index);
-    int (*gme_track_ended)( Music_Emu const*);
+    gme_err_t (*gme_start_track)(Music_Emu*, int index);
+    int (*gme_track_ended)(Music_Emu const*);
     void (*gme_set_tempo)(Music_Emu*, double tempo);
+    int (*gme_voice_count)(Music_Emu const*);
+    void (*gme_mute_voice)(Music_Emu*, int index, int mute);
 #if GME_VERSION >= 0x000700
     void (*gme_set_fade)(Music_Emu*, int start_msec, int fade_msec);
 #else
@@ -84,6 +86,8 @@ static int GME_Load(void)
         FUNCTION_LOADER(gme_start_track, gme_err_t (*)( Music_Emu*,int))
         FUNCTION_LOADER(gme_track_ended, int (*)( Music_Emu const*))
         FUNCTION_LOADER(gme_set_tempo, void (*)(Music_Emu*,double))
+        FUNCTION_LOADER(gme_voice_count, void (*)(Music_Emu const*))
+        FUNCTION_LOADER(gme_mute_voice, void (*)(Music_Emu*,int,int))
 #if GME_VERSION >= 0x000700
         FUNCTION_LOADER(gme_set_fade, void (*)(Music_Emu*,int,int))
 #else
@@ -529,6 +533,26 @@ static double GME_GetTempo(void *music_p)
     return -1.0;
 }
 
+static int GME_GetTracksCount(void *music_p)
+{
+    GME_Music *music = (GME_Music *)music_p;
+    if (music) {
+        return gme.gme_voice_count(music->game_emu);
+    }
+    return -1;
+}
+
+static int GME_SetTrackMute(void *music_p, int track, int mute)
+{
+    GME_Music *music = (GME_Music *)music_p;
+    if (music) {
+        gme.gme_mute_voice(music->game_emu, track, mute);
+        return 0;
+    }
+    return -1;
+}
+
+
 Mix_MusicInterface Mix_MusicInterface_GME =
 {
     "GME",
@@ -554,6 +578,8 @@ Mix_MusicInterface Mix_MusicInterface_GME =
     GME_Duration,
     GME_SetTempo,   /* [MIXER-X] */
     GME_GetTempo,   /* [MIXER-X] */
+    GME_GetTracksCount,
+    GME_SetTrackMute,
     NULL,   /* LoopStart [MIXER-X]*/
     NULL,   /* LoopEnd [MIXER-X]*/
     NULL,   /* LoopLength [MIXER-X]*/

@@ -2309,6 +2309,65 @@ double SDLCALLCC Mix_GetMusicTempo(Mix_Music *music)
     return(retval);
 }
 
+/* Get the count of tracks in the song */
+static int music_internal_tracks(Mix_Music *music)
+{
+    if (music->interface->GetTracksCount) {
+        return music->interface->GetTracksCount(music->context);
+    }
+    return -1;
+}
+int SDLCALLCC Mix_GetMusicTracks(Mix_Music *music)
+{
+    int retval;
+
+    Mix_LockAudio();
+    if (music) {
+        retval = music_internal_tracks(music);
+    } else if (music_playing) {
+        retval = music_internal_tracks(music_playing);
+    } else {
+        Mix_SetError("Music isn't playing");
+        retval = -1;
+    }
+    Mix_UnlockAudio();
+
+    return(retval);
+}
+
+/* Set the track mute state */
+int music_internal_set_track_mute(Mix_Music *music, int track, int mute)
+{
+    if (music->interface->SetTrackMute) {
+        return music->interface->SetTrackMute(music->context, track, mute);
+    }
+    return -1;
+}
+int SDLCALLCC Mix_SetMusicTrackMute(Mix_Music *music, int track, int mute)
+{
+    int retval;
+
+    Mix_LockAudio();
+    if (music) {
+        retval = music_internal_set_track_mute(music, track, mute);
+        if (retval < 0) {
+            Mix_SetError("Track muting is not implemented for music type");
+        }
+    } else if (music_playing) {
+        retval = music_internal_set_track_mute(music_playing, track, mute);
+        if (retval < 0) {
+            Mix_SetError("Track muting is not implemented for music type");
+        }
+    } else {
+        Mix_SetError("Music isn't playing");
+        retval = -1;
+    }
+    Mix_UnlockAudio();
+
+    return(retval);
+}
+
+
 /* Get Loop start position */
 static double music_internal_loop_start(Mix_Music *music)
 {
