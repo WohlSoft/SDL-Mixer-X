@@ -696,7 +696,6 @@ static int FLUIDSYNTH_SetTempo(void *context, double tempo)
         music->tempo = tempo;
         return 0;
     }
-
     return 0;
 }
 
@@ -727,7 +726,7 @@ static double FLUIDSYNTH_LoopEnd(void *context)
     return -1;
 }
 
-static double FLUIDSYNTH_oopLength(void *context)
+static double FLUIDSYNTH_LoopLength(void *context)
 {
     FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
     if (music) {
@@ -849,7 +848,7 @@ Mix_MusicInterface Mix_MusicInterface_FLUIDSYNTH =
     FLUIDSYNTH_GetTempo,
     FLUIDSYNTH_LoopStart,
     FLUIDSYNTH_LoopEnd,
-    FLUIDSYNTH_oopLength,
+    FLUIDSYNTH_LoopLength,
     FLUIDSYNTH_GetMetaTag,
     NULL,   /* Pause */
     NULL,   /* Resume */
