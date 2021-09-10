@@ -180,7 +180,6 @@ typedef struct
 
 } Mix_MusicInterface;
 
-
 extern int get_num_music_interfaces(void);
 extern Mix_MusicInterface *get_music_interface(int index);
 extern Mix_MusicType detect_music_type(SDL_RWops *src);
@@ -193,6 +192,7 @@ extern int music_pcm_getaudio(void *context, void *data, int bytes, int volume,
                               int (*GetSome)(void *context, void *data, int bytes, SDL_bool *done));
 extern void SDLCALL multi_music_mixer(void *udata, Uint8 *stream, int len);
 extern void SDLCALL music_mixer(void *udata, Uint8 *stream, int len);
+extern void pause_async_music(int pause_on);
 extern void close_music(void);
 extern void unload_music(void);
 
