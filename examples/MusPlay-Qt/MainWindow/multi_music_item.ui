@@ -150,7 +150,14 @@
       <string>FX</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="1" column="0">
+      <item row="0" column="0">
+       <widget class="QPushButton" name="showMusicFX">
+        <property name="text">
+         <string>FX</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
        <spacer name="verticalSpacer">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
@@ -163,10 +170,10 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="0">
-       <widget class="QPushButton" name="showMusicFX">
+      <item row="1" column="0">
+       <widget class="QPushButton" name="showTracksOnOff">
         <property name="text">
-         <string>Show</string>
+         <string>Tracks</string>
         </property>
        </widget>
       </item>

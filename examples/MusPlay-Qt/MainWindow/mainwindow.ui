@@ -545,6 +545,7 @@ border-bottom-color: rgb(0, 120, 0);
     <addaction name="actionMultiMusicTesting"/>
     <addaction name="actionSfxTesting"/>
     <addaction name="actionMusicFX"/>
+    <addaction name="actionTracksMuter"/>
     <addaction name="actionFileAssoc"/>
     <addaction name="separator"/>
     <addaction name="actionEnableReverb"/>
@@ -675,6 +676,11 @@ border-bottom-color: rgb(0, 120, 0);
   <action name="actionMusicFX">
    <property name="text">
     <string>Music FX</string>
+   </property>
+  </action>
+  <action name="actionTracksMuter">
+   <property name="text">
+    <string>Tracks enable/disable</string>
    </property>
   </action>
  </widget>

@@ -8,6 +8,7 @@
 #include "ui_multi_music_item.h"
 #include "seek_bar.h"
 #include "musicfx.h"
+#include "track_muter.h"
 
 
 static const char *musicTypeC(Mix_Music *mus)
@@ -365,5 +366,26 @@ void MultiMusicItem::on_showMusicFX_clicked()
     m_musicFX->repaint();
     m_musicFX->setDstMusic(m_curMus);
     m_musicFX->setTitle(ui->musicTitle->text());
+}
+
+
+void MultiMusicItem::on_showTracksOnOff_clicked()
+{
+    if(!m_curMus)
+        return;
+
+    if(!m_trackMuter)
+    {
+        m_trackMuter = new TrackMuter(this);
+        m_trackMuter->setModal(false);
+    }
+
+    m_trackMuter->show();
+    auto g = QCursor::pos();
+    m_trackMuter->move(g.x(), g.y());
+    m_trackMuter->update();
+    m_trackMuter->repaint();
+    m_trackMuter->setDstMusic(m_curMus);
+    m_trackMuter->setTitle(ui->musicTitle->text());
 }
 

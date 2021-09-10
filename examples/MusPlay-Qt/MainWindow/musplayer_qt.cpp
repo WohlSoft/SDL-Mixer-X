@@ -16,6 +16,7 @@
 #include "musplayer_qt.h"
 #include "multi_music_test.h"
 #include "musicfx.h"
+#include "track_muter.h"
 #include "../Player/mus_player.h"
 #include "../AssocFiles/assoc_files.h"
 #include "../Effects/reverb.h"
@@ -72,6 +73,9 @@ MusPlayer_Qt::MusPlayer_Qt(QWidget *parent) : QMainWindow(parent),
 
     m_musicFx = new MusicFX(this);
     m_musicFx->setModal(false);
+
+    m_trackMuter = new TrackMuter(this);
+    m_trackMuter->setModal(false);
 
     m_setupMidi = new SetupMidi(this);
     m_setupMidi->setModal(false);
@@ -197,6 +201,10 @@ void MusPlayer_Qt::moveEvent(QMoveEvent *event)
     {
         QRect g = m_musicFx->frameGeometry();
         m_musicFx->move(g.x() + deltaX, g.y() + deltaY);
+    }
+    {
+        QRect g = m_trackMuter->frameGeometry();
+        m_trackMuter->move(g.x() + deltaX, g.y() + deltaY);
     }
 
     m_oldWindowPos = event->pos();
@@ -396,6 +404,7 @@ void MusPlayer_Qt::on_play_clicked()
         ui->play->setToolTip(tr("Pause"));
         ui->play->setIcon(QIcon(":/buttons/pause.png"));
         m_musicFx->resetAll();
+        m_trackMuter->buildTracksList();
     }
 
     m_positionWatcher.stop();
@@ -657,6 +666,16 @@ void MusPlayer_Qt::on_actionMusicFX_triggered()
     m_musicFx->move(g.right(), g.top());
     m_musicFx->update();
     m_musicFx->repaint();
+}
+
+
+void MusPlayer_Qt::on_actionTracksMuter_triggered()
+{
+    m_trackMuter->show();
+    QRect g = this->frameGeometry();
+    m_trackMuter->move(g.right(), g.top());
+    m_trackMuter->update();
+    m_trackMuter->repaint();
 }
 
 void MusPlayer_Qt::on_actionEnableReverb_triggered(bool checked)

@@ -14,6 +14,7 @@
 
 class SeekBar;
 class MusicFX;
+class TrackMuter;
 
 namespace Ui {
 class MultiMusicItem;
@@ -26,6 +27,7 @@ class MultiMusicItem : public QWidget
     QString m_curMusPath;
     SeekBar *m_seekBar = nullptr;
     MusicFX *m_musicFX = nullptr;
+    TrackMuter *m_trackMuter = nullptr;
 
     friend class MultiMusicTest;
 
@@ -41,6 +43,7 @@ protected:
 
 private slots:
     void on_showMusicFX_clicked();
+    void on_showTracksOnOff_clicked();
 
     void on_tempo_sliderMoved(int position);
     void on_musicVolume_sliderMoved(int position);
