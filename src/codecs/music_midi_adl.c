@@ -924,8 +924,8 @@ Mix_MusicInterface Mix_MusicInterface_ADLMIDI =
     ADLMIDI_Seek,
     ADLMIDI_Tell,   /* Tell [MIXER-X]*/
     ADLMIDI_Duration,
-    ADLMIDI_SetTempo,   /* Set Tempo multiplier [MIXER-X] */
-    ADLMIDI_GetTempo,   /* Get Tempo multiplier [MIXER-X] */
+    ADLMIDI_SetTempo,   /* [MIXER-X] */
+    ADLMIDI_GetTempo,   /* [MIXER-X] */
     ADLMIDI_LoopStart,   /* LoopStart [MIXER-X]*/
     ADLMIDI_LoopEnd,   /* LoopEnd [MIXER-X]*/
     ADLMIDI_LoopLength,   /* LoopLength [MIXER-X]*/
@@ -962,8 +962,8 @@ Mix_MusicInterface Mix_MusicInterface_ADLIMF =
     ADLMIDI_Seek,
     ADLMIDI_Tell,   /* Tell [MIXER-X]*/
     ADLMIDI_Duration,
-    ADLMIDI_SetTempo,   /* Set Tempo multiplier [MIXER-X] */
-    ADLMIDI_GetTempo,   /* Get Tempo multiplier [MIXER-X] */
+    ADLMIDI_SetTempo,   /* [MIXER-X] */
+    ADLMIDI_GetTempo,   /* [MIXER-X] */
     ADLMIDI_LoopStart,   /* LoopStart [MIXER-X]*/
     ADLMIDI_LoopEnd,   /* LoopEnd [MIXER-X]*/
     ADLMIDI_LoopLength,   /* LoopLength [MIXER-X]*/

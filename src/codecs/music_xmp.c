@@ -441,8 +441,8 @@ Mix_MusicInterface Mix_MusicInterface_XMP =
     XMP_Seek,
     XMP_Tell,
     XMP_Duration,
-    XMP_SetTempo,   /* Set Tempo multiplier [MIXER-X] */
-    XMP_GetTempo,   /* Get Tempo multiplier [MIXER-X] */
+    XMP_SetTempo,   /* [MIXER-X] */
+    XMP_GetTempo,   /* [MIXER-X] */
     NULL,   /* LoopStart */
     NULL,   /* LoopEnd */
     NULL,   /* LoopLength */

@@ -514,8 +514,8 @@ Mix_MusicInterface Mix_MusicInterface_Opus =
     OPUS_Seek,
     OPUS_Tell,
     OPUS_Duration,
-    NULL,   /* Set Tempo multiplier [MIXER-X] */
-    NULL,   /* Get Tempo multiplier [MIXER-X] */
+    NULL,   /* SetTempo [MIXER-X] */
+    NULL,   /* GetTempo [MIXER-X] */
     OPUS_LoopStart,
     OPUS_LoopEnd,
     OPUS_LoopLength,
