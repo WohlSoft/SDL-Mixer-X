@@ -289,24 +289,6 @@ void SDLCALLCC Mix_ADLMIDI_setScaleMod(int sc)
 #endif
 }
 
-int SDLCALLCC Mix_ADLMIDI_getLogarithmicVolumes()
-{
-#ifdef MUSIC_MID_ADLMIDI
-    return (adlmidi_setup.volume_model == ADLMIDI_VolumeModel_NativeOPL3);
-#else
-    return -1;
-#endif
-}
-
-void SDLCALLCC Mix_ADLMIDI_setLogarithmicVolumes(int vm)
-{
-#ifdef MUSIC_MID_ADLMIDI
-    adlmidi_setup.volume_model = vm ? ADLMIDI_VolumeModel_NativeOPL3 : ADLMIDI_VolumeModel_AUTO;
-#else
-    (void)vm;
-#endif
-}
-
 int SDLCALLCC Mix_ADLMIDI_getVolumeModel()
 {
 #ifdef MUSIC_MID_ADLMIDI
