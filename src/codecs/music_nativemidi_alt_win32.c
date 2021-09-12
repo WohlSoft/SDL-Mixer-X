@@ -691,6 +691,46 @@ Mix_MusicInterface Mix_MusicInterface_NATIVEMIDI =
     NULL    /* Unload */
 };
 
+/* Special case to play XMI/MUS formats */
+Mix_MusicInterface Mix_MusicInterface_NATIVEXMI =
+{
+    "NATIVEXMI",
+    MIX_MUSIC_NATIVEMIDI,
+    MUS_NATIVEMIDI,
+    SDL_FALSE,
+    SDL_FALSE,
+
+    NULL,   /* Load */
+    NULL,   /* Open */
+    NATIVEMIDI_CreateFromRW,
+    NULL,   /* CreateFromRWex [MIXER-X]*/
+    NULL,   /* CreateFromFile */
+    NULL,   /* CreateFromFileEx [MIXER-X]*/
+    NATIVEMIDI_SetVolume,
+    NATIVEMIDI_GetVolume,   /* GetVolume [MIXER-X]*/
+    NATIVEMIDI_Play,
+    NATIVEMIDI_IsPlaying,
+    NULL,   /* GetAudio */
+    NULL,   /* Jump */
+    NATIVEMIDI_Seek,   /* Seek */
+    NATIVEMIDI_Tell,   /* Tell [MIXER-X]*/
+    NATIVEMIDI_Duration,   /* Duration */
+    NATIVEMIDI_SetTempo,   /* [MIXER-X] */
+    NATIVEMIDI_GetTempo,   /*[MIXER-X] */
+    NATIVEMIDI_GetTracksCount,   /* [MIXER-X] */
+    NATIVEMIDI_SetTrackMuted,   /* [MIXER-X] */
+    NATIVEMIDI_LoopStart,   /* LoopStart [MIXER-X]*/
+    NATIVEMIDI_LoopEnd,   /* LoopEnd [MIXER-X]*/
+    NATIVEMIDI_LoopLength,   /* LoopLength [MIXER-X]*/
+    NATIVEMIDI_GetMetaTag,   /* GetMetaTag [MIXER-X]*/
+    NATIVEMIDI_Pause,
+    NATIVEMIDI_Resume,
+    NATIVEMIDI_Stop,
+    NATIVEMIDI_Delete,
+    NULL,   /* Close */
+    NULL    /* Unload */
+};
+
 #endif /* MUSIC_MID_NATIVE */
 
 /* vi: set ts=4 sw=4 expandtab: */

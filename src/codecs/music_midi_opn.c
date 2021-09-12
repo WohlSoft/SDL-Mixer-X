@@ -168,123 +168,73 @@ static void OPNMIDI_SetDefault(OpnMidi_Setup *setup)
     setup->gain = 2.0;
 }
 
-#endif
-
-
-int SDLCALLCC Mix_OPNMIDI_getVolumeModel()
+int _Mix_OPNMIDI_getVolumeModel(void)
 {
-#ifdef MUSIC_MID_OPNMIDI
     return opnmidi_setup.volume_model;
-#else
-    return -1;
-#endif
 }
 
-void SDLCALLCC Mix_OPNMIDI_setVolumeModel(int vm)
+void _Mix_OPNMIDI_setVolumeModel(int vm)
 {
-#ifdef MUSIC_MID_OPNMIDI
     opnmidi_setup.volume_model = vm;
     if (vm < 0) {
         opnmidi_setup.volume_model = 0;
     }
-#else
-    (void)vm;
-#endif
 }
 
-int SDLCALLCC Mix_OPNMIDI_getFullRangeBrightness()
+int _Mix_OPNMIDI_getFullRangeBrightness(void)
 {
-#ifdef MUSIC_MID_OPNMIDI
     return opnmidi_setup.full_brightness_range;
-#else
-    return -1;
-#endif
 }
 
-void SDLCALLCC Mix_OPNMIDI_setFullRangeBrightness(int frb)
+void _Mix_OPNMIDI_setFullRangeBrightness(int frb)
 {
-#ifdef MUSIC_MID_OPNMIDI
     opnmidi_setup.full_brightness_range = frb;
-#else
-    (void)frb;
-#endif
 }
 
-int SDLCALLCC Mix_OPNMIDI_getFullPanStereo()
+int _Mix_OPNMIDI_getFullPanStereo(void)
 {
-#ifdef MUSIC_MID_OPNMIDI
     return opnmidi_setup.soft_pan;
-#else
-    return -1;
-#endif
 }
 
-void SDLCALLCC Mix_OPNMIDI_setFullPanStereo(int fp)
+void _Mix_OPNMIDI_setFullPanStereo(int fp)
 {
-#ifdef MUSIC_MID_OPNMIDI
     opnmidi_setup.soft_pan = fp;
-#else
-    (void)fp;
-#endif
 }
 
-int SDLCALLCC Mix_OPNMIDI_getEmulator()
+int _Mix_OPNMIDI_getEmulator(void)
 {
-#ifdef MUSIC_MID_OPNMIDI
     return opnmidi_setup.emulator;
-#else
-    return -1;
-#endif
 }
 
-void SDLCALLCC Mix_OPNMIDI_setEmulator(int emu)
+void _Mix_OPNMIDI_setEmulator(int emu)
 {
-#ifdef MUSIC_MID_OPNMIDI
     opnmidi_setup.emulator = emu;
-#else
-    (void)emu;
-#endif
 }
 
-int SDLCALLCC Mix_OPNMIDI_getChipsCount()
+int _Mix_OPNMIDI_getChipsCount(void)
 {
-#ifdef MUSIC_MID_OPNMIDI
     return opnmidi_setup.chips_count;
-#else
-    return -1;
-#endif
 }
 
-void SDLCALLCC Mix_OPNMIDI_setChipsCount(int chips)
+void _Mix_OPNMIDI_setChipsCount(int chips)
 {
-#ifdef MUSIC_MID_OPNMIDI
     opnmidi_setup.chips_count = chips;
-#else
-    (void)chips;
-#endif
 }
 
-void SDLCALLCC Mix_OPNMIDI_setSetDefaults()
+void _Mix_OPNMIDI_setSetDefaults(void)
 {
-#ifdef MUSIC_MID_OPNMIDI
     OPNMIDI_SetDefault(&opnmidi_setup);
-#endif
 }
 
-void SDLCALLCC Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path)
+void _Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path)
 {
-#ifdef MUSIC_MID_OPNMIDI
     if (bank_wonp_path) {
         SDL_strlcpy(opnmidi_setup.custom_bank_path, bank_wonp_path, 2048);
     } else {
         opnmidi_setup.custom_bank_path[0] = '\0';
     }
-#else
-    (void)bank_wonp_path;
-#endif
 }
 
-#ifdef MUSIC_MID_OPNMIDI
 
 /* This structure supports OPNMIDI-based MIDI music streams */
 typedef struct
@@ -802,5 +752,46 @@ Mix_MusicInterface Mix_MusicInterface_OPNMIDI =
     OPNMIDI_Unload
 };
 
+/* Special case to play XMI/MUS formats */
+Mix_MusicInterface Mix_MusicInterface_OPNXMI =
+{
+    "OPNXMI",
+    MIX_MUSIC_OPNMIDI,
+    MUS_OPNMIDI,
+    SDL_FALSE,
+    SDL_FALSE,
+
+    OPNMIDI_Load,
+    NULL,   /* Open */
+    OPNMIDI_new_RW,
+    OPNMIDI_new_RWex,/* CreateFromRWex [MIXER-X]*/
+    NULL,   /* CreateFromFile */
+    NULL,   /* CreateFromFileEx [MIXER-X]*/
+    OPNMIDI_setvolume,
+    OPNMIDI_getvolume,   /* GetVolume [MIXER-X]*/
+    OPNMIDI_play,
+    NULL,   /* IsPlaying */
+    OPNMIDI_playAudio,
+    NULL,       /* Jump */
+    OPNMIDI_Seek,
+    OPNMIDI_Tell,   /* Tell [MIXER-X]*/
+    OPNMIDI_Duration,
+    OPNMIDI_SetTempo,   /* [MIXER-X] */
+    OPNMIDI_GetTempo,   /* [MIXER-X] */
+    OPNMIDI_GetTracksCount,   /* [MIXER-X] */
+    OPNMIDI_SetTrackMute,   /* [MIXER-X] */
+    OPNMIDI_LoopStart,   /* LoopStart [MIXER-X]*/
+    OPNMIDI_LoopEnd,   /* LoopEnd [MIXER-X]*/
+    OPNMIDI_LoopLength,   /* LoopLength [MIXER-X]*/
+    OPNMIDI_GetMetaTag,   /* GetMetaTag [MIXER-X]*/
+    NULL,   /* Pause */
+    NULL,   /* Resume */
+    NULL,   /* Stop */
+    OPNMIDI_delete,
+    NULL,   /* Close */
+    OPNMIDI_Unload
+};
+
 #endif /* MUSIC_MID_OPNMIDI */
 
+/* vi: set ts=4 sw=4 expandtab: */

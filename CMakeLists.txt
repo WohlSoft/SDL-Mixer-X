@@ -260,11 +260,6 @@ if(USE_MIDI)
         message_error("To have MIDI support you must enable at least one MIDI sequencer library")
     endif()
 else()
-    # Fallbacks to prevent undefined reference errors with giving of dummy calls
-    list(APPEND SDLMixerX_SOURCES
-        ${SDLMixerX_SOURCE_DIR}/src/codecs/music_midi_adl.c
-        ${SDLMixerX_SOURCE_DIR}/src/codecs/music_midi_opn.c
-    )
     message("== !!! MIDI SUPORT HAS BEEN DISABLED !!! ==")
 endif()
 

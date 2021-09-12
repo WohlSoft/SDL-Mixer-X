@@ -24,3 +24,28 @@
 #include "music.h"
 
 extern Mix_MusicInterface Mix_MusicInterface_OPNMIDI;
+extern Mix_MusicInterface Mix_MusicInterface_OPNXMI;
+
+#ifdef MUSIC_MID_OPNMIDI
+
+extern int _Mix_OPNMIDI_getVolumeModel(void);
+extern void _Mix_OPNMIDI_setVolumeModel(int vm);
+
+extern int _Mix_OPNMIDI_getFullRangeBrightness(void);
+extern void _Mix_OPNMIDI_setFullRangeBrightness(int frb);
+
+extern int _Mix_OPNMIDI_getFullPanStereo(void);
+extern void _Mix_OPNMIDI_setFullPanStereo(int fp);
+
+extern int _Mix_OPNMIDI_getEmulator(void);
+extern void _Mix_OPNMIDI_setEmulator(int emu);
+
+extern int _Mix_OPNMIDI_getChipsCount(void);
+extern void _Mix_OPNMIDI_setChipsCount(int chips);
+
+extern void _Mix_OPNMIDI_setSetDefaults(void);
+extern void _Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path);
+
+#endif /* MUSIC_MID_OPNMIDI */
+
+/* vi: set ts=4 sw=4 expandtab: */

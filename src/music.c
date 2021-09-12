@@ -194,6 +194,7 @@ static Mix_MusicInterface *s_music_interfaces[] =
 #endif
 #ifdef MUSIC_MID_OPNMIDI
     &Mix_MusicInterface_OPNMIDI,
+    &Mix_MusicInterface_OPNXMI,
 #endif
 #ifdef MUSIC_MP3_MAD
     &Mix_MusicInterface_MAD,
@@ -210,11 +211,17 @@ static Mix_MusicInterface *s_music_interfaces[] =
 #ifdef MUSIC_MID_FLUIDSYNTH
     &Mix_MusicInterface_FLUIDSYNTH,
 #endif
+#ifdef MUSIC_MID_FLUIDLITE
+    &Mix_MusicInterface_FLUIDXMI,
+#endif
 #ifdef MUSIC_MID_TIMIDITY
     &Mix_MusicInterface_TIMIDITY,
 #endif
 #ifdef MUSIC_MID_NATIVE
     &Mix_MusicInterface_NATIVEMIDI,
+#endif
+#ifdef MUSIC_MID_NATIVE_ALT
+    &Mix_MusicInterface_NATIVEXMI,
 #endif
 };
 
@@ -635,38 +642,57 @@ SDL_bool has_music(Mix_MusicType type)
     return SDL_FALSE;
 }
 
+#if defined(MUSIC_MID_ADLMIDI) || defined(MUSIC_MID_OPNMIDI) || defined(MUSIC_MID_NATIVE_ALT) || defined(MUSIC_MID_FLUIDLITE)
+#define MUSIC_HAS_XMI_SUPPORT
+#endif
+
 /*
     XMI and MUS are can be played on ADLMIDI or OPNMIDI only. Yet.
  */
-#if defined(MUSIC_MID_ADLMIDI) || defined(MUSIC_MID_OPNMIDI) || defined(MUSIC_MID_NATIVE_ALT)
+#if defined(MUSIC_HAS_XMI_SUPPORT)
 static Mix_MusicType xmi_compatible_midi_player()
 {
+    int is_compatible = 0;
+
 #if defined(MUSIC_MID_NATIVE_ALT)
     if (mididevice_current == MIDI_Native) {
-        return MUS_MID;
+        is_compatible |= 1;
+    }
+#endif
+
+#if defined(MUSIC_MID_ADLMIDI)
+    if (mididevice_current == MIDI_ADLMIDI) {
+        is_compatible |= 1;
+    }
+#endif
+
+#if defined(MUSIC_MID_OPNMIDI)
+    if (mididevice_current == MIDI_OPNMIDI) {
+        is_compatible |= 1;
     }
 #endif
 
 #if defined(MUSIC_MID_FLUIDLITE)
     if (mididevice_current == MIDI_Fluidsynth) {
-        return MUS_MID;
+        is_compatible |= 1;
     }
 #endif
 
-#if defined(MUSIC_MID_ADLMIDI) && defined(MUSIC_MID_OPNMIDI)
-    if ((mididevice_current != MIDI_ADLMIDI) && (mididevice_current != MIDI_OPNMIDI)) {
-        return MUS_ADLMIDI;
-    } else
-#elif defined(MUSIC_MID_OPNMIDI)
-    if (mididevice_current != MIDI_OPNMIDI) {
-        return MIDI_OPNMIDI;
-    } else
-#elif defined(MUSIC_MID_ADLMIDI)
-    if (mididevice_current != MIDI_ADLMIDI) {
-        return MUS_ADLMIDI;
-    } else
-#endif
+    if (is_compatible) {
         return MUS_MID;
+    } else {
+#if defined(MUSIC_MID_ADLMIDI)
+        return MUS_ADLMIDI;
+#elif defined(MUSIC_MID_OPNMIDI)
+        return MUS_OPNMIDI;
+#elif defined(MUSIC_MID_FLUIDLITE)
+        return MUS_FLUIDLITE;
+#elif defined(MUSIC_MID_NATIVE_ALT)
+        return MUS_NATIVEMIDI;
+#else
+        return MUS_NONE;
+#endif
+    }
 }
 #endif
 
@@ -877,7 +903,7 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
     if ((SDL_memcmp(magic, "RIFF", 4) == 0) && (SDL_memcmp(magic + 8, "RMID", 4) == 0)) {
         return MUS_MID;
     }
-#if defined(MUSIC_MID_ADLMIDI) || defined(MUSIC_MID_OPNMIDI) || defined(MUSIC_MID_NATIVE_ALT) || defined(MUSIC_MID_FLUIDLITE)
+#if defined(MUSIC_HAS_XMI_SUPPORT)
     if (SDL_memcmp(magic, "MUS\x1A", 4) == 0) {
         return xmi_compatible_midi_player();
     }
@@ -2311,6 +2337,315 @@ int SDLCALLCC Mix_SetMidiPlayer(int player)
 void SDLCALLCC Mix_SetLockMIDIArgs(int lock_midiargs)
 {
     mididevice_args_lock = lock_midiargs;
+}
+
+
+
+/* ADLMIDI module setup calls */
+
+int SDLCALLCC Mix_ADLMIDI_getTotalBanks(void)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    return _Mix_ADLMIDI_getTotalBanks();
+#endif
+    return 0;
+}
+
+const char *const * SDLCALLCC Mix_ADLMIDI_getBankNames()
+{
+#ifdef MUSIC_MID_ADLMIDI
+    return _Mix_ADLMIDI_getBankNames();
+#else
+    static const char *const empty[] = {"<no instruments>", NULL};
+    return empty;
+#endif
+}
+
+int SDLCALLCC Mix_ADLMIDI_getBankID(void)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    return _Mix_ADLMIDI_getBankID();
+#else
+    return 0;
+#endif
+}
+
+void SDLCALLCC Mix_ADLMIDI_setBankID(int bnk)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    _Mix_ADLMIDI_setBankID(bnk);
+#else
+    (void)bnk;
+#endif
+}
+
+int SDLCALLCC Mix_ADLMIDI_getTremolo(void)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    return _Mix_ADLMIDI_getTremolo();
+#else
+    return -1;
+#endif
+}
+void SDLCALLCC Mix_ADLMIDI_setTremolo(int tr)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    _Mix_ADLMIDI_setTremolo(tr);
+#else
+    (void)tr;
+#endif
+}
+
+int SDLCALLCC Mix_ADLMIDI_getVibrato(void)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    return _Mix_ADLMIDI_getVibrato();
+#else
+    return -1;
+#endif
+}
+
+void SDLCALLCC Mix_ADLMIDI_setVibrato(int vib)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    _Mix_ADLMIDI_setVibrato(vib);
+#else
+    (void)vib;
+#endif
+}
+
+int SDLCALLCC Mix_ADLMIDI_getScaleMod(void)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    return _Mix_ADLMIDI_getScaleMod();
+#else
+    return -1;
+#endif
+}
+
+void SDLCALLCC Mix_ADLMIDI_setScaleMod(int sc)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    _Mix_ADLMIDI_setScaleMod(sc);
+#else
+    (void)sc;
+#endif
+}
+
+int SDLCALLCC Mix_ADLMIDI_getVolumeModel(void)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    return _Mix_ADLMIDI_getVolumeModel();
+#else
+    return -1;
+#endif
+}
+
+void SDLCALLCC Mix_ADLMIDI_setVolumeModel(int vm)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    _Mix_ADLMIDI_setVolumeModel(vm);
+#else
+    (void)vm;
+#endif
+}
+
+int SDLCALLCC Mix_ADLMIDI_getFullRangeBrightness(void)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    return _Mix_ADLMIDI_getFullRangeBrightness();
+#else
+    return -1;
+#endif
+}
+
+void SDLCALLCC Mix_ADLMIDI_setFullRangeBrightness(int frb)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    _Mix_ADLMIDI_setFullRangeBrightness(frb);
+#else
+    (void)frb;
+#endif
+}
+
+int SDLCALLCC Mix_ADLMIDI_getFullPanStereo(void)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    return _Mix_ADLMIDI_getFullPanStereo();
+#else
+    return -1;
+#endif
+}
+
+void SDLCALLCC Mix_ADLMIDI_setFullPanStereo(int fp)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    _Mix_ADLMIDI_setFullPanStereo(fp);
+#else
+    (void)fp;
+#endif
+}
+
+int SDLCALLCC Mix_ADLMIDI_getEmulator(void)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    return _Mix_ADLMIDI_getEmulator();
+#else
+    return -1;
+#endif
+}
+
+void SDLCALLCC Mix_ADLMIDI_setEmulator(int emu)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    _Mix_ADLMIDI_setEmulator(emu);
+#else
+    (void)emu;
+#endif
+}
+
+int SDLCALLCC Mix_ADLMIDI_getChipsCount(void)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    return _Mix_ADLMIDI_getChipsCount();
+#else
+    return -1;
+#endif
+}
+
+void SDLCALLCC Mix_ADLMIDI_setChipsCount(int chips)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    _Mix_ADLMIDI_setChipsCount(chips);
+#else
+    (void)chips;
+#endif
+}
+
+void SDLCALLCC Mix_ADLMIDI_setSetDefaults(void)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    _Mix_ADLMIDI_setSetDefaults();
+#endif
+}
+
+void SDLCALLCC Mix_ADLMIDI_setCustomBankFile(const char *bank_wonl_path)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    _Mix_ADLMIDI_setCustomBankFile(bank_wonl_path);
+#else
+    (void)bank_wonl_path;
+#endif
+}
+
+
+
+/* OPNMIDI module setup calls */
+
+int SDLCALLCC Mix_OPNMIDI_getVolumeModel(void)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    return _Mix_OPNMIDI_getVolumeModel();
+#else
+    return -1;
+#endif
+}
+
+void SDLCALLCC Mix_OPNMIDI_setVolumeModel(int vm)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    _Mix_OPNMIDI_setVolumeModel(vm);
+#else
+    (void)vm;
+#endif
+}
+
+int SDLCALLCC Mix_OPNMIDI_getFullRangeBrightness(void)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    return _Mix_OPNMIDI_getFullRangeBrightness();
+#else
+    return -1;
+#endif
+}
+
+void SDLCALLCC Mix_OPNMIDI_setFullRangeBrightness(int frb)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    _Mix_OPNMIDI_setFullRangeBrightness(frb);
+#else
+    (void)frb;
+#endif
+}
+
+int SDLCALLCC Mix_OPNMIDI_getFullPanStereo(void)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    return _Mix_OPNMIDI_getFullPanStereo();
+#else
+    return -1;
+#endif
+}
+
+void SDLCALLCC Mix_OPNMIDI_setFullPanStereo(int fp)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    _Mix_OPNMIDI_setFullPanStereo(fp);
+#else
+    (void)fp;
+#endif
+}
+
+int SDLCALLCC Mix_OPNMIDI_getEmulator(void)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    return _Mix_OPNMIDI_getEmulator();
+#else
+    return -1;
+#endif
+}
+
+void SDLCALLCC Mix_OPNMIDI_setEmulator(int emu)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    _Mix_OPNMIDI_setEmulator(emu);
+#else
+    (void)emu;
+#endif
+}
+
+int SDLCALLCC Mix_OPNMIDI_getChipsCount(void)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    return _Mix_OPNMIDI_getChipsCount();
+#else
+    return -1;
+#endif
+}
+
+void SDLCALLCC Mix_OPNMIDI_setChipsCount(int chips)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    _Mix_OPNMIDI_setChipsCount(chips);
+#else
+    (void)chips;
+#endif
+}
+
+void SDLCALLCC Mix_OPNMIDI_setSetDefaults(void)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    _Mix_OPNMIDI_setSetDefaults();
+#endif
+}
+
+void SDLCALLCC Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    _Mix_OPNMIDI_setCustomBankFile(bank_wonp_path);
+#else
+    (void)bank_wonp_path;
+#endif
 }
 
 /* vi: set ts=4 sw=4 expandtab: */

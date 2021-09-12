@@ -27,5 +27,8 @@
 #include "music.h"
 
 extern Mix_MusicInterface Mix_MusicInterface_FLUIDSYNTH;
+#if defined(MUSIC_MID_FLUIDLITE)
+extern Mix_MusicInterface Mix_MusicInterface_FLUIDXMI;
+#endif
 
 /* vi: set ts=4 sw=4 expandtab: */
