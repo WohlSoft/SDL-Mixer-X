@@ -49,7 +49,6 @@ Music is therefore manipulated separately, except in post-processing hooks.
 * Mix_GetMusicPosition::            Get the time current position of music stream @b{[Mixer X]}
 * Mix_ModMusicStreamJumpToOrder::   Jump to a given order in mod music. Only for MOD music formats. @b{[Mixer X]}
 * Mix_MusicDuration::               Get the total time length of music stream @b{[Mixer X]}
-* Mix_GetMusicTotalTime::           Get the total time length of music stream @b{[Mixer X]}
 * Mix_GetMusicLoopStartTime::       Get the loop start time position of music stream @b{[Mixer X]}
 * Mix_GetMusicLoopEndTime::         Get the loop end time position of music stream @b{[Mixer X]}
 * Mix_GetMusicLoopLengthTime::      Get the loop time length of music stream @b{[Mixer X]}
@@ -1106,18 +1105,8 @@ WIP
 @subsection Mix_MusicDuration
 @findex Mix_MusicDuration
 
-WIP
-
-
-
-@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-@page
-@node Mix_GetMusicTotalTime
-@subsection Mix_GetMusicTotalTime
-@findex Mix_GetMusicTotalTime
-
 @noindent
-@code{double @b{Mix_GetMusicTotalTime}(Mix_Music *@var{music})}
+@code{double @b{Mix_MusicDuration}(Mix_Music *@var{music})}
 
 @table @var
 @item music
@@ -1125,7 +1114,7 @@ A pointer to current music stream
 @end table
 
 @noindent
-Get the time current position of music stream. It only works on some of music sources listed in table shown in description of @ref{Mix_SetMusicPosition} function.
+Get the full duration time of music stream. It only works on some of music sources listed in table shown in description of @ref{Mix_SetMusicPosition} function.
 
 @noindent
 @b{Returns}: seconds value of current music total length or -1.0 if this feature is not supported for some codec
@@ -1135,6 +1124,7 @@ Get the time current position of music stream. It only works on some of music so
 @ref{Mix_FadeInMusicPos}
 @ref{Mix_GetMusicPosition}
 @ref{Mix_SetMusicPosition}
+
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
