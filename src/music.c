@@ -2572,6 +2572,12 @@ int SDLCALLCC Mix_GetVolumeMusicStream(Mix_Music *music)
 void SDLCALLCC Mix_VolumeMusicGeneral(int volume)
 {
     Mix_LockAudio();
+    if (volume < 0) {
+        volume = 0;
+    }
+    if (volume > SDL_MIX_MAXVOLUME) {
+        volume = SDL_MIX_MAXVOLUME;
+    }
     music_general_volume = volume;
     Mix_UnlockAudio();
 }
