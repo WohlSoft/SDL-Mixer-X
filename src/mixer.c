@@ -922,10 +922,16 @@ void SDLCALLCC Mix_SetPostMix(void (SDLCALL *mix_func)
 }
 
 
-/* returns a pointer to the music mixer that can be used as a callback */
+/* returns a pointer to the single-music mixer that can be used as a callback */
 common_mixer SDLCALLCC Mix_GetMusicMixer(void)
 {
     return mix_music;
+}
+
+/* returns a pointer to the multi-music mixer that can be used as a callback */
+common_mixer SDLCALLCC Mix_GetMultiMusicMixer(void)
+{
+    return mix_multi_music;
 }
 
 /* Add your own music player or mixer function.

@@ -861,8 +861,10 @@ extern DECLSPEC int SDLCALL Mix_PlayMusic(Mix_Music *music, int loops);
 #define Mix_PlayChannelVol(channel,chunk,loops,vol) Mix_PlayChannelTimedVolume(channel,chunk,loops,-1,vol)/*MIXER-X*/
 extern DECLSPEC int SDLCALL Mix_PlayChannelTimedVolume(int which, Mix_Chunk *chunk, int loops, int ticks, int volume);/*MIXER-X*/
 
-/* returns a pointer to the music mixer that can be used as a callback */
+/* returns a pointer to the single-music mixer that can be used as a callback */
 extern DECLSPEC common_mixer SDLCALL Mix_GetMusicMixer(void);
+/* returns a pointer to the multi-music mixer that can be used as a callback */
+extern DECLSPEC common_mixer SDLCALL Mix_GetMultiMusicMixer(void);
 
 /* Fade in music or a channel over "ms" milliseconds, same semantics as the "Play" functions */
 extern DECLSPEC int SDLCALL Mix_FadeInMusic(Mix_Music *music, int loops, int ms);
