@@ -398,8 +398,7 @@ extern DECLSPEC void SDLCALL Mix_ChannelFinished(void (SDLCALL *channel_finished
  */
 typedef void (SDLCALL *Mix_EffectFunc_t)(int chan, void *stream, int len, void *udata);
 
-
-typedef void (SDLCALL *common_mixer)(void *udata, Uint8 *stream, int len);
+typedef void (SDLCALL *Mix_CommonMixer_t)(void *udata, Uint8 *stream, int len);
 
 /*
  * This is a callback that signifies that a channel has finished all its
@@ -690,7 +689,7 @@ extern DECLSPEC int SDLCALL Mix_PlayMusic(Mix_Music *music, int loops);
 extern DECLSPEC int SDLCALL Mix_PlayChannelTimedVolume(int which, Mix_Chunk *chunk, int loops, int ticks, int volume);/*MIXER-X*/
 
 /* returns a pointer to the music mixer that can be used as a callback */
-extern DECLSPEC common_mixer SDLCALL Mix_GetMusicMixer();
+extern DECLSPEC Mix_CommonMixer_t SDLCALL Mix_GetMusicMixer();
 
 /* Fade in music or a channel over "ms" milliseconds, same semantics as the "Play" functions */
 extern DECLSPEC int SDLCALL Mix_FadeInMusic(Mix_Music *music, int loops, int ms);

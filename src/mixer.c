@@ -80,7 +80,7 @@ static void *mix_postmix_data = NULL;
 static void (SDLCALL *channel_done_callback)(int channel) = NULL;
 
 /* Support for user defined music functions */
-static void (SDLCALL *mix_music)(void *udata, Uint8 *stream, int len) = music_mixer;
+static Mix_CommonMixer_t mix_music = music_mixer;
 static void *music_data = NULL;
 
 /* rcg06042009 report available decoders at runtime. */
@@ -250,7 +250,7 @@ static void *Mix_DoEffects(int chan, void *snd, int len)
 
 
 /* Mixing function */
-static void MIXSDLCALL
+static void SDLCALL
 mix_channels(void *udata, Uint8 *stream, int len)
 {
     Uint8 *mix_input;
@@ -375,7 +375,7 @@ static void PrintFormat(char *title, SDL_AudioSpec *fmt)
 #endif
 
 /* Cleanup the existing  */
-static SDL_bool MIXSDLCALL
+static SDL_bool SDLCALL
 is_already_initialized(const SDL_AudioSpec spec)
 {
     /* assume false until proven otherwise */
@@ -908,8 +908,8 @@ void SDLCALLCC Mix_SetPostMix(void (SDLCALL *mix_func)
 }
 
 
-/* returns a pointer to the music mixer that can be used as a callback */
-common_mixer SDLCALLCC Mix_GetMusicMixer()
+/* returns a pointer to the single-music mixer that can be used as a callback */
+Mix_CommonMixer_t SDLCALLCC Mix_GetMusicMixer(void)
 {
     return mix_music;
 }
