@@ -380,7 +380,7 @@ static void PrintFormat(char *title, SDL_AudioSpec *fmt)
 
 /* Cleanup the existing  */
 static SDL_bool SDLCALL
-is_already_initialized(const SDL_AudioSpec spec)
+is_already_initialized(const SDL_AudioSpec *spec)
 {
     /* assume false until proven otherwise */
     SDL_bool initialized_state = SDL_FALSE;
@@ -388,7 +388,7 @@ is_already_initialized(const SDL_AudioSpec spec)
     /* If the mixer is already initialized ... */
     if (audio_opened) {
         /* ... with our desired spec, then we're initialized */
-        if (spec.format == mixer.format && spec.channels == mixer.channels) {
+        if (spec->format == mixer.format && spec->channels == mixer.channels) {
             ++audio_opened;
             initialized_state = SDL_TRUE;
         }
@@ -407,15 +407,20 @@ is_already_initialized(const SDL_AudioSpec spec)
    Allows the calling to use their spec and audio callback.
    The caller must manage AudioOpen and CloseAudio externally.
 */
-int SDLCALLCC Mix_InitMixer(const SDL_AudioSpec spec, SDL_bool skip_init_check)
+int SDLCALLCC Mix_InitMixer(const SDL_AudioSpec *spec, SDL_bool skip_init_check)
 {
     int i;
+
+    if (!spec) {
+        return(-1);
+    }
 
     /* Check if we can skip initalization */
     if (!skip_init_check && is_already_initialized(spec)) {
         return(0);
     }
-    mixer = spec;
+
+    SDL_memcpy(&mixer, spec, sizeof(SDL_AudioSpec));
 
 #if 0
     PrintFormat("Audio device", &mixer);
@@ -477,14 +482,16 @@ int SDLCALLCC Mix_OpenAudioDevice(int frequency, Uint16 format, int nchannels, i
     desired.userdata = NULL;
 
     /* Check if we can skip initalization */
-    if (is_already_initialized(desired)) return(0);
+    if (is_already_initialized(&desired)) {
+        return(0);
+    }
 
     /* Accept nearly any audio format */
     if ((audio_device = SDL_OpenAudioDevice(device, 0, &desired, &mixer, allowed_changes)) == 0) {
         return(-1);
     }
 
-    Mix_InitMixer(mixer, SDL_TRUE);
+    Mix_InitMixer(&mixer, SDL_TRUE);
     SDL_PauseAudioDevice(audio_device, 0);
     return(0);
 }
