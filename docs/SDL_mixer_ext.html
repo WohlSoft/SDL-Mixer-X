@@ -3668,7 +3668,7 @@ Music is therefore manipulated separately, except in post-processing hooks.
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fGetMusicDecoder">5.5.2 Mix_GetMusicDecoder</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">      Name of enumerated music format type decoder
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fHasMusicDecoder">5.5.3 Mix_HasMusicDecoder</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">      Check if the specific music decodec is abailable by name in this build
+<tr><td align="left" valign="top"><a href="#Mix_005fHasMusicDecoder">5.5.3 Mix_HasMusicDecoder</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">      Check if the specific music decoder is abailable by name in this build
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fLoadMUS">5.5.4 Mix_LoadMUS</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">              Load a music file into a Mix_Music
 </td></tr>
@@ -4040,7 +4040,24 @@ for(i=0; i&lt;max; ++i)
 <h3 class="subsection">5.5.3 Mix_HasMusicDecoder</h3>
 <a name="index-Mix_005fHasMusicDecoder"></a>
 
-<p>WIP
+<p><code>SDL_bool <b>Mix_HasMusicDecoder</b>(const char *<var>name</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>name</var></dt>
+<dd><p>The decoder name to check it&rsquo;s presence.
+</p></dd>
+</dl>
+
+<p>Check if the music decoder named as <var>name</var> presented in this library build.
+</p>
+<p><b>Returns</b>: <code>SDL_TRUE</code> if the requested codec name is available in this library build or <code>SDL_FALSE</code> if not.
+</p>
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fMusic">Mix_Music</a>,
+<a href="#Mix_005fSetMusicCMD">Mix_SetMusicCMD</a>,
+<a href="#Mix_005fPlayMusic">Mix_PlayMusic</a>,
+<a href="#Mix_005fFadeInMusic">Mix_FadeInMusic</a>,
+<a href="#Mix_005fFadeInMusicPos">Mix_FadeInMusicPos</a>
 </p>
 
 
@@ -5057,7 +5074,41 @@ if(Mix_FadeInMusicPos(music, -1, 2000)==-1) {
 <h3 class="subsection">5.5.20 Mix_VolumeMusicStream</h3>
 <a name="index-Mix_005fVolumeMusicStream"></a>
 
-<p>WIP
+<p><code>int <b>Mix_VolumeMusicStream</b>(Mix_Music *<var>music</var>, int <var>volume</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>Music to set the volume.
+</p></dd>
+<dt> <var>volume</var></dt>
+<dd><p>Music volume, from 0 to <b>MIX_MAX_VOLUME</b>(128).<br>
+Values greater than <b>MIX_MAX_VOLUME</b> will use <b>MIX_MAX_VOLUME</b>.<br>
+-1 does not set the volume, but does return the current volume setting.
+</p></dd>
+</dl>
+
+<p>Set the volume to <var>volume</var>, if it is 0 or greater, and return the previous volume setting.
+Setting the volume during a fade will not work, the faders use this function to perform their effect!
+Setting volume while using an external music player set by <code>Mix_SetMusicCMD</code> will have no effect,
+and <code>Mix_GetError</code> will show the reason why not.
+</p>
+<p><b>Returns</b>: The previous volume setting.
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">// set the music volume to 1/2 maximum, and then check it
+printf(&quot;volume was    : %d\n&quot;, Mix_VolumeMusicStream(someMusic, MIX_MAX_VOLUME/2));
+printf(&quot;volume is now : %d\n&quot;, Mix_GetVolumeMusicStream(someMusic));
+</pre></td></tr></table>
+</td></tr></table>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fGetMusicVolume">Mix_GetMusicVolume</a>,
+<a href="#Mix_005fGetVolumeMusicStream">Mix_GetVolumeMusicStream</a>,
+<a href="#Mix_005fVolumeMusicGeneral">Mix_VolumeMusicGeneral</a>,
+<a href="#Mix_005fGetVolumeMusicGeneral">Mix_GetVolumeMusicGeneral</a>,
+<a href="#Mix_005fFadeInMusicStream">Mix_FadeInMusicStream</a>,
+<a href="#Mix_005fFadeOutMusicStream">Mix_FadeOutMusicStream</a>,
+<a href="#Mix_005fSetMusicCMD">Mix_SetMusicCMD</a>
 </p>
 
 
@@ -5083,9 +5134,27 @@ if(Mix_FadeInMusicPos(music, -1, 2000)==-1) {
 <h3 class="subsection">5.5.21 Mix_GetMusicVolume</h3>
 <a name="index-Mix_005fGetMusicVolume"></a>
 
-<p>WIP
+<p><code>int <b>Mix_GetMusicVolume</b>(Mix_Music *<var>music</var>)</code>
 </p>
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>Music to get the volume.
+</p></dd>
+</dl>
 
+<p>Get the current volume set on the <var>music</var>.
+</p>
+<p><b>Returns</b>: The current volume setting set on the <var>music</var>.
+</p>
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fGetVolumeMusicStream">Mix_GetVolumeMusicStream</a>,
+<a href="#Mix_005fVolumeMusicStream">Mix_VolumeMusicStream</a>,
+<a href="#Mix_005fVolumeMusicGeneral">Mix_VolumeMusicGeneral</a>,
+<a href="#Mix_005fGetVolumeMusicGeneral">Mix_GetVolumeMusicGeneral</a>,
+<a href="#Mix_005fFadeInMusicStream">Mix_FadeInMusicStream</a>,
+<a href="#Mix_005fFadeOutMusicStream">Mix_FadeOutMusicStream</a>,
+<a href="#Mix_005fSetMusicCMD">Mix_SetMusicCMD</a>
+</p>
 
 
 <hr size="6">
@@ -5110,8 +5179,28 @@ if(Mix_FadeInMusicPos(music, -1, 2000)==-1) {
 <h3 class="subsection">5.5.22 Mix_GetVolumeMusicStream</h3>
 <a name="index-Mix_005fGetVolumeMusicStream"></a>
 
-<p>WIP
+<p><code>int <b>Mix_GetVolumeMusicStream</b>(Mix_Music *<var>music</var>)</code>
 </p>
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>Music to get the volume.
+</p></dd>
+</dl>
+
+<p>Get the current volume set on the <var>music</var>. This is an alias to the <a href="#Mix_005fGetMusicVolume">Mix_GetMusicVolume</a> function.
+</p>
+<p><b>Returns</b>: The current volume setting set on the <var>music</var>.
+</p>
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fGetMusicVolume">Mix_GetMusicVolume</a>,
+<a href="#Mix_005fVolumeMusicStream">Mix_VolumeMusicStream</a>,
+<a href="#Mix_005fVolumeMusicGeneral">Mix_VolumeMusicGeneral</a>,
+<a href="#Mix_005fGetVolumeMusicGeneral">Mix_GetVolumeMusicGeneral</a>,
+<a href="#Mix_005fFadeInMusicStream">Mix_FadeInMusicStream</a>,
+<a href="#Mix_005fFadeOutMusicStream">Mix_FadeOutMusicStream</a>,
+<a href="#Mix_005fSetMusicCMD">Mix_SetMusicCMD</a>
+</p>
+
 
 
 <hr size="6">
@@ -5136,7 +5225,25 @@ if(Mix_FadeInMusicPos(music, -1, 2000)==-1) {
 <h3 class="subsection">5.5.23 Mix_VolumeMusicGeneral</h3>
 <a name="index-Mix_005fVolumeMusicGeneral"></a>
 
-<p>WIP
+<p><code>void <b>Mix_VolumeMusicGeneral</b>(int <var>volume</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>volume</var></dt>
+<dd><p>General multi-stream music volume, from 0 to <b>MIX_MAX_VOLUME</b>(128).<br>
+Values greater than <b>MIX_MAX_VOLUME</b> will use <b>MIX_MAX_VOLUME</b>.<br>
+</p></dd>
+</dl>
+
+<p>Set the general multi-stream music volume to <var>volume</var>, if it is 0 or greater.
+Setting volume while using an external music player set by <code>Mix_SetMusicCMD</code> will have no effect.
+</p>
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fGetMusicVolume">Mix_GetMusicVolume</a>,
+<a href="#Mix_005fVolumeMusicStream">Mix_VolumeMusicStream</a>,
+<a href="#Mix_005fGetVolumeMusicGeneral">Mix_GetVolumeMusicGeneral</a>,
+<a href="#Mix_005fFadeInMusicStream">Mix_FadeInMusicStream</a>,
+<a href="#Mix_005fFadeOutMusicStream">Mix_FadeOutMusicStream</a>,
+<a href="#Mix_005fSetMusicCMD">Mix_SetMusicCMD</a>
 </p>
 
 
@@ -5162,9 +5269,20 @@ if(Mix_FadeInMusicPos(music, -1, 2000)==-1) {
 <h3 class="subsection">5.5.24 Mix_GetVolumeMusicGeneral</h3>
 <a name="index-Mix_005fGetVolumeMusicGeneral"></a>
 
-<p>WIP
+<p><code>int <b>Mix_GetVolumeMusicGeneral</b>()</code>
 </p>
-
+<p>Get the current general multi-stream music volume.
+</p>
+<p><b>Returns</b>: The current general multi-stream music volume.
+</p>
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fGetMusicVolume">Mix_GetMusicVolume</a>,
+<a href="#Mix_005fVolumeMusicStream">Mix_VolumeMusicStream</a>,
+<a href="#Mix_005fVolumeMusicGeneral">Mix_VolumeMusicGeneral</a>,
+<a href="#Mix_005fFadeInMusicStream">Mix_FadeInMusicStream</a>,
+<a href="#Mix_005fFadeOutMusicStream">Mix_FadeOutMusicStream</a>,
+<a href="#Mix_005fSetMusicCMD">Mix_SetMusicCMD</a>
+</p>
 
 
 <hr size="6">
@@ -5189,8 +5307,29 @@ if(Mix_FadeInMusicPos(music, -1, 2000)==-1) {
 <h3 class="subsection">5.5.25 Mix_PauseMusicStream</h3>
 <a name="index-Mix_005fPauseMusicStream"></a>
 
-<p>WIP
+<p><code>void <b>Mix_PauseMusicStream</b>(Mix_Music *<var>music</var>)</code>
 </p>
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>Music to pause.
+</p></dd>
+</dl>
+
+<p>Pause the <var>music</var> playback.  You may halt paused music.<br>
+<b>Note</b>: Music can only be paused if it is actively playing.
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">// pause music playback
+Mix_PauseMusicStream(music);
+</pre></td></tr></table>
+</td></tr></table>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fResumeMusicStream">Mix_ResumeMusicStream</a>,
+<a href="#Mix_005fPausedMusicStream">Mix_PausedMusicStream</a>,
+<a href="#Mix_005fHaltMusicStream">Mix_HaltMusicStream</a>
+</p>
+
 
 <hr size="6">
 <a name="Mix_005fPauseMusicStreamAll"></a>
@@ -5214,8 +5353,24 @@ if(Mix_FadeInMusicPos(music, -1, 2000)==-1) {
 <h3 class="subsection">5.5.26 Mix_PauseMusicStreamAll</h3>
 <a name="index-Mix_005fPauseMusicStreamAll"></a>
 
-<p>WIP
+<p><code>void <b>Mix_PauseMusicStreamAll</b>()</code>
 </p>
+<p>Pause all multi-stream music playback.  You may halt any paused music.<br>
+<b>Note</b>: Music can only be paused if it is actively playing.
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">// pause music playback
+Mix_PauseMusicStreamAll();
+</pre></td></tr></table>
+</td></tr></table>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fResumeMusicStream">Mix_ResumeMusicStream</a>,
+<a href="#Mix_005fPausedMusicStream">Mix_PausedMusicStream</a>,
+<a href="#Mix_005fHaltMusicStream">Mix_HaltMusicStream</a>
+</p>
+
+
 
 <hr size="6">
 <a name="Mix_005fResumeMusicStream"></a>
@@ -5239,8 +5394,28 @@ if(Mix_FadeInMusicPos(music, -1, 2000)==-1) {
 <h3 class="subsection">5.5.27 Mix_ResumeMusicStream</h3>
 <a name="index-Mix_005fResumeMusicStream"></a>
 
-<p>WIP
+<p><code>void <b>Mix_ResumeMusicStream</b>(Mix_Music *<var>music</var>)</code>
 </p>
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>Paused music to resume.
+</p></dd>
+</dl>
+
+<p>Unpause the <var>music</var>. This is safe to use on halted, paused, and already playing music.
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">// resume music playback
+Mix_ResumeMusicStream(music);
+</pre></td></tr></table>
+</td></tr></table>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fPauseMusicStream">Mix_PauseMusicStream</a>,
+<a href="#Mix_005fPausedMusicStream">Mix_PausedMusicStream</a>,
+<a href="#Mix_005fHaltMusicStream">Mix_HaltMusicStream</a>
+</p>
+
 
 <hr size="6">
 <a name="Mix_005fResumeMusicStreamAll"></a>
@@ -5264,8 +5439,24 @@ if(Mix_FadeInMusicPos(music, -1, 2000)==-1) {
 <h3 class="subsection">5.5.28 Mix_ResumeMusicStreamAll</h3>
 <a name="index-Mix_005fResumeMusicStreamAll"></a>
 
-<p>WIP
+
+<p><code>void <b>Mix_ResumeMusicStreamAll</b>()</code>
 </p>
+<p>Unpause all multi-stream music. This is safe to use on halted, paused, and already playing music.
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">// resume music playback
+Mix_ResumeMusicStreamAll();
+</pre></td></tr></table>
+</td></tr></table>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fResumeMusicStream">Mix_ResumeMusicStream</a>,
+<a href="#Mix_005fPausedMusicStream">Mix_PausedMusicStream</a>,
+<a href="#Mix_005fHaltMusicStream">Mix_HaltMusicStream</a>
+</p>
+
+
 
 <hr size="6">
 <a name="Mix_005fRewindMusicStream"></a>
@@ -5289,7 +5480,26 @@ if(Mix_FadeInMusicPos(music, -1, 2000)==-1) {
 <h3 class="subsection">5.5.29 Mix_RewindMusicStream</h3>
 <a name="index-Mix_005fRewindMusicStream"></a>
 
-<p>WIP
+<p><code>void <b>Mix_RewindMusicStream</b>(Mix_Music *<var>music</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>Music to rewind.
+</p></dd>
+</dl>
+
+<p>Rewind the music to the start.  This is safe to use on halted, paused, and already playing music.  It is not useful to rewind the music immediately after starting playback, because it starts at the beginning by default.
+</p>
+<p>This function only works for streams that supports the seekability.
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">// rewind music playback to the start
+Mix_RewindMusicStream(music);
+</pre></td></tr></table>
+</td></tr></table>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fPlayMusicStream">Mix_PlayMusicStream</a>
 </p>
 
 
@@ -5317,7 +5527,65 @@ if(Mix_FadeInMusicPos(music, -1, 2000)==-1) {
 <h3 class="subsection">5.5.30 Mix_SetMusicStreamPosition</h3>
 <a name="index-Mix_005fSetMusicStreamPosition"></a>
 
-<p>WIP
+<p><code>int <b>Mix_SetMusicStreamPosition</b>(Mix_Music *<var>music</var>, double <var>position</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>Music to change the position.
+</p></dd>
+<dt> <var>position</var></dt>
+<dd><p>Posistion to play from in seconds.
+</p></dd>
+</dl>
+
+<p>Set the position of the <var>music</var>.
+The <var>position</var> takes different meanings for different music sources.
+It only works on the music sources listed below.
+</p>
+<dl compact="compact">
+<dt> <b>WAV</b></dt>
+<dd><p>Jumps to <var>position</var> seconds from the beginning of the song.
+</p></dd>
+<dt> <b>MOD</b></dt>
+<dd><p><b>ModPlug or XMP</b>: Jumps to <var>position</var> seconds from the beginning of the song.
+<b>Mikmod</b>: The double is cast to Uint16 and used for a pattern number in the module.<br>
+Passing zero is similar to rewinding the song.
+</p></dd>
+<dt> <b>OGG</b></dt>
+<dd><p>Jumps to <var>position</var> seconds from the beginning of the song.
+</p></dd>
+<dt> <b>OPUS</b></dt>
+<dd><p>Jumps to <var>position</var> seconds from the beginning of the song.
+</p></dd>
+<dt> <b>FLAC</b></dt>
+<dd><p>Jumps to <var>position</var> seconds from the beginning of the song.
+</p></dd>
+<dt> <b>MP3</b></dt>
+<dd><p>Jumps to <var>position</var> seconds from the beginning of the song.
+</p></dd>
+<dt> <b>GME</b></dt>
+<dd><p>Jumps to <var>position</var> seconds from the beginning of the song.
+</p></dd>
+<dt> <b>MIDI</b></dt>
+<dd><p>Works for <b>libADLMIDI</b> and <b>libOPNMIDI</b>. Doesn&rsquo;t works for <b>Timidity</b>, <b>FluidSynth</b>, and <b>NativeMIDI</b>.
+Jumps to <var>position</var> seconds from the beginning of the song.
+</p></dd>
+</dl>
+
+<p><b>Returns</b>: 0 on success, or -1 if the codec doesn&rsquo;t support this function.
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">// skip one minute into the song, from the start
+if(Mix_SetMusicStreamPosition(music, 60.0)==-1) {
+    printf(&quot;Mix_SetMusicStreamPosition: %s\n&quot;, Mix_GetError());
+}
+</pre></td></tr></table>
+</td></tr></table>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fFadeInMusicStreamPos">Mix_FadeInMusicStreamPos</a>
+<a href="#Mix_005fGetMusicPosition">Mix_GetMusicPosition</a>
+<a href="#Mix_005fMusicDuration">Mix_MusicDuration</a>
 </p>
 
 
@@ -5356,8 +5624,8 @@ if(Mix_FadeInMusicPos(music, -1, 2000)==-1) {
 <p><b>Returns</b>: seconds value of current music position or -1.0 if this feature is not supported for some codec
 </p>
 <p><b>See Also</b>:<br>
-<a href="#Mix_005fFadeInMusicPos">Mix_FadeInMusicPos</a>
-<a href="#Mix_005fSetMusicPosition">Mix_SetMusicPosition</a>
+<a href="#Mix_005fFadeInMusicStreamPos">Mix_FadeInMusicStreamPos</a>
+<a href="#Mix_005fSetMusicStreamPosition">Mix_SetMusicStreamPosition</a>
 <a href="#Mix_005fMusicDuration">Mix_MusicDuration</a>
 </p>
 
@@ -5385,9 +5653,26 @@ if(Mix_FadeInMusicPos(music, -1, 2000)==-1) {
 <h3 class="subsection">5.5.32 Mix_ModMusicStreamJumpToOrder</h3>
 <a name="index-Mix_005fModMusicStreamJumpToOrder"></a>
 
-<p>WIP
+<p><code>int <b>Mix_ModMusicStreamJumpToOrder</b>(Mix_Music *<var>music</var>, int <var>order</var>)</code>
 </p>
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>Music to change the position.
+</p></dd>
+<dt> <var>order</var></dt>
+<dd><p>A pattern number in the module.
+</p></dd>
+</dl>
 
+<p>Jump to a given order in mod music. Only for MOD music formats.
+</p>
+<p><b>Returns</b>: 0 if successful, or -1 if failed or isn&rsquo;t implemented.
+</p>
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fFadeInMusicStreamPos">Mix_FadeInMusicStreamPos</a>
+<a href="#Mix_005fSetMusicStreamPosition">Mix_SetMusicStreamPosition</a>
+<a href="#Mix_005fMusicDuration">Mix_MusicDuration</a>
+</p>
 
 
 <hr size="6">
@@ -5573,7 +5858,26 @@ if(Mix_FadeInMusicPos(music, -1, 2000)==-1) {
 <h3 class="subsection">5.5.37 Mix_SetMusicTempo</h3>
 <a name="index-Mix_005fSetMusicTempo"></a>
 
-<p>WIP
+<p><code>int <b>Mix_SetMusicTempo</b>(Mix_Music *<var>music</var>, double <var>tempo</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>Music to change the tempo.
+</p></dd>
+<dt> <var>tempo</var></dt>
+<dd><p>Tempo multiplier. Setting value into the 1.0 will reset the tempo into default.
+</p></dd>
+</dl>
+
+<p>Set the current tempo multiplier in the music stream.
+</p>
+<p><b>Returns</b>: 0 if successful, or -1 if failed or isn&rsquo;t implemented.
+</p>
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fGetMusicTempo">Mix_GetMusicTempo</a>
+<a href="#Mix_005fFadeInMusicStreamPos">Mix_FadeInMusicStreamPos</a>
+<a href="#Mix_005fSetMusicStreamPosition">Mix_SetMusicStreamPosition</a>
+<a href="#Mix_005fMusicDuration">Mix_MusicDuration</a>
 </p>
 
 
@@ -5599,7 +5903,23 @@ if(Mix_FadeInMusicPos(music, -1, 2000)==-1) {
 <h3 class="subsection">5.5.38 Mix_GetMusicTempo</h3>
 <a name="index-Mix_005fGetMusicTempo"></a>
 
-<p>WIP
+<p><code>double <b>Mix_GetMusicTempo</b>(Mix_Music *<var>music</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>Music to get the tempo.
+</p></dd>
+</dl>
+
+<p>Returns the current tempo multiplier of the music stream.
+</p>
+<p><b>Returns</b>: positive value if successful, or -1.0 if failed or isn&rsquo;t implemented.
+</p>
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fSetMusicTempo">Mix_SetMusicTempo</a>
+<a href="#Mix_005fFadeInMusicStreamPos">Mix_FadeInMusicStreamPos</a>
+<a href="#Mix_005fSetMusicStreamPosition">Mix_SetMusicStreamPosition</a>
+<a href="#Mix_005fMusicDuration">Mix_MusicDuration</a>
 </p>
 
 
@@ -5626,7 +5946,23 @@ if(Mix_FadeInMusicPos(music, -1, 2000)==-1) {
 <h3 class="subsection">5.5.39 Mix_GetMusicTracks</h3>
 <a name="index-Mix_005fGetMusicTracks"></a>
 
-<p>WIP
+<p><code>int <b>Mix_GetMusicTracks</b>(Mix_Music *<var>music</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>Music to get the number of tracks/channels.
+</p></dd>
+</dl>
+
+<p>Get the count of concurrently playing tracks at the song (MIDI, Tracker, Chiptune, etc.)
+</p>
+<p><b>Returns</b>: count of tracks/channels if successful, or -1 if failed or isn&rsquo;t implemented.
+</p>
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fSetMusicTrackMute">Mix_SetMusicTrackMute</a>
+<a href="#Mix_005fFadeInMusicStreamPos">Mix_FadeInMusicStreamPos</a>
+<a href="#Mix_005fSetMusicStreamPosition">Mix_SetMusicStreamPosition</a>
+<a href="#Mix_005fMusicDuration">Mix_MusicDuration</a>
 </p>
 
 
@@ -5653,7 +5989,29 @@ if(Mix_FadeInMusicPos(music, -1, 2000)==-1) {
 <h3 class="subsection">5.5.40 Mix_SetMusicTrackMute</h3>
 <a name="index-Mix_005fSetMusicTrackMute"></a>
 
-<p>WIP
+<p><code>int <b>Mix_GetMusicTracks</b>(Mix_Music *<var>music</var>, int <var>track</var>, int <var>mute</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>Music to get the number of tracks/channels.
+</p></dd>
+<dt> <var>track</var></dt>
+<dd><p>Track/Channel number to mute
+</p></dd>
+<dt> <var>mute</var></dt>
+<dd><p>The mute state: 1 mute, 0 unmute
+</p></dd>
+</dl>
+
+<p>Mute one of playing tracks (or channels) at the song (MIDI, Tracker, Chiptune, etc.)
+</p>
+<p><b>Returns</b>: 0 if successful, or -1 if failed or isn&rsquo;t implemented.
+</p>
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fGetMusicTracks">Mix_GetMusicTracks</a>
+<a href="#Mix_005fFadeInMusicStreamPos">Mix_FadeInMusicStreamPos</a>
+<a href="#Mix_005fSetMusicStreamPosition">Mix_SetMusicStreamPosition</a>
+<a href="#Mix_005fMusicDuration">Mix_MusicDuration</a>
 </p>
 
 
@@ -5741,7 +6099,9 @@ if(Mix_SetMusicCMD(&quot;mpg123 -q&quot;)==-1) {
 <h3 class="subsection">5.5.42 Mix_GetSynchroValue</h3>
 <a name="index-Mix_005fGetSynchroValue"></a>
 
-<p>WIP
+<p><code>int <b>Mix_GetSynchroValue</b>()</code>
+</p>
+<p>Not supported by any players at this time.
 </p>
 
 
@@ -5767,7 +6127,9 @@ if(Mix_SetMusicCMD(&quot;mpg123 -q&quot;)==-1) {
 <h3 class="subsection">5.5.43 Mix_SetSynchroValue</h3>
 <a name="index-Mix_005fSetSynchroValue"></a>
 
-<p>WIP
+<p><code>int <b>Mix_SetSynchroValue</b>(int <var>value</var>)</code>
+</p>
+<p>Not supported by any players at this time.
 </p>
 
 
@@ -5794,8 +6156,21 @@ if(Mix_SetMusicCMD(&quot;mpg123 -q&quot;)==-1) {
 <h3 class="subsection">5.5.44 Mix_SetMusicFileName</h3>
 <a name="index-Mix_005fSetMusicFileName"></a>
 
-<p>WIP
+<p><code>void <b>Mix_SetMusicFileName</b>(Mix_Music *<var>music</var>, const char *<var>file</var>)</code>
 </p>
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>The music to change the reported filename.
+</p></dd>
+<dt> <var>file</var></dt>
+<dd><p>The file name or file path.
+</p></dd>
+</dl>
+
+<p>Change the filename reported by the <a href="#Mix_005fGetMusicTitle">Mix_GetMusicTitle</a> function in a case when
+the actual title tag is not specified in the file.
+</p>
+
 
 
 
@@ -6015,8 +6390,10 @@ Passing zero is similar to rewinding the song.
 <dd><p>Jumps to <var>position</var> seconds from the beginning of the song.
 </p></dd>
 <dt> <b>MP3</b></dt>
-<dd><p>Jumps to <var>position</var> seconds from the current position in the stream.<br>
-Does not go in reverse...negative values do nothing.
+<dd><p>Jumps to <var>position</var> seconds from the beginning of the song.
+</p></dd>
+<dt> <b>GME</b></dt>
+<dd><p>Jumps to <var>position</var> seconds from the beginning of the song.
 </p></dd>
 <dt> <b>MIDI</b></dt>
 <dd><p>Works for <b>libADLMIDI</b> and <b>libOPNMIDI</b>. Doesn&rsquo;t works for <b>Timidity</b>, <b>FluidSynth</b>, and <b>NativeMIDI</b>.
@@ -6028,8 +6405,6 @@ Jumps to <var>position</var> seconds from the beginning of the song.
 </p>
 <table class="cartouche" border="1"><tr><td>
 <table><tr><td>&nbsp;</td><td><pre class="example">// skip one minute into the song, from the start
-// this assumes you are playing an MP3
-Mix_RewindMusic();
 if(Mix_SetMusicPosition(60.0)==-1) {
     printf(&quot;Mix_SetMusicPosition: %s\n&quot;, Mix_GetError());
 }
@@ -6067,7 +6442,22 @@ if(Mix_SetMusicPosition(60.0)==-1) {
 <h3 class="subsection">5.5.50 Mix_ModMusicJumpToOrder</h3>
 <a name="index-Mix_005fModMusicJumpToOrder"></a>
 
-<p>WIP
+<p><code>int <b>Mix_ModMusicJumpToOrder</b>(int <var>order</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>order</var></dt>
+<dd><p>A pattern number in the module.
+</p></dd>
+</dl>
+
+<p>Jump to a given order in mod music currently playing as a single-stream. Only for MOD music formats.
+</p>
+<p><b>Returns</b>: 0 if successful, or -1 if failed or isn&rsquo;t implemented.
+</p>
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fFadeInMusicPos">Mix_FadeInMusicPos</a>
+<a href="#Mix_005fSetMusicPosition">Mix_SetMusicPosition</a>
+<a href="#Mix_005fMusicDuration">Mix_MusicDuration</a>
 </p>
 
 
@@ -6299,8 +6689,32 @@ Mix_SetLockMIDIArgs(1);
 <h3 class="subsection">5.5.55 Mix_HaltMusicStream</h3>
 <a name="index-Mix_005fHaltMusicStream"></a>
 
-<p>WIP
+<p><code>int <b>Mix_HaltMusicStream</b>(Mix_Music *<var>music</var>)</code>
 </p>
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>Playing music to halt.
+</p></dd>
+</dl>
+
+<p>Halt playback of <var>music</var>. This interrupts music fader effects.
+Any callback set by <code>Mix_HookMusicStreamFinished</code> will be called when the music stops.
+</p>
+<p><b>Returns</b>: always returns zero. (even more silly than <var>Mix_HaltGroup</var>)
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">// halt music playback
+Mix_HaltMusicStream(music);
+</pre></td></tr></table>
+</td></tr></table>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fFadeOutMusicStream">Mix_FadeOutMusicStream</a>,
+<a href="#Mix_005fHookMusicStreamFinished">Mix_HookMusicStreamFinished</a>,
+<a href="#Mix_005fHookMusicStreamFinishedAny">Mix_HookMusicStreamFinishedAny</a>
+</p>
+
+
 
 <hr size="6">
 <a name="Mix_005fFadeOutMusicStream"></a>
@@ -6324,8 +6738,42 @@ Mix_SetLockMIDIArgs(1);
 <h3 class="subsection">5.5.56 Mix_FadeOutMusicStream</h3>
 <a name="index-Mix_005fFadeOutMusicStream"></a>
 
-<p>WIP
+<p><code>int <b>Mix_FadeOutMusicStream</b>(Mix_Music *<var>music</var>, int <var>ms</var>)</code>
 </p>
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>Playing music to fade out.
+</p></dd>
+<dt> <var>ms</var></dt>
+<dd><p>Milliseconds of time that the fade-out effect should take to go to silence, starting now.
+</p></dd>
+</dl>
+
+<p>Gradually fade out the <var>music</var> over <var>ms</var> milliseconds starting from now.
+The <var>music</var> will be halted after the fade out is completed.
+Only when music is playing and not fading already are set to fade out, including paused channels.
+Any callback set by <code>Mix_HookMusicStreamFinished</code> will be called when the music finishes fading out.
+</p>
+<p><b>Returns</b>: 1 on success, 0 on failure.
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">// fade out music to finish 3 seconds from now
+while(!Mix_FadeOutMusicStream(music, 3000) &amp;&amp; Mix_PlayingMusicStream(music)) {
+    // wait for any fades to complete
+    SDL_Delay(100);
+}
+</pre></td></tr></table>
+</td></tr></table>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fHaltMusicStream">Mix_HaltMusicStream</a>,
+<a href="#Mix_005fFadingMusicStream">Mix_FadingMusicStream</a>,
+<a href="#Mix_005fPlayingMusicStream">Mix_PlayingMusicStream</a>,
+<a href="#Mix_005fHookMusicStreamFinished">Mix_HookMusicStreamFinished</a>,
+<a href="#Mix_005fHookMusicStreamFinishedAny">Mix_HookMusicStreamFinishedAny</a>
+</p>
+
+
 
 <hr size="6">
 <a name="Mix_005fHookMusicStreamFinished"></a>
@@ -6349,8 +6797,43 @@ Mix_SetLockMIDIArgs(1);
 <h3 class="subsection">5.5.57 Mix_HookMusicStreamFinished</h3>
 <a name="index-Mix_005fHaMix_005fHookMusicStreamFinishedltMusic"></a>
 
-<p>WIP
+<p><code>void <b>Mix_HookMusicStreamFinished</b>(Mix_Music *<var>music</var>, void (*<var>music_finished</var>)(SDLCALL *music_finished)(Mix_Music*, void*), void *<var>user_data</var>)</code>
 </p>
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>Music to set the hook.
+</p></dd>
+<dt> <var>music_finished</var></dt>
+<dd><p>Function pointer to a <code>void function(Mix_Music *music, void *user_data)</code>.<br>
+<b>NULL</b> will remove the hook.
+</p></dd>
+<dt> <var>user_data</var></dt>
+<dd><p>User data pointer used with the the <var>music_finished</var> callback
+</p></dd>
+</dl>
+
+<p>This sets up a function to be called when <var>music</var> playback is halted.
+Any time music stops, the <var>music_finished</var> function will be called.
+Call with <b>NULL</b> to remove the callback.<br>
+<b>NOTE</b>: NEVER call SDL_Mixer functions, nor <code>SDL_LockAudio</code>, from a callback function.
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">// make a music finished function
+void musicFinished(Mix_Music *music, void *user_data)
+{
+    printf(&quot;Music stopped.\n&quot;);
+}
+...
+// use musicFinished for when music stops
+Mix_HookMusicStreamFinished(music, musicFinished);
+</pre></td></tr></table>
+</td></tr></table>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fHaltMusicStream">Mix_HaltMusicStream</a>,
+<a href="#Mix_005fFadeOutMusicStream">Mix_FadeOutMusicStream</a>
+</p>
+
 
 <hr size="6">
 <a name="Mix_005fHookMusicStreamFinishedAny"></a>
@@ -6374,7 +6857,34 @@ Mix_SetLockMIDIArgs(1);
 <h3 class="subsection">5.5.58 Mix_HookMusicStreamFinishedAny</h3>
 <a name="index-Mix_005fHookMusicStreamFinishedAny"></a>
 
-<p>WIP
+<p><code>void <b>Mix_HookMusicStreamFinishedAny</b>(void (*<var>music_finished</var>)())</code>
+</p>
+<dl compact="compact">
+<dt> <var>music_finished</var></dt>
+<dd><p>Function pointer to a <code>void function()</code>.<br>
+<b>NULL</b> will remove the hook.
+</p></dd>
+</dl>
+
+<p>This sets up a function to be called when any multi-stream music playback is halted.
+Any time music stops, the <var>music_finished</var> function will be called.  Call with <b>NULL</b> to remove the callback.<br>
+<b>NOTE</b>: NEVER call SDL_Mixer functions, nor <code>SDL_LockAudio</code>, from a callback function.
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">// make a music finished function
+void musicFinished()
+{
+    printf(&quot;Music stopped.\n&quot;);
+}
+...
+// use musicFinished for when any music stops
+Mix_HookMusicStreamFinishedAny(musicFinished);
+</pre></td></tr></table>
+</td></tr></table>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fHaltMusicStream">Mix_HaltMusicStream</a>,
+<a href="#Mix_005fFadeOutMusicStream">Mix_FadeOutMusicStream</a>
 </p>
 
 
@@ -6501,7 +7011,7 @@ while(!Mix_FadeOutMusic(3000) &amp;&amp; Mix_PlayingMusic()) {
 </p></dd>
 </dl>
 
-<p>This sets up a function to be called when music playback is halted.  Any time music stops, the <var>music_finished</var> function will be called.  Call with <b>NULL</b> to remove the callback.<br>
+<p>This sets up a function to be called when single-stream music playback is halted.  Any time music stops, the <var>music_finished</var> function will be called.  Call with <b>NULL</b> to remove the callback.<br>
 <b>NOTE</b>: NEVER call SDL_Mixer functions, nor <code>SDL_LockAudio</code>, from a callback function.
 </p>
 <table class="cartouche" border="1"><tr><td>
@@ -6548,7 +7058,7 @@ Mix_HookMusicFinished(musicFinished);
 <dl compact="compact">
 <dt> <var>music</var></dt>
 <dd><p>The music to get the type of.<br>
-<b>NULL</b> will get the currently playing music type.
+<b>NULL</b> will get the currently playing single-stream music type.
 </p></dd>
 </dl>
 
@@ -6626,7 +7136,30 @@ switch(Mix_GetMusicType(NULL))
 <h3 class="subsection">5.5.63 Mix_PlayingMusicStream</h3>
 <a name="index-Mix_005fPlayingMusicStream"></a>
 
-<p>WIP
+<p><code>int <b>Mix_PlayingMusicStream</b>(Mix_Music *<var>music</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>The music to get playing state.<br>
+<b>NULL</b> will get the currently playing music playing state.
+</p></dd>
+</dl>
+
+<p>Tells you if <var>music</var> is actively playing, or not.<br>
+<b>Note</b>: Does not check if the channel has been paused.
+</p>
+<p><b>Returns</b>: Zero if the <var>music</var> is not playing, or 1 if it is playing.
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">// check if music is playing
+printf(&quot;music is%s playing.\n&quot;, Mix_PlayingMusicStream(music)?&quot;&quot;:&quot; not&quot;);
+</pre></td></tr></table>
+</td></tr></table>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fPausedMusicStream">Mix_PausedMusicStream</a>,
+<a href="#Mix_005fFadingMusicStream">Mix_FadingMusicStream</a>,
+<a href="#Mix_005fPlayMusicStream">Mix_PlayMusicStream</a>
 </p>
 
 
@@ -6652,7 +7185,30 @@ switch(Mix_GetMusicType(NULL))
 <h3 class="subsection">5.5.64 Mix_PausedMusicStream</h3>
 <a name="index-Mix_005fPausedMusicStream"></a>
 
-<p>WIP
+<p><code>int <b>Mix_PausedMusicStream</b>(Mix_Music *<var>music</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>The music to get paused state.<br>
+<b>NULL</b> will get the currently playing music paused state.
+</p></dd>
+</dl>
+
+<p>Tells you if <var>music</var> is paused, or not.<br>
+<b>Note</b>: Does not check if the <var>music</var> was been halted after it was paused, which may seem a little weird.
+</p>
+<p><b>Returns</b>: Zero if music is not paused.  1 if it is paused.
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">// check the music pause status
+printf(&quot;music is%s paused\n&quot;, Mix_PausedMusicStream(music)?&quot;&quot;:&quot; not&quot;);
+</pre></td></tr></table>
+</td></tr></table>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fPlayingMusicStream">Mix_PlayingMusicStream</a>,
+<a href="#Mix_005fPauseMusicStream">Mix_PauseMusicStream</a>,
+<a href="#Mix_005fResumeMusicStream">Mix_ResumeMusicStream</a>
 </p>
 
 
@@ -6679,7 +7235,41 @@ switch(Mix_GetMusicType(NULL))
 <h3 class="subsection">5.5.65 Mix_FadingMusicStream</h3>
 <a name="index-Mix_005fFadingMusicStream"></a>
 
-<p>WIP
+<p><code>Mix_Fading <b>Mix_FadingMusicStream</b>(Mix_Music *<var>music</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>The music to get fading state.<br>
+<b>NULL</b> will get the currently playing music fading state.
+</p></dd>
+</dl>
+
+<p>Tells you if <var>music</var> is fading in, out, or not at all.  Does not tell you if the channel is playing anything, or paused, so you&rsquo;d need to test that separately.
+</p>
+<p><b>Returns</b>: the fading status.  Never returns an error.
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">// check the music fade status
+switch(Mix_FadingMusicStream(music)) {
+    case MIX_NO_FADING:
+        printf(&quot;Not fading music.\n&quot;);
+        break;
+    case MIX_FADING_OUT:
+        printf(&quot;Fading out music.\n&quot;);
+        break;
+    case MIX_FADING_IN:
+        printf(&quot;Fading in music.\n&quot;);
+        break;
+}
+</pre></td></tr></table>
+</td></tr></table>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fFading">Mix_Fading</a>,
+<a href="#Mix_005fPausedMusicStream">Mix_PausedMusicStream</a>,
+<a href="#Mix_005fPlayingMusicStream">Mix_PlayingMusicStream</a>,
+<a href="#Mix_005fFadeInMusicStreamPos">Mix_FadeInMusicStreamPos</a>,
+<a href="#Mix_005fFadeOutMusicStream">Mix_FadeOutMusicStream</a>
 </p>
 
 
@@ -6749,13 +7339,13 @@ data=Mix_GetMusicHookData();
 
 <p><code>int <b>Mix_PlayingMusic</b>()</code>
 </p>
-<p>Tells you if music is actively playing, or not.<br>
+<p>Tells you if any single-stream music is actively playing, or not.<br>
 <b>Note</b>: Does not check if the channel has been paused.
 </p>
-<p><b>Returns</b>: Zero if the music is not playing, or 1 if it is playing.
+<p><b>Returns</b>: Zero if the any single-stream music is not playing, or 1 if it is playing.
 </p>
 <table class="cartouche" border="1"><tr><td>
-<table><tr><td>&nbsp;</td><td><pre class="example">// check if music is playing
+<table><tr><td>&nbsp;</td><td><pre class="example">// check if any single-stream music is playing
 printf(&quot;music is%s playing.\n&quot;, Mix_PlayingMusic()?&quot;&quot;:&quot; not&quot;);
 </pre></td></tr></table>
 </td></tr></table>
@@ -6884,9 +7474,9 @@ switch(Mix_FadingMusic()) {
 <h3 class="subsection">5.5.70 Mix_GetMusicTitle</h3>
 <a name="index-Mix_005fGetMusicTitle"></a>
 
-<p><code>const char *<b>Mix_GetMusicTitle</b>(const Mix_Music *music)</code>
+<p><code>const char *<b>Mix_GetMusicTitle</b>(const Mix_Music *<var>music</var>)</code>
 </p>
-<p>Get music title from meta-tag if possible. If title tag is empty, filename will be returned
+<p>Get <var>music</var> title from meta-tag if possible. If title tag is empty, filename will be returned unlike the <code>Mix_GetMusicTitleTag()</code> call.
 </p>
 <p><b>Returns</b>: the <var>music</var> title string pointer.
 </p>
@@ -6926,9 +7516,9 @@ title=Mix_GetMusicTitle(myMusic);
 <h3 class="subsection">5.5.71 Mix_GetMusicTitleTag</h3>
 <a name="index-Mix_005fGetMusicTitleTag"></a>
 
-<p><code>const char *<b>Mix_GetMusicTitleTag</b>(const Mix_Music *music)</code>
+<p><code>const char *<b>Mix_GetMusicTitleTag</b>(const Mix_Music *<var>music</var>)</code>
 </p>
-<p>Get music title from meta-tag if possible. If title tag is empty, returns NULL
+<p>Get <var>music</var> title from meta-tag if possible. If title tag is empty, returns NULL
 </p>
 <p><b>Returns</b>: the <var>music</var> title string pointer or NULL.
 </p>
@@ -6968,9 +7558,9 @@ title=Mix_GetMusicTitleTag(myMusic);
 <h3 class="subsection">5.5.72 Mix_GetMusicArtistTag</h3>
 <a name="index-Mix_005fGetMusicArtistTag"></a>
 
-<p><code>const char *<b>Mix_GetMusicArtistTag</b>(const Mix_Music *music)</code>
+<p><code>const char *<b>Mix_GetMusicArtistTag</b>(const Mix_Music *<var>music</var>)</code>
 </p>
-<p>Get music artist from meta-tag if possible. If artist tag is empty, returns NULL
+<p>Get <var>music</var> artist from meta-tag if possible. If artist tag is empty, returns NULL
 </p>
 <p><b>Returns</b>: the <var>music</var> artist string pointer or NULL.
 </p>
@@ -7010,9 +7600,9 @@ title=Mix_GetMusicArtistTag(myMusic);
 <h3 class="subsection">5.5.73 Mix_GetMusicAlbumTag</h3>
 <a name="index-Mix_005fGetMusicAlbumTag"></a>
 
-<p><code>const char *<b>Mix_GetMusicAlbumTag</b>(const Mix_Music *music)</code>
+<p><code>const char *<b>Mix_GetMusicAlbumTag</b>(const Mix_Music *<var>music</var>)</code>
 </p>
-<p>Get music album from meta-tag if possible. If album tag is empty, returns NULL
+<p>Get <var>music</var> album from meta-tag if possible. If album tag is empty, returns NULL
 </p>
 <p><b>Returns</b>: the <var>music</var> album string pointer or NULL.
 </p>
@@ -7052,9 +7642,9 @@ title=Mix_GetMusicAlbumTag(myMusic);
 <h3 class="subsection">5.5.74 Mix_GetMusicCopyrightTag</h3>
 <a name="index-Mix_005fGetMusicCopyrightTag"></a>
 
-<p><code>const char *<b>Mix_GetMusicCopyrightTag</b>(const Mix_Music *music)</code>
+<p><code>const char *<b>Mix_GetMusicCopyrightTag</b>(const Mix_Music *<var>music</var>)</code>
 </p>
-<p>Get music copyright from meta-tag if possible. If copyright tag is empty, returns NULL
+<p>Get <var>music</var> copyright from meta-tag if possible. If copyright tag is empty, returns NULL
 </p>
 <p><b>Returns</b>: the <var>music</var> copyright string pointer or NULL.
 </p>
@@ -7096,7 +7686,33 @@ title=Mix_GetMusicCopyrightTag(myMusic);
 <h3 class="subsection">5.5.75 Mix_SetTimidityCfg</h3>
 <a name="index-Mix_005fSetTimidityCfg"></a>
 
-<p>WIP
+<p><code>int <b>Mix_SetTimidityCfg</b>(const char *<var>path</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>path</var></dt>
+<dd><p>Timidity config file path.<br>
+Set the <b>NULL</b> to let Timidity use the default system paths by the internal logic.
+</p></dd>
+</dl>
+
+<p>The Timidity cfg file path which defines the set of patches used by the Timidity during playback.<br>
+<b>Note</b>: Takes no effect when no MIDI music files currently loaded by Timidity. To apply the config path change
+you should unload all MIDI music using <code>Mix_FreeMusic()</code> call and open them back again.
+Timidity doesn&rsquo;t support individual different patch sets per song.
+</p>
+<p><b>Returns</b>: 0 if success, -1 on failure.
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">// change the timidity config path
+Mix_SetTimidityCfg(&quot;/home/user/Music/timidity_patches/mybank.cfg&quot;);
+</pre></td></tr></table>
+</td></tr></table>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fGetTimidityCfg">Mix_GetTimidityCfg</a>,
+<a href="#Mix_005fPausedMusicStream">Mix_PausedMusicStream</a>,
+<a href="#Mix_005fFadingMusicStream">Mix_FadingMusicStream</a>,
+<a href="#Mix_005fPlayMusicStream">Mix_PlayMusicStream</a>
 </p>
 
 
@@ -7122,7 +7738,17 @@ title=Mix_GetMusicCopyrightTag(myMusic);
 <h3 class="subsection">5.5.76 Mix_GetTimidityCfg</h3>
 <a name="index-Mix_005fGetTimidityCfg"></a>
 
-<p>WIP
+<p><code>const char *<b>Mix_GetTimidityCfg</b>()</code>
+</p>
+<p>Reports the full path to the current config file. NULL if no custom config paths was set.
+</p>
+<p><b>Returns</b>: The full Timidity config file path or <b>NULL</b>.
+</p>
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fSetTimidityCfg">Mix_SetTimidityCfg</a>,
+<a href="#Mix_005fPausedMusicStream">Mix_PausedMusicStream</a>,
+<a href="#Mix_005fFadingMusicStream">Mix_FadingMusicStream</a>,
+<a href="#Mix_005fPlayMusicStream">Mix_PlayMusicStream</a>
 </p>
 
 
@@ -7173,7 +7799,8 @@ title=Mix_GetMusicCopyrightTag(myMusic);
 
 <p><b>See Also</b>:<br>
 <a href="#Mix_005fGetSoundFonts">Mix_GetSoundFonts</a>,
-<a href="#Mix_005fEachSoundFont">Mix_EachSoundFont</a>
+<a href="#Mix_005fEachSoundFont">Mix_EachSoundFont</a>,
+<a href="#Mix_005fEachSoundFontEx">Mix_EachSoundFontEx</a>
 </p>
 
 <hr size="6">
@@ -7227,8 +7854,10 @@ for(path = strtok_r(fonts, &quot;;&quot;, &amp;context); path; path = strtok_r(N
 
 <p><b>See Also</b>:<br>
 <a href="#Mix_005fSetSoundFonts">Mix_SetSoundFonts</a>,
-<a href="#Mix_005fEachSoundFont">Mix_EachSoundFont</a>
+<a href="#Mix_005fEachSoundFont">Mix_EachSoundFont</a>,
+<a href="#Mix_005fEachSoundFontEx">Mix_EachSoundFontEx</a>
 </p>
+
 
 <hr size="6">
 <a name="Mix_005fEachSoundFont"></a>
@@ -7290,7 +7919,8 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) {
 
 <p><b>See Also</b>:<br>
 <a href="#Mix_005fSetSoundFonts">Mix_SetSoundFonts</a>,
-<a href="#Mix_005fGetSoundFonts">Mix_GetSoundFonts</a>
+<a href="#Mix_005fGetSoundFonts">Mix_GetSoundFonts</a>,
+<a href="#Mix_005fEachSoundFontEx">Mix_EachSoundFontEx</a>
 </p>
 
 
@@ -7317,8 +7947,51 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) {
 <h3 class="subsection">5.5.80 Mix_EachSoundFontEx</h3>
 <a name="index-Mix_005fEachSoundFontEx"></a>
 
+<p><code>const char *<b>Mix_EachSoundFontEx</b>(const char* <var>cpaths</var>, int (*<var>function</var>)(const char *, void *), void *<var>data</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>cpaths</var></dt>
+<dd><p>The semicolon-separated list of custom SoundFont file paths
+</p></dd>
+<dt> <var>function</var></dt>
+<dd><p>The callback function will be called for each sound font
+listed in the paths. Has arguments <var>path</var> and <var>data</var>.
+</p></dd>
+<dt> <var>data</var></dt>
+<dd><p>User data passed to the callback
+</p></dd>
+</dl>
 
-<p>WIP
+<p>Iterate the current set of internal paths list to sound font files will be used by
+FluidSynth MIDI backend, and additionally, iterate through the custom paths list given by the <var>cpaths</var> argument.
+If there are wasn&rsquo;t set by <a href="#Mix_005fSetSoundFonts">Mix_SetSoundFonts</a>
+function, there are will be tooken from <b>SDL_SOUNDFONTS</b> or
+<b>SDL_FORCE_SOUNDFONTS</b> environment variables.
+</p>
+<p><b>Returns</b>: 1 if function successfully completed, or 0 if error has occouped.
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">int print_sound_font(const char *path, void *data) {
+    printf(&quot; - %s\n&quot;, path);
+    return 1;
+}
+
+//...
+
+//Print list of available sound fonts
+char *fonts = Mix_GetSoundFonts();
+char *other_fonts = &quot;/path/to/font1.sf2:/path/to/font2.sf2:/path/to/fontN.sf2&quot;;
+printf(&quot;Available sound fonts:\n&quot;);
+for(!Mix_EachSoundFontEx(other_fonts, print_sound_font, NULL)) {
+    printf(&quot; - %s\n&quot;, path);
+}
+</pre></td></tr></table>
+</td></tr></table>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fSetSoundFonts">Mix_SetSoundFonts</a>,
+<a href="#Mix_005fGetSoundFonts">Mix_GetSoundFonts</a>,
+<a href="#Mix_005fEachSoundFont">Mix_EachSoundFont</a>
 </p>
 
 
@@ -7893,8 +8566,8 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) {
 </p></dd>
 </dl>
 
-<p>Select the OPL3 Emulator for ADLMIDI
-<b>NOTE</b>: Applies on MIDI file reopen
+<p>Select the default OPL3 Emulator for ADLMIDI used for every new MIDI file opened.<br>
+<b>Note:</b> Using path arguments may override this setting.
 </p>
 
 
@@ -7920,8 +8593,13 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) {
 <h3 class="subsection">5.5.99 Mix_ADLMIDI_getChipsCount</h3>
 <a name="index-Mix_005fADLMIDI_005fgetChipsCount"></a>
 
-<p>WIP
+<p><code>int <b>Mix_ADLMIDI_getChipsCount</b>()</code>
 </p>
+<p><b>Returns</b>: initial number of emulated chips running by ADLMIDI.
+</p>
+<p>Get the number of emulated chips used by ADLMIDI for every new MIDI file opened.
+</p>
+
 
 <hr size="6">
 <a name="Mix_005fADLMIDI_005fsetChipsCount"></a>
@@ -7945,7 +8623,16 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) {
 <h3 class="subsection">5.5.100 Mix_ADLMIDI_setChipsCount</h3>
 <a name="index-Mix_005fADLMIDI_005fsetChipsCount"></a>
 
-<p>WIP
+<p><code>void <b>Mix_ADLMIDI_setChipsCount</b>(int <var>chips</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>chips</var></dt>
+<dd><p>Number of emulated chips.
+</p></dd>
+</dl>
+
+<p>Get the number of emulated chips used by ADLMIDI for every new MIDI file opened.<br>
+<b>Note:</b> Using path arguments may override this setting.
 </p>
 
 
@@ -8040,7 +8727,11 @@ Mix_ADLMIDI_setCustomBankFile(&quot;./music/my-gm-bank.wonl&quot;);
 <h3 class="subsection">5.5.103 Mix_OPNMIDI_getVolumeModel</h3>
 <a name="index-Mix_005fOPNMIDI_005fgetVolumeModel"></a>
 
-<p>WIP
+<p><code>int <b>Mix_OPNMIDI_getVolumeModel</b>()</code>
+</p>
+<p><b>Returns</b>: value of <b>Mix_OPNMIDI_VolumeModel</b> enum which a current volume model.
+</p>
+<p>Get ID of current volumes model of OPNMIDI
 </p>
 
 
@@ -8066,7 +8757,16 @@ Mix_ADLMIDI_setCustomBankFile(&quot;./music/my-gm-bank.wonl&quot;);
 <h3 class="subsection">5.5.104 Mix_OPNMIDI_setVolumeModel</h3>
 <a name="index-Mix_005fOPNMIDI_005fsetVolumeModel"></a>
 
-<p>WIP
+<p><code>void <b>Mix_OPNMIDI_setVolumeModel</b>(int <var>vm</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>vm</var></dt>
+<dd><p>Value of <b>Mix_OPNMIDI_VolumeModel</b> enum.
+</p></dd>
+</dl>
+
+<p>Change current volume model.
+<b>NOTE</b>: Applies on MIDI file reopen
 </p>
 
 
@@ -8282,8 +8982,13 @@ Mix_ADLMIDI_setCustomBankFile(&quot;./music/my-gm-bank.wonl&quot;);
 <h3 class="subsection">5.5.111 Mix_OPNMIDI_getChipsCount</h3>
 <a name="index-Mix_005fOPNMIDI_005fgetChipsCount"></a>
 
-<p>WIP
+<p><code>int <b>Mix_OPNMIDI_getChipsCount</b>()</code>
 </p>
+<p><b>Returns</b>: initial number of emulated chips running by OPNMIDI.
+</p>
+<p>Get the number of emulated chips used by OPNMIDI for every new MIDI file opened.
+</p>
+
 
 <hr size="6">
 <a name="Mix_005fOPNMIDI_005fsetChipsCount"></a>
@@ -8307,7 +9012,16 @@ Mix_ADLMIDI_setCustomBankFile(&quot;./music/my-gm-bank.wonl&quot;);
 <h3 class="subsection">5.5.112 Mix_OPNMIDI_setChipsCount</h3>
 <a name="index-Mix_005fOPNMIDI_005fsetChipsCount"></a>
 
-<p>WIP
+<p><code>void <b>Mix_OPNMIDI_setChipsCount</b>(int <var>chips</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>chips</var></dt>
+<dd><p>Number of emulated chips.
+</p></dd>
+</dl>
+
+<p>Get the number of emulated chips used by OPNMIDI for every new MIDI file opened.<br>
+<b>Note:</b> Using path arguments may override this setting.
 </p>
 
 

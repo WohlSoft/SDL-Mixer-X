@@ -11,7 +11,7 @@ Music is therefore manipulated separately, except in post-processing hooks.
 @b{Loading}
 * Mix_GetNumMusicDecoders::  Number of music format types that can be decoded
 * Mix_GetMusicDecoder::      Name of enumerated music format type decoder
-* Mix_HasMusicDecoder::      Check if the specific music decodec is abailable by name in this build
+* Mix_HasMusicDecoder::      Check if the specific music decoder is abailable by name in this build
 * Mix_LoadMUS::              Load a music file into a Mix_Music
 * Mix_LoadMUS_RW::           Load Music through SDL RWops
 * Mix_LoadMUS_RW_ARG::       Load music through SDL RWops with passing of extra arguments string @b{[Mixer X]}
@@ -231,7 +231,27 @@ for(i=0; i<max; ++i)
 @subsection Mix_HasMusicDecoder
 @findex Mix_HasMusicDecoder
 
-WIP
+@noindent
+@code{SDL_bool @b{Mix_HasMusicDecoder}(const char *@var{name})}
+
+@table @var
+@item name
+The decoder name to check it's presence.
+@end table
+
+@noindent
+Check if the music decoder named as @var{name} presented in this library build.
+
+@noindent
+@b{Returns}: @code{SDL_TRUE} if the requested codec name is available in this library build or @code{SDL_FALSE} if not.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_Music},
+@ref{Mix_SetMusicCMD},
+@ref{Mix_PlayMusic},
+@ref{Mix_FadeInMusic},
+@ref{Mix_FadeInMusicPos}
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -989,7 +1009,44 @@ if(Mix_FadeInMusicPos(music, -1, 2000)==-1) @{
 @subsection Mix_VolumeMusicStream
 @findex Mix_VolumeMusicStream
 
-WIP
+@noindent
+@code{int @b{Mix_VolumeMusicStream}(Mix_Music *@var{music}, int @var{volume})}
+
+@table @var
+@item music
+Music to set the volume.
+@item volume
+Music volume, from 0 to @b{MIX_MAX_VOLUME}(128).@*
+Values greater than @b{MIX_MAX_VOLUME} will use @b{MIX_MAX_VOLUME}.@*
+-1 does not set the volume, but does return the current volume setting.
+@end table
+
+@noindent
+Set the volume to @var{volume}, if it is 0 or greater, and return the previous volume setting.
+Setting the volume during a fade will not work, the faders use this function to perform their effect!
+Setting volume while using an external music player set by @code{Mix_SetMusicCMD} will have no effect,
+and @code{Mix_GetError} will show the reason why not.
+
+@noindent
+@b{Returns}: The previous volume setting.
+
+@cartouche
+@example
+// set the music volume to 1/2 maximum, and then check it
+printf("volume was    : %d\n", Mix_VolumeMusicStream(someMusic, MIX_MAX_VOLUME/2));
+printf("volume is now : %d\n", Mix_GetVolumeMusicStream(someMusic));
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_GetMusicVolume},
+@ref{Mix_GetVolumeMusicStream},
+@ref{Mix_VolumeMusicGeneral},
+@ref{Mix_GetVolumeMusicGeneral},
+@ref{Mix_FadeInMusicStream},
+@ref{Mix_FadeOutMusicStream},
+@ref{Mix_SetMusicCMD}
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -998,8 +1055,29 @@ WIP
 @subsection Mix_GetMusicVolume
 @findex Mix_GetMusicVolume
 
-WIP
+@noindent
+@code{int @b{Mix_GetMusicVolume}(Mix_Music *@var{music})}
 
+@table @var
+@item music
+Music to get the volume.
+@end table
+
+@noindent
+Get the current volume set on the @var{music}.
+
+@noindent
+@b{Returns}: The current volume setting set on the @var{music}.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_GetVolumeMusicStream},
+@ref{Mix_VolumeMusicStream},
+@ref{Mix_VolumeMusicGeneral},
+@ref{Mix_GetVolumeMusicGeneral},
+@ref{Mix_FadeInMusicStream},
+@ref{Mix_FadeOutMusicStream},
+@ref{Mix_SetMusicCMD}
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1008,7 +1086,30 @@ WIP
 @subsection Mix_GetVolumeMusicStream
 @findex Mix_GetVolumeMusicStream
 
-WIP
+@noindent
+@code{int @b{Mix_GetVolumeMusicStream}(Mix_Music *@var{music})}
+
+@table @var
+@item music
+Music to get the volume.
+@end table
+
+@noindent
+Get the current volume set on the @var{music}. This is an alias to the @ref{Mix_GetMusicVolume} function.
+
+@noindent
+@b{Returns}: The current volume setting set on the @var{music}.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_GetMusicVolume},
+@ref{Mix_VolumeMusicStream},
+@ref{Mix_VolumeMusicGeneral},
+@ref{Mix_GetVolumeMusicGeneral},
+@ref{Mix_FadeInMusicStream},
+@ref{Mix_FadeOutMusicStream},
+@ref{Mix_SetMusicCMD}
+
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1017,7 +1118,27 @@ WIP
 @subsection Mix_VolumeMusicGeneral
 @findex Mix_VolumeMusicGeneral
 
-WIP
+@noindent
+@code{void @b{Mix_VolumeMusicGeneral}(int @var{volume})}
+
+@table @var
+@item volume
+General multi-stream music volume, from 0 to @b{MIX_MAX_VOLUME}(128).@*
+Values greater than @b{MIX_MAX_VOLUME} will use @b{MIX_MAX_VOLUME}.@*
+@end table
+
+@noindent
+Set the general multi-stream music volume to @var{volume}, if it is 0 or greater.
+Setting volume while using an external music player set by @code{Mix_SetMusicCMD} will have no effect.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_GetMusicVolume},
+@ref{Mix_VolumeMusicStream},
+@ref{Mix_GetVolumeMusicGeneral},
+@ref{Mix_FadeInMusicStream},
+@ref{Mix_FadeOutMusicStream},
+@ref{Mix_SetMusicCMD}
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1026,8 +1147,23 @@ WIP
 @subsection Mix_GetVolumeMusicGeneral
 @findex Mix_GetVolumeMusicGeneral
 
-WIP
+@noindent
+@code{int @b{Mix_GetVolumeMusicGeneral}()}
 
+@noindent
+Get the current general multi-stream music volume.
+
+@noindent
+@b{Returns}: The current general multi-stream music volume.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_GetMusicVolume},
+@ref{Mix_VolumeMusicStream},
+@ref{Mix_VolumeMusicGeneral},
+@ref{Mix_FadeInMusicStream},
+@ref{Mix_FadeOutMusicStream},
+@ref{Mix_SetMusicCMD}
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1036,7 +1172,31 @@ WIP
 @subsection Mix_PauseMusicStream
 @findex Mix_PauseMusicStream
 
-WIP
+@noindent
+@code{void @b{Mix_PauseMusicStream}(Mix_Music *@var{music})}
+
+@table @var
+@item music
+Music to pause.
+@end table
+
+@noindent
+Pause the @var{music} playback.  You may halt paused music.@*
+@b{Note}: Music can only be paused if it is actively playing.
+
+@cartouche
+@example
+// pause music playback
+Mix_PauseMusicStream(music);
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_ResumeMusicStream},
+@ref{Mix_PausedMusicStream},
+@ref{Mix_HaltMusicStream}
+
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
@@ -1044,7 +1204,27 @@ WIP
 @subsection Mix_PauseMusicStreamAll
 @findex Mix_PauseMusicStreamAll
 
-WIP
+@noindent
+@code{void @b{Mix_PauseMusicStreamAll}()}
+
+@noindent
+Pause all multi-stream music playback.  You may halt any paused music.@*
+@b{Note}: Music can only be paused if it is actively playing.
+
+@cartouche
+@example
+// pause music playback
+Mix_PauseMusicStreamAll();
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_ResumeMusicStream},
+@ref{Mix_PausedMusicStream},
+@ref{Mix_HaltMusicStream}
+
+
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
@@ -1052,7 +1232,30 @@ WIP
 @subsection Mix_ResumeMusicStream
 @findex Mix_ResumeMusicStream
 
-WIP
+@noindent
+@code{void @b{Mix_ResumeMusicStream}(Mix_Music *@var{music})}
+
+@table @var
+@item music
+Paused music to resume.
+@end table
+
+@noindent
+Unpause the @var{music}. This is safe to use on halted, paused, and already playing music.
+
+@cartouche
+@example
+// resume music playback
+Mix_ResumeMusicStream(music);
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_PauseMusicStream},
+@ref{Mix_PausedMusicStream},
+@ref{Mix_HaltMusicStream}
+
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
@@ -1060,7 +1263,27 @@ WIP
 @subsection Mix_ResumeMusicStreamAll
 @findex Mix_ResumeMusicStreamAll
 
-WIP
+
+@noindent
+@code{void @b{Mix_ResumeMusicStreamAll}()}
+
+@noindent
+Unpause all multi-stream music. This is safe to use on halted, paused, and already playing music.
+
+@cartouche
+@example
+// resume music playback
+Mix_ResumeMusicStreamAll();
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_ResumeMusicStream},
+@ref{Mix_PausedMusicStream},
+@ref{Mix_HaltMusicStream}
+
+
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
@@ -1068,7 +1291,30 @@ WIP
 @subsection Mix_RewindMusicStream
 @findex Mix_RewindMusicStream
 
-WIP
+@noindent
+@code{void @b{Mix_RewindMusicStream}(Mix_Music *@var{music})}
+
+@table @var
+@item music
+Music to rewind.
+@end table
+
+@noindent
+Rewind the music to the start.  This is safe to use on halted, paused, and already playing music.  It is not useful to rewind the music immediately after starting playback, because it starts at the beginning by default.
+
+@noindent
+This function only works for streams that supports the seekability.
+
+@cartouche
+@example
+// rewind music playback to the start
+Mix_RewindMusicStream(music);
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_PlayMusicStream}
 
 
 
@@ -1079,7 +1325,60 @@ WIP
 @subsection Mix_SetMusicStreamPosition
 @findex Mix_SetMusicStreamPosition
 
-WIP
+@noindent
+@code{int @b{Mix_SetMusicStreamPosition}(Mix_Music *@var{music}, double @var{position})}
+
+@table @var
+@item music
+Music to change the position.
+@item position
+Posistion to play from in seconds.
+@end table
+
+@noindent
+Set the position of the @var{music}.
+The @var{position} takes different meanings for different music sources.
+It only works on the music sources listed below.
+
+@table @b
+@item WAV
+Jumps to @var{position} seconds from the beginning of the song.
+@item MOD
+@b{ModPlug or XMP}: Jumps to @var{position} seconds from the beginning of the song.
+@b{Mikmod}: The double is cast to Uint16 and used for a pattern number in the module.@*
+Passing zero is similar to rewinding the song.
+@item OGG
+Jumps to @var{position} seconds from the beginning of the song.
+@item OPUS
+Jumps to @var{position} seconds from the beginning of the song.
+@item FLAC
+Jumps to @var{position} seconds from the beginning of the song.
+@item MP3
+Jumps to @var{position} seconds from the beginning of the song.
+@item GME
+Jumps to @var{position} seconds from the beginning of the song.
+@item MIDI
+Works for @b{libADLMIDI} and @b{libOPNMIDI}. Doesn't works for @b{Timidity}, @b{FluidSynth}, and @b{NativeMIDI}.
+Jumps to @var{position} seconds from the beginning of the song.
+@end table
+
+@noindent
+@b{Returns}: 0 on success, or -1 if the codec doesn't support this function.
+
+@cartouche
+@example
+// skip one minute into the song, from the start
+if(Mix_SetMusicStreamPosition(music, 60.0)==-1) @{
+    printf("Mix_SetMusicStreamPosition: %s\n", Mix_GetError());
+@}
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_FadeInMusicStreamPos}
+@ref{Mix_GetMusicPosition}
+@ref{Mix_MusicDuration}
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1104,8 +1403,8 @@ Get the time current position of music stream. It only works on some of music so
 
 @noindent
 @b{See Also}:@*
-@ref{Mix_FadeInMusicPos}
-@ref{Mix_SetMusicPosition}
+@ref{Mix_FadeInMusicStreamPos}
+@ref{Mix_SetMusicStreamPosition}
 @ref{Mix_MusicDuration}
 
 
@@ -1116,8 +1415,27 @@ Get the time current position of music stream. It only works on some of music so
 @subsection Mix_ModMusicStreamJumpToOrder
 @findex Mix_ModMusicStreamJumpToOrder
 
-WIP
+@noindent
+@code{int @b{Mix_ModMusicStreamJumpToOrder}(Mix_Music *@var{music}, int @var{order})}
 
+@table @var
+@item music
+Music to change the position.
+@item order
+A pattern number in the module.
+@end table
+
+@noindent
+Jump to a given order in mod music. Only for MOD music formats.
+
+@noindent
+@b{Returns}: 0 if successful, or -1 if failed or isn't implemented.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_FadeInMusicStreamPos}
+@ref{Mix_SetMusicStreamPosition}
+@ref{Mix_MusicDuration}
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1231,7 +1549,28 @@ A part of loop points feature. Get the loop time length of music stream. It only
 @subsection Mix_SetMusicTempo
 @findex Mix_SetMusicTempo
 
-WIP
+@noindent
+@code{int @b{Mix_SetMusicTempo}(Mix_Music *@var{music}, double @var{tempo})}
+
+@table @var
+@item music
+Music to change the tempo.
+@item tempo
+Tempo multiplier. Setting value into the 1.0 will reset the tempo into default.
+@end table
+
+@noindent
+Set the current tempo multiplier in the music stream.
+
+@noindent
+@b{Returns}: 0 if successful, or -1 if failed or isn't implemented.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_GetMusicTempo}
+@ref{Mix_FadeInMusicStreamPos}
+@ref{Mix_SetMusicStreamPosition}
+@ref{Mix_MusicDuration}
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1240,7 +1579,26 @@ WIP
 @subsection Mix_GetMusicTempo
 @findex Mix_GetMusicTempo
 
-WIP
+@noindent
+@code{double @b{Mix_GetMusicTempo}(Mix_Music *@var{music})}
+
+@table @var
+@item music
+Music to get the tempo.
+@end table
+
+@noindent
+Returns the current tempo multiplier of the music stream.
+
+@noindent
+@b{Returns}: positive value if successful, or -1.0 if failed or isn't implemented.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_SetMusicTempo}
+@ref{Mix_FadeInMusicStreamPos}
+@ref{Mix_SetMusicStreamPosition}
+@ref{Mix_MusicDuration}
 
 
 
@@ -1250,7 +1608,26 @@ WIP
 @subsection Mix_GetMusicTracks
 @findex Mix_GetMusicTracks
 
-WIP
+@noindent
+@code{int @b{Mix_GetMusicTracks}(Mix_Music *@var{music})}
+
+@table @var
+@item music
+Music to get the number of tracks/channels.
+@end table
+
+@noindent
+Get the count of concurrently playing tracks at the song (MIDI, Tracker, Chiptune, etc.)
+
+@noindent
+@b{Returns}: count of tracks/channels if successful, or -1 if failed or isn't implemented.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_SetMusicTrackMute}
+@ref{Mix_FadeInMusicStreamPos}
+@ref{Mix_SetMusicStreamPosition}
+@ref{Mix_MusicDuration}
 
 
 
@@ -1260,7 +1637,30 @@ WIP
 @subsection Mix_SetMusicTrackMute
 @findex Mix_SetMusicTrackMute
 
-WIP
+@noindent
+@code{int @b{Mix_GetMusicTracks}(Mix_Music *@var{music}, int @var{track}, int @var{mute})}
+
+@table @var
+@item music
+Music to get the number of tracks/channels.
+@item track
+Track/Channel number to mute
+@item mute
+The mute state: 1 mute, 0 unmute
+@end table
+
+@noindent
+Mute one of playing tracks (or channels) at the song (MIDI, Tracker, Chiptune, etc.)
+
+@noindent
+@b{Returns}: 0 if successful, or -1 if failed or isn't implemented.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_GetMusicTracks}
+@ref{Mix_FadeInMusicStreamPos}
+@ref{Mix_SetMusicStreamPosition}
+@ref{Mix_MusicDuration}
 
 
 
@@ -1318,7 +1718,11 @@ if(Mix_SetMusicCMD("mpg123 -q")==-1) @{
 @subsection Mix_GetSynchroValue
 @findex Mix_GetSynchroValue
 
-WIP
+@noindent
+@code{int @b{Mix_GetSynchroValue}()}
+
+@noindent
+Not supported by any players at this time.
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1327,7 +1731,11 @@ WIP
 @subsection Mix_SetSynchroValue
 @findex Mix_SetSynchroValue
 
-WIP
+@noindent
+@code{int @b{Mix_SetSynchroValue}(int @var{value})}
+
+@noindent
+Not supported by any players at this time.
 
 
 
@@ -1337,7 +1745,20 @@ WIP
 @subsection Mix_SetMusicFileName
 @findex Mix_SetMusicFileName
 
-WIP
+@noindent
+@code{void @b{Mix_SetMusicFileName}(Mix_Music *@var{music}, const char *@var{file})}
+
+@table @var
+@item music
+The music to change the reported filename.
+@item file
+The file name or file path.
+@end table
+
+@noindent
+Change the filename reported by the @ref{Mix_GetMusicTitle} function in a case when
+the actual title tag is not specified in the file.
+
 
 
 
@@ -1486,8 +1907,9 @@ Jumps to @var{position} seconds from the beginning of the song.
 @item FLAC
 Jumps to @var{position} seconds from the beginning of the song.
 @item MP3
-Jumps to @var{position} seconds from the current position in the stream.@*
-Does not go in reverse...negative values do nothing.
+Jumps to @var{position} seconds from the beginning of the song.
+@item GME
+Jumps to @var{position} seconds from the beginning of the song.
 @item MIDI
 Works for @b{libADLMIDI} and @b{libOPNMIDI}. Doesn't works for @b{Timidity}, @b{FluidSynth}, and @b{NativeMIDI}.
 Jumps to @var{position} seconds from the beginning of the song.
@@ -1499,8 +1921,6 @@ Jumps to @var{position} seconds from the beginning of the song.
 @cartouche
 @example
 // skip one minute into the song, from the start
-// this assumes you are playing an MP3
-Mix_RewindMusic();
 if(Mix_SetMusicPosition(60.0)==-1) @{
     printf("Mix_SetMusicPosition: %s\n", Mix_GetError());
 @}
@@ -1522,7 +1942,25 @@ if(Mix_SetMusicPosition(60.0)==-1) @{
 @subsection Mix_ModMusicJumpToOrder
 @findex Mix_ModMusicJumpToOrder
 
-WIP
+@noindent
+@code{int @b{Mix_ModMusicJumpToOrder}(int @var{order})}
+
+@table @var
+@item order
+A pattern number in the module.
+@end table
+
+@noindent
+Jump to a given order in mod music currently playing as a single-stream. Only for MOD music formats.
+
+@noindent
+@b{Returns}: 0 if successful, or -1 if failed or isn't implemented.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_FadeInMusicPos}
+@ref{Mix_SetMusicPosition}
+@ref{Mix_MusicDuration}
 
 
 
@@ -1686,7 +2124,35 @@ Mix_SetLockMIDIArgs(1);
 @subsection Mix_HaltMusicStream
 @findex Mix_HaltMusicStream
 
-WIP
+@noindent
+@code{int @b{Mix_HaltMusicStream}(Mix_Music *@var{music})}
+
+@table @var
+@item music
+Playing music to halt.
+@end table
+
+@noindent
+Halt playback of @var{music}. This interrupts music fader effects.
+Any callback set by @code{Mix_HookMusicStreamFinished} will be called when the music stops.
+
+@noindent
+@b{Returns}: always returns zero. (even more silly than @var{Mix_HaltGroup})
+
+@cartouche
+@example
+// halt music playback
+Mix_HaltMusicStream(music);
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_FadeOutMusicStream},
+@ref{Mix_HookMusicStreamFinished},
+@ref{Mix_HookMusicStreamFinishedAny}
+
+
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
@@ -1694,7 +2160,44 @@ WIP
 @subsection Mix_FadeOutMusicStream
 @findex Mix_FadeOutMusicStream
 
-WIP
+@noindent
+@code{int @b{Mix_FadeOutMusicStream}(Mix_Music *@var{music}, int @var{ms})}
+
+@table @var
+@item music
+Playing music to fade out.
+@item ms
+Milliseconds of time that the fade-out effect should take to go to silence, starting now.
+@end table
+
+@noindent
+Gradually fade out the @var{music} over @var{ms} milliseconds starting from now.
+The @var{music} will be halted after the fade out is completed.
+Only when music is playing and not fading already are set to fade out, including paused channels.
+Any callback set by @code{Mix_HookMusicStreamFinished} will be called when the music finishes fading out.
+
+@noindent
+@b{Returns}: 1 on success, 0 on failure.
+
+@cartouche
+@example
+// fade out music to finish 3 seconds from now
+while(!Mix_FadeOutMusicStream(music, 3000) && Mix_PlayingMusicStream(music)) @{
+    // wait for any fades to complete
+    SDL_Delay(100);
+@}
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_HaltMusicStream},
+@ref{Mix_FadingMusicStream},
+@ref{Mix_PlayingMusicStream},
+@ref{Mix_HookMusicStreamFinished},
+@ref{Mix_HookMusicStreamFinishedAny}
+
+
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
@@ -1702,7 +2205,43 @@ WIP
 @subsection Mix_HookMusicStreamFinished
 @findex Mix_HaMix_HookMusicStreamFinishedltMusic
 
-WIP
+@noindent
+@code{void @b{Mix_HookMusicStreamFinished}(Mix_Music *@var{music}, void (*@var{music_finished})(SDLCALL *music_finished)(Mix_Music*, void*), void *@var{user_data})}
+
+@table @var
+@item music
+Music to set the hook.
+@item music_finished
+Function pointer to a @code{void function(Mix_Music *music, void *user_data)}.@*
+@b{NULL} will remove the hook.
+@item user_data
+User data pointer used with the the @var{music_finished} callback
+@end table
+
+@noindent
+This sets up a function to be called when @var{music} playback is halted.
+Any time music stops, the @var{music_finished} function will be called.
+Call with @b{NULL} to remove the callback.@*
+@b{NOTE}: NEVER call SDL_Mixer functions, nor @code{SDL_LockAudio}, from a callback function.
+
+@cartouche
+@example
+// make a music finished function
+void musicFinished(Mix_Music *music, void *user_data)
+@{
+    printf("Music stopped.\n");
+@}
+...
+// use musicFinished for when music stops
+Mix_HookMusicStreamFinished(music, musicFinished);
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_HaltMusicStream},
+@ref{Mix_FadeOutMusicStream}
+
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
@@ -1710,7 +2249,37 @@ WIP
 @subsection Mix_HookMusicStreamFinishedAny
 @findex Mix_HookMusicStreamFinishedAny
 
-WIP
+@noindent
+@code{void @b{Mix_HookMusicStreamFinishedAny}(void (*@var{music_finished})())}
+
+@table @var
+@item music_finished
+Function pointer to a @code{void function()}.@*
+@b{NULL} will remove the hook.
+@end table
+
+@noindent
+This sets up a function to be called when any multi-stream music playback is halted.
+Any time music stops, the @var{music_finished} function will be called.  Call with @b{NULL} to remove the callback.@*
+@b{NOTE}: NEVER call SDL_Mixer functions, nor @code{SDL_LockAudio}, from a callback function.
+
+@cartouche
+@example
+// make a music finished function
+void musicFinished()
+@{
+    printf("Music stopped.\n");
+@}
+...
+// use musicFinished for when any music stops
+Mix_HookMusicStreamFinishedAny(musicFinished);
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_HaltMusicStream},
+@ref{Mix_FadeOutMusicStream}
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1796,7 +2365,7 @@ Function pointer to a @code{void function()}.@*
 @end table
 
 @noindent
-This sets up a function to be called when music playback is halted.  Any time music stops, the @var{music_finished} function will be called.  Call with @b{NULL} to remove the callback.@*
+This sets up a function to be called when single-stream music playback is halted.  Any time music stops, the @var{music_finished} function will be called.  Call with @b{NULL} to remove the callback.@*
 @b{NOTE}: NEVER call SDL_Mixer functions, nor @code{SDL_LockAudio}, from a callback function.
 
 @cartouche
@@ -1829,7 +2398,7 @@ Mix_HookMusicFinished(musicFinished);
 @table @var
 @item music
 The music to get the type of.@*
-@b{NULL} will get the currently playing music type.
+@b{NULL} will get the currently playing single-stream music type.
 @end table
 
 @noindent
@@ -1893,7 +2462,34 @@ switch(Mix_GetMusicType(NULL))
 @subsection Mix_PlayingMusicStream
 @findex Mix_PlayingMusicStream
 
-WIP
+@noindent
+@code{int @b{Mix_PlayingMusicStream}(Mix_Music *@var{music})}
+
+@table @var
+@item music
+The music to get playing state.@*
+@b{NULL} will get the currently playing music playing state.
+@end table
+
+@noindent
+Tells you if @var{music} is actively playing, or not.@*
+@b{Note}: Does not check if the channel has been paused.
+
+@noindent
+@b{Returns}: Zero if the @var{music} is not playing, or 1 if it is playing.
+
+@cartouche
+@example
+// check if music is playing
+printf("music is%s playing.\n", Mix_PlayingMusicStream(music)?"":" not");
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_PausedMusicStream},
+@ref{Mix_FadingMusicStream},
+@ref{Mix_PlayMusicStream}
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1902,7 +2498,34 @@ WIP
 @subsection Mix_PausedMusicStream
 @findex Mix_PausedMusicStream
 
-WIP
+@noindent
+@code{int @b{Mix_PausedMusicStream}(Mix_Music *@var{music})}
+
+@table @var
+@item music
+The music to get paused state.@*
+@b{NULL} will get the currently playing music paused state.
+@end table
+
+@noindent
+Tells you if @var{music} is paused, or not.@*
+@b{Note}: Does not check if the @var{music} was been halted after it was paused, which may seem a little weird.
+
+@noindent
+@b{Returns}: Zero if music is not paused.  1 if it is paused.
+
+@cartouche
+@example
+// check the music pause status
+printf("music is%s paused\n", Mix_PausedMusicStream(music)?"":" not");
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_PlayingMusicStream},
+@ref{Mix_PauseMusicStream},
+@ref{Mix_ResumeMusicStream}
 
 
 
@@ -1912,7 +2535,45 @@ WIP
 @subsection Mix_FadingMusicStream
 @findex Mix_FadingMusicStream
 
-WIP
+@noindent
+@code{Mix_Fading @b{Mix_FadingMusicStream}(Mix_Music *@var{music})}
+
+@table @var
+@item music
+The music to get fading state.@*
+@b{NULL} will get the currently playing music fading state.
+@end table
+
+@noindent
+Tells you if @var{music} is fading in, out, or not at all.  Does not tell you if the channel is playing anything, or paused, so you'd need to test that separately.
+
+@noindent
+@b{Returns}: the fading status.  Never returns an error.
+
+@cartouche
+@example
+// check the music fade status
+switch(Mix_FadingMusicStream(music)) @{
+    case MIX_NO_FADING:
+        printf("Not fading music.\n");
+        break;
+    case MIX_FADING_OUT:
+        printf("Fading out music.\n");
+        break;
+    case MIX_FADING_IN:
+        printf("Fading in music.\n");
+        break;
+@}
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_Fading},
+@ref{Mix_PausedMusicStream},
+@ref{Mix_PlayingMusicStream},
+@ref{Mix_FadeInMusicStreamPos},
+@ref{Mix_FadeOutMusicStream}
 
 
 
@@ -1955,15 +2616,15 @@ data=Mix_GetMusicHookData();
 @code{int @b{Mix_PlayingMusic}()}
 
 @noindent
-Tells you if music is actively playing, or not.@*
+Tells you if any single-stream music is actively playing, or not.@*
 @b{Note}: Does not check if the channel has been paused.
 
 @noindent
-@b{Returns}: Zero if the music is not playing, or 1 if it is playing.
+@b{Returns}: Zero if the any single-stream music is not playing, or 1 if it is playing.
 
 @cartouche
 @example
-// check if music is playing
+// check if any single-stream music is playing
 printf("music is%s playing.\n", Mix_PlayingMusic()?"":" not");
 @end example
 @end cartouche
@@ -2053,10 +2714,10 @@ switch(Mix_FadingMusic()) @{
 @findex Mix_GetMusicTitle
 
 @noindent
-@code{const char *@b{Mix_GetMusicTitle}(const Mix_Music *music)}
+@code{const char *@b{Mix_GetMusicTitle}(const Mix_Music *@var{music})}
 
 @noindent
-Get music title from meta-tag if possible. If title tag is empty, filename will be returned
+Get @var{music} title from meta-tag if possible. If title tag is empty, filename will be returned unlike the @code{Mix_GetMusicTitleTag()} call.
 
 @noindent
 @b{Returns}: the @var{music} title string pointer.
@@ -2083,10 +2744,10 @@ title=Mix_GetMusicTitle(myMusic);
 @findex Mix_GetMusicTitleTag
 
 @noindent
-@code{const char *@b{Mix_GetMusicTitleTag}(const Mix_Music *music)}
+@code{const char *@b{Mix_GetMusicTitleTag}(const Mix_Music *@var{music})}
 
 @noindent
-Get music title from meta-tag if possible. If title tag is empty, returns NULL
+Get @var{music} title from meta-tag if possible. If title tag is empty, returns NULL
 
 @noindent
 @b{Returns}: the @var{music} title string pointer or NULL.
@@ -2113,10 +2774,10 @@ title=Mix_GetMusicTitleTag(myMusic);
 @findex Mix_GetMusicArtistTag
 
 @noindent
-@code{const char *@b{Mix_GetMusicArtistTag}(const Mix_Music *music)}
+@code{const char *@b{Mix_GetMusicArtistTag}(const Mix_Music *@var{music})}
 
 @noindent
-Get music artist from meta-tag if possible. If artist tag is empty, returns NULL
+Get @var{music} artist from meta-tag if possible. If artist tag is empty, returns NULL
 
 @noindent
 @b{Returns}: the @var{music} artist string pointer or NULL.
@@ -2143,10 +2804,10 @@ title=Mix_GetMusicArtistTag(myMusic);
 @findex Mix_GetMusicAlbumTag
 
 @noindent
-@code{const char *@b{Mix_GetMusicAlbumTag}(const Mix_Music *music)}
+@code{const char *@b{Mix_GetMusicAlbumTag}(const Mix_Music *@var{music})}
 
 @noindent
-Get music album from meta-tag if possible. If album tag is empty, returns NULL
+Get @var{music} album from meta-tag if possible. If album tag is empty, returns NULL
 
 @noindent
 @b{Returns}: the @var{music} album string pointer or NULL.
@@ -2173,10 +2834,10 @@ title=Mix_GetMusicAlbumTag(myMusic);
 @findex Mix_GetMusicCopyrightTag
 
 @noindent
-@code{const char *@b{Mix_GetMusicCopyrightTag}(const Mix_Music *music)}
+@code{const char *@b{Mix_GetMusicCopyrightTag}(const Mix_Music *@var{music})}
 
 @noindent
-Get music copyright from meta-tag if possible. If copyright tag is empty, returns NULL
+Get @var{music} copyright from meta-tag if possible. If copyright tag is empty, returns NULL
 
 @noindent
 @b{Returns}: the @var{music} copyright string pointer or NULL.
@@ -2204,7 +2865,37 @@ title=Mix_GetMusicCopyrightTag(myMusic);
 @subsection Mix_SetTimidityCfg
 @findex Mix_SetTimidityCfg
 
-WIP
+@noindent
+@code{int @b{Mix_SetTimidityCfg}(const char *@var{path})}
+
+@table @var
+@item path
+Timidity config file path.@*
+Set the @b{NULL} to let Timidity use the default system paths by the internal logic.
+@end table
+
+@noindent
+The Timidity cfg file path which defines the set of patches used by the Timidity during playback.@*
+@b{Note}: Takes no effect when no MIDI music files currently loaded by Timidity. To apply the config path change
+you should unload all MIDI music using @code{Mix_FreeMusic()} call and open them back again.
+Timidity doesn't support individual different patch sets per song.
+
+@noindent
+@b{Returns}: 0 if success, -1 on failure.
+
+@cartouche
+@example
+// change the timidity config path
+Mix_SetTimidityCfg("/home/user/Music/timidity_patches/mybank.cfg");
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_GetTimidityCfg},
+@ref{Mix_PausedMusicStream},
+@ref{Mix_FadingMusicStream},
+@ref{Mix_PlayMusicStream}
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2213,7 +2904,21 @@ WIP
 @subsection Mix_GetTimidityCfg
 @findex Mix_GetTimidityCfg
 
-WIP
+@noindent
+@code{const char *@b{Mix_GetTimidityCfg}()}
+
+@noindent
+Reports the full path to the current config file. NULL if no custom config paths was set.
+
+@noindent
+@b{Returns}: The full Timidity config file path or @b{NULL}.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_SetTimidityCfg},
+@ref{Mix_PausedMusicStream},
+@ref{Mix_FadingMusicStream},
+@ref{Mix_PlayMusicStream}
 
 
 
@@ -2251,7 +2956,8 @@ if(Mix_SetSoundFonts("./myfonts/melodic.sf2;myfonts/drups.sf2")==0) @{
 @noindent
 @b{See Also}:@*
 @ref{Mix_GetSoundFonts},
-@ref{Mix_EachSoundFont}
+@ref{Mix_EachSoundFont},
+@ref{Mix_EachSoundFontEx}
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
@@ -2292,7 +2998,9 @@ for(path = strtok_r(fonts, ";", &context); path; path = strtok_r(NULL, ";", &con
 @noindent
 @b{See Also}:@*
 @ref{Mix_SetSoundFonts},
-@ref{Mix_EachSoundFont}
+@ref{Mix_EachSoundFont},
+@ref{Mix_EachSoundFontEx}
+
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
@@ -2341,7 +3049,8 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) @{
 @noindent
 @b{See Also}:@*
 @ref{Mix_SetSoundFonts},
-@ref{Mix_GetSoundFonts}
+@ref{Mix_GetSoundFonts},
+@ref{Mix_EachSoundFontEx}
 
 
 
@@ -2351,8 +3060,53 @@ for(!Mix_EachSoundFont(print_sound_font, NULL)) @{
 @subsection Mix_EachSoundFontEx
 @findex Mix_EachSoundFontEx
 
+@noindent
+@code{const char *@b{Mix_EachSoundFontEx}(const char* @var{cpaths}, int (*@var{function})(const char *, void *), void *@var{data})}
 
-WIP
+@table @var
+@item cpaths
+The semicolon-separated list of custom SoundFont file paths
+@item function
+The callback function will be called for each sound font
+listed in the paths. Has arguments @var{path} and @var{data}.
+@item data
+User data passed to the callback
+@end table
+
+@noindent
+Iterate the current set of internal paths list to sound font files will be used by
+FluidSynth MIDI backend, and additionally, iterate through the custom paths list given by the @var{cpaths} argument.
+If there are wasn't set by @ref{Mix_SetSoundFonts}
+function, there are will be tooken from @b{SDL_SOUNDFONTS} or
+@b{SDL_FORCE_SOUNDFONTS} environment variables.
+
+@noindent
+@b{Returns}: 1 if function successfully completed, or 0 if error has occouped.
+
+@cartouche
+@example
+int print_sound_font(const char *path, void *data) @{
+    printf(" - %s\n", path);
+    return 1;
+@}
+
+//...
+
+//Print list of available sound fonts
+char *fonts = Mix_GetSoundFonts();
+char *other_fonts = "/path/to/font1.sf2:/path/to/font2.sf2:/path/to/fontN.sf2";
+printf("Available sound fonts:\n");
+for(!Mix_EachSoundFontEx(other_fonts, print_sound_font, NULL)) @{
+    printf(" - %s\n", path);
+@}
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_SetSoundFonts},
+@ref{Mix_GetSoundFonts},
+@ref{Mix_EachSoundFont}
 
 
 
@@ -2659,8 +3413,8 @@ Value of @b{Mix_ADLMIDI_Emulator} enum.
 @end table
 
 @noindent
-Select the OPL3 Emulator for ADLMIDI
-@b{NOTE}: Applies on MIDI file reopen
+Select the default OPL3 Emulator for ADLMIDI used for every new MIDI file opened.@*
+@b{Note:} Using path arguments may override this setting.
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2669,7 +3423,15 @@ Select the OPL3 Emulator for ADLMIDI
 @subsection Mix_ADLMIDI_getChipsCount
 @findex Mix_ADLMIDI_getChipsCount
 
-WIP
+@noindent
+@code{int @b{Mix_ADLMIDI_getChipsCount}()}
+
+@noindent
+@b{Returns}: initial number of emulated chips running by ADLMIDI.
+
+@noindent
+Get the number of emulated chips used by ADLMIDI for every new MIDI file opened.
+
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
@@ -2677,7 +3439,17 @@ WIP
 @subsection Mix_ADLMIDI_setChipsCount
 @findex Mix_ADLMIDI_setChipsCount
 
-WIP
+@noindent
+@code{void @b{Mix_ADLMIDI_setChipsCount}(int @var{chips})}
+
+@table @var
+@item chips
+Number of emulated chips.
+@end table
+
+@noindent
+Get the number of emulated chips used by ADLMIDI for every new MIDI file opened.@*
+@b{Note:} Using path arguments may override this setting.
 
 
 
@@ -2725,7 +3497,14 @@ Mix_ADLMIDI_setCustomBankFile("./music/my-gm-bank.wonl");
 @subsection Mix_OPNMIDI_getVolumeModel
 @findex Mix_OPNMIDI_getVolumeModel
 
-WIP
+@noindent
+@code{int @b{Mix_OPNMIDI_getVolumeModel}()}
+
+@noindent
+@b{Returns}: value of @b{Mix_OPNMIDI_VolumeModel} enum which a current volume model.
+
+@noindent
+Get ID of current volumes model of OPNMIDI
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2734,7 +3513,17 @@ WIP
 @subsection Mix_OPNMIDI_setVolumeModel
 @findex Mix_OPNMIDI_setVolumeModel
 
-WIP
+@noindent
+@code{void @b{Mix_OPNMIDI_setVolumeModel}(int @var{vm})}
+
+@table @var
+@item vm
+Value of @b{Mix_OPNMIDI_VolumeModel} enum.
+@end table
+
+@noindent
+Change current volume model.
+@b{NOTE}: Applies on MIDI file reopen
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2843,7 +3632,15 @@ Select the OPN2 Emulator for OPNMIDI
 @subsection Mix_OPNMIDI_getChipsCount
 @findex Mix_OPNMIDI_getChipsCount
 
-WIP
+@noindent
+@code{int @b{Mix_OPNMIDI_getChipsCount}()}
+
+@noindent
+@b{Returns}: initial number of emulated chips running by OPNMIDI.
+
+@noindent
+Get the number of emulated chips used by OPNMIDI for every new MIDI file opened.
+
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
@@ -2851,7 +3648,17 @@ WIP
 @subsection Mix_OPNMIDI_setChipsCount
 @findex Mix_OPNMIDI_setChipsCount
 
-WIP
+@noindent
+@code{void @b{Mix_OPNMIDI_setChipsCount}(int @var{chips})}
+
+@table @var
+@item chips
+Number of emulated chips.
+@end table
+
+@noindent
+Get the number of emulated chips used by OPNMIDI for every new MIDI file opened.@*
+@b{Note:} Using path arguments may override this setting.
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
