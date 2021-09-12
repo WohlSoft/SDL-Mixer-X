@@ -242,13 +242,15 @@ typedef enum {
 /* OPN2 chip emulators for OPNMIDI */
 typedef enum {
     OPNMIDI_OPN2_EMU_DEFAULT = -1,
-    OPNMIDI_OPN2_EMU_MIME = 0,/*!!!TYPO!!!*/
     OPNMIDI_OPN2_EMU_MAME_OPN2 = 0,
     OPNMIDI_OPN2_EMU_NUKED,
     OPNMIDI_OPN2_EMU_GENS,
-    /* OPNMIDI_OPN2_EMU_GX, [THIS emulator is inavailable by default] */
-    OPNMIDI_OPN2_EMU_NP2 = 5,
-    OPNMIDI_OPN2_EMU_MAME_OPNA
+    OPNMIDI_OPN2_EMU_GX, /* Caution: THIS emulator is inavailable by default */
+    OPNMIDI_OPN2_EMU_NP2,
+    OPNMIDI_OPN2_EMU_MAME_OPNA,
+    OPNMIDI_OPN2_EMU_PMDWIN,
+    /* Deprecated */
+    OPNMIDI_OPN2_EMU_MIME = 0 /*!!!TYPO!!!*/
 } Mix_OPNMIDI_Emulator;
 
 /* The internal format for a music chunk interpreted via mikmod */
