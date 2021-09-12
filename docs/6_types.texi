@@ -13,6 +13,7 @@ These types are defined and used by the SDL_mixer API.
 * Mix_MIDI_Device::         MIDI sequencer type enumerations @b{[Mixer X]}
 * Mix_ADLMIDI_VolumeModel:: Volume model of libADLMIDI MIDI sequencer @b{[Mixer X]}
 * Mix_ADLMIDI_Emulator::    OPL3 chip emulators used by ADLMIDI @b{[Mixer X]}
+* Mix_OPNMIDI_VolumeModel:: Volume model of libOPNMIDI MIDI sequencer @b{[Mixer X]}
 * Mix_OPNMIDI_Emulator::    OPN2 chip emulators used by OPNMIDI @b{[Mixer X]}
 * Mix_Fading::              Fader effect type enumerations
 * Mix_EffectFunc_t::        Special effect callback function pointer
@@ -105,8 +106,13 @@ typedef enum @{
     MUS_FLAC,
     MUS_MODPLUG_UNUSED,
     MUS_OPUS,
-    MUS_GME,
-    MUS_ADLMIDI/*Use ADLMIDI coded for super-special formats like IMF, MUS or XMI are can't be played without ADLMIDI*/
+    /* MixerX specific codecs starts with 100 */
+    MUS_GME = 100,
+    /* Special cases to play formats IMF, MUS, or XMI are can't be played without specific MIDI libraries */
+    MUS_ADLMIDI = 200,
+    MUS_OPNMIDI,
+    MUS_FLUIDLITE,
+    MUS_NATIVEMIDI
 @} Mix_MusicType;
 @end example
 @end cartouche
@@ -196,7 +202,32 @@ typedef enum @{
 
 @b{ADLMIDI_OPL3_EMU_NUKED} is a Nuked OPL3 1.8 emulator which a very accurate, but needs a powerful CPU.@*
 @b{ADLMIDI_OPL3_EMU_NUKED_1_7_4} is an unofficial optimized Nuked OPL3 1.7.4. Needs a powerful CPU.@*
-@b{ADLMIDI_OPL3_EMU_DOSBOX} is a DosBox 0.74 emulator. Fast emulator.
+@b{ADLMIDI_OPL3_EMU_DOSBOX} is a DosBox 0.74 emulator. Fast emulator.@*
+@b{ADLMIDI_OPL3_EMU_OPAL} is a Opal emulator made by developers of the Reality Adlib Tracker. Doesn't implements rhythm mode.@*
+@b{ADLMIDI_OPL3_EMU_JAVA} is a C++ port of the "That Vintage Tone" Java-written emulator by Robson Cozendey.
+
+@c -----------------------------------------------------------------------------
+@page
+@node Mix_OPNMIDI_VolumeModel
+@section Mix_OPNMIDI_VolumeModel
+@tindex Mix_OPNMIDI_VolumeModel
+
+@cartouche
+@example
+typedef enum @{
+    OPNMIDI_VM_AUTO,
+    OPNMIDI_VM_GENERIC,
+    OPNMIDI_VM_NATIVE,
+    OPNMIDI_VM_DMX,
+    OPNMIDI_VM_APOGEE,
+    OPNMIDI_VM_9X
+@} Mix_OPNMIDI_VolumeModel;
+@end example
+@end cartouche
+
+@b{OPNMIDI_VM_AUTO} is automatical choice of volume model in dependence from selected bank.@*
+Otherwise they are self explanatory.
+
 
 @c -----------------------------------------------------------------------------
 @page
@@ -208,20 +239,24 @@ typedef enum @{
 @example
 typedef enum @{
     OPNMIDI_OPN2_EMU_DEFAULT = -1,
-    OPNMIDI_OPN2_EMU_MIME = 0,/*!!!TYPO!!!*/
     OPNMIDI_OPN2_EMU_MAME_OPN2 = 0,
     OPNMIDI_OPN2_EMU_NUKED,
     OPNMIDI_OPN2_EMU_GENS,
-    /* OPNMIDI_OPN2_EMU_GX, [THIS emulator is inavailable by default] */
-    OPNMIDI_OPN2_EMU_NP2 = 5,
-    OPNMIDI_OPN2_EMU_MAME_OPNA
+    OPNMIDI_OPN2_EMU_GX, /* Caution: THIS emulator is inavailable by default */
+    OPNMIDI_OPN2_EMU_NP2,
+    OPNMIDI_OPN2_EMU_MAME_OPNA,
+    OPNMIDI_OPN2_EMU_PMDWIN
 @} Mix_OPNMIDI_Emulator;
 @end example
 @end cartouche
 
-@b{OPNMIDI_OPN2_EMU_MIME} is a MIME YM2612 emulator, fast and well-accurate.@*
+@b{OPNMIDI_OPN2_EMU_MIME} is a MAME YM2612 emulator, fast and well-accurate.@*
 @b{OPNMIDI_OPN2_EMU_NUKED} is a Nuked OPN2 is a very accurate, but needs a VERY powerful CPU. It's much stronger even than Nuked OPL3!@*
-@b{OPNMIDI_OPN2_EMU_GENS} is a GENS 2.10 emulator. Very outdated and inaccurate, but fastest.
+@b{OPNMIDI_OPN2_EMU_GENS} is a GENS GS/II emulator. Isn't so accurate, but the fastest emulator here.@*
+@b{OPNMIDI_OPN2_EMU_GX} is a Genesis Plus GX emulator, a fork of the MAME. Experimental and usually disabled by default at the libOPNMIDI side.@*
+@b{OPNMIDI_OPN2_EMU_NP2} is a Neko Project II Kai OPNA emulator. Performance is almost same as GENS.@*
+@b{OPNMIDI_OPN2_EMU_MAME_OPNA} is a MIME OPNA emulator, very similar to MAME YM2612, but works a bit differently.@*
+@b{OPNMIDI_OPN2_EMU_PMDWIN} is a PMDWIN OPNA emulator, old and dirty emulator.
 
 @c -----------------------------------------------------------------------------
 @page

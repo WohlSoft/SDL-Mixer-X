@@ -8917,13 +8917,15 @@ if(!Mix_SetReverseStereo(MIX_CHANNEL_POST, 1)) {
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fEmulator">6.6 Mix_ADLMIDI_Emulator</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">    OPL3 chip emulators used by ADLMIDI <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fOPNMIDI_005fEmulator">6.7 Mix_OPNMIDI_Emulator</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">    OPN2 chip emulators used by OPNMIDI <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fOPNMIDI_005fVolumeModel">6.7 Mix_OPNMIDI_VolumeModel</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top"> Volume model of libOPNMIDI MIDI sequencer <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fFading">6.8 Mix_Fading</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">              Fader effect type enumerations
+<tr><td align="left" valign="top"><a href="#Mix_005fOPNMIDI_005fEmulator">6.8 Mix_OPNMIDI_Emulator</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">    OPN2 chip emulators used by OPNMIDI <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fEffectFunc_005ft">6.9 Mix_EffectFunc_t</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Special effect callback function pointer
+<tr><td align="left" valign="top"><a href="#Mix_005fFading">6.9 Mix_Fading</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">              Fader effect type enumerations
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fEffectDone_005ft">6.10 Mix_EffectDone_t</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Special effect done callback function pointer
+<tr><td align="left" valign="top"><a href="#Mix_005fEffectFunc_005ft">6.10 Mix_EffectFunc_t</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Special effect callback function pointer
+</td></tr>
+<tr><td align="left" valign="top"><a href="#Mix_005fEffectDone_005ft">6.11 Mix_EffectDone_t</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Special effect done callback function pointer
 </td></tr>
 </table>
 
@@ -9062,8 +9064,13 @@ Who knows why it isn&rsquo;t a pointer in this typedef...
     MUS_FLAC,
     MUS_MODPLUG_UNUSED,
     MUS_OPUS,
-    MUS_GME,
-    MUS_ADLMIDI/*Use ADLMIDI coded for super-special formats like IMF, MUS or XMI are can't be played without ADLMIDI*/
+    /* MixerX specific codecs starts with 100 */
+    MUS_GME = 100,
+    /* Special cases to play formats IMF, MUS, or XMI are can't be played without specific MIDI libraries */
+    MUS_ADLMIDI = 200,
+    MUS_OPNMIDI,
+    MUS_FLUIDLITE,
+    MUS_NATIVEMIDI
 } Mix_MusicType;
 </pre></td></tr></table>
 </td></tr></table>
@@ -9167,7 +9174,7 @@ Otherwise they are self explanatory.
 <a name="Mix_005fADLMIDI_005fEmulator"></a>
 <table cellpadding="1" cellspacing="1" border="0">
 <tr><td valign="middle" align="left">[<a href="#Mix_005fADLMIDI_005fVolumeModel" title="Previous section in reading order"> &lt; </a>]</td>
-<td valign="middle" align="left">[<a href="#Mix_005fOPNMIDI_005fEmulator" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Mix_005fOPNMIDI_005fVolumeModel" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Types" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#Types" title="Up section"> Up </a>]</td>
@@ -9199,13 +9206,54 @@ Otherwise they are self explanatory.
 
 <p><b>ADLMIDI_OPL3_EMU_NUKED</b> is a Nuked OPL3 1.8 emulator which a very accurate, but needs a powerful CPU.<br>
 <b>ADLMIDI_OPL3_EMU_NUKED_1_7_4</b> is an unofficial optimized Nuked OPL3 1.7.4. Needs a powerful CPU.<br>
-<b>ADLMIDI_OPL3_EMU_DOSBOX</b> is a DosBox 0.74 emulator. Fast emulator.
+<b>ADLMIDI_OPL3_EMU_DOSBOX</b> is a DosBox 0.74 emulator. Fast emulator.<br>
+<b>ADLMIDI_OPL3_EMU_OPAL</b> is a Opal emulator made by developers of the Reality Adlib Tracker. Doesn&rsquo;t implements rhythm mode.<br>
+<b>ADLMIDI_OPL3_EMU_JAVA</b> is a C++ port of the &quot;That Vintage Tone&quot; Java-written emulator by Robson Cozendey.
 </p>
+
+<hr size="6">
+<a name="Mix_005fOPNMIDI_005fVolumeModel"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#Mix_005fADLMIDI_005fEmulator" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Mix_005fOPNMIDI_005fEmulator" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#Types" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Types" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="#Defines" title="Next chapter"> &gt;&gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<a name="Mix_005fOPNMIDI_005fVolumeModel-1"></a>
+<h2 class="section">6.7 Mix_OPNMIDI_VolumeModel</h2>
+<a name="index-Mix_005fOPNMIDI_005fVolumeModel"></a>
+
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">typedef enum {
+    OPNMIDI_VM_AUTO,
+    OPNMIDI_VM_GENERIC,
+    OPNMIDI_VM_NATIVE,
+    OPNMIDI_VM_DMX,
+    OPNMIDI_VM_APOGEE,
+    OPNMIDI_VM_9X
+} Mix_OPNMIDI_VolumeModel;
+</pre></td></tr></table>
+</td></tr></table>
+
+<p><b>OPNMIDI_VM_AUTO</b> is automatical choice of volume model in dependence from selected bank.<br>
+Otherwise they are self explanatory.
+</p>
+
 
 <hr size="6">
 <a name="Mix_005fOPNMIDI_005fEmulator"></a>
 <table cellpadding="1" cellspacing="1" border="0">
-<tr><td valign="middle" align="left">[<a href="#Mix_005fADLMIDI_005fEmulator" title="Previous section in reading order"> &lt; </a>]</td>
+<tr><td valign="middle" align="left">[<a href="#Mix_005fOPNMIDI_005fVolumeModel" title="Previous section in reading order"> &lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#Mix_005fFading" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Types" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
@@ -9221,26 +9269,30 @@ Otherwise they are self explanatory.
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fOPNMIDI_005fEmulator-1"></a>
-<h2 class="section">6.7 Mix_OPNMIDI_Emulator</h2>
+<h2 class="section">6.8 Mix_OPNMIDI_Emulator</h2>
 <a name="index-Mix_005fOPNMIDI_005fEmulator"></a>
 
 <table class="cartouche" border="1"><tr><td>
 <table><tr><td>&nbsp;</td><td><pre class="example">typedef enum {
     OPNMIDI_OPN2_EMU_DEFAULT = -1,
-    OPNMIDI_OPN2_EMU_MIME = 0,/*!!!TYPO!!!*/
     OPNMIDI_OPN2_EMU_MAME_OPN2 = 0,
     OPNMIDI_OPN2_EMU_NUKED,
     OPNMIDI_OPN2_EMU_GENS,
-    /* OPNMIDI_OPN2_EMU_GX, [THIS emulator is inavailable by default] */
-    OPNMIDI_OPN2_EMU_NP2 = 5,
-    OPNMIDI_OPN2_EMU_MAME_OPNA
+    OPNMIDI_OPN2_EMU_GX, /* Caution: THIS emulator is inavailable by default */
+    OPNMIDI_OPN2_EMU_NP2,
+    OPNMIDI_OPN2_EMU_MAME_OPNA,
+    OPNMIDI_OPN2_EMU_PMDWIN
 } Mix_OPNMIDI_Emulator;
 </pre></td></tr></table>
 </td></tr></table>
 
-<p><b>OPNMIDI_OPN2_EMU_MIME</b> is a MIME YM2612 emulator, fast and well-accurate.<br>
+<p><b>OPNMIDI_OPN2_EMU_MIME</b> is a MAME YM2612 emulator, fast and well-accurate.<br>
 <b>OPNMIDI_OPN2_EMU_NUKED</b> is a Nuked OPN2 is a very accurate, but needs a VERY powerful CPU. It&rsquo;s much stronger even than Nuked OPL3!<br>
-<b>OPNMIDI_OPN2_EMU_GENS</b> is a GENS 2.10 emulator. Very outdated and inaccurate, but fastest.
+<b>OPNMIDI_OPN2_EMU_GENS</b> is a GENS GS/II emulator. Isn&rsquo;t so accurate, but the fastest emulator here.<br>
+<b>OPNMIDI_OPN2_EMU_GX</b> is a Genesis Plus GX emulator, a fork of the MAME. Experimental and usually disabled by default at the libOPNMIDI side.<br>
+<b>OPNMIDI_OPN2_EMU_NP2</b> is a Neko Project II Kai OPNA emulator. Performance is almost same as GENS.<br>
+<b>OPNMIDI_OPN2_EMU_MAME_OPNA</b> is a MIME OPNA emulator, very similar to MAME YM2612, but works a bit differently.<br>
+<b>OPNMIDI_OPN2_EMU_PMDWIN</b> is a PMDWIN OPNA emulator, old and dirty emulator.
 </p>
 
 <hr size="6">
@@ -9262,7 +9314,7 @@ Otherwise they are self explanatory.
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fFading-1"></a>
-<h2 class="section">6.8 Mix_Fading</h2>
+<h2 class="section">6.9 Mix_Fading</h2>
 <a name="index-Mix_005fFading"></a>
 
 <table class="cartouche" border="1"><tr><td>
@@ -9302,7 +9354,7 @@ Otherwise they are self explanatory.
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fEffectFunc_005ft-1"></a>
-<h2 class="section">6.9 Mix_EffectFunc_t</h2>
+<h2 class="section">6.10 Mix_EffectFunc_t</h2>
 <a name="index-Mix_005fEffectFunc_005ft"></a>
 
 <table class="cartouche" border="1"><tr><td>
@@ -9358,7 +9410,7 @@ It may also be advantageous to keep the effect state in the <var>udata</var>, wi
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <a name="Mix_005fEffectDone_005ft-1"></a>
-<h2 class="section">6.10 Mix_EffectDone_t</h2>
+<h2 class="section">6.11 Mix_EffectDone_t</h2>
 <a name="index-Mix_005fEffectDone_005ft"></a>
 
 <table class="cartouche" border="1"><tr><td>
@@ -9609,8 +9661,8 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <tr><td></td><td valign="top"><a href="#index-MIX_005fDEFAULT_005fFREQUENCY">MIX_DEFAULT_FREQUENCY</a></td><td valign="top"><a href="#Defines">7. Defines</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fEachSoundFont"><code>Mix_EachSoundFont</code></a></td><td valign="top"><a href="#Mix_005fEachSoundFont">5.5.79 Mix_EachSoundFont</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fEachSoundFontEx"><code>Mix_EachSoundFontEx</code></a></td><td valign="top"><a href="#Mix_005fEachSoundFontEx">5.5.80 Mix_EachSoundFontEx</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fEffectDone_005ft"><code>Mix_EffectDone_t</code></a></td><td valign="top"><a href="#Mix_005fEffectDone_005ft">6.10 Mix_EffectDone_t</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fEffectFunc_005ft"><code>Mix_EffectFunc_t</code></a></td><td valign="top"><a href="#Mix_005fEffectFunc_005ft">6.9 Mix_EffectFunc_t</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fEffectDone_005ft"><code>Mix_EffectDone_t</code></a></td><td valign="top"><a href="#Mix_005fEffectDone_005ft">6.11 Mix_EffectDone_t</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fEffectFunc_005ft"><code>Mix_EffectFunc_t</code></a></td><td valign="top"><a href="#Mix_005fEffectFunc_005ft">6.10 Mix_EffectFunc_t</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-MIX_005fEFFECTSMAXSPEED">MIX_EFFECTSMAXSPEED</a></td><td valign="top"><a href="#Defines">7. Defines</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fExpireChannel"><code>Mix_ExpireChannel</code></a></td><td valign="top"><a href="#Mix_005fExpireChannel">5.3.14 Mix_ExpireChannel</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fFadeInChannel"><code>Mix_FadeInChannel</code></a></td><td valign="top"><a href="#Mix_005fFadeInChannel">5.3.7 Mix_FadeInChannel</a></td></tr>
@@ -9627,7 +9679,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <tr><td></td><td valign="top"><a href="#index-Mix_005fFadeOutGroup"><code>Mix_FadeOutGroup</code></a></td><td valign="top"><a href="#Mix_005fFadeOutGroup">5.4.8 Mix_FadeOutGroup</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fFadeOutMusic"><code>Mix_FadeOutMusic</code></a></td><td valign="top"><a href="#Mix_005fFadeOutMusic">5.5.60 Mix_FadeOutMusic</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fFadeOutMusicStream"><code>Mix_FadeOutMusicStream</code></a></td><td valign="top"><a href="#Mix_005fFadeOutMusicStream">5.5.56 Mix_FadeOutMusicStream</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fFading"><code>Mix_Fading</code></a></td><td valign="top"><a href="#Mix_005fFading">6.8 Mix_Fading</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fFading"><code>Mix_Fading</code></a></td><td valign="top"><a href="#Mix_005fFading">6.9 Mix_Fading</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fFadingChannel"><code>Mix_FadingChannel</code></a></td><td valign="top"><a href="#Mix_005fFadingChannel">5.3.19 Mix_FadingChannel</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fFadingMusic"><code>Mix_FadingMusic</code></a></td><td valign="top"><a href="#Mix_005fFadingMusic">5.5.69 Mix_FadingMusic</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fFadingMusicStream"><code>Mix_FadingMusicStream</code></a></td><td valign="top"><a href="#Mix_005fFadingMusicStream">5.5.65 Mix_FadingMusicStream</a></td></tr>
@@ -9702,7 +9754,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <tr><td></td><td valign="top"><a href="#index-Mix_005fMusicType"><code>Mix_MusicType</code></a></td><td valign="top"><a href="#Mix_005fMusicType">6.3 Mix_MusicType</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fOpenAudio"><code>Mix_OpenAudio</code></a></td><td valign="top"><a href="#Mix_005fOpenAudio">5.1.4 Mix_OpenAudio</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fOpenAudioDevice"><code>Mix_OpenAudioDevice</code></a></td><td valign="top"><a href="#Mix_005fOpenAudioDevice">5.1.5 Mix_OpenAudioDevice</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fOPNMIDI_005fEmulator"><code>Mix_OPNMIDI_Emulator</code></a></td><td valign="top"><a href="#Mix_005fOPNMIDI_005fEmulator">6.7 Mix_OPNMIDI_Emulator</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fOPNMIDI_005fEmulator"><code>Mix_OPNMIDI_Emulator</code></a></td><td valign="top"><a href="#Mix_005fOPNMIDI_005fEmulator">6.8 Mix_OPNMIDI_Emulator</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fOPNMIDI_005fgetChipsCount"><code>Mix_OPNMIDI_getChipsCount</code></a></td><td valign="top"><a href="#Mix_005fOPNMIDI_005fgetChipsCount">5.5.111 Mix_OPNMIDI_getChipsCount</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fOPNMIDI_005fgetEmulator"><code>Mix_OPNMIDI_getEmulator</code></a></td><td valign="top"><a href="#Mix_005fOPNMIDI_005fgetEmulator">5.5.109 Mix_OPNMIDI_getEmulator</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fOPNMIDI_005fgetFullPanStereo"><code>Mix_OPNMIDI_getFullPanStereo</code></a></td><td valign="top"><a href="#Mix_005fOPNMIDI_005fgetFullPanStereo">5.5.107 Mix_OPNMIDI_getFullPanStereo</a></td></tr>
@@ -9715,6 +9767,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <tr><td></td><td valign="top"><a href="#index-Mix_005fOPNMIDI_005fsetFullRangeBrightness"><code>Mix_OPNMIDI_setFullRangeBrightness</code></a></td><td valign="top"><a href="#Mix_005fOPNMIDI_005fsetFullRangeBrightness">5.5.106 Mix_OPNMIDI_setFullRangeBrightness</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fOPNMIDI_005fsetSetDefaults"><code>Mix_OPNMIDI_setSetDefaults</code></a></td><td valign="top"><a href="#Mix_005fOPNMIDI_005fsetSetDefaults">5.5.113 Mix_OPNMIDI_setSetDefaults</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fOPNMIDI_005fsetVolumeModel"><code>Mix_OPNMIDI_setVolumeModel</code></a></td><td valign="top"><a href="#Mix_005fOPNMIDI_005fsetVolumeModel">5.5.104 Mix_OPNMIDI_setVolumeModel</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fOPNMIDI_005fVolumeModel"><code>Mix_OPNMIDI_VolumeModel</code></a></td><td valign="top"><a href="#Mix_005fOPNMIDI_005fVolumeModel">6.7 Mix_OPNMIDI_VolumeModel</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-MIX_005fPATCHLEVEL">MIX_PATCHLEVEL</a></td><td valign="top"><a href="#Defines">7. Defines</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fPause"><code>Mix_Pause</code></a></td><td valign="top"><a href="#Mix_005fPause">5.3.11 Mix_Pause</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fPauseAudio"><code>Mix_PauseAudio</code></a></td><td valign="top"><a href="#Mix_005fPauseAudio">5.1.6 Mix_PauseAudio</a></td></tr>
@@ -10043,10 +10096,11 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
     <li><a name="toc-Mix_005fMIDI_005fDevice-1" href="#Mix_005fMIDI_005fDevice">6.4 Mix_MIDI_Device</a></li>
     <li><a name="toc-Mix_005fADLMIDI_005fVolumeModel-1" href="#Mix_005fADLMIDI_005fVolumeModel">6.5 Mix_ADLMIDI_VolumeModel</a></li>
     <li><a name="toc-Mix_005fADLMIDI_005fEmulator-1" href="#Mix_005fADLMIDI_005fEmulator">6.6 Mix_ADLMIDI_Emulator</a></li>
-    <li><a name="toc-Mix_005fOPNMIDI_005fEmulator-1" href="#Mix_005fOPNMIDI_005fEmulator">6.7 Mix_OPNMIDI_Emulator</a></li>
-    <li><a name="toc-Mix_005fFading-1" href="#Mix_005fFading">6.8 Mix_Fading</a></li>
-    <li><a name="toc-Mix_005fEffectFunc_005ft-1" href="#Mix_005fEffectFunc_005ft">6.9 Mix_EffectFunc_t</a></li>
-    <li><a name="toc-Mix_005fEffectDone_005ft-1" href="#Mix_005fEffectDone_005ft">6.10 Mix_EffectDone_t</a></li>
+    <li><a name="toc-Mix_005fOPNMIDI_005fVolumeModel-1" href="#Mix_005fOPNMIDI_005fVolumeModel">6.7 Mix_OPNMIDI_VolumeModel</a></li>
+    <li><a name="toc-Mix_005fOPNMIDI_005fEmulator-1" href="#Mix_005fOPNMIDI_005fEmulator">6.8 Mix_OPNMIDI_Emulator</a></li>
+    <li><a name="toc-Mix_005fFading-1" href="#Mix_005fFading">6.9 Mix_Fading</a></li>
+    <li><a name="toc-Mix_005fEffectFunc_005ft-1" href="#Mix_005fEffectFunc_005ft">6.10 Mix_EffectFunc_t</a></li>
+    <li><a name="toc-Mix_005fEffectDone_005ft-1" href="#Mix_005fEffectDone_005ft">6.11 Mix_EffectDone_t</a></li>
   </ul></li>
   <li><a name="toc-Defines-1" href="#Defines">7. Defines</a></li>
   <li><a name="toc-Glossary-1" href="#Glossary">8. Glossary</a></li>
