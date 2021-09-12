@@ -174,7 +174,7 @@ Bytes used per output sample.
 Initialize the mixer API.@*
 This must be called before using other functions in this library.@*
 SDL must be initialized with @b{SDL_INIT_AUDIO} before this call.
-@var{frequency} would be 44100 for 44.1KHz, which is CD audio rate.  Most games use 22050, because 44100 requires too much CPU power on older computers.
+@var{frequency} would be 44100 for 44.1KHz, which is CD audio rate.  Some games use 22050, because 44100 requires too much CPU power on very old computers.
 @var{chunksize} is the size of each mixed sample.  The smaller this is the more your hooks will be called.  If make this too small on a slow system, sound may skip.  If made to large, sound effects will lag behind the action more.  You want a happy medium for your target computer.  You also may make this 4096, or larger, if you are just playing music.
 @b{MIX_CHANNELS}(8) mixing channels will be allocated by default.
 You may call this function multiple times, however you will have to call @code{Mix_CloseAudio} just as many times for the device to actually close.  The format will not changed on subsequent calls until fully closed.  So you will have to close all the way before trying to open with different format parameters.
@@ -203,6 +203,22 @@ same as @b{AUDIO_S16LSB} (for backwards compatability probably)@*
 Unsigned 16-bit samples, in system byte order@*
 @item AUDIO_S16SYS
 Signed 16-bit samples, in system byte order@*
+@item AUDIO_S32LSB
+Signed 32-bit samples, in little-endian byte order@*
+@item AUDIO_S32MSB
+Signed 32-bit samples, in bin-endian byte order@*
+@item AUDIO_S32
+same as @b{AUDIO_S32LSB} (for backwards compatability probably)@*
+@item AUDIO_S32SYS
+Signed 32-bit samples, in system byte order@*
+@item AUDIO_F32LSB
+Floating 32-bit samples, in little-endian byte order@*
+@item AUDIO_F32MSB
+Floating 32-bit samples, in big-endian byte order@*
+@item AUDIO_F32
+same as @b{AUDIO_F32LSB} (for backwards compatability probably)@*
+@item AUDIO_F32SYS
+Signed 32-bit float samples, in system byte order@*
 @end table
 @*
 @b{MIX_DEFAULT_FORMAT} is the same as @b{AUDIO_S16SYS}.
@@ -228,9 +244,12 @@ if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024)==-1) @{
 
 @noindent
 @b{See Also}:@*
+@ref{Mix_OpenAudioDevice},
 @ref{Mix_CloseAudio},
+@ref{Mix_PauseAudio},
 @ref{Mix_QuerySpec},
 @ref{Mix_AllocateChannels}
+@ref{Mix_OpenAudioDevice}
 
 
 
@@ -240,7 +259,65 @@ if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024)==-1) @{
 @subsection Mix_OpenAudioDevice
 @findex Mix_OpenAudioDevice
 
-WIP
+@noindent
+@code{int @b{Mix_OpenAudioDevice}(int @var{frequency}, Uint16 @var{format}, int @var{channels}, int @var{chunksize}, const char* @var{device}, int @var{allowed_changes})}
+
+@table @var
+@item frequency
+Output sampling frequency in samples per second (Hz).@*
+you might use @b{MIX_DEFAULT_FREQUENCY}(44100) since that is a good value for most games.
+@item format
+Output sample format. See @ref{Mix_OpenAudio} for the table of available formats.@*
+@item channels
+Number of sound channels in output.@*
+Set to 2 for stereo, 1 for mono.
+This has nothing to do with mixing channels.
+@item chunksize
+Bytes used per output sample.
+@item device
+A UTF-8 string reported by @code{SDL_GetAudioDeviceName()} or a driver-specific name as appropriate. NULL requests the most reasonable default device.
+@item allowed_changes
+0, or one or more flags OR'd together.
+@end table
+
+@noindent
+Initialize the mixer API.@*
+This must be called before using other functions in this library.@*
+SDL must be initialized with @b{SDL_INIT_AUDIO} before this call.
+@var{frequency} would be 44100 for 44.1KHz, which is CD audio rate. Some games use 22050, because 44100 requires too much CPU power on very old computers.
+@var{chunksize} is the size of each mixed sample.  The smaller this is the more your hooks will be called.  If make this too small on a slow system, sound may skip.  If made to large, sound effects will lag behind the action more.  You want a happy medium for your target computer.  You also may make this 4096, or larger, if you are just playing music.
+@b{MIX_CHANNELS}(8) mixing channels will be allocated by default.
+You may call this function multiple times, however you will have to call @code{Mix_CloseAudio} just as many times for the device to actually close.  The format will not changed on subsequent calls until fully closed.  So you will have to close all the way before trying to open with different format parameters.
+
+@noindent
+@b{Returns}: 0 on success, -1 on errors
+
+@cartouche
+@example
+// start SDL with audio support
+if(SDL_Init(SDL_INIT_AUDIO)==-1) @{
+    printf("SDL_Init: %s\n", SDL_GetError());
+    exit(1);
+@}
+// open 44.1KHz, signed 16bit, system byte order,
+//      stereo audio, using 1024 byte chunks
+if(Mix_OpenAudioDevice(44100, MIX_DEFAULT_FORMAT, 2, 1024, NULL,
+                        SDL_AUDIO_ALLOW_FREQUENCY_CHANGE |
+                        SDL_AUDIO_ALLOW_CHANNELS_CHANGE)==-1) @{
+    printf("Mix_OpenAudioDevice: %s\n", Mix_GetError());
+    exit(2);
+@}
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_OpenAudio},
+@ref{Mix_CloseAudio},
+@ref{Mix_PauseAudio},
+@ref{Mix_QuerySpec},
+@ref{Mix_AllocateChannels}
+@ref{Mix_OpenAudio}
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -249,8 +326,25 @@ WIP
 @subsection Mix_PauseAudio
 @findex Mix_PauseAudio
 
-WIP
+@noindent
+@code{void @b{Mix_PauseAudio}(int @var{pause_on})}
 
+@noindent
+Pauses or resume the whole audio processing: all playing music and channels will get paused synchroniously.
+
+@table @var
+@item pause_on
+1 pauses the whole audio processing, 0 resumes the audio processing back.
+@end table
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_OpenAudio},
+@ref{Mix_OpenAudioDevice},
+@ref{Mix_CloseAudio},
+@ref{Mix_QuerySpec},
+@ref{Mix_AllocateChannels}
+@ref{Mix_OpenAudio}
 
 
 
@@ -283,7 +377,9 @@ Mix_CloseAudio();
 @noindent
 @b{See Also}:@*
 @ref{Mix_OpenAudio},
+@ref{Mix_OpenAudioDevice},
 @ref{Mix_QuerySpec}
+@ref{Mix_PauseAudio},
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
