@@ -804,7 +804,7 @@ extern DECLSPEC double SDLCALL Mix_GetMusicTotalTime(Mix_Music *music);
     This function is only implemented for ADLMIDI, OPNMIDI MIDI synthesizers,
     GME chiptune formats, and for XMP library
  */
-extern DECLSPEC int SDLCALL Mix_SetMusicTempo(Mix_Music *music, double position);
+extern DECLSPEC int SDLCALL Mix_SetMusicTempo(Mix_Music *music, double tempo);
 
 /*
     Get the current tempo multiplier of the music stream
