@@ -1,4 +1,4 @@
-# SDL Mixer X
+# MixerX - the extended SDL_mixer
 A fork of [SDL_mixer](http://www.libsdl.org/projects/SDL_mixer/) library
 
 # Description
@@ -7,20 +7,18 @@ It supports any number of simultaneously playing channels of 16 bit stereo audio
 plus a single channel of music, mixed by the popular FLAC, OPUS, XMP, ModPlug,
 MikMod MOD, Timidity MIDI, FluidSynth, Ogg Vorbis, FLAC, libMAD, and MPG123 MP3 libraries.
 
-SDL Mixer X (or shorty MixerX) - is an extended fork made by Vitaly Novichkov "Wohlstand"
-in 13 January 2015. SDL_mixer is a quick and stable high-quality audio library,
-however, it had own bunch of deffects such as broken resampling, incorrect
-playback of WAV files, inability to choose MIDI backend in runtime,
-inability to customize Timidty patches path, No support for cross-fade
-and parallel streams playing (has only one musical stream. Using of very
-long Chunks is ineffectively), etc. The goal of this fork is resolving those
-issues, providing of more extended functionality than was originally,
-and providing the support for more supported audio formats. Some of listed issues
-got been fixed with newer updates of a mainstream SDL_mixer include backporting
-of MixerX changes into the mainstream directly.
+SDL Mixer X (or shorty MixerX) - It’s an extended fork of the SDL_mixer library
+made by Vitaly Novichkov "Wohlstand" in 13 January 2015. SDL_mixer is a quick and
+stable high-quality audio library, however, it has own bunch of deffects and lack
+of certain abilities such as inability to choose the MIDI backend in runtime,
+No support for cross-fade and parallel streams playing (has only one musical stream.
+Using of very long Chunks is ineffectively), etc. The goal of this fork is resolving
+those issues, providing more extended functionality than was originally, and
+providing support for more supported audio formats.
 
 ## New features of MixerX in comparison to original SDL_mixer
 * Added much more music formats (Such a game music emulators liks NSF, VGM, HES, GBM, etc. playing via GME library, also XMI, MUS, and IMF playing via [ADLMIDI](https://github.com/Wohlstand/libADLMIDI) library)
+* Support for multiple parallel music (or atmpsphere) streams using new-added API functions including the cross-fade support
 * Better MIDI support:
   * Added ability to choose any of available MIDI backends in runtime
   * Added ability to append custom config path for Timidity synthesizer, then no more limit to default patches set
@@ -30,6 +28,9 @@ of MixerX changes into the mainstream directly.
   * Added ADLMIDI Extra functions: Change bank ID, enable/disable high-level tremolo, enable/disable high-level vibrato, enable/disable scalable modulation, Set path to custom bank file (You can use [this editor](https://github.com/Wohlstand/OPL3BankEditor) to create or edit them)
   * Added OPNMIDI Extra function: Set path to custom bank file (You can use [this editor](https://github.com/Wohlstand/OPN2BankEditor) to create or edit them)
   * Music tempo change function: you can change speed of playing music by giving the factor value while music is playing. Works for MIDI (libADLMIDI and libOPNMIDI), GME, and XMP.
+  * Added music functions with the `Stream` suffix which can alter individual properties of every opened music and even play them concurrently.
+* Added an ability to set individual effects per every `Mix_Music` instance.
+* Built-in effects (such as 3D-position, distance, panning, and reverse stereo) now supported per every `Mix_Music` instance
 * Added support of [extra arguments](http://wohlsoft.ru/pgewiki/SDL_Mixer_X#Path_arguments) in the tail of the file path, passed into Mix_LoadMUS function.
 * Added ability to build shared library in the <u>stdcall</u> mode with static linking of libSDL on Windows to use it as independent audio library with other languages like VB6 or .NET.
 * CMake building systems in use
@@ -47,8 +48,8 @@ of MixerX changes into the mainstream directly.
 ## Requirements
 * Fresh [SDL2 library](https://hg.libsdl.org/SDL/)
 * Optionally, complete set of audio codecs from [this repository](https://github.com/WohlSoft/AudioCodecs) can be built in one run with a small effort.
-  * OGG Vorbis:
-    * [libogg, libvorbis, libvorbisfile](https://www.xiph.org/downloads/)
+  * OGG Vorbis or Tremor:
+    * [libogg, libvorbis, libvorbisfile (or libvorbisidec)](https://www.xiph.org/downloads/)
   * OPUS
     * [liboups, libopusfle](http://opus-codec.org/downloads/)
   * [FLAC](https://www.xiph.org/flac/)
