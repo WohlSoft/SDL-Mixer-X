@@ -170,7 +170,61 @@ if(!Mix_UnregisterAllEffects(0)) @{
 @subsection Mix_RegisterMusicEffect
 @findex Mix_RegisterMusicEffect
 
-WIP
+@example
+int @b{Mix_RegisterMusicEffect}(Mix_Music *@var{music}, Mix_MusicEffectFunc_t @var{f},
+                                Mix_MusicEffectDone_t @var{d}, void *@var{arg})
+@end example
+
+@table @var
+@item music
+music to register @var{f} and @var{d} on.@*
+@item f
+The function pointer for the music effects processor.
+@item d
+The function pointer for any cleanup routine to be called when the music is getting closed up.@*
+This may be @b{NULL} for any processors that don't need to clean up any memory or other dynamic data.
+@item arg
+A pointer to data to pass into the @var{f}'s and @var{d}'s @code{udata} parameter.  It is a good place
+to keep the state data for the processor, especially if the processor is made to handle multiple channels
+at the same time.@*
+This may be @b{NULL}, depending on the processor.
+@end table
+
+@noindent
+Hook a processor function @var{f} into a music for post processing effects.  You may just be reading
+the data and displaying it, or you may be altering the stream to add an echo.  Most processors also have
+state data that they allocate as they are in use, this would be stored in the @var{arg} pointer data space.
+When a processor is finished being used, any function passed into @var{d} will be called, which is when
+your processor should clean up the data in the @var{arg} data space.@*
+The effects are put into a linked list, and always appended to the end, meaning they always work on
+previously registered effects output.  Effects may be added multiple times in a row.
+Effects are cumulative this way.
+
+@noindent
+@b{Returns}: Zero on errors, such as a nonexisting music.
+
+@cartouche
+@example
+// make a passthru processor function that does nothing...
+void noEffect(Mix_Music *music, void *stream, int len, void *udata)
+@{
+    // you could work with stream here...
+@}
+...
+
+// Mix_Music *someMusic = Mix_LoadMUS("somemusic.ogg");
+// register noEffect as a someMusic processor
+if(!Mix_RegisterMusicEffect(someMusic, noEffect, NULL, NULL)) @{
+    printf("Mix_RegisterMusicEffect: %s\n", Mix_GetError());
+@}
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_UnregisterMusicEffect},
+@ref{Mix_UnregisterAllMusicEffects}
+
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
@@ -178,7 +232,42 @@ WIP
 @subsection Mix_UnregisterMusicEffect
 @findex Mix_UnregisterMusicEffect
 
-WIP
+@noindent
+@code{int @b{Mix_UnregisterMusicEffect}(Mix_Music @var{music}, Mix_MusicEffectFunc_t @var{f})}
+
+@table @var
+@item music
+Music to remove @var{f} from as a post processor.@*
+@item f
+The function to remove from @var{music}.
+@end table
+
+@noindent
+Remove the oldest (first found) registered effect function @var{f} from the effect list for @var{channel}.
+This only removes the first found occurance of that function, so it may need to be called multiple times
+if you added the same function multiple times, just stop removing when @code{Mix_UnregisterMusicEffect} returns
+an error, to remove all occurances of @var{f} from a channel.@*
+If the music is active the registered effect will have its @code{Mix_MusicEffectDone_t} function called,
+if it was specified in @code{Mix_RegisterMusicEffect}.
+
+@noindent
+@b{Returns}: Zero on errors, such as invalid music, or effect function not registered on music.
+
+@cartouche
+@example
+// unregister the noEffect from the someMusic effects
+// this removes all occurances of noEffect registered to the postmix
+while(Mix_UnregisterMusicEffect(someMusic, noEffect));
+// you may print Mix_GetError() if you want to check it.
+// it should say "No such effect registered" after this loop.
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_RegisterMusicEffect},
+@ref{Mix_UnregisterAllMusicEffects}
+
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
@@ -186,7 +275,34 @@ WIP
 @subsection Mix_UnregisterAllMusicEffects
 @findex Mix_UnregisterAllMusicEffects
 
-WIP
+@noindent
+@code{int @b{Mix_UnregisterAllMusicEffects}(Mix_Music *@var{music})}
+
+@table @var
+@item music
+Music to remove all effects from.@*
+@end table
+
+@noindent
+This removes all effects registered to @var{music}.
+If the music is active all the registered effects will have their @code{Mix_MusicEffectDone_t} functions called, if they were specified in @code{Mix_RegisterMusicEffect}.
+
+@noindent
+@b{Returns}: Zero on errors, such as @var{music} not existing.
+
+@cartouche
+@example
+// remove all effects from someMusic
+if(!Mix_UnregisterAllMusicEffects(someMusic)) @{
+    printf("Mix_UnregisterAllMusicEffects: %s\n", Mix_GetError());
+@}
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_RegisterMusicEffect},
+@ref{Mix_UnregisterMusicEffect}
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -416,7 +532,49 @@ if(!Mix_SetReverseStereo(MIX_CHANNEL_POST, 1)) @{
 @subsection Mix_SetMusicEffectPanning
 @findex Mix_SetMusicEffectPanning
 
-WIP
+@noindent
+@code{int @b{Mix_SetMusicEffectPanning}(Mix_Music *@var{music}, Uint8 @var{left}, Uint8 @var{right})}
+
+@table @var
+@item music
+Music to register this effect on.@*
+@item left
+Volume for the left channel, range is 0(silence) to 255(loud)
+@item right
+Volume for the left channel, range is 0(silence) to 255(loud)
+@end table
+
+@noindent
+This effect will only work on stereo audio.  Meaning you called @code{Mix_OpenAudio}
+with 2 channels (@b{MIX_DEFAULT_CHANNELS}).  The easiest way to do true panning is to call
+@code{Mix_SetMusicEffectPanning(music, left, 254 - left);} so that the total volume is correct,
+if you consider the maximum volume to be 127 per channel for center, or 254 max for left, this works,
+but about halves the effective volume.@*
+This Function registers the effect for you, so don't try to @code{Mix_RegisterMusicEffect} it yourself.@*
+@b{NOTE}: Setting both @var{left} and @var{right} to 255 will unregister the effect from
+@var{music}.  You cannot unregister it any other way, unless you use
+@code{Mix_UnregisterAllMusicEffects} on the @var{music}.@*
+@b{NOTE}: Using this function on a mono audio device will not register the effect,
+nor will it return an error status.
+
+
+@noindent
+@b{Returns}: Zero on errors, such as bad music, or if @code{Mix_RegisterMusicEffect} failed.
+
+@cartouche
+@example
+// pan someMusic halfway to the left
+if(!Mix_SetMusicEffectPanning(someMusic, 255, 127)) @{
+    printf("Mix_SetMusicEffectPanning: %s\n", Mix_GetError());
+    // no panning, is it ok?
+@}
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_SetMusicEffectPosition},
+@ref{Mix_UnregisterAllMusicEffects}
 
 
 
@@ -426,8 +584,40 @@ WIP
 @subsection Mix_SetMusicEffectDistance
 @findex Mix_SetMusicEffectDistance
 
-WIP
+@noindent
+@code{int @b{Mix_SetMusicEffectDistance}(Mix_Music *@var{music}, Uint8 @var{distance})}
 
+@table @var
+@item music
+Music to register this effect on.@*
+@item distance
+Specify the distance from the listener, from 0(close/loud) to 255(far/quiet).
+@end table
+
+@noindent
+This effect simulates a simple attenuation of volume due to distance.
+The volume never quite reaches silence, even at max distance.@*
+@b{NOTE}: Using a @var{distance} of 0 will cause the effect to unregister itself from @var{channel}.
+You cannot unregister it any other way, unless you use @code{Mix_UnregisterAllMusicEffects} on the @var{music}.
+
+@noindent
+@b{Returns}: Zero on errors, such as an invalid music, or if @code{Mix_RegisterMusicEffect} failed.
+
+@cartouche
+@example
+// distance someMusic to be farthest away
+if(!Mix_SetMusicEffectDistance(someMusic, 255)) @{
+    printf("Mix_SetMusicEffectDistance: %s\n", Mix_GetError());
+    // no distance, is it ok?
+@}
+@end example
+@end cartouche
+
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_SetMusicEffectPosition},
+@ref{Mix_UnregisterAllMusicEffects}
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -436,8 +626,53 @@ WIP
 @subsection Mix_SetMusicEffectPosition
 @findex Mix_SetMusicEffectPosition
 
-WIP
+@noindent
+@code{int @b{Mix_SetMusicEffectPosition}(Mix_Music *@var{music}, Sint16 @var{angle}, Uint8 @var{distance})}
 
+@table @var
+@item music
+Music to register this effect on.@*
+@item angle
+Direction in relation to forward from 0 to 360 degrees.  Larger angles will be reduced to this range using @code{@var{angles} % 360}.@*
+0 = directly in front.@*
+90 = directly to the right.@*
+180 = directly behind.@*
+270 = directly to the left.@*
+So you can see it goes clockwise starting at directly in front.@*
+This ends up being similar in effect to @code{Mix_SetMusicEffectPanning}.
+@item distance
+The distance from the listener, from 0(near/loud) to 255(far/quiet).@*
+This is the same as the @code{Mix_SetMusicEffectDistance} effect.
+@end table
+
+@noindent
+This effect emulates a simple 3D audio effect.
+It's not all that realistic, but it can help improve some level of realism.
+By giving it the angle and distance from the camera's point of view, the effect pans and attenuates volumes.
+If you are looking for better positional audio, using @b{OpenAL} is suggested.@*
+@b{NOTE}: Using @var{angle} and @var{distance} of 0, will cause the effect to unregister itself
+from @var{music}.
+You cannot unregister it any other way, unless you use @code{Mix_UnregisterAllMusicEffects} on the @var{music}.
+
+@noindent
+@b{Returns}: Zero on errors, such as an invalid music, or if @code{Mix_RegisterMusicEffect} failed.
+
+@cartouche
+@example
+// set someMusic to be behind and right, and 100 units away
+if(!Mix_SetMusicEffectPosition(someMusic, 135, 100)) @{
+    printf("Mix_SetMusicEffectPosition: %s\n", Mix_GetError());
+    // no position effect, is it ok?
+@}
+@end example
+@end cartouche
+
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_SetMusicEffectPanning},
+@ref{Mix_SetMusicEffectDistance},
+@ref{Mix_UnregisterAllMusicEffects}
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -446,4 +681,35 @@ WIP
 @subsection Mix_SetMusicEffectReverseStereo
 @findex Mix_SetMusicEffectReverseStereo
 
-WIP
+@noindent
+@code{int @b{Mix_SetMusicEffectReverseStereo}(Mix_Music *@var{music}, int @var{flip})}
+
+@table @var
+@item music
+Music to register this effect on.@*
+@item flip
+Must be non-zero to work, means nothing to the effect processor itself.@*
+set to zero to unregister the effect from @var{music}.
+@end table
+
+@noindent
+Simple reverse stereo, swaps left and right channel sound.@*
+@b{NOTE}: Using a @var{flip} of 0, will cause the effect to unregister itself from @var{music}.
+You cannot unregister it any other way, unless you use @code{Mix_UnregisterAllMusicEffects} on the @var{music}.
+
+@noindent
+@b{Returns}: Zero on errors, such as an invalid music, or if @code{Mix_RegisterMusicEffect} failed.
+
+@cartouche
+@example
+// set the someMusic to be reverse stereo
+if(!Mix_SetMusicEffectReverseStereo(someMusic, 1)) @{
+    printf("Mix_SetMusicEffectReverseStereo: %s\n", Mix_GetError());
+    // no reverse stereo, is it ok?
+@}
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_UnregisterAllMusicEffects}

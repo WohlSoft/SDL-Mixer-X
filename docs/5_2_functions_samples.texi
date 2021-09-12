@@ -50,6 +50,7 @@ printf("There are %d sample chunk deocoders available\n", Mix_GetNumChunkDecoder
 @b{See Also}:@*
 @ref{Mix_GetNumMusicDecoders},
 @ref{Mix_GetChunkDecoder},
+@ref{Mix_HasChunkDecoder},
 @ref{Mix_LoadWAV}
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -87,6 +88,7 @@ for(i=0; i<max; ++i)
 @b{See Also}:@*
 @ref{Mix_GetNumChunkDecoders},
 @ref{Mix_GetMusicDecoder},
+@ref{Mix_HasChunkDecoder},
 @ref{Mix_LoadWAV}
 
 
@@ -96,7 +98,26 @@ for(i=0; i<max; ++i)
 @subsection Mix_HasChunkDecoder
 @findex Mix_HasChunkDecoder
 
-WIP
+@noindent
+@code{SDL_bool @b{Mix_HasChunkDecoder}(const char *@var{name})}
+
+@table @var
+@item name
+The decoder name to check it's presence.
+@end table
+
+@noindent
+Check if the sample chunk decoder named as @var{name} presented in this library build.
+
+@noindent
+@b{Returns}: @code{SDL_TRUE} if the requested codec name is available in this library build or @code{SDL_FALSE} if not.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_GetNumChunkDecoders},
+@ref{Mix_GetChunkDecoder},
+@ref{Mix_GetMusicDecoder},
+@ref{Mix_LoadWAV}
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

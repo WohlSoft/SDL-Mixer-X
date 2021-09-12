@@ -16,8 +16,11 @@ These types are defined and used by the SDL_mixer API.
 * Mix_OPNMIDI_VolumeModel:: Volume model of libOPNMIDI MIDI sequencer @b{[Mixer X]}
 * Mix_OPNMIDI_Emulator::    OPN2 chip emulators used by OPNMIDI @b{[Mixer X]}
 * Mix_Fading::              Fader effect type enumerations
-* Mix_EffectFunc_t::        Special effect callback function pointer
-* Mix_EffectDone_t::        Special effect done callback function pointer
+* Mix_EffectFunc_t::        Special channel effect callback function pointer
+* Mix_EffectDone_t::        Special channel effect done callback function pointer
+* Mix_MusicEffectFunc_t::   Special music effect callback function pointer
+* Mix_MusicEffectDone_t::   Special music effect done callback function pointer
+* Mix_CommonMixer_t::       Common mixer function pointer
 @end menu
 
 @c -----------------------------------------------------------------------------
@@ -353,3 +356,108 @@ or free some memory.  It should free memory at least, because the processor coul
 @b{See Also}:@*
 @ref{Mix_RegisterEffect}
 @ref{Mix_UnregisterEffect}
+
+
+@c -----------------------------------------------------------------------------
+@page
+@node Mix_MusicEffectFunc_t
+@section Mix_MusicEffectFunc_t
+@tindex Mix_MusicEffectFunc_t
+
+@cartouche
+@example
+typedef void (*Mix_MusicEffectFunc_t)(Mix_Music *@var{music}, void *@var{stream}, int @var{len},
+                                 void *@var{udata});
+@end example
+@end cartouche
+
+@table @var
+@item music
+The music that this effect is effecting now.@*
+@item stream
+The buffer containing the current sample to process.
+@item len
+The length of @var{stream} in bytes.
+@item udata
+User data pointer that was passed in to @code{Mix_RegisterMusicEffect} when registering this
+effect processor function.
+@end table
+
+@noindent
+This is the prototype for effect processing functions.
+These functions are used to apply effects processing on a music.
+As a music plays a sample, the registered effect functions are called.
+Each effect would then read and perhaps alter the @var{len} bytes of @var{stream}.
+It may also be advantageous to keep the effect state in the @var{udata},
+with would be setup when registering the effect function on a channel.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_RegisterMusicEffect}
+@ref{Mix_UnregisterMusicEffect}
+
+
+@c -----------------------------------------------------------------------------
+@page
+@node Mix_MusicEffectDone_t
+@section Mix_MusicEffectDone_t
+@tindex Mix_MusicEffectDone_t
+
+@cartouche
+@example
+typedef void (*Mix_MusicEffectDone_t)(Mix_Music @var{music}, void *@var{udata});
+@end example
+@end cartouche
+
+@table @var
+@item music
+The music that this effect is effecting now.@*
+@item udata
+User data pointer that was passed in to @code{Mix_RegisterMusicEffect} when registering this
+effect processor function.
+@end table
+
+@noindent
+This is the prototype for effect processing functions.
+This is called when a music has finished playing, or halted, or is deallocated.
+This is also called when a processor is unregistered while processing is active.
+At that time the effects processing function may want to reset some internal variables
+or free some memory.  It should free memory at least, because the processor could be freed after this call.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_RegisterMusicEffect}
+@ref{Mix_UnregisterMusicEffect}
+
+
+@c -----------------------------------------------------------------------------
+@page
+@node Mix_CommonMixer_t
+@section Mix_CommonMixer_t
+@tindex Mix_CommonMixer_t
+
+@cartouche
+@example
+typedef void (*Mix_CommonMixer_t)(void *@var{udata}, void *@var{stream}, int @var{len});
+@end example
+@end cartouche
+
+@table @var
+@item udata
+User data pointer that you can pass into the function.
+@item stream
+The destination buffer to write the data.@*
+@item len
+The length of the buffer to write the data.@*
+@end table
+
+@noindent
+This is the prototype for the internal mixer processing callback.
+You should to call given callbacks to run the internal mixer processing
+and get the final audio data ready for output.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_GetMusicMixer}
+@ref{Mix_GetMultiMusicMixer}
+@ref{Mix_GetGeneralMixer}

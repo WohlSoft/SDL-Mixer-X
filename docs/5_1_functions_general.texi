@@ -248,7 +248,7 @@ if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024)==-1) @{
 @ref{Mix_CloseAudio},
 @ref{Mix_PauseAudio},
 @ref{Mix_QuerySpec},
-@ref{Mix_AllocateChannels}
+@ref{Mix_AllocateChannels},
 @ref{Mix_OpenAudioDevice}
 
 
@@ -316,7 +316,7 @@ if(Mix_OpenAudioDevice(44100, MIX_DEFAULT_FORMAT, 2, 1024, NULL,
 @ref{Mix_CloseAudio},
 @ref{Mix_PauseAudio},
 @ref{Mix_QuerySpec},
-@ref{Mix_AllocateChannels}
+@ref{Mix_AllocateChannels},
 @ref{Mix_OpenAudio}
 
 
@@ -343,7 +343,7 @@ Pauses or resume the whole audio processing: all playing music and channels will
 @ref{Mix_OpenAudioDevice},
 @ref{Mix_CloseAudio},
 @ref{Mix_QuerySpec},
-@ref{Mix_AllocateChannels}
+@ref{Mix_AllocateChannels},
 @ref{Mix_OpenAudio}
 
 
@@ -378,7 +378,7 @@ Mix_CloseAudio();
 @b{See Also}:@*
 @ref{Mix_OpenAudio},
 @ref{Mix_OpenAudioDevice},
-@ref{Mix_QuerySpec}
+@ref{Mix_QuerySpec},
 @ref{Mix_PauseAudio},
 
 
@@ -388,7 +388,34 @@ Mix_CloseAudio();
 @subsection Mix_InitMixer
 @findex Mix_InitMixer
 
-WIP
+@noindent
+@code{void @b{Mix_InitMixer}(const SDL_AudioSpec *@var{spec}, SDL_bool @var{skip_init_check})}
+
+@table @var
+@item spec
+The audio spec such as frequency, sample format, number of channels, and desired chunk size, using the @code{SDL_AudioSpec} structure.
+@item skip_init_check
+Disable the internal check of the initialization state.
+@end table
+
+@noindent
+Initialize the mixer API without starting the audio processing.
+That means, you can make your own audio processing and manually run the mixer API
+by using callbacks you may retrieve using @ref{Mix_GetGeneralMixer}, @ref{Mix_GetMusicMixer},
+and @ref{Mix_GetMultiMusicMixer} calls.
+
+@noindent
+@b{CAUTION:} Don't even try to call this function and any of mixer callback
+if you initialized the mixer using @ref{Mix_OpenAudio} or @ref{Mix_OpenAudioDevice} calls.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_GetMusicMixer},
+@ref{Mix_GetMultiMusicMixer},
+@ref{Mix_GetGeneralMixer},
+@ref{Mix_FreeMixer}
+
+
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
@@ -396,7 +423,28 @@ WIP
 @subsection Mix_GetMusicMixer
 @findex Mix_GetMusicMixer
 
-WIP
+@noindent
+@code{Mix_CommonMixer_t @b{Mix_GetMusicMixer}()}
+
+@noindent
+@b{Returns}: The mixer callback to process the single-stream music.
+
+@noindent
+Get the callback to process the single-stream music out of the main process of mixer API
+and receive the output of currently playing single-stream music. To receive the
+multi-stream music output use the @ref{Mix_GetMultiMusicMixer} callback.@*
+
+@noindent
+@b{CAUTION:} Don't even try to call the returned callback if you initialized the mixer using
+@ref{Mix_OpenAudio} or @ref{Mix_OpenAudioDevice} calls.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_InitMixer},
+@ref{Mix_GetMultiMusicMixer},
+@ref{Mix_GetGeneralMixer},
+@ref{Mix_FreeMixer}
+
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -405,7 +453,29 @@ WIP
 @subsection Mix_GetMultiMusicMixer
 @findex Mix_GetMultiMusicMixer
 
-WIP
+@noindent
+@code{Mix_CommonMixer_t @b{Mix_GetMultiMusicMixer}()}
+
+@noindent
+@b{Returns}: The mixer callback to process the multi-stream music.
+
+@noindent
+Get the callback to process the single-stream music out of the main process of mixer API
+and receive the output of all music streams except the single-stream music. To receive the
+single-stream music output use the @ref{Mix_GetMusicMixer} callback.@*
+
+@noindent
+@b{CAUTION:} Don't even try to call the returned callback if you initialized the mixer using
+@ref{Mix_OpenAudio} or @ref{Mix_OpenAudioDevice} calls.
+
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_InitMixer},
+@ref{Mix_GetMusicMixer},
+@ref{Mix_GetGeneralMixer},
+@ref{Mix_FreeMixer}
+
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -414,7 +484,33 @@ WIP
 @subsection Mix_GetGeneralMixer
 @findex Mix_GetGeneralMixer
 
-WIP
+@noindent
+@code{Mix_CommonMixer_t @b{Mix_GetMultiMusicMixer}()}
+
+@noindent
+@b{Returns}: The mixer callback to process the general mixer API.
+
+@noindent
+Get the callback to process the general Mixer API out of the main process of mixer API
+and receive the generated output of all playing music streams and channels.@*
+
+@noindent
+@b{CAUTION 1:} Don't even try to call the returned callback if you initialized the mixer using
+@ref{Mix_OpenAudio} or @ref{Mix_OpenAudioDevice} calls.
+
+@noindent
+@b{CAUTION 2:} Once you execute the callback returned by @code{Mix_GetGeneralMixer())},
+callbacks returned by @code{Mix_GetMusicMixer()} and @code{Mix_GetMultiMusicMixer()} were
+already processed internally. You don't need to call them at all.
+
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_InitMixer},
+@ref{Mix_GetMusicMixer},
+@ref{Mix_GetMultiMusicMixer},
+@ref{Mix_FreeMixer}
+
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -423,7 +519,23 @@ WIP
 @subsection Mix_FreeMixer
 @findex Mix_FreeMixer
 
-WIP
+@noindent
+@code{void @b{Mix_FreeMixer}()}
+
+@noindent
+Shutdown and cleanup the mixer API.@*
+Use this call in only condition you initialized the mixer API using the @ref{Mix_InitMixer} call.
+
+@noindent
+@b{CAUTION:} Don't even try to call this function and any of mixer callback
+if you initialized the mixer using @ref{Mix_OpenAudio} or @ref{Mix_OpenAudioDevice} calls.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_InitMixer},
+@ref{Mix_GetMusicMixer},
+@ref{Mix_GetMultiMusicMixer},
+@ref{Mix_GetGeneralMixer}
 
 
 
@@ -523,6 +635,10 @@ else @{
         case AUDIO_S16LSB: format_str="S16LSB"; break;
         case AUDIO_U16MSB: format_str="U16MSB"; break;
         case AUDIO_S16MSB: format_str="S16MSB"; break;
+        case AUDIO_S32LSB: format_str="S32LSB"; break;
+        case AUDIO_S32MSB: format_str="S32MSB"; break;
+        case AUDIO_F32LSB: format_str="F32LSB"; break;
+        case AUDIO_F32MSB: format_str="F32MSB"; break;
     @}
     printf("opened=%d times  frequency=%dHz  format=%s  channels=%d",
             numtimesopened, frequency, format_str, channels);
