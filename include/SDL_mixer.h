@@ -887,7 +887,7 @@ extern DECLSPEC Mix_CommonMixer_t SDLCALL Mix_GetMultiMusicMixer(void);
 
 /* returns a pointer to the general mixer of music and channels that can be used as a callback
  *
- * This mixer processes the whole internality of the Mixereqg library: music, mutli-music, and channels
+ * This mixer processes the whole internality of the Mixer library: music, mutli-music, and channels
  * Use this callback if you want to make your own audio output processing. Use the Mix_InitMixer() to
  * initialize the Mixer without starting the SDL Audio instance and the Mix_FreeMixer() to close the library.
  *
