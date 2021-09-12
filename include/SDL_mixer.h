@@ -1091,8 +1091,10 @@ extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getAdLibMode(void);
 MIXERX_DEPRECATED("This function is no more useful, rhythm-mode is now fully automated")
 extern DECLSPEC void SDLCALL Mix_ADLMIDI_setAdLibMode(int tr);
 /* Get state of logarithmic mode */
+MIXERX_DEPRECATED("This function is no longer has effect. Please use the Mix_ADLMIDI_getVolumeModel()")
 extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getLogarithmicVolumes(void);
 /* Set logarithmic volumes mode in the generic/CMF volume models (0 off, 1 on) (Applying on stop/play) */
+MIXERX_DEPRECATED("This function is no longer has effect. Please use the Mix_ADLMIDI_setVolumeModel()")
 extern DECLSPEC void SDLCALL Mix_ADLMIDI_setLogarithmicVolumes(int lv);
 /* Get current volume model ID */
 extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getVolumeModel(void);
