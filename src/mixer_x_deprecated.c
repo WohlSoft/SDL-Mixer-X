@@ -59,7 +59,7 @@ void SDLCALLCC Mix_ADLMIDI_setAdLibMode(int ald)
 int SDLCALLCC Mix_ADLMIDI_getLogarithmicVolumes()
 {
 #ifdef MUSIC_MID_ADLMIDI
-    return (Mix_ADLMIDI_getVolumeModel() == ADLMIDI_VM_CMF);
+    return (Mix_ADLMIDI_getVolumeModel() == ADLMIDI_VM_NATIVE);
 #else
     return -1;
 #endif
@@ -68,7 +68,7 @@ int SDLCALLCC Mix_ADLMIDI_getLogarithmicVolumes()
 void SDLCALLCC Mix_ADLMIDI_setLogarithmicVolumes(int vm)
 {
 #ifdef MUSIC_MID_ADLMIDI
-    Mix_ADLMIDI_setVolumeModel(vm ? ADLMIDI_VM_CMF : ADLMIDI_VM_AUTO);
+    Mix_ADLMIDI_setVolumeModel(vm ? ADLMIDI_VM_NATIVE : ADLMIDI_VM_AUTO);
 #else
     (void)vm;
 #endif

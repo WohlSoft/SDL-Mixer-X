@@ -184,7 +184,7 @@ typedef enum {
     MUS_OPUS,
     /* MixerX specific codecs starts with 100 */
     MUS_GME = 100,
-    /* Special cases to play formats IMF, MUS or XMI are can't be played without specific MIDI libraries */
+    /* Special cases to play formats IMF, MUS, or XMI are can't be played without specific MIDI libraries */
     MUS_ADLMIDI = 200,
     MUS_OPNMIDI,
     MUS_FLUIDLITE,
@@ -205,7 +205,7 @@ typedef enum {
 typedef enum {
     ADLMIDI_VM_AUTO,
     ADLMIDI_VM_GENERIC,
-    ADLMIDI_VM_CMF,
+    ADLMIDI_VM_NATIVE,
     ADLMIDI_VM_DMX,
     ADLMIDI_VM_APOGEE,
     ADLMIDI_VM_9X,
@@ -214,7 +214,9 @@ typedef enum {
     ADLMIDI_VM_AIL,
     ADLMIDI_VM_9X_GENERIC_FM,
     ADLMIDI_VM_HMI,
-    ADLMIDI_VM_HMI_OLD
+    ADLMIDI_VM_HMI_OLD,
+    /* Deprecated */
+    ADLMIDI_VM_CMF = ADLMIDI_VM_NATIVE
 } Mix_ADLMIDI_VolumeModel;
 
 /* OPL3 chip emulators for ADLMIDI */
@@ -227,16 +229,28 @@ typedef enum {
     ADLMIDI_OPL3_EMU_JAVA
 } Mix_ADLMIDI_Emulator;
 
+/* Volume model type in the OPNMIDI */
+typedef enum {
+    OPNMIDI_VM_AUTO,
+    OPNMIDI_VM_GENERIC,
+    OPNMIDI_VM_NATIVE,
+    OPNMIDI_VM_DMX,
+    OPNMIDI_VM_APOGEE,
+    OPNMIDI_VM_9X
+} Mix_OPNMIDI_VolumeModel;
+
 /* OPN2 chip emulators for OPNMIDI */
 typedef enum {
     OPNMIDI_OPN2_EMU_DEFAULT = -1,
-    OPNMIDI_OPN2_EMU_MIME = 0,/*!!!TYPO!!!*/
     OPNMIDI_OPN2_EMU_MAME_OPN2 = 0,
     OPNMIDI_OPN2_EMU_NUKED,
     OPNMIDI_OPN2_EMU_GENS,
-    /* OPNMIDI_OPN2_EMU_GX, [THIS emulator is inavailable by default] */
-    OPNMIDI_OPN2_EMU_NP2 = 5,
-    OPNMIDI_OPN2_EMU_MAME_OPNA
+    OPNMIDI_OPN2_EMU_GX, /* Caution: THIS emulator is inavailable by default */
+    OPNMIDI_OPN2_EMU_NP2,
+    OPNMIDI_OPN2_EMU_MAME_OPNA,
+    OPNMIDI_OPN2_EMU_PMDWIN,
+    /* Deprecated */
+    OPNMIDI_OPN2_EMU_MIME = 0 /*!!!TYPO!!!*/
 } Mix_OPNMIDI_Emulator;
 
 /* The internal format for a music chunk interpreted via mikmod */
@@ -247,6 +261,9 @@ extern DECLSPEC int SDLCALL Mix_OpenAudio(int frequency, Uint16 format, int chan
 
 /* Open the mixer with specific device and certain audio format */
 extern DECLSPEC int SDLCALL Mix_OpenAudioDevice(int frequency, Uint16 format, int channels, int chunksize, const char* device, int allowed_changes);
+
+/* Pause or resume the audio streaming */
+extern DECLSPEC void SDLCALL Mix_PauseAudio(int pause_on);
 
 /* Dynamically change the number of channels managed by the mixer.
    If decreasing the number of channels, the upper channels are
@@ -270,6 +287,9 @@ extern DECLSPEC int SDLCALL Mix_QuerySpec(int *frequency,Uint16 *format,int *cha
 extern DECLSPEC Mix_Chunk * SDLCALL Mix_LoadWAV_RW(SDL_RWops *src, int freesrc);
 #define Mix_LoadWAV(file)   Mix_LoadWAV_RW(SDL_RWFromFile(file, "rb"), 1)
 extern DECLSPEC Mix_Music * SDLCALL Mix_LoadMUS(const char *file);
+
+/* Set the displayable filename used in cases of memory-read files */
+extern DECLSPEC void SDLCALL Mix_SetMusicFileName(Mix_Music *music, const char *file);
 
 /* Load a music file from an SDL_RWop object
  * Matt Campbell (matt@campbellhome.dhs.org) April 2000 */
@@ -360,6 +380,8 @@ extern DECLSPEC void SDLCALL Mix_HookMusic(void (SDLCALL *mix_func)(void *udata,
  * stopped from a call to Mix_HaltMusic.
  */
 extern DECLSPEC void SDLCALL Mix_HookMusicFinished(void (SDLCALL *music_finished)(void));
+extern DECLSPEC void SDLCALL Mix_HookMusicStreamFinishedAny(void (SDLCALL *music_finished)(void));
+extern DECLSPEC void SDLCALL Mix_HookMusicStreamFinished(Mix_Music *music, void (SDLCALL *music_finished)(Mix_Music*, void*), void *user_data);/*Mixer-X*/
 
 /* Get a pointer to the user data for the current music hook */
 extern DECLSPEC void * SDLCALL Mix_GetMusicHookData(void);
@@ -410,6 +432,34 @@ typedef void (SDLCALL *Mix_CommonMixer_t)(void *udata, Uint8 *stream, int len);
  * DO NOT EVER call SDL_LockAudio() from your callback function!
  */
 typedef void (SDLCALL *Mix_EffectDone_t)(int chan, void *udata);
+
+/* This is the format of a special effect callback:
+ *
+ *   myeffect(Mix_Music *mus, void *stream, int len, void *udata);
+ *
+ * (mus) is the music instalce that your effect is affecting. (stream) is
+ *  the buffer of data to work upon. (len) is the size of (stream), and
+ *  (udata) is a user-defined bit of data, which you pass as the last arg of
+ *  Mix_RegisterMusicEffect(), and is passed back unmolested to your callback.
+ *  Your effect changes the contents of (stream) based on whatever parameters
+ *  are significant, or just leaves it be, if you prefer. You can do whatever
+ *  you like to the buffer, though, and it will continue in its changed state
+ *  down the mixing pipeline, through any other effect functions, then finally
+ *  to be mixed with the rest of the channels and music for the final output
+ *  stream.
+ *
+ * DO NOT EVER call SDL_LockAudio() from your callback function!
+ */
+typedef void (SDLCALL *Mix_MusicEffectFunc_t)(Mix_Music *mus, void *stream, int len, void *udata); /*MIXER-X*/
+
+/*
+ * This is a callback that signifies that a music is going to be deleted.
+ *  This gets called if implicitly stop the music or request closing via Mix_FreeMusic(),
+ *  or unregister a callback while it's still playing.
+ *
+ * DO NOT EVER call SDL_LockAudio() from your callback function!
+ */
+typedef void (SDLCALL *Mix_MusicEffectDone_t)(Mix_Music *mus, void *udata); /*MIXER-X*/
 
 
 /* Register a special effect function. At mixing time, the channel data is
@@ -466,6 +516,7 @@ extern DECLSPEC int SDLCALL Mix_RegisterEffect(int chan, Mix_EffectFunc_t f, Mix
  * Posteffects are never implicitly unregistered as they are for channels,
  *  but they may be explicitly unregistered through this function by
  *  specifying MIX_CHANNEL_POST for a channel.
+ *
  * returns zero if error (no such channel or effect), nonzero if removed.
  *  Error messages can be retrieved from Mix_GetError().
  */
@@ -480,10 +531,47 @@ extern DECLSPEC int SDLCALL Mix_UnregisterEffect(int channel, Mix_EffectFunc_t f
  * Posteffects are never implicitly unregistered as they are for channels,
  *  but they may be explicitly unregistered through this function by
  *  specifying MIX_CHANNEL_POST for a channel.
+ *
  * returns zero if error (no such channel), nonzero if all effects removed.
  *  Error messages can be retrieved from Mix_GetError().
  */
 extern DECLSPEC int SDLCALL Mix_UnregisterAllEffects(int channel);
+
+
+/* The function is like the Mix_RegisterEffect(), but works exclusively for music
+ * streams. Unlike the channels API, all effects were assigned to every individual
+ * opened music instance and will stay working until the music will be closed or
+ * all effects has been changed or removed manually.
+ *
+ * DO NOT EVER call SDL_LockAudio() from your callback function!
+ *
+ * returns zero if error (no such music), nonzero if added.
+ *  Error messages can be retrieved from Mix_GetError().
+ */
+extern DECLSPEC int SDLCALL Mix_RegisterMusicEffect(Mix_Music *mus,
+                                                    Mix_MusicEffectFunc_t f,
+                                                    Mix_MusicEffectDone_t d,
+                                                    void *arg); /*MIXER-X*/
+
+/* You may not need to call this explicitly, unless you need to stop an
+ *  effect from processing in the middle of a music's playback.
+ *
+ * returns zero if error (no such channel or effect), nonzero if removed.
+ *  Error messages can be retrieved from Mix_GetError().
+ */
+extern DECLSPEC int SDLCALL Mix_UnregisterMusicEffect(Mix_Music *mus,
+                                                      Mix_MusicEffectFunc_t f); /*MIXER-X*/
+
+/* You may not need to call this explicitly, unless you need to stop all
+ *  effects from processing in the middle of a music's playback. Note that
+ *  this will also shut off some internal effect processing, since
+ *  Mix_SetMusicEffectPanning() and others may use this API under the hood. This is
+ *  called internally when a channel completes playback.
+ *
+ * returns zero if error (no such channel), nonzero if all effects removed.
+ *  Error messages can be retrieved from Mix_GetError().
+ */
+extern DECLSPEC int SDLCALL Mix_UnregisterAllMusicEffects(Mix_Music *mus); /*MIXER-X*/
 
 
 #define MIX_EFFECTSMAXSPEED  "MIX_EFFECTSMAXSPEED"
@@ -642,6 +730,110 @@ extern no_parse_DECLSPEC int SDLCALL Mix_SetReverb(int channel, Uint8 echo);
  */
 extern DECLSPEC int SDLCALL Mix_SetReverseStereo(int channel, int flip);
 
+
+/* Set the panning of a music. The left and right channels are specified
+ *  as integers between 0 and 255, quietest to loudest, respectively.
+ *
+ * Technically, this is just individual volume control for a sample with
+ *  two (stereo) channels, so it can be used for more than just panning.
+ *  If you want real panning, call it like this:
+ *
+ *   Mix_SetMusicEffectPanning(music, left, 255 - left);
+ *
+ * ...which isn't so hard.
+ *
+ * This uses the Mix_RegisterMusicEffect() API internally, and returns without
+ *  registering the effect function if the audio device is not configured
+ *  for stereo output. Setting both (left) and (right) to 255 causes this
+ *  effect to be unregistered, since that is the data's normal state.
+ *
+ * returns zero if error (no such music or Mix_RegisterMusicEffect() fails),
+ *  nonzero if panning effect enabled. Note that an audio device in mono
+ *  mode is a no-op, but this call will return successful in that case.
+ *  Error messages can be retrieved from Mix_GetError().
+ */
+extern DECLSPEC int SDLCALL Mix_SetMusicEffectPanning(Mix_Music *mus, Uint8 left, Uint8 right); /*MIXER-X*/
+
+
+/* Set the position of a music. (angle) is an integer from 0 to 360, that
+ *  specifies the location of the sound in relation to the listener. (angle)
+ *  will be reduced as neccesary (540 becomes 180 degrees, -100 becomes 260).
+ *  Angle 0 is due north, and rotates clockwise as the value increases.
+ *  For efficiency, the precision of this effect may be limited (angles 1
+ *  through 7 might all produce the same effect, 8 through 15 are equal, etc).
+ *  (distance) is an integer between 0 and 255 that specifies the space
+ *  between the sound and the listener. The larger the number, the further
+ *  away the sound is. Using 255 does not guarantee that the channel will be
+ *  culled from the mixing process or be completely silent. For efficiency,
+ *  the precision of this effect may be limited (distance 0 through 5 might
+ *  all produce the same effect, 6 through 10 are equal, etc). Setting (angle)
+ *  and (distance) to 0 unregisters this effect, since the data would be
+ *  unchanged.
+ *
+ * If you need more precise positional audio, consider using OpenAL for
+ *  spatialized effects instead of SDL_mixer. This is only meant to be a
+ *  basic effect for simple "3D" games.
+ *
+ * If the audio device is configured for mono output, then you won't get
+ *  any effectiveness from the angle; however, distance attenuation on the
+ *  channel will still occur. While this effect will function with stereo
+ *  voices, it makes more sense to use voices with only one channel of sound,
+ *  so when they are mixed through this effect, the positioning will sound
+ *  correct. You can convert them to mono through SDL before giving them to
+ *  the mixer in the first place if you like.
+ *
+ * This is a convenience wrapper over Mix_SetMusicEffectDistance() and
+ *  Mix_SetMusicEffectPanning().
+ *
+ * returns zero if error (no such music or Mix_RegisterMusicEffect() fails),
+ *  nonzero if position effect is enabled.
+ *  Error messages can be retrieved from Mix_GetError().
+ */
+extern DECLSPEC int SDLCALL Mix_SetMusicEffectPosition(Mix_Music *mus, Sint16 angle, Uint8 distance); /*MIXER-X*/
+
+/* Set the "distance" of a music. (distance) is an integer from 0 to 255
+ *  that specifies the location of the sound in relation to the listener.
+ *  Distance 0 is overlapping the listener, and 255 is as far away as possible
+ *  A distance of 255 does not guarantee silence; in such a case, you might
+ *  want to try changing the chunk's volume, or just cull the sample from the
+ *  mixing process with Mix_HaltMusicStream().
+ * For efficiency, the precision of this effect may be limited (distances 1
+ *  through 7 might all produce the same effect, 8 through 15 are equal, etc).
+ *  (distance) is an integer between 0 and 255 that specifies the space
+ *  between the sound and the listener. The larger the number, the further
+ *  away the sound is.
+ * Setting (distance) to 0 unregisters this effect, since the data would be
+ *  unchanged.
+ * If you need more precise positional audio, consider using OpenAL for
+ *  spatialized effects instead of SDL_mixer. This is only meant to be a
+ *  basic effect for simple "3D" games.
+ *
+ * This uses the Mix_RegisterMusicEffect() API internally.
+ *
+ * returns zero if error (no such music or Mix_RegisterMusicEffect() fails),
+ *  nonzero if position effect is enabled.
+ *  Error messages can be retrieved from Mix_GetError().
+ */
+extern DECLSPEC int SDLCALL Mix_SetMusicEffectDistance(Mix_Music *mus, Uint8 distance); /*MIXER-X*/
+
+/* Causes a music to reverse its stereo. This is handy if the user has his
+ *  speakers hooked up backwards, or you would like to have a minor bit of
+ *  psychedelia in your sound code.  :)  Calling this function with (flip)
+ *  set to non-zero reverses the chunks's usual channels. If (flip) is zero,
+ *  the effect is unregistered.
+ *
+ * This uses the Mix_RegisterMusicEffect() API internally, and thus is probably
+ *  more CPU intensive than having the user just plug in his speakers
+ *  correctly. Mix_SetMusicEffectReverseStereo() returns without registering the effect
+ *  function if the audio device is not configured for stereo output.
+ *
+ * returns zero if error (no such music or Mix_RegisterMusicEffect() fails),
+ *  nonzero if reversing effect is enabled. Note that an audio device in mono
+ *  mode is a no-op, but this call will return successful in that case.
+ *  Error messages can be retrieved from Mix_GetError().
+ */
+extern DECLSPEC int SDLCALL Mix_SetMusicEffectReverseStereo(Mix_Music *mus, int flip); /*MIXER-X*/
+
 /* end of effects API. --ryan. */
 
 
@@ -688,8 +880,21 @@ extern DECLSPEC int SDLCALL Mix_PlayMusic(Mix_Music *music, int loops);
 #define Mix_PlayChannelVol(channel,chunk,loops,vol) Mix_PlayChannelTimedVolume(channel,chunk,loops,-1,vol)/*MIXER-X*/
 extern DECLSPEC int SDLCALL Mix_PlayChannelTimedVolume(int which, Mix_Chunk *chunk, int loops, int ticks, int volume);/*MIXER-X*/
 
-/* returns a pointer to the music mixer that can be used as a callback */
-extern DECLSPEC Mix_CommonMixer_t SDLCALL Mix_GetMusicMixer();
+/* returns a pointer to the single-music mixer that can be used as a callback */
+extern DECLSPEC Mix_CommonMixer_t SDLCALL Mix_GetMusicMixer(void);
+/* returns a pointer to the multi-music mixer that can be used as a callback */
+extern DECLSPEC Mix_CommonMixer_t SDLCALL Mix_GetMultiMusicMixer(void);
+
+/* returns a pointer to the general mixer of music and channels that can be used as a callback
+ *
+ * This mixer processes the whole internality of the Mixer library: music, mutli-music, and channels
+ * Use this callback if you want to make your own audio output processing. Use the Mix_InitMixer() to
+ * initialize the Mixer without starting the SDL Audio instance and the Mix_FreeMixer() to close the library.
+ *
+ * CAUTION: using this callback, don't use Mix_GeneralMusicMixer() and Mix_GeneralMultiMusicMixeR() at all
+ * they both already used in this mixer internally.
+ */
+extern DECLSPEC Mix_CommonMixer_t SDLCALL Mix_GetGeneralMixer(void);
 
 /* Fade in music or a channel over "ms" milliseconds, same semantics as the "Play" functions */
 extern DECLSPEC int SDLCALL Mix_FadeInMusic(Mix_Music *music, int loops, int ms);
@@ -698,6 +903,11 @@ extern DECLSPEC int SDLCALL Mix_FadeInMusicPos(Mix_Music *music, int loops, int 
 extern DECLSPEC int SDLCALL Mix_FadeInChannelTimed(int channel, Mix_Chunk *chunk, int loops, int ms, int ticks);
 #define Mix_FadeInChannelVolume(channel,chunk,loops,ms,vol) Mix_FadeInChannelTimedVolume(channel,chunk,loops,ms,-1,vol)/*MIXER-X*/
 extern DECLSPEC int SDLCALL Mix_FadeInChannelTimedVolume(int which, Mix_Chunk *chunk, int loops, int ms, int ticks, int volume);/*MIXER-X*/
+
+/* Multi-Music */
+extern DECLSPEC int SDLCALL Mix_PlayMusicStream(Mix_Music *music, int loops); /*MIXER-X*/
+extern DECLSPEC int SDLCALL Mix_FadeInMusicStream(Mix_Music *music, int loops, int ms); /*MIXER-X*/
+extern DECLSPEC int SDLCALL Mix_FadeInMusicStreamPos(Mix_Music *music, int loops, int ms, double position); /*MIXER-X*/
 
 
 /* Set the volume in the range of 0-128 of a specific channel or chunk.
@@ -713,6 +923,9 @@ extern DECLSPEC int SDLCALL Mix_VolumeMusic(int volume);
 /* Get the current volume value in the range of 0-128 of a music stream */
 extern DECLSPEC int SDLCALL Mix_GetMusicVolume(Mix_Music *music);
 extern DECLSPEC int SDLCALL Mix_GetVolumeMusicStream(Mix_Music *music);
+
+extern DECLSPEC void SDLCALL Mix_VolumeMusicGeneral(int volume);
+extern DECLSPEC int SDLCALL Mix_GetVolumeMusicGeneral(void);
 
 /* Halt playing of a particular channel */
 extern DECLSPEC int SDLCALL Mix_HaltChannel(int channel);
@@ -737,6 +950,9 @@ extern DECLSPEC int SDLCALL Mix_FadeOutMusicStream(Mix_Music *music, int ms);
 /* MIXERX_DEPRECATED("Use Mix_FadeOutMusicStream(Mix_Music*,int) instead") */
 extern DECLSPEC int SDLCALL Mix_FadeOutMusic(int ms);
 
+extern DECLSPEC int SDLCALL Mix_CrossFadeMusicStream(Mix_Music *old_music, Mix_Music *new_music, int loops, int ms, int free_old);
+extern DECLSPEC int SDLCALL Mix_CrossFadeMusicStreamPos(Mix_Music *old_music, Mix_Music *new_music, int loops, int ms, double pos, int free_old);
+
 /* Query the fading status of a channel */
 extern DECLSPEC Mix_Fading SDLCALL Mix_FadingMusicStream(Mix_Music *music);
 /* MIXERX_DEPRECATED("Use Mix_FadingMusicStream(Mix_Music*) instead") */
@@ -753,6 +969,8 @@ extern DECLSPEC void SDLCALL Mix_PauseMusicStream(Mix_Music *music);
 extern DECLSPEC void SDLCALL Mix_ResumeMusicStream(Mix_Music *music);
 extern DECLSPEC void SDLCALL Mix_RewindMusicStream(Mix_Music *music);
 extern DECLSPEC int SDLCALL Mix_PausedMusicStream(Mix_Music *music);
+extern DECLSPEC void SDLCALL Mix_PauseMusicStreamAll(void);
+extern DECLSPEC void SDLCALL Mix_ResumeMusicStreamAll(void);
 
 /* Pause/Resume the music stream (Deprecated calls) */
 /* MIXERX_DEPRECATED("Use Mix_PauseMusicStream(Mix_Music*) instead") */
@@ -769,6 +987,7 @@ extern DECLSPEC int SDLCALL Mix_PausedMusic(void);
    Only for MOD music formats.
  */
 extern DECLSPEC int SDLCALL Mix_ModMusicJumpToOrder(int order);
+extern DECLSPEC int SDLCALL Mix_ModMusicStreamJumpToOrder(Mix_Music *music, int order);
 /* Set the current position in the music stream.
    This returns 0 if successful, or -1 if it failed or isn't implemented.
    This function is only implemented for MOD music formats (set pattern
@@ -904,8 +1123,10 @@ extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getAdLibMode(void);
 MIXERX_DEPRECATED("This function is no more useful, rhythm-mode is now fully automated")
 extern DECLSPEC void SDLCALL Mix_ADLMIDI_setAdLibMode(int tr);
 /* Get state of logarithmic mode */
+MIXERX_DEPRECATED("This function is no longer has effect. Please use the Mix_ADLMIDI_getVolumeModel()")
 extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getLogarithmicVolumes(void);
 /* Set logarithmic volumes mode in the generic/CMF volume models (0 off, 1 on) (Applying on stop/play) */
+MIXERX_DEPRECATED("This function is no longer has effect. Please use the Mix_ADLMIDI_setVolumeModel()")
 extern DECLSPEC void SDLCALL Mix_ADLMIDI_setLogarithmicVolumes(int lv);
 /* Get current volume model ID */
 extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getVolumeModel(void);

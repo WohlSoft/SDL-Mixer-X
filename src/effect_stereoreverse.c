@@ -134,6 +134,53 @@ int SDLCALLCC Mix_SetReverseStereo(int channel, int flip)
     return(0);
 }
 
+
+#define MUS_FUNCTION(x) \
+static void SDLCALL x##_mus(Mix_Music *mus, void *stream, int len, void *udata) \
+{ \
+    (void)mus;\
+    x(0, stream, len, udata); \
+}
+
+MUS_FUNCTION(_Eff_reversestereo8)
+MUS_FUNCTION(_Eff_reversestereo16)
+MUS_FUNCTION(_Eff_reversestereo32)
+
+#undef MUS_FUNCTION
+
+
+int SDLCALLCC Mix_SetMusicEffectReverseStereo(Mix_Music *mus, int flip)
+{
+    Mix_MusicEffectFunc_t f = NULL;
+    int channels;
+    Uint16 format;
+
+    Mix_QuerySpec(NULL, &format, &channels);
+
+    if (channels == 2) {
+        int bits = (format & 0xFF);
+        switch (bits) {
+        case 8:
+            f = _Eff_reversestereo8_mus;
+            break;
+        case 16:
+            f = _Eff_reversestereo16_mus;
+            break;
+        case 32:
+            f = _Eff_reversestereo32_mus;
+            break;
+        default:
+            Mix_SetError("Unsupported audio format");
+            return(0);
+        }
+        if (!flip) return Mix_UnregisterMusicEffect(mus, f);
+        return(Mix_RegisterMusicEffect(mus, f, NULL, NULL));
+    }
+
+    Mix_SetError("Trying to reverse stereo on a non-stereo stream");
+    return(0);
+}
+
 /* end of effect_stereoreverse.c ... */
 
 /* vi: set ts=4 sw=4 expandtab: */

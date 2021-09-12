@@ -42,6 +42,9 @@
 
 static int audio_open = 0;
 static Mix_Music *music = NULL;
+static Mix_Music *music_prev = NULL;
+static Mix_Music *multi_music[20] = {NULL};
+static int multi_music_count = 0;
 static int next_track = 0;
 
 void CleanUp(int exitcode)
@@ -76,21 +79,24 @@ void Menu(void)
     if (scanf("%s",buf) == 1) {
         switch(buf[0]){
         case 'p': case 'P':
-            Mix_PauseMusic();
+            Mix_PauseMusicStream(music);
             break;
         case 'r': case 'R':
-            Mix_ResumeMusic();
+            Mix_ResumeMusicStream(music);
             break;
         case 'h': case 'H':
-            Mix_HaltMusic();
+            Mix_HaltMusicStream(music);
             break;
         case 'v': case 'V':
-            Mix_VolumeMusic(atoi(buf+1));
+            Mix_VolumeMusicStream(music, atoi(buf+1));
+            break;
+        case 'n': case 'N':
+            next_track++;
             break;
         }
     }
-    printf("Music playing: %s Paused: %s\n", Mix_PlayingMusic() ? "yes" : "no",
-           Mix_PausedMusic() ? "yes" : "no");
+    printf("Music playing: %s Paused: %s\n", Mix_PlayingMusicStream(music) ? "yes" : "no",
+           Mix_PausedMusicStream(music) ? "yes" : "no");
 }
 
 #ifdef HAVE_SIGNAL_H
@@ -116,6 +122,9 @@ int main(int argc, char *argv[])
     int looping = 0;
     int interactive = 0;
     int rwops = 0;
+    int multimusic = 0;
+    int multimusic_actives = 0;
+    int crossfade = 0;
     int i;
     const char *typ;
     const char *tag_title = NULL;
@@ -125,6 +134,7 @@ int main(int argc, char *argv[])
     double loop_start, loop_end, loop_length, current_position;
 
     (void) argc;
+    SDL_memset(multi_music, 0, sizeof(Mix_Music*));
 
     /* Initialize variables */
     audio_rate = MIX_DEFAULT_FREQUENCY;
@@ -167,6 +177,12 @@ int main(int argc, char *argv[])
         } else
         if (strcmp(argv[i], "-rwops") == 0) {
             rwops = 1;
+        } else
+        if (strcmp(argv[i], "-mm") == 0) {
+            multimusic = 1;
+        } else
+        if (strcmp(argv[i], "-cf") == 0) {
+            crossfade = 1;
         } else {
             Usage(argv[0]);
             return(1);
@@ -208,6 +224,52 @@ int main(int argc, char *argv[])
     /* Set the external music player, if any */
     Mix_SetMusicCMD(SDL_getenv("MUSIC_CMD"));
 
+    if (multimusic) { /* Play multiple streams at once */
+        while (argv[i]) {
+            /* Load the requested music file */
+            if (rwops) {
+                multi_music[multi_music_count] = Mix_LoadMUS_RW(SDL_RWFromFile(argv[i], "rb"), SDL_TRUE);
+            } else {
+                multi_music[multi_music_count] = Mix_LoadMUS(argv[i]);
+            }
+
+            if (multi_music[multi_music_count] == NULL) {
+                SDL_Log("Couldn't load %s: %s\n",
+                    argv[i], SDL_GetError());
+                CleanUp(2);
+            }
+            Mix_FadeInMusicStream(multi_music[multi_music_count], looping, 2000);
+            multi_music_count++;
+            i++;
+        }
+
+        do
+        {
+            printf("Positions: ");
+            for(i = 0; i < multi_music_count; ++i) {
+                current_position = Mix_GetMusicPosition(multi_music[i]);
+                if (current_position >= 0.0) {
+                    printf("%5.1f;", current_position);
+                }
+            }
+
+            multimusic_actives = 0;
+            for(i = 0; i < multi_music_count; ++i) {
+                multimusic_actives += Mix_PlayingMusicStream(multi_music[i]) || Mix_PausedMusicStream(multi_music[i]) ? 1 : 0;
+            }
+
+            printf("--(%d) \r", multimusic_actives);
+            fflush(stdout);
+            SDL_Delay(100);
+
+        } while(!next_track && multimusic_actives > 0);
+
+        for (i = 0; i < multi_music_count; ++i) {
+            Mix_FreeMusic(multi_music[i]);
+            multi_music_count = 0;
+        }
+
+    } else
     while (argv[i]) {
         next_track = 0;
 
@@ -292,8 +354,17 @@ int main(int argc, char *argv[])
         if (loop_start > 0.0 && loop_end > 0.0 && loop_length > 0.0) {
             SDL_Log("Loop points: start %g s, end %g s, length %g s\n", loop_start, loop_end, loop_length);
         }
-        Mix_FadeInMusic(music,looping,2000);
-        while (!next_track && (Mix_PlayingMusic() || Mix_PausedMusic())) {
+        if (crossfade) {
+            if (music_prev) {
+                Mix_CrossFadeMusicStream(music_prev, music, looping, 5000, 1);
+            } else {
+                Mix_FadeInMusicStream(music, looping, 2000);
+            }
+            music_prev = music;
+        } else {
+            Mix_FadeInMusic(music,looping,2000);
+        }
+        while (!next_track && (Mix_PlayingMusicStream(music) || Mix_PausedMusicStream(music))) {
             if(interactive)
                 Menu();
             else {
@@ -305,8 +376,10 @@ int main(int argc, char *argv[])
                 SDL_Delay(100);
             }
         }
-        Mix_FreeMusic(music);
-        music = NULL;
+        if (!crossfade) {
+            Mix_FreeMusic(music);
+            music = NULL;
+        }
 
         /* If the user presses Ctrl-C more than once, exit. */
         SDL_Delay(500);
@@ -314,6 +387,13 @@ int main(int argc, char *argv[])
 
         i++;
     }
+
+    if (crossfade) {
+        Mix_FadeOutMusicStream(music, 5000);
+        Mix_FreeMusic(music);
+        music = NULL;
+    }
+
     CleanUp(0);
 
     /* Not reached, but fixes compiler warnings */

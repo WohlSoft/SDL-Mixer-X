@@ -413,6 +413,7 @@ static int GME_play(void *music_p, int play_count)
     GME_Music *music = (GME_Music*)music_p;
     int fade_start;
     if (music) {
+        SDL_AudioStreamClear(music->stream);
         music->play_count = play_count;
         fade_start = play_count > 0 ? music->intro_length + (music->loop_length * play_count) : -1;
 #if GME_VERSION >= 0x000700

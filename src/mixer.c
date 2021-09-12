@@ -81,6 +81,7 @@ static void (SDLCALL *channel_done_callback)(int channel) = NULL;
 
 /* Support for user defined music functions */
 static Mix_CommonMixer_t mix_music = music_mixer;
+static Mix_CommonMixer_t mix_multi_music = multi_music_mixer;
 static void *music_data = NULL;
 
 /* rcg06042009 report available decoders at runtime. */
@@ -266,6 +267,9 @@ mix_channels(void *udata, Uint8 *stream, int len)
 
     /* Mix the music (must be done before the channels are added) */
     mix_music(music_data, stream, len);
+    if (mix_multi_music) {
+        mix_multi_music(music_data, stream, len);
+    }
 
     /* Mix any playing channels... */
     sdl_ticks = SDL_GetTicks();
@@ -499,6 +503,16 @@ int SDLCALLCC Mix_OpenAudio(int frequency, Uint16 format, int nchannels, int chu
                                 SDL_AUDIO_ALLOW_FREQUENCY_CHANGE |
                                 SDL_AUDIO_ALLOW_CHANNELS_CHANGE);
 }
+
+/* Pause or resume the audio streaming */
+void SDLCALLCC Mix_PauseAudio(int pause_on)
+{
+    SDL_PauseAudioDevice(audio_device, pause_on);
+    Mix_LockAudio();
+    pause_async_music(pause_on);
+    Mix_UnlockAudio();
+}
+
 
 /* Dynamically change the number of channels managed by the mixer.
    If decreasing the number of channels, the upper channels are
@@ -921,6 +935,18 @@ Mix_CommonMixer_t SDLCALLCC Mix_GetMusicMixer(void)
     return mix_music;
 }
 
+/* returns a pointer to the multi-music mixer that can be used as a callback */
+Mix_CommonMixer_t SDLCALLCC Mix_GetMultiMusicMixer(void)
+{
+    return mix_multi_music;
+}
+
+/* returns a pointer to the general mixer of music and channels that can be used as a callback */
+Mix_CommonMixer_t SDLCALLCC Mix_GetGeneralMixer(void)
+{
+    return mix_channels;
+}
+
 /* Add your own music player or mixer function.
    If 'mix_func' is NULL, the default music player is re-enabled.
  */
@@ -931,9 +957,11 @@ void SDLCALLCC Mix_HookMusic(void (SDLCALL *mix_func)(void *udata, Uint8 *stream
     if (mix_func != NULL) {
         music_data = arg;
         mix_music = mix_func;
+        mix_multi_music = NULL;
     } else {
         music_data = NULL;
         mix_music = music_mixer;
+        mix_multi_music = mix_multi_music;
     }
     Mix_UnlockAudio();
 }

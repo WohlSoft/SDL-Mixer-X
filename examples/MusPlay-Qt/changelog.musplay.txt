@@ -1,3 +1,16 @@
+1.5.0
+* Added the music FX toolbox to set up the special effects for music such as 3D-position, distance, and panning using built-in features of the MixerX library
+* Added the multi-music test toolbox that allows to open multiple music files and play them independently from each other
+* Added the ability to enable/disable channels/tracks on the supported music (MIDI, Tracker, Chiptune, etc.)
+
+1.4.4
+- Fixed the incorrect working of the effects applying at the SFX tester
+- Stabilized the MIDI Setup change processing
+- Added the SPC echo effect code for testing and polishing puprose. Note: It will work incorrectly if the frequency formula isn't multiple 32000 Hz or at least, by half
+
+1.4.3
+- Default audio output format has been changed into float32 to improve the quality and prevent any possible clipping distortions
+
 1.4.2
 * Added tempo change slider (will work for some formats only)
 * Added tooltip to display current volume value while sliding volume by mouse
@@ -8,6 +21,7 @@
 * Added Audio Settings to change sample rate, format and a count of channels
 * Added an ability to change Timidity config path on the fly
 * Added an ability to change FluidSynth SF2 path on the fly
+* Added an ability to change the audio output on Windows
 
 1.4.1
 * Removed "AdLib percussion" flag since it have lost a sense with rework on libADLMIDI side
@@ -23,4 +37,3 @@
 * MIDI settings now can be changed without requirement of a MIDI file open
 * Added ability to setup the chip emulator for ADLMIDI and OPNMIDI
 * Added printing of arguments in the bottom of MIDI settings
-

@@ -349,6 +349,7 @@ static int XMP_Jump(void *context, int order)
 static int XMP_Seek(void *context, double pos)
 {
     XMP_Music *music = (XMP_Music *)context;
+    SDL_AudioStreamClear(music->stream);
     libxmp.xmp_seek_time(music->ctx, (int)(pos * 1000));
     libxmp.xmp_play_buffer(music->ctx, NULL, 0, 0); /* reset internal state. */
     return 0;
