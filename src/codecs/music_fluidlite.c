@@ -879,6 +879,46 @@ Mix_MusicInterface Mix_MusicInterface_FLUIDSYNTH =
     FLUIDSYNTH_Unload
 };
 
+/* Special case to play XMI/MUS formats */
+Mix_MusicInterface Mix_MusicInterface_FLUIDXMI =
+{
+    "FLUIDXMI",
+    MIX_MUSIC_FLUIDSYNTH,
+    MUS_FLUIDLITE,
+    SDL_FALSE,
+    SDL_FALSE,
+
+    FLUIDSYNTH_Load,
+    FLUIDSYNTH_Open,
+    FLUIDSYNTH_CreateFromRW,
+    FLUIDSYNTH_CreateFromRWEx,
+    NULL,   /* CreateFromFile */
+    NULL,   /* CreateFromFileEx [MIXER-X]*/
+    FLUIDSYNTH_SetVolume,
+    FLUIDSYNTH_GetVolume,
+    FLUIDSYNTH_Play,
+    NULL,
+    FLUIDSYNTH_GetAudio,
+    NULL,   /* Jump */
+    FLUIDSYNTH_Seek,
+    FLUIDSYNTH_Tell,
+    FLUIDSYNTH_Duration,
+    FLUIDSYNTH_SetTempo,
+    FLUIDSYNTH_GetTempo,
+    FLUIDSYNTH_GetTracksCount, /* [MIXER-X] */
+    FLUIDSYNTH_SetTrackMuted,  /* [MIXER-X] */
+    FLUIDSYNTH_LoopStart,
+    FLUIDSYNTH_LoopEnd,
+    FLUIDSYNTH_LoopLength,
+    FLUIDSYNTH_GetMetaTag,
+    NULL,   /* Pause */
+    NULL,   /* Resume */
+    NULL,   /* Stop */
+    FLUIDSYNTH_Delete,
+    NULL,   /* Close */
+    FLUIDSYNTH_Unload
+};
+
 #endif /* MUSIC_MID_FLUIDSYNTH */
 
 /* vi: set ts=4 sw=4 expandtab: */

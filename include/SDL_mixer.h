@@ -182,8 +182,13 @@ typedef enum {
     MUS_FLAC,
     MUS_MODPLUG_UNUSED,
     MUS_OPUS,
-    MUS_GME,
-    MUS_ADLMIDI/*Use ADLMIDI coded for super-special formats like IMF, MUS or XMI are can't be played without ADLMIDI*/
+    /* MixerX specific codecs starts with 100 */
+    MUS_GME = 100,
+    /* Special cases to play formats IMF, MUS or XMI are can't be played without specific MIDI libraries */
+    MUS_ADLMIDI = 200,
+    MUS_OPNMIDI,
+    MUS_FLUIDLITE,
+    MUS_NATIVEMIDI
 } Mix_MusicType;
 
 typedef enum {

@@ -26,4 +26,43 @@
 extern Mix_MusicInterface Mix_MusicInterface_ADLMIDI;
 extern Mix_MusicInterface Mix_MusicInterface_ADLIMF;
 
+#ifdef MUSIC_MID_ADLMIDI
+
+extern int _Mix_ADLMIDI_getTotalBanks(void);
+
+extern const char *const * _Mix_ADLMIDI_getBankNames(void);
+
+extern int _Mix_ADLMIDI_getBankID(void);
+extern void _Mix_ADLMIDI_setBankID(int bnk);
+
+extern int _Mix_ADLMIDI_getTremolo(void);
+extern void _Mix_ADLMIDI_setTremolo(int tr);
+
+extern int _Mix_ADLMIDI_getVibrato(void);
+extern void _Mix_ADLMIDI_setVibrato(int vib);
+
+extern int _Mix_ADLMIDI_getScaleMod(void);
+extern void _Mix_ADLMIDI_setScaleMod(int sc);
+
+extern int _Mix_ADLMIDI_getVolumeModel(void);
+extern void _Mix_ADLMIDI_setVolumeModel(int vm);
+
+extern int _Mix_ADLMIDI_getFullRangeBrightness(void);
+extern void _Mix_ADLMIDI_setFullRangeBrightness(int frb);
+
+extern int _Mix_ADLMIDI_getFullPanStereo(void);
+extern void _Mix_ADLMIDI_setFullPanStereo(int fp);
+
+extern int _Mix_ADLMIDI_getEmulator(void);
+extern void _Mix_ADLMIDI_setEmulator(int emu);
+
+extern int _Mix_ADLMIDI_getChipsCount(void);
+extern void _Mix_ADLMIDI_setChipsCount(int chips);
+
+extern void _Mix_ADLMIDI_setSetDefaults(void);
+
+extern void _Mix_ADLMIDI_setCustomBankFile(const char *bank_wonl_path);
+
+#endif /* MUSIC_MID_ADLMIDI */
+
 /* vi: set ts=4 sw=4 expandtab: */
