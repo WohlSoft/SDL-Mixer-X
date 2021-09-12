@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html401/loose.dtd">
 <html>
-<!-- Created on September 12, 2021 by texi2html 1.82
+<!-- Created on September 13, 2021 by texi2html 1.82
 texi2html was written by: 
             Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -10,10 +10,10 @@ Maintained by: Many creative people.
 Send bugs and suggestions to <texi2html-bug@nongnu.org>
 -->
 <head>
-<title>SDL Mixer X</title>
+<title>MixerX - the extended SDL_mixer</title>
 
-<meta name="description" content="SDL Mixer X">
-<meta name="keywords" content="SDL Mixer X">
+<meta name="description" content="MixerX - the extended SDL_mixer">
+<meta name="keywords" content="MixerX - the extended SDL_mixer">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="texi2html 1.82">
@@ -48,13 +48,13 @@ ul.toc {list-style: none}
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
-<a name="SDL-Mixer-X-1"></a>
-<h1 class="settitle">SDL Mixer X</h1>
+<a name="MixerX-1"></a>
+<h1 class="settitle">MixerX</h1>
 
 <table class="menu" border="0" cellspacing="0">
-<tr><td align="left" valign="top"><a href="#Overview">1. Overview</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">         The README from the SDL_mixer  SDL Mixer X distribution
+<tr><td align="left" valign="top"><a href="#Overview">1. Overview</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">         The README from the MixerX distribution
 </td></tr>
-<tr><td align="left" valign="top"><a href="#SDL-Mixer-X">2. SDL Mixer X</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">      About SDL Mixer X fork
+<tr><td align="left" valign="top"><a href="#MixerX">2. MixerX</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">           About MixerX (a.k.a. SDL Mixer X) fork
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Getting-Started">3. Getting Started</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">  Using SDL_mixer
 </td></tr>
@@ -77,11 +77,11 @@ ul.toc {list-style: none}
 <a name="Overview"></a>
 <table cellpadding="1" cellspacing="1" border="0">
 <tr><td valign="middle" align="left">[<a href="#Top" title="Previous section in reading order"> &lt; </a>]</td>
-<td valign="middle" align="left">[<a href="#SDL-Mixer-X" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left">[<a href="#MixerX" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Top" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#Top" title="Up section"> Up </a>]</td>
-<td valign="middle" align="left">[<a href="#SDL-Mixer-X" title="Next chapter"> &gt;&gt; </a>]</td>
+<td valign="middle" align="left">[<a href="#MixerX" title="Next chapter"> &gt;&gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
@@ -167,7 +167,7 @@ the ZLib License, see the file &quot;COPYING&quot; for details.
 </p></td></tr></table>
 
 <hr size="6">
-<a name="SDL-Mixer-X"></a>
+<a name="MixerX"></a>
 <table cellpadding="1" cellspacing="1" border="0">
 <tr><td valign="middle" align="left">[<a href="#Overview" title="Previous section in reading order"> &lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#Getting-Started" title="Next section in reading order"> &gt; </a>]</td>
@@ -184,17 +184,17 @@ the ZLib License, see the file &quot;COPYING&quot; for details.
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
-<a name="SDL-Mixer-X-2"></a>
-<h1 class="chapter">2. SDL Mixer X</h1>
+<a name="MixerX-2"></a>
+<h1 class="chapter">2. MixerX</h1>
 
-<p>It&rsquo;s an extended fork made by Vitaly Novichkov &quot;Wohlstand&quot; in 13 January 2015.
-SDL_mixer is a quick and stable high-quality audio library, however, it has own
-bunch of deffects such as broken resampling, incorrect playback of WAV files,
-inability to choose MIDI backend in runtime, inability to customize Timidty
-patches path, No support for cross-fade and parallel streams playing (has only
-one musical stream. Using of very long Chunks is ineffectively), etc. The goal
-of this fork is resolving those issues, providing more extended functionality
-than was originally, and providing support for more supported audio formats.
+<p>It&rsquo;s an extended fork of the SDL_mixer library made by Vitaly Novichkov &quot;Wohlstand&quot;
+in 13 January 2015. SDL_mixer is a quick and stable high-quality audio library,
+however, it has own bunch of deffects and lack of certain abilities such
+as inability to choose the MIDI backend in runtime, No support for cross-fade
+and parallel streams playing (has only one musical stream. Using of very long
+Chunks is ineffectively), etc. The goal of this fork is resolving those issues,
+providing more extended functionality than was originally, and providing support
+for more supported audio formats.
 </p>
 <p>In this documentation, new-added functions, definitions, and enums in this fork
 will be marked by <b>[Mixer X]</b> label. That means those functions are existing only
@@ -205,20 +205,16 @@ created for SDL_mixer 1.2. Some functions would be marked by <b>[Mixer X]</b> la
 which means those functions are not available in SDL_mixer 1.x, but available in
 SDL_mixer 2.0 and SDL Mixer X fork.
 </p>
-<p><b>IMPORTANT</b>: The licenses for libGME is LGPL2+. Using of those modules makes
-this library licensed under LGPL2+ and you must use it dynamically, or your
-application must also be GPL!
-</p>
 <p><b>IMPORTANT</b>: The license for libADLMIDI, libOPNMIDI, libMAD is GPL which means
 that in order to use it your application must also be GPL!
 
 </p><hr size="6">
 <a name="Getting-Started"></a>
 <table cellpadding="1" cellspacing="1" border="0">
-<tr><td valign="middle" align="left">[<a href="#SDL-Mixer-X" title="Previous section in reading order"> &lt; </a>]</td>
+<tr><td valign="middle" align="left">[<a href="#MixerX" title="Previous section in reading order"> &lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#Includes" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
-<td valign="middle" align="left">[<a href="#SDL-Mixer-X" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#MixerX" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#Top" title="Up section"> Up </a>]</td>
 <td valign="middle" align="left">[<a href="#Conflicts" title="Next chapter"> &gt;&gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
@@ -292,7 +288,7 @@ make
 <a name="Includes-1"></a>
 <h2 class="section">3.1 Includes</h2>
 
-<p>To use SDL_mixer functions in a C/C++ source code file, you must use the
+<p>To use MixerX functions in a C/C++ source code file, you must use the
 SDL_mixer_ext.h include file:
 </p>
 <table class="cartouche" border="1"><tr><td>
@@ -322,21 +318,22 @@ SDL_mixer_ext.h include file:
 <h2 class="section">3.2 Compiling</h2>
 <a name="index-sdl_002dconfig"></a>
 
-<p>To link with SDL Mixer X you should use sdl-config to get the required SDL
-compilation options.  After that, compiling with SDL Mixer X is quite easy.<br>
+<p>To link with SDL MixerX you should use sdl-config to get the required SDL
+compilation options. After that, compiling with MixerX is quite easy.<br>
 <b>Note</b>: Some systems may not have the SDL_mixer library and include file in the same place as the SDL library and includes are located, in that case you will need to add more -I and -L paths to these command lines.
 </p>
 <table class="cartouche" border="1"><tr><td>
 <p>Simple Example for compiling an object file:
 </p>
-<p><code>  cc -c `sdl-config --cflags` mysource.c</code>
+<p><code>  cc -c `sdl2-config --cflags` mysource.c</code>
 </p>
-<p>Simple Example for compiling an object file:
+<p>Simple Example for linking a program:
 </p>
-<p><code>  cc -o myprogram mysource.o `sdl-config --libs` -lSDL_mixer_ext -lvorbis -lFLAC -logg -lmad -lADLMIDI -lOPNMIDI -ltimidity -lmodplug -lgme -lzlib</code>
+<p><code>  cc -o myprogram mysource.o `sdl2-config --libs` -lSDL2_mixer_ext</code>
 </p></td></tr></table>
 
 <p>Now <code>myprogram</code> is ready to run.
+
 </p><hr size="6">
 <a name="Conflicts"></a>
 <table cellpadding="1" cellspacing="1" border="0">
@@ -795,7 +792,7 @@ if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024)==-1) {
 <a href="#Mix_005fCloseAudio">Mix_CloseAudio</a>,
 <a href="#Mix_005fPauseAudio">Mix_PauseAudio</a>,
 <a href="#Mix_005fQuerySpec">Mix_QuerySpec</a>,
-<a href="#Mix_005fAllocateChannels">Mix_AllocateChannels</a>
+<a href="#Mix_005fAllocateChannels">Mix_AllocateChannels</a>,
 <a href="#Mix_005fOpenAudioDevice">Mix_OpenAudioDevice</a>
 </p>
 
@@ -881,7 +878,7 @@ if(Mix_OpenAudioDevice(44100, MIX_DEFAULT_FORMAT, 2, 1024, NULL,
 <a href="#Mix_005fCloseAudio">Mix_CloseAudio</a>,
 <a href="#Mix_005fPauseAudio">Mix_PauseAudio</a>,
 <a href="#Mix_005fQuerySpec">Mix_QuerySpec</a>,
-<a href="#Mix_005fAllocateChannels">Mix_AllocateChannels</a>
+<a href="#Mix_005fAllocateChannels">Mix_AllocateChannels</a>,
 <a href="#Mix_005fOpenAudio">Mix_OpenAudio</a>
 </p>
 
@@ -923,7 +920,7 @@ if(Mix_OpenAudioDevice(44100, MIX_DEFAULT_FORMAT, 2, 1024, NULL,
 <a href="#Mix_005fOpenAudioDevice">Mix_OpenAudioDevice</a>,
 <a href="#Mix_005fCloseAudio">Mix_CloseAudio</a>,
 <a href="#Mix_005fQuerySpec">Mix_QuerySpec</a>,
-<a href="#Mix_005fAllocateChannels">Mix_AllocateChannels</a>
+<a href="#Mix_005fAllocateChannels">Mix_AllocateChannels</a>,
 <a href="#Mix_005fOpenAudio">Mix_OpenAudio</a>
 </p>
 
@@ -971,7 +968,7 @@ needs to be called before the device is actually closed.
 <p><b>See Also</b>:<br>
 <a href="#Mix_005fOpenAudio">Mix_OpenAudio</a>,
 <a href="#Mix_005fOpenAudioDevice">Mix_OpenAudioDevice</a>,
-<a href="#Mix_005fQuerySpec">Mix_QuerySpec</a>
+<a href="#Mix_005fQuerySpec">Mix_QuerySpec</a>,
 <a href="#Mix_005fPauseAudio">Mix_PauseAudio</a>,
 </p>
 
@@ -998,8 +995,33 @@ needs to be called before the device is actually closed.
 <h3 class="subsection">5.1.8 Mix_InitMixer</h3>
 <a name="index-Mix_005fInitMixer"></a>
 
-<p>WIP
+<p><code>void <b>Mix_InitMixer</b>(const SDL_AudioSpec *<var>spec</var>, SDL_bool <var>skip_init_check</var>)</code>
 </p>
+<dl compact="compact">
+<dt> <var>spec</var></dt>
+<dd><p>The audio spec such as frequency, sample format, number of channels, and desired chunk size, using the <code>SDL_AudioSpec</code> structure.
+</p></dd>
+<dt> <var>skip_init_check</var></dt>
+<dd><p>Disable the internal check of the initialization state.
+</p></dd>
+</dl>
+
+<p>Initialize the mixer API without starting the audio processing.
+That means, you can make your own audio processing and manually run the mixer API
+by using callbacks you may retrieve using <a href="#Mix_005fGetGeneralMixer">Mix_GetGeneralMixer</a>, <a href="#Mix_005fGetMusicMixer">Mix_GetMusicMixer</a>,
+and <a href="#Mix_005fGetMultiMusicMixer">Mix_GetMultiMusicMixer</a> calls.
+</p>
+<p><b>CAUTION:</b> Don&rsquo;t even try to call this function and any of mixer callback
+if you initialized the mixer using <a href="#Mix_005fOpenAudio">Mix_OpenAudio</a> or <a href="#Mix_005fOpenAudioDevice">Mix_OpenAudioDevice</a> calls.
+</p>
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fGetMusicMixer">Mix_GetMusicMixer</a>,
+<a href="#Mix_005fGetMultiMusicMixer">Mix_GetMultiMusicMixer</a>,
+<a href="#Mix_005fGetGeneralMixer">Mix_GetGeneralMixer</a>,
+<a href="#Mix_005fFreeMixer">Mix_FreeMixer</a>
+</p>
+
+
 
 <hr size="6">
 <a name="Mix_005fGetMusicMixer"></a>
@@ -1023,8 +1045,24 @@ needs to be called before the device is actually closed.
 <h3 class="subsection">5.1.9 Mix_GetMusicMixer</h3>
 <a name="index-Mix_005fGetMusicMixer"></a>
 
-<p>WIP
+<p><code>Mix_CommonMixer_t <b>Mix_GetMusicMixer</b>()</code>
 </p>
+<p><b>Returns</b>: The mixer callback to process the single-stream music.
+</p>
+<p>Get the callback to process the single-stream music out of the main process of mixer API
+and receive the output of currently playing single-stream music. To receive the
+multi-stream music output use the <a href="#Mix_005fGetMultiMusicMixer">Mix_GetMultiMusicMixer</a> callback.<br>
+</p>
+<p><b>CAUTION:</b> Don&rsquo;t even try to call the returned callback if you initialized the mixer using
+<a href="#Mix_005fOpenAudio">Mix_OpenAudio</a> or <a href="#Mix_005fOpenAudioDevice">Mix_OpenAudioDevice</a> calls.
+</p>
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fInitMixer">Mix_InitMixer</a>,
+<a href="#Mix_005fGetMultiMusicMixer">Mix_GetMultiMusicMixer</a>,
+<a href="#Mix_005fGetGeneralMixer">Mix_GetGeneralMixer</a>,
+<a href="#Mix_005fFreeMixer">Mix_FreeMixer</a>
+</p>
+
 
 
 <hr size="6">
@@ -1049,8 +1087,25 @@ needs to be called before the device is actually closed.
 <h3 class="subsection">5.1.10 Mix_GetMultiMusicMixer</h3>
 <a name="index-Mix_005fGetMultiMusicMixer"></a>
 
-<p>WIP
+<p><code>Mix_CommonMixer_t <b>Mix_GetMultiMusicMixer</b>()</code>
 </p>
+<p><b>Returns</b>: The mixer callback to process the multi-stream music.
+</p>
+<p>Get the callback to process the single-stream music out of the main process of mixer API
+and receive the output of all music streams except the single-stream music. To receive the
+single-stream music output use the <a href="#Mix_005fGetMusicMixer">Mix_GetMusicMixer</a> callback.<br>
+</p>
+<p><b>CAUTION:</b> Don&rsquo;t even try to call the returned callback if you initialized the mixer using
+<a href="#Mix_005fOpenAudio">Mix_OpenAudio</a> or <a href="#Mix_005fOpenAudioDevice">Mix_OpenAudioDevice</a> calls.
+</p>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fInitMixer">Mix_InitMixer</a>,
+<a href="#Mix_005fGetMusicMixer">Mix_GetMusicMixer</a>,
+<a href="#Mix_005fGetGeneralMixer">Mix_GetGeneralMixer</a>,
+<a href="#Mix_005fFreeMixer">Mix_FreeMixer</a>
+</p>
+
 
 
 <hr size="6">
@@ -1075,8 +1130,28 @@ needs to be called before the device is actually closed.
 <h3 class="subsection">5.1.11 Mix_GetGeneralMixer</h3>
 <a name="index-Mix_005fGetGeneralMixer"></a>
 
-<p>WIP
+<p><code>Mix_CommonMixer_t <b>Mix_GetMultiMusicMixer</b>()</code>
 </p>
+<p><b>Returns</b>: The mixer callback to process the general mixer API.
+</p>
+<p>Get the callback to process the general Mixer API out of the main process of mixer API
+and receive the generated output of all playing music streams and channels.<br>
+</p>
+<p><b>CAUTION 1:</b> Don&rsquo;t even try to call the returned callback if you initialized the mixer using
+<a href="#Mix_005fOpenAudio">Mix_OpenAudio</a> or <a href="#Mix_005fOpenAudioDevice">Mix_OpenAudioDevice</a> calls.
+</p>
+<p><b>CAUTION 2:</b> Once you execute the callback returned by <code>Mix_GetGeneralMixer())</code>,
+callbacks returned by <code>Mix_GetMusicMixer()</code> and <code>Mix_GetMultiMusicMixer()</code> were
+already processed internally. You don&rsquo;t need to call them at all.
+</p>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fInitMixer">Mix_InitMixer</a>,
+<a href="#Mix_005fGetMusicMixer">Mix_GetMusicMixer</a>,
+<a href="#Mix_005fGetMultiMusicMixer">Mix_GetMultiMusicMixer</a>,
+<a href="#Mix_005fFreeMixer">Mix_FreeMixer</a>
+</p>
+
 
 
 <hr size="6">
@@ -1101,7 +1176,19 @@ needs to be called before the device is actually closed.
 <h3 class="subsection">5.1.12 Mix_FreeMixer</h3>
 <a name="index-Mix_005fFreeMixer"></a>
 
-<p>WIP
+<p><code>void <b>Mix_FreeMixer</b>()</code>
+</p>
+<p>Shutdown and cleanup the mixer API.<br>
+Use this call in only condition you initialized the mixer API using the <a href="#Mix_005fInitMixer">Mix_InitMixer</a> call.
+</p>
+<p><b>CAUTION:</b> Don&rsquo;t even try to call this function and any of mixer callback
+if you initialized the mixer using <a href="#Mix_005fOpenAudio">Mix_OpenAudio</a> or <a href="#Mix_005fOpenAudioDevice">Mix_OpenAudioDevice</a> calls.
+</p>
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fInitMixer">Mix_InitMixer</a>,
+<a href="#Mix_005fGetMusicMixer">Mix_GetMusicMixer</a>,
+<a href="#Mix_005fGetMultiMusicMixer">Mix_GetMultiMusicMixer</a>,
+<a href="#Mix_005fGetGeneralMixer">Mix_GetGeneralMixer</a>
 </p>
 
 
@@ -1242,6 +1329,10 @@ else {
         case AUDIO_S16LSB: format_str=&quot;S16LSB&quot;; break;
         case AUDIO_U16MSB: format_str=&quot;U16MSB&quot;; break;
         case AUDIO_S16MSB: format_str=&quot;S16MSB&quot;; break;
+        case AUDIO_S32LSB: format_str=&quot;S32LSB&quot;; break;
+        case AUDIO_S32MSB: format_str=&quot;S32MSB&quot;; break;
+        case AUDIO_F32LSB: format_str=&quot;F32LSB&quot;; break;
+        case AUDIO_F32MSB: format_str=&quot;F32MSB&quot;; break;
     }
     printf(&quot;opened=%d times  frequency=%dHz  format=%s  channels=%d&quot;,
             numtimesopened, frequency, format_str, channels);
@@ -1340,6 +1431,7 @@ printf(&quot;There are %d sample chunk deocoders available\n&quot;, Mix_GetNumCh
 <p><b>See Also</b>:<br>
 <a href="#Mix_005fGetNumMusicDecoders">Mix_GetNumMusicDecoders</a>,
 <a href="#Mix_005fGetChunkDecoder">Mix_GetChunkDecoder</a>,
+<a href="#Mix_005fHasChunkDecoder">Mix_HasChunkDecoder</a>,
 <a href="#Mix_005fLoadWAV">Mix_LoadWAV</a>
 </p>
 
@@ -1390,6 +1482,7 @@ for(i=0; i&lt;max; ++i)
 <p><b>See Also</b>:<br>
 <a href="#Mix_005fGetNumChunkDecoders">Mix_GetNumChunkDecoders</a>,
 <a href="#Mix_005fGetMusicDecoder">Mix_GetMusicDecoder</a>,
+<a href="#Mix_005fHasChunkDecoder">Mix_HasChunkDecoder</a>,
 <a href="#Mix_005fLoadWAV">Mix_LoadWAV</a>
 </p>
 
@@ -1416,7 +1509,23 @@ for(i=0; i&lt;max; ++i)
 <h3 class="subsection">5.2.3 Mix_HasChunkDecoder</h3>
 <a name="index-Mix_005fHasChunkDecoder"></a>
 
-<p>WIP
+<p><code>SDL_bool <b>Mix_HasChunkDecoder</b>(const char *<var>name</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>name</var></dt>
+<dd><p>The decoder name to check it&rsquo;s presence.
+</p></dd>
+</dl>
+
+<p>Check if the sample chunk decoder named as <var>name</var> presented in this library build.
+</p>
+<p><b>Returns</b>: <code>SDL_TRUE</code> if the requested codec name is available in this library build or <code>SDL_FALSE</code> if not.
+</p>
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fGetNumChunkDecoders">Mix_GetNumChunkDecoders</a>,
+<a href="#Mix_005fGetChunkDecoder">Mix_GetChunkDecoder</a>,
+<a href="#Mix_005fGetMusicDecoder">Mix_GetMusicDecoder</a>,
+<a href="#Mix_005fLoadWAV">Mix_LoadWAV</a>
 </p>
 
 
@@ -8531,8 +8640,61 @@ if(!Mix_UnregisterAllEffects(0)) {
 <h3 class="subsection">5.6.4 Mix_RegisterMusicEffect</h3>
 <a name="index-Mix_005fRegisterMusicEffect"></a>
 
-<p>WIP
+<table><tr><td>&nbsp;</td><td><pre class="example">int <b>Mix_RegisterMusicEffect</b>(Mix_Music *<var>music</var>, Mix_MusicEffectFunc_t <var>f</var>,
+                                Mix_MusicEffectDone_t <var>d</var>, void *<var>arg</var>)
+</pre></td></tr></table>
+
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>music to register <var>f</var> and <var>d</var> on.<br>
+</p></dd>
+<dt> <var>f</var></dt>
+<dd><p>The function pointer for the music effects processor.
+</p></dd>
+<dt> <var>d</var></dt>
+<dd><p>The function pointer for any cleanup routine to be called when the music is getting closed up.<br>
+This may be <b>NULL</b> for any processors that don&rsquo;t need to clean up any memory or other dynamic data.
+</p></dd>
+<dt> <var>arg</var></dt>
+<dd><p>A pointer to data to pass into the <var>f</var>&rsquo;s and <var>d</var>&rsquo;s <code>udata</code> parameter.  It is a good place
+to keep the state data for the processor, especially if the processor is made to handle multiple channels
+at the same time.<br>
+This may be <b>NULL</b>, depending on the processor.
+</p></dd>
+</dl>
+
+<p>Hook a processor function <var>f</var> into a music for post processing effects.  You may just be reading
+the data and displaying it, or you may be altering the stream to add an echo.  Most processors also have
+state data that they allocate as they are in use, this would be stored in the <var>arg</var> pointer data space.
+When a processor is finished being used, any function passed into <var>d</var> will be called, which is when
+your processor should clean up the data in the <var>arg</var> data space.<br>
+The effects are put into a linked list, and always appended to the end, meaning they always work on
+previously registered effects output.  Effects may be added multiple times in a row.
+Effects are cumulative this way.
 </p>
+<p><b>Returns</b>: Zero on errors, such as a nonexisting music.
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">// make a passthru processor function that does nothing...
+void noEffect(Mix_Music *music, void *stream, int len, void *udata)
+{
+    // you could work with stream here...
+}
+...
+
+// Mix_Music *someMusic = Mix_LoadMUS(&quot;somemusic.ogg&quot;);
+// register noEffect as a someMusic processor
+if(!Mix_RegisterMusicEffect(someMusic, noEffect, NULL, NULL)) {
+    printf(&quot;Mix_RegisterMusicEffect: %s\n&quot;, Mix_GetError());
+}
+</pre></td></tr></table>
+</td></tr></table>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fUnregisterMusicEffect">Mix_UnregisterMusicEffect</a>,
+<a href="#Mix_005fUnregisterAllMusicEffects">Mix_UnregisterAllMusicEffects</a>
+</p>
+
 
 <hr size="6">
 <a name="Mix_005fUnregisterMusicEffect"></a>
@@ -8556,8 +8718,40 @@ if(!Mix_UnregisterAllEffects(0)) {
 <h3 class="subsection">5.6.5 Mix_UnregisterMusicEffect</h3>
 <a name="index-Mix_005fUnregisterMusicEffect"></a>
 
-<p>WIP
+<p><code>int <b>Mix_UnregisterMusicEffect</b>(Mix_Music <var>music</var>, Mix_MusicEffectFunc_t <var>f</var>)</code>
 </p>
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>Music to remove <var>f</var> from as a post processor.<br>
+</p></dd>
+<dt> <var>f</var></dt>
+<dd><p>The function to remove from <var>music</var>.
+</p></dd>
+</dl>
+
+<p>Remove the oldest (first found) registered effect function <var>f</var> from the effect list for <var>channel</var>.
+This only removes the first found occurance of that function, so it may need to be called multiple times
+if you added the same function multiple times, just stop removing when <code>Mix_UnregisterMusicEffect</code> returns
+an error, to remove all occurances of <var>f</var> from a channel.<br>
+If the music is active the registered effect will have its <code>Mix_MusicEffectDone_t</code> function called,
+if it was specified in <code>Mix_RegisterMusicEffect</code>.
+</p>
+<p><b>Returns</b>: Zero on errors, such as invalid music, or effect function not registered on music.
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">// unregister the noEffect from the someMusic effects
+// this removes all occurances of noEffect registered to the postmix
+while(Mix_UnregisterMusicEffect(someMusic, noEffect));
+// you may print Mix_GetError() if you want to check it.
+// it should say &quot;No such effect registered&quot; after this loop.
+</pre></td></tr></table>
+</td></tr></table>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fRegisterMusicEffect">Mix_RegisterMusicEffect</a>,
+<a href="#Mix_005fUnregisterAllMusicEffects">Mix_UnregisterAllMusicEffects</a>
+</p>
+
 
 <hr size="6">
 <a name="Mix_005fUnregisterAllMusicEffects"></a>
@@ -8581,7 +8775,30 @@ if(!Mix_UnregisterAllEffects(0)) {
 <h3 class="subsection">5.6.6 Mix_UnregisterAllMusicEffects</h3>
 <a name="index-Mix_005fUnregisterAllMusicEffects"></a>
 
-<p>WIP
+<p><code>int <b>Mix_UnregisterAllMusicEffects</b>(Mix_Music *<var>music</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>Music to remove all effects from.<br>
+</p></dd>
+</dl>
+
+<p>This removes all effects registered to <var>music</var>.
+If the music is active all the registered effects will have their <code>Mix_MusicEffectDone_t</code> functions called, if they were specified in <code>Mix_RegisterMusicEffect</code>.
+</p>
+<p><b>Returns</b>: Zero on errors, such as <var>music</var> not existing.
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">// remove all effects from someMusic
+if(!Mix_UnregisterAllMusicEffects(someMusic)) {
+    printf(&quot;Mix_UnregisterAllMusicEffects: %s\n&quot;, Mix_GetError());
+}
+</pre></td></tr></table>
+</td></tr></table>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fRegisterMusicEffect">Mix_RegisterMusicEffect</a>,
+<a href="#Mix_005fUnregisterMusicEffect">Mix_UnregisterMusicEffect</a>
 </p>
 
 
@@ -8901,7 +9118,47 @@ if(!Mix_SetReverseStereo(MIX_CHANNEL_POST, 1)) {
 <h3 class="subsection">5.6.12 Mix_SetMusicEffectPanning</h3>
 <a name="index-Mix_005fSetMusicEffectPanning"></a>
 
-<p>WIP
+<p><code>int <b>Mix_SetMusicEffectPanning</b>(Mix_Music *<var>music</var>, Uint8 <var>left</var>, Uint8 <var>right</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>Music to register this effect on.<br>
+</p></dd>
+<dt> <var>left</var></dt>
+<dd><p>Volume for the left channel, range is 0(silence) to 255(loud)
+</p></dd>
+<dt> <var>right</var></dt>
+<dd><p>Volume for the left channel, range is 0(silence) to 255(loud)
+</p></dd>
+</dl>
+
+<p>This effect will only work on stereo audio.  Meaning you called <code>Mix_OpenAudio</code>
+with 2 channels (<b>MIX_DEFAULT_CHANNELS</b>).  The easiest way to do true panning is to call
+<code>Mix_SetMusicEffectPanning(music, left, 254 - left);</code> so that the total volume is correct,
+if you consider the maximum volume to be 127 per channel for center, or 254 max for left, this works,
+but about halves the effective volume.<br>
+This Function registers the effect for you, so don&rsquo;t try to <code>Mix_RegisterMusicEffect</code> it yourself.<br>
+<b>NOTE</b>: Setting both <var>left</var> and <var>right</var> to 255 will unregister the effect from
+<var>music</var>.  You cannot unregister it any other way, unless you use
+<code>Mix_UnregisterAllMusicEffects</code> on the <var>music</var>.<br>
+<b>NOTE</b>: Using this function on a mono audio device will not register the effect,
+nor will it return an error status.
+</p>
+
+<p><b>Returns</b>: Zero on errors, such as bad music, or if <code>Mix_RegisterMusicEffect</code> failed.
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">// pan someMusic halfway to the left
+if(!Mix_SetMusicEffectPanning(someMusic, 255, 127)) {
+    printf(&quot;Mix_SetMusicEffectPanning: %s\n&quot;, Mix_GetError());
+    // no panning, is it ok?
+}
+</pre></td></tr></table>
+</td></tr></table>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fSetMusicEffectPosition">Mix_SetMusicEffectPosition</a>,
+<a href="#Mix_005fUnregisterAllMusicEffects">Mix_UnregisterAllMusicEffects</a>
 </p>
 
 
@@ -8928,9 +9185,38 @@ if(!Mix_SetReverseStereo(MIX_CHANNEL_POST, 1)) {
 <h3 class="subsection">5.6.13 Mix_SetMusicEffectDistance</h3>
 <a name="index-Mix_005fSetMusicEffectDistance"></a>
 
-<p>WIP
+<p><code>int <b>Mix_SetMusicEffectDistance</b>(Mix_Music *<var>music</var>, Uint8 <var>distance</var>)</code>
 </p>
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>Music to register this effect on.<br>
+</p></dd>
+<dt> <var>distance</var></dt>
+<dd><p>Specify the distance from the listener, from 0(close/loud) to 255(far/quiet).
+</p></dd>
+</dl>
 
+<p>This effect simulates a simple attenuation of volume due to distance.
+The volume never quite reaches silence, even at max distance.<br>
+<b>NOTE</b>: Using a <var>distance</var> of 0 will cause the effect to unregister itself from <var>channel</var>.
+You cannot unregister it any other way, unless you use <code>Mix_UnregisterAllMusicEffects</code> on the <var>music</var>.
+</p>
+<p><b>Returns</b>: Zero on errors, such as an invalid music, or if <code>Mix_RegisterMusicEffect</code> failed.
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">// distance someMusic to be farthest away
+if(!Mix_SetMusicEffectDistance(someMusic, 255)) {
+    printf(&quot;Mix_SetMusicEffectDistance: %s\n&quot;, Mix_GetError());
+    // no distance, is it ok?
+}
+</pre></td></tr></table>
+</td></tr></table>
+
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fSetMusicEffectPosition">Mix_SetMusicEffectPosition</a>,
+<a href="#Mix_005fUnregisterAllMusicEffects">Mix_UnregisterAllMusicEffects</a>
+</p>
 
 
 <hr size="6">
@@ -8955,9 +9241,52 @@ if(!Mix_SetReverseStereo(MIX_CHANNEL_POST, 1)) {
 <h3 class="subsection">5.6.14 Mix_SetMusicEffectPosition</h3>
 <a name="index-Mix_005fSetMusicEffectPosition"></a>
 
-<p>WIP
+<p><code>int <b>Mix_SetMusicEffectPosition</b>(Mix_Music *<var>music</var>, Sint16 <var>angle</var>, Uint8 <var>distance</var>)</code>
 </p>
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>Music to register this effect on.<br>
+</p></dd>
+<dt> <var>angle</var></dt>
+<dd><p>Direction in relation to forward from 0 to 360 degrees.  Larger angles will be reduced to this range using <code><var>angles</var> % 360</code>.<br>
+0 = directly in front.<br>
+90 = directly to the right.<br>
+180 = directly behind.<br>
+270 = directly to the left.<br>
+So you can see it goes clockwise starting at directly in front.<br>
+This ends up being similar in effect to <code>Mix_SetMusicEffectPanning</code>.
+</p></dd>
+<dt> <var>distance</var></dt>
+<dd><p>The distance from the listener, from 0(near/loud) to 255(far/quiet).<br>
+This is the same as the <code>Mix_SetMusicEffectDistance</code> effect.
+</p></dd>
+</dl>
 
+<p>This effect emulates a simple 3D audio effect.
+It&rsquo;s not all that realistic, but it can help improve some level of realism.
+By giving it the angle and distance from the camera&rsquo;s point of view, the effect pans and attenuates volumes.
+If you are looking for better positional audio, using <b>OpenAL</b> is suggested.<br>
+<b>NOTE</b>: Using <var>angle</var> and <var>distance</var> of 0, will cause the effect to unregister itself
+from <var>music</var>.
+You cannot unregister it any other way, unless you use <code>Mix_UnregisterAllMusicEffects</code> on the <var>music</var>.
+</p>
+<p><b>Returns</b>: Zero on errors, such as an invalid music, or if <code>Mix_RegisterMusicEffect</code> failed.
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">// set someMusic to be behind and right, and 100 units away
+if(!Mix_SetMusicEffectPosition(someMusic, 135, 100)) {
+    printf(&quot;Mix_SetMusicEffectPosition: %s\n&quot;, Mix_GetError());
+    // no position effect, is it ok?
+}
+</pre></td></tr></table>
+</td></tr></table>
+
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fSetMusicEffectPanning">Mix_SetMusicEffectPanning</a>,
+<a href="#Mix_005fSetMusicEffectDistance">Mix_SetMusicEffectDistance</a>,
+<a href="#Mix_005fUnregisterAllMusicEffects">Mix_UnregisterAllMusicEffects</a>
+</p>
 
 
 <hr size="6">
@@ -8982,7 +9311,35 @@ if(!Mix_SetReverseStereo(MIX_CHANNEL_POST, 1)) {
 <h3 class="subsection">5.6.15 Mix_SetMusicEffectReverseStereo</h3>
 <a name="index-Mix_005fSetMusicEffectReverseStereo"></a>
 
-<p>WIP
+<p><code>int <b>Mix_SetMusicEffectReverseStereo</b>(Mix_Music *<var>music</var>, int <var>flip</var>)</code>
+</p>
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>Music to register this effect on.<br>
+</p></dd>
+<dt> <var>flip</var></dt>
+<dd><p>Must be non-zero to work, means nothing to the effect processor itself.<br>
+set to zero to unregister the effect from <var>music</var>.
+</p></dd>
+</dl>
+
+<p>Simple reverse stereo, swaps left and right channel sound.<br>
+<b>NOTE</b>: Using a <var>flip</var> of 0, will cause the effect to unregister itself from <var>music</var>.
+You cannot unregister it any other way, unless you use <code>Mix_UnregisterAllMusicEffects</code> on the <var>music</var>.
+</p>
+<p><b>Returns</b>: Zero on errors, such as an invalid music, or if <code>Mix_RegisterMusicEffect</code> failed.
+</p>
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">// set the someMusic to be reverse stereo
+if(!Mix_SetMusicEffectReverseStereo(someMusic, 1)) {
+    printf(&quot;Mix_SetMusicEffectReverseStereo: %s\n&quot;, Mix_GetError());
+    // no reverse stereo, is it ok?
+}
+</pre></td></tr></table>
+</td></tr></table>
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fUnregisterAllMusicEffects">Mix_UnregisterAllMusicEffects</a>
 
 </p><hr size="6">
 <a name="Types"></a>
@@ -9026,9 +9383,15 @@ if(!Mix_SetReverseStereo(MIX_CHANNEL_POST, 1)) {
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fFading">6.9 Mix_Fading</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">              Fader effect type enumerations
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fEffectFunc_005ft">6.10 Mix_EffectFunc_t</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Special effect callback function pointer
+<tr><td align="left" valign="top"><a href="#Mix_005fEffectFunc_005ft">6.10 Mix_EffectFunc_t</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Special channel effect callback function pointer
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fEffectDone_005ft">6.11 Mix_EffectDone_t</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Special effect done callback function pointer
+<tr><td align="left" valign="top"><a href="#Mix_005fEffectDone_005ft">6.11 Mix_EffectDone_t</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Special channel effect done callback function pointer
+</td></tr>
+<tr><td align="left" valign="top"><a href="#Mix_005fMusicEffectFunc_005ft">6.12 Mix_MusicEffectFunc_t</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">   Special music effect callback function pointer
+</td></tr>
+<tr><td align="left" valign="top"><a href="#Mix_005fMusicEffectDone_005ft">6.13 Mix_MusicEffectDone_t</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">   Special music effect done callback function pointer
+</td></tr>
+<tr><td align="left" valign="top"><a href="#Mix_005fCommonMixer_005ft">6.14 Mix_CommonMixer_t</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">       Common mixer function pointer
 </td></tr>
 </table>
 
@@ -9498,7 +9861,7 @@ It may also be advantageous to keep the effect state in the <var>udata</var>, wi
 <a name="Mix_005fEffectDone_005ft"></a>
 <table cellpadding="1" cellspacing="1" border="0">
 <tr><td valign="middle" align="left">[<a href="#Mix_005fEffectFunc_005ft" title="Previous section in reading order"> &lt; </a>]</td>
-<td valign="middle" align="left">[<a href="#Defines" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Mix_005fMusicEffectFunc_005ft" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Types" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#Types" title="Up section"> Up </a>]</td>
@@ -9541,11 +9904,167 @@ or free some memory.  It should free memory at least, because the processor coul
 <p><b>See Also</b>:<br>
 <a href="#Mix_005fRegisterEffect">Mix_RegisterEffect</a>
 <a href="#Mix_005fUnregisterEffect">Mix_UnregisterEffect</a>
+</p>
+
+
+<hr size="6">
+<a name="Mix_005fMusicEffectFunc_005ft"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#Mix_005fEffectDone_005ft" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Mix_005fMusicEffectDone_005ft" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#Types" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Types" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="#Defines" title="Next chapter"> &gt;&gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<a name="Mix_005fMusicEffectFunc_005ft-1"></a>
+<h2 class="section">6.12 Mix_MusicEffectFunc_t</h2>
+<a name="index-Mix_005fMusicEffectFunc_005ft"></a>
+
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">typedef void (*Mix_MusicEffectFunc_t)(Mix_Music *<var>music</var>, void *<var>stream</var>, int <var>len</var>,
+                                 void *<var>udata</var>);
+</pre></td></tr></table>
+</td></tr></table>
+
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>The music that this effect is effecting now.<br>
+</p></dd>
+<dt> <var>stream</var></dt>
+<dd><p>The buffer containing the current sample to process.
+</p></dd>
+<dt> <var>len</var></dt>
+<dd><p>The length of <var>stream</var> in bytes.
+</p></dd>
+<dt> <var>udata</var></dt>
+<dd><p>User data pointer that was passed in to <code>Mix_RegisterMusicEffect</code> when registering this
+effect processor function.
+</p></dd>
+</dl>
+
+<p>This is the prototype for effect processing functions.
+These functions are used to apply effects processing on a music.
+As a music plays a sample, the registered effect functions are called.
+Each effect would then read and perhaps alter the <var>len</var> bytes of <var>stream</var>.
+It may also be advantageous to keep the effect state in the <var>udata</var>,
+with would be setup when registering the effect function on a channel.
+</p>
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fRegisterMusicEffect">Mix_RegisterMusicEffect</a>
+<a href="#Mix_005fUnregisterMusicEffect">Mix_UnregisterMusicEffect</a>
+</p>
+
+
+<hr size="6">
+<a name="Mix_005fMusicEffectDone_005ft"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#Mix_005fMusicEffectFunc_005ft" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Mix_005fCommonMixer_005ft" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#Types" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Types" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="#Defines" title="Next chapter"> &gt;&gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<a name="Mix_005fMusicEffectDone_005ft-1"></a>
+<h2 class="section">6.13 Mix_MusicEffectDone_t</h2>
+<a name="index-Mix_005fMusicEffectDone_005ft"></a>
+
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">typedef void (*Mix_MusicEffectDone_t)(Mix_Music <var>music</var>, void *<var>udata</var>);
+</pre></td></tr></table>
+</td></tr></table>
+
+<dl compact="compact">
+<dt> <var>music</var></dt>
+<dd><p>The music that this effect is effecting now.<br>
+</p></dd>
+<dt> <var>udata</var></dt>
+<dd><p>User data pointer that was passed in to <code>Mix_RegisterMusicEffect</code> when registering this
+effect processor function.
+</p></dd>
+</dl>
+
+<p>This is the prototype for effect processing functions.
+This is called when a music has finished playing, or halted, or is deallocated.
+This is also called when a processor is unregistered while processing is active.
+At that time the effects processing function may want to reset some internal variables
+or free some memory.  It should free memory at least, because the processor could be freed after this call.
+</p>
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fRegisterMusicEffect">Mix_RegisterMusicEffect</a>
+<a href="#Mix_005fUnregisterMusicEffect">Mix_UnregisterMusicEffect</a>
+</p>
+
+
+<hr size="6">
+<a name="Mix_005fCommonMixer_005ft"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#Mix_005fMusicEffectDone_005ft" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Defines" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#Types" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Types" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="#Defines" title="Next chapter"> &gt;&gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<a name="Mix_005fCommonMixer_005ft-1"></a>
+<h2 class="section">6.14 Mix_CommonMixer_t</h2>
+<a name="index-Mix_005fCommonMixer_005ft"></a>
+
+<table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">typedef void (*Mix_CommonMixer_t)(void *<var>udata</var>, void *<var>stream</var>, int <var>len</var>);
+</pre></td></tr></table>
+</td></tr></table>
+
+<dl compact="compact">
+<dt> <var>udata</var></dt>
+<dd><p>User data pointer that you can pass into the function.
+</p></dd>
+<dt> <var>stream</var></dt>
+<dd><p>The destination buffer to write the data.<br>
+</p></dd>
+<dt> <var>len</var></dt>
+<dd><p>The length of the buffer to write the data.<br>
+</p></dd>
+</dl>
+
+<p>This is the prototype for the internal mixer processing callback.
+You should to call given callbacks to run the internal mixer processing
+and get the final audio data ready for output.
+</p>
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fGetMusicMixer">Mix_GetMusicMixer</a>
+<a href="#Mix_005fGetMultiMusicMixer">Mix_GetMultiMusicMixer</a>
+<a href="#Mix_005fGetGeneralMixer">Mix_GetGeneralMixer</a>
 
 </p><hr size="6">
 <a name="Defines"></a>
 <table cellpadding="1" cellspacing="1" border="0">
-<tr><td valign="middle" align="left">[<a href="#Mix_005fEffectDone_005ft" title="Previous section in reading order"> &lt; </a>]</td>
+<tr><td valign="middle" align="left">[<a href="#Mix_005fCommonMixer_005ft" title="Previous section in reading order"> &lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#Glossary" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Types" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
@@ -9757,6 +10276,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <tr><td></td><td valign="top"><a href="#index-Mix_005fChunk"><code>Mix_Chunk</code></a></td><td valign="top"><a href="#Samples">5.2 Samples</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fChunk-1"><code>Mix_Chunk</code></a></td><td valign="top"><a href="#Mix_005fChunk">6.1 Mix_Chunk</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fCloseAudio"><code>Mix_CloseAudio</code></a></td><td valign="top"><a href="#Mix_005fCloseAudio">5.1.7 Mix_CloseAudio</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fCommonMixer_005ft"><code>Mix_CommonMixer_t</code></a></td><td valign="top"><a href="#Mix_005fCommonMixer_005ft">6.14 Mix_CommonMixer_t</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fCrossFadeMusicStream"><code>Mix_CrossFadeMusicStream</code></a></td><td valign="top"><a href="#Mix_005fCrossFadeMusicStream">5.5.14 Mix_CrossFadeMusicStream</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fCrossFadeMusicStreamPos"><code>Mix_CrossFadeMusicStreamPos</code></a></td><td valign="top"><a href="#Mix_005fCrossFadeMusicStreamPos">5.5.15 Mix_CrossFadeMusicStreamPos</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-MIX_005fDEFAULT_005fCHANNELS">MIX_DEFAULT_CHANNELS</a></td><td valign="top"><a href="#Defines">7. Defines</a></td></tr>
@@ -9854,6 +10374,8 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <tr><td></td><td valign="top"><a href="#index-Mix_005fModMusicStreamJumpToOrder"><code>Mix_ModMusicStreamJumpToOrder</code></a></td><td valign="top"><a href="#Mix_005fModMusicStreamJumpToOrder">5.5.32 Mix_ModMusicStreamJumpToOrder</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fMusic"><code>Mix_Music</code></a></td><td valign="top"><a href="#Mix_005fMusic">6.2 Mix_Music</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fMusicDuration"><code>Mix_MusicDuration</code></a></td><td valign="top"><a href="#Mix_005fMusicDuration">5.5.33 Mix_MusicDuration</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fMusicEffectDone_005ft"><code>Mix_MusicEffectDone_t</code></a></td><td valign="top"><a href="#Mix_005fMusicEffectDone_005ft">6.13 Mix_MusicEffectDone_t</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fMusicEffectFunc_005ft"><code>Mix_MusicEffectFunc_t</code></a></td><td valign="top"><a href="#Mix_005fMusicEffectFunc_005ft">6.12 Mix_MusicEffectFunc_t</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fMusicType"><code>Mix_MusicType</code></a></td><td valign="top"><a href="#Mix_005fMusicType">6.3 Mix_MusicType</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fOpenAudio"><code>Mix_OpenAudio</code></a></td><td valign="top"><a href="#Mix_005fOpenAudio">5.1.4 Mix_OpenAudio</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fOpenAudioDevice"><code>Mix_OpenAudioDevice</code></a></td><td valign="top"><a href="#Mix_005fOpenAudioDevice">5.1.5 Mix_OpenAudioDevice</a></td></tr>
@@ -9980,7 +10502,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 
 <ul class="toc">
   <li><a name="toc-Overview-1" href="#Overview">1. Overview</a></li>
-  <li><a name="toc-SDL-Mixer-X-2" href="#SDL-Mixer-X">2. SDL Mixer X</a></li>
+  <li><a name="toc-MixerX-2" href="#MixerX">2. MixerX</a></li>
   <li><a name="toc-Getting-Started-1" href="#Getting-Started">3. Getting Started</a>
   <ul class="toc">
     <li><a name="toc-Includes-1" href="#Includes">3.1 Includes</a></li>
@@ -10204,6 +10726,9 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
     <li><a name="toc-Mix_005fFading-1" href="#Mix_005fFading">6.9 Mix_Fading</a></li>
     <li><a name="toc-Mix_005fEffectFunc_005ft-1" href="#Mix_005fEffectFunc_005ft">6.10 Mix_EffectFunc_t</a></li>
     <li><a name="toc-Mix_005fEffectDone_005ft-1" href="#Mix_005fEffectDone_005ft">6.11 Mix_EffectDone_t</a></li>
+    <li><a name="toc-Mix_005fMusicEffectFunc_005ft-1" href="#Mix_005fMusicEffectFunc_005ft">6.12 Mix_MusicEffectFunc_t</a></li>
+    <li><a name="toc-Mix_005fMusicEffectDone_005ft-1" href="#Mix_005fMusicEffectDone_005ft">6.13 Mix_MusicEffectDone_t</a></li>
+    <li><a name="toc-Mix_005fCommonMixer_005ft-1" href="#Mix_005fCommonMixer_005ft">6.14 Mix_CommonMixer_t</a></li>
   </ul></li>
   <li><a name="toc-Defines-1" href="#Defines">7. Defines</a></li>
   <li><a name="toc-Glossary-1" href="#Glossary">8. Glossary</a></li>
@@ -10222,7 +10747,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <div class="shortcontents">
 <ul class="toc">
 <li><a name="stoc-Overview-1" href="#Overview">1. Overview</a></li>
-<li><a name="stoc-SDL-Mixer-X-2" href="#SDL-Mixer-X">2. SDL Mixer X</a></li>
+<li><a name="stoc-MixerX-2" href="#MixerX">2. MixerX</a></li>
 <li><a name="stoc-Getting-Started-1" href="#Getting-Started">3. Getting Started</a></li>
 <li><a name="stoc-Conflicts-1" href="#Conflicts">4. Conflicts</a></li>
 <li><a name="stoc-Functions-1" href="#Functions">5. Functions</a></li>
@@ -10242,7 +10767,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 </tr></table>
 <h1>About This Document</h1>
 <p>
-  This document was generated by <em>Wohlstand Fox</em> on <em>September 12, 2021</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
+  This document was generated by <em>Wohlstand Fox</em> on <em>September 13, 2021</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
 </p>
 <p>
   The buttons in the navigation panels have the following meaning:
@@ -10344,7 +10869,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <hr size="1">
 <p>
  <font size="-1">
-  This document was generated by <em>Wohlstand Fox</em> on <em>September 12, 2021</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
+  This document was generated by <em>Wohlstand Fox</em> on <em>September 13, 2021</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
  </font>
  <br>
 
