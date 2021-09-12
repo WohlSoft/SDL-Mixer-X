@@ -184,7 +184,7 @@ typedef enum {
     MUS_OPUS,
     /* MixerX specific codecs starts with 100 */
     MUS_GME = 100,
-    /* Special cases to play formats IMF, MUS or XMI are can't be played without specific MIDI libraries */
+    /* Special cases to play formats IMF, MUS, or XMI are can't be played without specific MIDI libraries */
     MUS_ADLMIDI = 200,
     MUS_OPNMIDI,
     MUS_FLUIDLITE,
@@ -205,7 +205,7 @@ typedef enum {
 typedef enum {
     ADLMIDI_VM_AUTO,
     ADLMIDI_VM_GENERIC,
-    ADLMIDI_VM_CMF,
+    ADLMIDI_VM_NATIVE,
     ADLMIDI_VM_DMX,
     ADLMIDI_VM_APOGEE,
     ADLMIDI_VM_9X,
@@ -214,7 +214,9 @@ typedef enum {
     ADLMIDI_VM_AIL,
     ADLMIDI_VM_9X_GENERIC_FM,
     ADLMIDI_VM_HMI,
-    ADLMIDI_VM_HMI_OLD
+    ADLMIDI_VM_HMI_OLD,
+    /* Deprecated */
+    ADLMIDI_VM_CMF = ADLMIDI_VM_NATIVE
 } Mix_ADLMIDI_VolumeModel;
 
 /* OPL3 chip emulators for ADLMIDI */
@@ -226,6 +228,16 @@ typedef enum {
     ADLMIDI_OPL3_EMU_OPAL,
     ADLMIDI_OPL3_EMU_JAVA
 } Mix_ADLMIDI_Emulator;
+
+/* Volume model type in the OPNMIDI */
+typedef enum {
+    OPNMIDI_VM_AUTO,
+    OPNMIDI_VM_GENERIC,
+    OPNMIDI_VM_NATIVE,
+    OPNMIDI_VM_DMX,
+    OPNMIDI_VM_APOGEE,
+    OPNMIDI_VM_9X
+} Mix_OPNMIDI_VolumeModel;
 
 /* OPN2 chip emulators for OPNMIDI */
 typedef enum {
