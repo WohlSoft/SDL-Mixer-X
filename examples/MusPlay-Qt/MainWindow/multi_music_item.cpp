@@ -32,7 +32,10 @@ static const char *musicTypeC(Mix_Music *mus)
                type == MUS_OPUS ? "OPUS" :
 #   endif
                type == MUS_ADLMIDI ? "IMF/MUS/XMI" :
-               type == MUS_GME ? "Game Music Emulator" :
+               type == MUS_OPNMIDI ? "MUS/XMI(OPN)" :
+               type == MUS_FLUIDLITE ? "MUS/XMI(Fluid)" :
+               type == MUS_NATIVEMIDI ? "MUS/XMI(Native)" :
+               type == MUS_GME ? "GME Chiptune" :
 #else
 #   if SDL_MIXER_MAJOR_VERSION > 2 || \
 (SDL_MIXER_MAJOR_VERSION == 2 && SDL_MIXER_MINOR_VERSION > 0) || \
