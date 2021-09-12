@@ -866,6 +866,17 @@ extern DECLSPEC Mix_CommonMixer_t SDLCALL Mix_GetMusicMixer(void);
 /* returns a pointer to the multi-music mixer that can be used as a callback */
 extern DECLSPEC Mix_CommonMixer_t SDLCALL Mix_GetMultiMusicMixer(void);
 
+/* returns a pointer to the general mixer of music and channels that can be used as a callback
+ *
+ * This mixer processes the whole internality of the Mixer library: music, mutli-music, and channels
+ * Use this callback if you want to make your own audio output processing. Use the Mix_InitMixer() to
+ * initialize the Mixer without starting the SDL Audio instance and the Mix_FreeMixer() to close the library.
+ *
+ * CAUTION: using this callback, don't use Mix_GeneralMusicMixer() and Mix_GeneralMultiMusicMixeR() at all
+ * they both already used in this mixer internally.
+ */
+extern DECLSPEC Mix_CommonMixer_t SDLCALL Mix_GetGeneralMixer(void);
+
 /* Fade in music or a channel over "ms" milliseconds, same semantics as the "Play" functions */
 extern DECLSPEC int SDLCALL Mix_FadeInMusic(Mix_Music *music, int loops, int ms);
 extern DECLSPEC int SDLCALL Mix_FadeInMusicPos(Mix_Music *music, int loops, int ms, double position);

@@ -934,6 +934,12 @@ Mix_CommonMixer_t SDLCALLCC Mix_GetMultiMusicMixer(void)
     return mix_multi_music;
 }
 
+/* returns a pointer to the general mixer of music and channels that can be used as a callback */
+Mix_CommonMixer_t SDLCALLCC Mix_GetGeneralMixer(void)
+{
+    return mix_channels;
+}
+
 /* Add your own music player or mixer function.
    If 'mix_func' is NULL, the default music player is re-enabled.
  */
