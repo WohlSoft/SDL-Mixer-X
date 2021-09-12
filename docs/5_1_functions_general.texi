@@ -13,7 +13,16 @@ These functions are useful, as they are the only/best ways to work with SDL_mixe
 * Mix_Init::                    Initialize SDL_mixer
 * Mix_Quit::                    Cleanup SDL_mixer
 * Mix_OpenAudio::               Open sound mixer
+* Mix_OpenAudioDevice::         Open sound mixer with specific device @b{[Mixer 2.0]}
+* Mix_PauseAudio::              Pause or resume the whole audio engine @b{[Mixer X]}
 * Mix_CloseAudio::              Close sound mixer
+
+@b{Manual audio output processing}
+* Mix_InitMixer::               Initialize the Mixer internality without audio output @b{[Mixer X]}
+* Mix_GetMusicMixer::           Get the internal single-stream music mixer callback for manual audio output processing @b{[Mixer X]}
+* Mix_GetMultiMusicMixer::      Get the internal multi-stream music mixer callback for manual audio output processing @b{[Mixer X]}
+* Mix_GetGeneralMixer::         Get the inernal gemeral mixer callback for manual audio output processing @b{[Mixer X]}
+* Mix_FreeMixer::               Deinitialize and free all Mixer inetnality when used without audio output @b{[Mixer X]}
 
 @b{Errors}
 * Mix_SetError::                Set the current error string
@@ -74,7 +83,9 @@ bitwise OR'd set of sample/music formats to support by loading a library now.  T
 @b{MIX_INIT_FLAC}@*
 @b{MIX_INIT_MOD}@*
 @b{MIX_INIT_MP3}@*
-@b{MIX_INIT_OGG}
+@b{MIX_INIT_OGG}@*
+@b{MIX_INIT_MID}@*
+@b{MIX_INIT_OPUS}
 @end table
 
 @noindent
@@ -221,6 +232,28 @@ if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024)==-1) @{
 @ref{Mix_QuerySpec},
 @ref{Mix_AllocateChannels}
 
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_OpenAudioDevice
+@subsection Mix_OpenAudioDevice
+@findex Mix_OpenAudioDevice
+
+WIP
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_PauseAudio
+@subsection Mix_PauseAudio
+@findex Mix_PauseAudio
+
+WIP
+
+
+
+
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
 @node Mix_CloseAudio
@@ -251,6 +284,52 @@ Mix_CloseAudio();
 @b{See Also}:@*
 @ref{Mix_OpenAudio},
 @ref{Mix_QuerySpec}
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_InitMixer
+@subsection Mix_InitMixer
+@findex Mix_InitMixer
+
+WIP
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_GetMusicMixer
+@subsection Mix_GetMusicMixer
+@findex Mix_GetMusicMixer
+
+WIP
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_GetMultiMusicMixer
+@subsection Mix_GetMultiMusicMixer
+@findex Mix_GetMultiMusicMixer
+
+WIP
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_GetGeneralMixer
+@subsection Mix_GetGeneralMixer
+@findex Mix_GetGeneralMixer
+
+WIP
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_FreeMixer
+@subsection Mix_FreeMixer
+@findex Mix_FreeMixer
+
+WIP
+
+
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page

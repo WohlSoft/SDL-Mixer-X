@@ -11,6 +11,7 @@ Music is therefore manipulated separately, except in post-processing hooks.
 @b{Loading}
 * Mix_GetNumMusicDecoders::  Number of music format types that can be decoded
 * Mix_GetMusicDecoder::      Name of enumerated music format type decoder
+* Mix_HasMusicDecoder::      Check if the specific music decodec is abailable by name in this build
 * Mix_LoadMUS::              Load a music file into a Mix_Music
 * Mix_LoadMUS_RW::           Load Music through SDL RWops
 * Mix_LoadMUS_RW_ARG::       Load music through SDL RWops with passing of extra arguments string @b{[Mixer X]}
@@ -57,6 +58,9 @@ Music is therefore manipulated separately, except in post-processing hooks.
 * Mix_GetMusicTracks::              Get the number of tracks (or channels) at the MIDI/Tracker/Chiptune music @b{[Mixer X]}
 * Mix_SetMusicTrackMute::           Mute or unmute the given track (or channel) at the MIDI/Tracker/Chiptune music @b{[Mixer X]}
 * Mix_SetMusicCMD::                 Use external program for music playback
+* Mix_GetSynchroValue::             @b{makes no effect yet.} Get the MikMod synchro value @b{[Mixer 2.0]}
+* Mix_SetSynchroValue::             @b{makes no effect yet.} Set the synchro value for MikMod @b{[Mixer 2.0]}
+* Mix_SetMusicFileName::            Change the reporting filename tag of a music @b{[Mixer X]}
 @c Mix_SetSynchroValue::          seems useless! (return -1;)
 
 @b{Settings (legacy single-stream)}
@@ -105,8 +109,8 @@ Music is therefore manipulated separately, except in post-processing hooks.
 * Mix_GetMusicCopyrightTag:: Retrieve the copyright meta-tag of currently playing @var{music} @b{[Mixer X]}
 
 @b{Timidity Extra Settings}
-* Mix_SetTimidityCfg::          Set the custom Timidity config path @b{[Mixer X]}
-* Mix_GetTimidityCfg::          Get the current Timidity config path @b{[Mixer X]}
+* Mix_SetTimidityCfg::       Set the custom Timidity config path @b{[Mixer X]}
+* Mix_GetTimidityCfg::       Get the current Timidity config path @b{[Mixer X]}
 
 @b{FluidSynth Extra Settings}
 * Mix_SetSoundFonts::        Set global SoundFonts paths to use by supported FluidSynth MIDI backend @b{[Mixer 2.0]}
@@ -133,18 +137,25 @@ Music is therefore manipulated separately, except in post-processing hooks.
 * Mix_ADLMIDI_setFullPanStereo::            Set full panning stereo mode
 * Mix_ADLMIDI_getEmulator::                 Get the OPL3 Emulator for ADLMIDI
 * Mix_ADLMIDI_setEmulator::                 Select the OPL3 Emulator for ADLMIDI
+* Mix_ADLMIDI_getChipsCount::               Get the number of parallel emulated OPL3 chips to get the available polyphony range @b{[Mixer X]}
+* Mix_ADLMIDI_setChipsCount::               Set the number of parallel emulated OPL3 chips to define the available polyphony range @b{[Mixer X]}
 * Mix_ADLMIDI_setSetDefaults::              Reset ADLMIDI settings to default state. Applying on MIDI file reopen. @b{[Mixer X]}
 * Mix_ADLMIDI_setCustomBankFile::           Path to custom WOPL bank file. Applying on MIDI file reopen. @b{[Mixer X]}
 
 @b{libOPNMIDI Extra Settings}
+* Mix_OPNMIDI_getVolumeModel::              Get ID of current volumes model @b{[Mixer X]}
+* Mix_OPNMIDI_setVolumeModel::              Change current volume model. Applying on MIDI file reopen. @b{[Mixer X]}
 * Mix_OPNMIDI_getFullRangeBrightness::      Get full range mode for CC74-Brightness controller
 * Mix_OPNMIDI_setFullRangeBrightness::      Set full range mode for CC74-Brightness controller
 * Mix_OPNMIDI_getFullPanStereo::            Get full panning stereo mode
 * Mix_OPNMIDI_setFullPanStereo::            Set full panning stereo mode
-* Mix_OPNMIDI_getEmulator::                 Get the OPN2 Emulator for OPNMIDI
-* Mix_OPNMIDI_setEmulator::                 Select the OPN2 Emulator for OPNMIDI
+* Mix_OPNMIDI_getEmulator::                 Get the OPN2/OPNA Emulator for OPNMIDI
+* Mix_OPNMIDI_setEmulator::                 Select the OPN2/OPNA Emulator for OPNMIDI
+* Mix_OPNMIDI_getChipsCount::               Get the number of parallel emulated OPN2/OPNA chips to get the available polyphony range @b{[Mixer X]}
+* Mix_OPNMIDI_setChipsCount::               Set the number of parallel emulated OPN2/OPNA chips to define the available polyphony range @b{[Mixer X]}
 * Mix_OPNMIDI_setSetDefaults::              Reset OPNMIDI settings to default state. Applying on MIDI file reopen. @b{[Mixer X]}
 * Mix_OPNMIDI_setCustomBankFile::           Path to custom WOPN bank file. Applying on MIDI file reopen. @b{[Mixer X]}
+
 
 @end menu
 
@@ -212,6 +223,16 @@ for(i=0; i<max; ++i)
 @ref{Mix_GetNumMusicDecoders},
 @ref{Mix_GetChunkDecoder},
 @ref{Mix_LoadWAV}
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_HasMusicDecoder
+@subsection Mix_HasMusicDecoder
+@findex Mix_HasMusicDecoder
+
+WIP
+
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
@@ -1085,7 +1106,7 @@ Get the time current position of music stream. It only works on some of music so
 @b{See Also}:@*
 @ref{Mix_FadeInMusicPos}
 @ref{Mix_SetMusicPosition}
-@ref{Mix_GetMusicTotalTime}
+@ref{Mix_MusicDuration}
 
 
 
@@ -1293,6 +1314,35 @@ if(Mix_SetMusicCMD("mpg123 -q")==-1) @{
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
+@node Mix_GetSynchroValue
+@subsection Mix_GetSynchroValue
+@findex Mix_GetSynchroValue
+
+WIP
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_SetSynchroValue
+@subsection Mix_SetSynchroValue
+@findex Mix_SetSynchroValue
+
+WIP
+
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_SetMusicFileName
+@subsection Mix_SetMusicFileName
+@findex Mix_SetMusicFileName
+
+WIP
+
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
 @node Mix_VolumeMusic
 @subsection Mix_VolumeMusic
 @findex Mix_VolumeMusic
@@ -1461,7 +1511,7 @@ if(Mix_SetMusicPosition(60.0)==-1) @{
 @b{See Also}:@*
 @ref{Mix_FadeInMusicPos}
 @ref{Mix_GetMusicPosition}
-@ref{Mix_GetMusicTotalTime}
+@ref{Mix_MusicDuration}
 
 
 
@@ -2612,6 +2662,25 @@ Value of @b{Mix_ADLMIDI_Emulator} enum.
 Select the OPL3 Emulator for ADLMIDI
 @b{NOTE}: Applies on MIDI file reopen
 
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_ADLMIDI_getChipsCount
+@subsection Mix_ADLMIDI_getChipsCount
+@findex Mix_ADLMIDI_getChipsCount
+
+WIP
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_ADLMIDI_setChipsCount
+@subsection Mix_ADLMIDI_setChipsCount
+@findex Mix_ADLMIDI_setChipsCount
+
+WIP
+
+
+
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
 @node Mix_ADLMIDI_setSetDefaults
@@ -2649,6 +2718,24 @@ Sets path to custom WOPL bank file.
 Mix_ADLMIDI_setCustomBankFile("./music/my-gm-bank.wonl");
 @end example
 @end cartouche
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_OPNMIDI_getVolumeModel
+@subsection Mix_OPNMIDI_getVolumeModel
+@findex Mix_OPNMIDI_getVolumeModel
+
+WIP
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_OPNMIDI_setVolumeModel
+@subsection Mix_OPNMIDI_setVolumeModel
+@findex Mix_OPNMIDI_setVolumeModel
+
+WIP
+
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
@@ -2748,6 +2835,24 @@ Value of @b{Mix_OPNMIDI_Emulator} enum.
 @noindent
 Select the OPN2 Emulator for OPNMIDI
 @b{NOTE}: Applies on MIDI file reopen
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_OPNMIDI_getChipsCount
+@subsection Mix_OPNMIDI_getChipsCount
+@findex Mix_OPNMIDI_getChipsCount
+
+WIP
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_OPNMIDI_setChipsCount
+@subsection Mix_OPNMIDI_setChipsCount
+@findex Mix_OPNMIDI_setChipsCount
+
+WIP
+
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page

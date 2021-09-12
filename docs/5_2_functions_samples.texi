@@ -11,6 +11,7 @@ These functions work with @t{Mix_Chunk} samples.
 @b{Loading}
 * Mix_GetNumChunkDecoders::  Number of sample format types that can be decoded
 * Mix_GetChunkDecoder::      Name of enumerated sample format type decoder
+* Mix_HasChunkDecoder::      Check if the specific chunk decodec is abailable by name in this build
 * Mix_LoadWAV::              From a file
 * Mix_LoadWAV_RW::           Using RWops
 * Mix_QuickLoad_WAV::        From memory, in output format already
@@ -87,6 +88,16 @@ for(i=0; i<max; ++i)
 @ref{Mix_GetNumChunkDecoders},
 @ref{Mix_GetMusicDecoder},
 @ref{Mix_LoadWAV}
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_HasChunkDecoder
+@subsection Mix_HasChunkDecoder
+@findex Mix_HasChunkDecoder
+
+WIP
+
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
