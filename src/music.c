@@ -2191,11 +2191,11 @@ int SDLCALLCC Mix_SetTimidityCfg(const char *path)
     if (path && *path) {
         if (!(timidity_cfg = SDL_strdup(path))) {
             Mix_SetError("Insufficient memory to set Timidity cfg file");
-            return 0;
+            return -1;
         }
     }
 
-    return 1;
+    return 0;
 }
 
 const char* SDLCALLCC Mix_GetTimidityCfg(void)
