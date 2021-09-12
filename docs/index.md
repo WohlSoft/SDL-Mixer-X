@@ -36,12 +36,14 @@ providing support for more supported audio formats.
 * CMake building systems in use
   * Can be used with libraries currently installed in the system.
   * Optionally, you can set the `-DDOWNLOAD_AUDIO_CODECS_DEPENDENCY=ON` option to automatically download sources of all dependencies and build them in a place.
+
 ### Features introduced at MixerX later added into the mainstream SDL_mixer
 * Added support of the loop points in the OGG and OPUS files (via <u>LOOPSTART</u> and <u>LOOPEND</u> (or <u>LOOPLENGHT</u>) meta-tags). Backported into SDL_mixer since 12'th of Novenber, 2019.
 * In the Modplug module enabled internal loops (tracker musics with internal loops are will be looped correctly). Fixed at SDL_mixer since 31'th of January.
 * Added new API functions
   * Ability to redefine Timidity patches path. So, patches folders are can be stored in any place!
   * Added functions to retrieve some meta-tags: Title, Artist, Album, Copyright
+
 ### Features introduced at MixerX later removed because of unnecessarity
 * Own re-sampling implementation which a workaround to glitches caused with inaccurate re-sampler implementation from SDL2. Recent versions of SDL2 now has much better resampler than was before.
 
