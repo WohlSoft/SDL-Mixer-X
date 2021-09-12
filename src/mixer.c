@@ -267,7 +267,9 @@ mix_channels(void *udata, Uint8 *stream, int len)
 
     /* Mix the music (must be done before the channels are added) */
     mix_music(music_data, stream, len);
-    mix_multi_music(music_data, stream, len);
+    if (mix_multi_music) {
+        mix_multi_music(music_data, stream, len);
+    }
 
     /* Mix any playing channels... */
     sdl_ticks = SDL_GetTicks();
@@ -936,9 +938,11 @@ void SDLCALLCC Mix_HookMusic(void (SDLCALL *mix_func)(void *udata, Uint8 *stream
     if (mix_func != NULL) {
         music_data = arg;
         mix_music = mix_func;
+        mix_multi_music = NULL;
     } else {
         music_data = NULL;
         mix_music = music_mixer;
+        mix_multi_music = mix_multi_music;
     }
     Mix_UnlockAudio();
 }
