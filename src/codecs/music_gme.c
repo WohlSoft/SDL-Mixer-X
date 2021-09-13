@@ -86,7 +86,7 @@ static int GME_Load(void)
         FUNCTION_LOADER(gme_start_track, gme_err_t (*)( Music_Emu*,int))
         FUNCTION_LOADER(gme_track_ended, int (*)( Music_Emu const*))
         FUNCTION_LOADER(gme_set_tempo, void (*)(Music_Emu*,double))
-        FUNCTION_LOADER(gme_voice_count, void (*)(Music_Emu const*))
+        FUNCTION_LOADER(gme_voice_count, int (*)(Music_Emu const*))
         FUNCTION_LOADER(gme_mute_voice, void (*)(Music_Emu*,int,int))
 #if GME_VERSION >= 0x000700
         FUNCTION_LOADER(gme_set_fade, void (*)(Music_Emu*,int,int))
@@ -251,18 +251,16 @@ static void process_args(const char *args, Gme_Setup *setup)
 
 GME_Music *GME_LoadSongRW(SDL_RWops *src, const char *args)
 {
-    void *bytes = 0;
-    long spcsize, bytes_l;
-    unsigned char byte[1];
+    void *mem = 0;
+    size_t size;
     gme_info_t *musInfo;
     GME_Music *music;
     Gme_Setup setup = gme_setup;
     const char *err;
     SDL_bool has_loop_length = SDL_TRUE;
 
-    Sint64 length = 0;
-
     if (src == NULL) {
+        Mix_SetError("GME: Empty source given");
         return NULL;
     }
 
@@ -288,38 +286,19 @@ GME_Music *GME_LoadSongRW(SDL_RWops *src, const char *args)
         return NULL;
     }
 
-    length = SDL_RWseek(src, 0, RW_SEEK_END);
-    if (length < 0) {
-        GME_delete(music);
-        Mix_SetError("GAME-EMU: wrong file\n");
-        return NULL;
-    }
-
     SDL_RWseek(src, 0, RW_SEEK_SET);
-    bytes = SDL_malloc((size_t)length);
-    if (!bytes) {
+    mem = SDL_LoadFile_RW(src, &size, SDL_FALSE);
+    if (mem) {
+        err = gme.gme_open_data(mem, size, &music->game_emu, music_spec.freq);
+        SDL_free(mem);
+        if (err != 0) {
+            GME_delete(music);
+            Mix_SetError("GME: %s", err);
+            return NULL;
+        }
+    } else {
         SDL_OutOfMemory();
         GME_delete(music);
-        return NULL;
-    }
-
-    spcsize = 0;
-    while ((bytes_l = (long)SDL_RWread(src, &byte, sizeof(unsigned char), 1)) != 0) {
-        ((unsigned char *)bytes)[spcsize] = byte[0];
-        spcsize++;
-    }
-
-    if (spcsize == 0) {
-        GME_delete(music);
-        Mix_SetError("GAME-EMU: wrong file\n");
-        return NULL;
-    }
-
-    err = gme.gme_open_data(bytes, spcsize, &music->game_emu, music_spec.freq);
-    SDL_free(bytes);
-    if (err != 0) {
-        GME_delete(music);
-        Mix_SetError("GAME-EMU: %s", err);
         return NULL;
     }
 
@@ -328,13 +307,14 @@ GME_Music *GME_LoadSongRW(SDL_RWops *src, const char *args)
     }
 
     /* Set this flag BEFORE calling the gme_start_track() to fix an inability to loop forever */
-    if(gme.gme_set_autoload_playback_limit)
+    if (gme.gme_set_autoload_playback_limit) {
         gme.gme_set_autoload_playback_limit(music->game_emu, 0);
+    }
 
     err = gme.gme_start_track(music->game_emu, setup.track_number);
     if (err != 0) {
         GME_delete(music);
-        Mix_SetError("GAME-EMU: %s", err);
+        Mix_SetError("GME: %s", err);
         return NULL;
     }
 
@@ -346,7 +326,7 @@ GME_Music *GME_LoadSongRW(SDL_RWops *src, const char *args)
     err = gme.gme_track_info(music->game_emu, &musInfo, setup.track_number);
     if (err != 0) {
         GME_delete(music);
-        Mix_SetError("GAME-EMU: %s", err);
+        Mix_SetError("GME: %s", err);
         return NULL;
     }
 
@@ -393,7 +373,6 @@ static void *GME_new_RWEx(struct SDL_RWops *src, int freesrc, const char *extraS
 
     gmeMusic = GME_LoadSongRW(src, extraSettings);
     if (!gmeMusic) {
-        Mix_SetError("GAME-EMU: Can't load file");
         return NULL;
     }
     if (freesrc) {
@@ -445,7 +424,7 @@ static int GME_GetSome(void *context, void *data, int bytes, SDL_bool *done)
 
     err = gme.gme_play(music->game_emu, (music->buffer_size / 2), (short*)music->buffer);
     if (err != NULL) {
-        Mix_SetError("GAME-EMU: %s", err);
+        Mix_SetError("GME: %s", err);
         return 0;
     }
 
