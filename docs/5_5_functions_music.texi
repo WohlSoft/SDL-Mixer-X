@@ -25,6 +25,7 @@ There are two different music sub-systems providen:@*
 
 @b{Free}
 * Mix_FreeMusic::            Free a Mix_Music
+* Mix_SetFreeOnStop::        Mark a Mix_Music to be free automatically when it get halted. @b{[Mixer X]}
 
 @b{Playing}
 * Mix_PlayMusicStream::         Play music, with looping @b{[Mixer X]}
@@ -586,6 +587,50 @@ music=NULL; // so we know we freed it...
 @noindent
 @b{See Also}:@*
 @ref{Mix_LoadMUS}
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_SetFreeOnStop
+@subsection Mix_SetFreeOnStop
+@findex Mix_SetFreeOnStop
+
+@noindent
+@code{void @b{Mix_FreeMusic}(Mix_Music *@var{music}, int @var{free_on_stop})}
+
+@table @var
+@item music
+Pointer to Mix_Music to free.
+@item free_on_stop
+1 - make music to be free automatically when it finishes the playback, 0 - cancel the automatical free.
+@end table
+
+@noindent
+Mark the loaded @var{music} to be free automatically when it get halted.
+Can be used to simplify the dynamic stream processing when you want
+to automatically free the music once it get halted.@*
+@*
+@b{Note:} Music will NOT be free when you stop it manually using the @ref{Mix_HaltMusicStream} call.
+However, it will get free automatically when you will use the @ref{Mix_FadeOutMusicStream} call
+with a non-zero @var{ms} delay.@*
+Supported by multi-stream music sub-system only.
+
+@cartouche
+@example
+// free music
+Mix_Music *music;
+// play music once
+Mix_PlayMusicStream(music, 1);
+// Mark music to be free automatically
+Mix_SetFreeOnStop(music, 1);
+music=NULL; // we are safe to NULL this, no memory leak promised
+@end example
+@end cartouche
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_LoadMUS}
+
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
@@ -2189,7 +2234,9 @@ Playing music to halt.
 
 @noindent
 Halt playback of @var{music}. This interrupts music fader effects.
-Any callback set by @code{Mix_HookMusicStreamFinished} will be called when the music stops.
+Any callback set by @code{Mix_HookMusicStreamFinished} will be called when the music stops.@*
+@*
+@b{Note:} Music will not be free automatically if you called the @ref{Mix_SetFreeOnStop} function before.
 
 @noindent
 @b{Returns}: always returns zero. (even more silly than @var{Mix_HaltGroup})
@@ -2229,7 +2276,10 @@ Milliseconds of time that the fade-out effect should take to go to silence, star
 Gradually fade out the @var{music} over @var{ms} milliseconds starting from now.
 The @var{music} will be halted after the fade out is completed.
 Only when music is playing and not fading already are set to fade out, including paused channels.
-Any callback set by @code{Mix_HookMusicStreamFinished} will be called when the music finishes fading out.
+Any callback set by @code{Mix_HookMusicStreamFinished} will be called when the music finishes fading out.@*
+@*
+@b{Note:} Music will not be free automatically if you called the @ref{Mix_SetFreeOnStop} function before
+and if you set the @var{ms} delay to be 0.
 
 @noindent
 @b{Returns}: 1 on success, 0 on failure.

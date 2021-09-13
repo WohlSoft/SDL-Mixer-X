@@ -1881,6 +1881,29 @@ void SDLCALLCC Mix_FreeMusic(Mix_Music *music)
     }
 }
 
+/* Set the music to be self-destroyed once playback has get finished. */
+int SDLCALLCC Mix_SetFreeOnStop(Mix_Music *music, int free_on_stop)
+{
+    int ret = 0;
+
+    if (!music) {
+        return(-1);
+    }
+
+    Mix_LockAudio();
+
+    if (music != music_playing && music->is_multimusic) {
+        music->free_on_stop = free_on_stop;
+    } else {
+        Mix_SetError("This free_on_stop can be set when music is playing through the multi-music system.");
+        ret = -1;
+    }
+
+    Mix_UnlockAudio();
+
+    return(ret);
+}
+
 /* Find out the music format of a mixer music, or the currently playing
    music, if 'music' is NULL.
 */
@@ -2629,6 +2652,7 @@ int SDLCALLCC Mix_HaltMusicStream(Mix_Music *music)
             if (music_finished_hook_mm) {
                 music_finished_hook_mm();
             }
+            music->free_on_stop = 0; /* Unsed this flag as it makes no effect and will make the confusion in the future */
         } else {
             if (music_finished_hook) {
                 music_finished_hook();

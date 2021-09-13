@@ -323,6 +323,10 @@ extern DECLSPEC Mix_Chunk * SDLCALL Mix_QuickLoad_RAW(Uint8 *mem, Uint32 len);
 extern DECLSPEC void SDLCALL Mix_FreeChunk(Mix_Chunk *chunk);
 extern DECLSPEC void SDLCALL Mix_FreeMusic(Mix_Music *music);
 
+/* Set the music to be self-destroyed once playback has get finished.
+ Works only on multi-stream sub-system. */
+extern DECLSPEC int SDLCALL Mix_SetFreeOnStop(Mix_Music *music, int free_on_stop);
+
 /* Get a list of chunk/music decoders that this build of SDL_mixer provides.
    This list can change between builds AND runs of the program, if external
    libraries that add functionality become available.
