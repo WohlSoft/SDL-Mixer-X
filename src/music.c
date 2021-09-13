@@ -2652,7 +2652,7 @@ int SDLCALLCC Mix_HaltMusicStream(Mix_Music *music)
             if (music_finished_hook_mm) {
                 music_finished_hook_mm();
             }
-            music->free_on_stop = 0; /* Unsed this flag as it makes no effect and will make the confusion in the future */
+            music->free_on_stop = 0; /* Unset this flag as it makes no effect and will make the confusion in the future */
         } else {
             if (music_finished_hook) {
                 music_finished_hook();
