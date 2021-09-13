@@ -4516,6 +4516,13 @@ music=NULL; // so we know we freed it...
 
 <p>Play the loaded <var>music</var> <var>loop</var> times through from start to finish.
 The previous music will continue play or fade concurrently.
+You can use this function to play multiple parallel music files
+(or long atmosphere sound effects).<br>
+<br>
+<b>CAUTION:</b> You can&rsquo;t use this function with modules played through <b>MikMod</b> and
+MIDI played through <b>Native MIDI</b> interface: these libraries don&rsquo;t support parallel
+playing of multiple music files. Please use the <a href="#Mix_005fPlayMusic">Mix_PlayMusic</a> function to play MikMod
+and NativeMidi as a single-stream music.
 </p>
 <p><b>Returns</b>: 0 on success, or -1 on errors.
 </p>
@@ -4531,6 +4538,7 @@ if(Mix_PlayMusicStream(music, -1)==-1) {
 
 <p><b>See Also</b>:<br>
 <a href="#Mix_005fFadeInMusicStream">Mix_FadeInMusicStream</a>
+<a href="#Mix_005fCrossFadeMusicStream">Mix_CrossFadeMusicStream</a>
 </p>
 
 
@@ -4572,10 +4580,18 @@ if(Mix_PlayMusicStream(music, -1)==-1) {
 </p></dd>
 </dl>
 
-<p>Fade in over <var>ms</var> milliseconds of time, the loaded <var>music</var>, playing it <var>loop</var> times through from start to finish.<br>
+<p>Fade in over <var>ms</var> milliseconds of time, the loaded <var>music</var>, playing
+it <var>loop</var> times through from start to finish.<br>
 The fade in effect only applies to the first loop.<br>
-Any previous music will continue play or fade concurrently.<br>
-This function is the same as <code>Mix_FadeInMusicStreamPos(<var>music</var>, <var>loops</var>, <var>ms</var>, 0)</code>.
+Any previous music will continue play or fade concurrently.
+You can use this function to play multiple parallel music files
+(or long atmosphere sound effects).<br>
+This function is the same as <code>Mix_FadeInMusicStreamPos(<var>music</var>, <var>loops</var>, <var>ms</var>, 0)</code>.<br>
+<br>
+<b>CAUTION:</b> You can&rsquo;t use this function with modules played through <b>MikMod</b> and
+MIDI played through <b>Native MIDI</b> interface: these libraries don&rsquo;t support parallel
+playing of multiple music files. Please use the <a href="#Mix_005fFadeInMusic">Mix_FadeInMusic</a> function to play MikMod
+and NativeMidi as a single-stream music.
 </p>
 <p><b>Returns</b>: 0 on success, or -1 on errors.
 </p>
@@ -4592,6 +4608,8 @@ if(Mix_FadeInMusicStream(music, -1, 2000)==-1) {
 <p><b>See Also</b>:<br>
 <a href="#Mix_005fPlayMusicStream">Mix_PlayMusicStream</a>,
 <a href="#Mix_005fFadeInMusicStreamPos">Mix_FadeInMusicStreamPos</a>
+<a href="#Mix_005fCrossFadeMusicStream">Mix_CrossFadeMusicStream</a>
+<a href="#Mix_005fCrossFadeMusicStreamPos">Mix_CrossFadeMusicStreamPos</a>
 </p>
 
 <hr size="6">
@@ -4638,7 +4656,14 @@ if(Mix_FadeInMusicStream(music, -1, 2000)==-1) {
 <p>Fade in over <var>ms</var> milliseconds of time, the loaded <var>music</var>, playing it <var>loop</var> times through from start to finish.<br>
 The fade in effect only applies to the first loop.<br>
 The first time the music is played, it posistion will be set to <var>posistion</var>, which means different things for different types of music files, see <code>Mix_SetMusicPosition</code> for more info on that.<br>
-Any previous music will continue play or fade concurrently.<br>
+Any previous music will continue play or fade concurrently.
+You can use this function to play multiple parallel music files
+(or long atmosphere sound effects).<br>
+<br>
+<b>CAUTION:</b> You can&rsquo;t use this function with modules played through <b>MikMod</b> and
+MIDI played through <b>Native MIDI</b> interface: these libraries don&rsquo;t support parallel
+playing of multiple music files. Please use the <a href="#Mix_005fFadeInMusicPos">Mix_FadeInMusicPos</a> function tp play MikMod
+and NativeMidi as a single-stream music.<br>
 </p>
 <p><b>Returns</b>: 0 on success, or -1 on errors.
 </p>
@@ -4656,6 +4681,8 @@ if(Mix_FadeInMusicStreamPos(music, -1, 2000)==-1) {
 <a href="#Mix_005fPlayMusicStream">Mix_PlayMusicStream</a>,
 <a href="#Mix_005fFadeInMusicStream">Mix_FadeInMusicStream</a>,
 <a href="#Mix_005fSetMusicPosition">Mix_SetMusicPosition</a>
+<a href="#Mix_005fCrossFadeMusicStream">Mix_CrossFadeMusicStream</a>
+<a href="#Mix_005fCrossFadeMusicStreamPos">Mix_CrossFadeMusicStreamPos</a>
 </p>
 
 
@@ -4709,7 +4736,11 @@ if(Mix_FadeInMusicStreamPos(music, -1, 2000)==-1) {
 Fade out the <var>old_music</var> at the same time as fade in the <var>new_music</var>.<br>
 The fade in effect only applies to the first loop.<br>
 Any previous music will continue play or fade concurrently.<br>
-This function is the same as <code>Mix_CrossFadeMusicStreamPos(<var>old_music</var>, <var>new_music</var>, <var>loops</var>, <var>ms</var>, 0, 0)</code>.
+This function is the same as <code>Mix_CrossFadeMusicStreamPos(<var>old_music</var>, <var>new_music</var>, <var>loops</var>, <var>ms</var>, 0, 0)</code>.<br>
+<br>
+<b>CAUTION:</b> You can&rsquo;t use this function with modules played through <b>MikMod</b> and
+MIDI played through <b>Native MIDI</b> interface: these libraries don&rsquo;t support parallel
+playing of multiple music files.
 </p>
 <p><b>Returns</b>: 0 on success, or -1 on errors.
 </p>
@@ -4783,6 +4814,10 @@ Fade out the <var>old_music</var> at the same time as fade in the <var>new_music
 The fade in effect only applies to the first loop.<br>
 The first time the music is played, it posistion will be set to <var>posistion</var>, which means different things for different types of music files, see <code>Mix_SetMusicPosition</code> for more info on that.<br>
 Any previous music will continue play or fade concurrently.<br>
+<br>
+<b>CAUTION:</b> You can&rsquo;t use this function with modules played through <b>MikMod</b> and
+MIDI played through <b>Native MIDI</b> interface: these libraries don&rsquo;t support parallel
+playing of multiple music files.<br>
 </p>
 <p><b>Returns</b>: 0 on success, or -1 on errors.
 </p>
@@ -4907,7 +4942,8 @@ Mix_HookMusic(myMusicPlayer, &amp;music_pos);
 </p></dd>
 </dl>
 
-<p>Play the loaded <var>music</var> <var>loop</var> times through from start to finish.  The previous music will be halted, or if fading out it waits (blocking) for that to finish.
+<p>Play the loaded <var>music</var> <var>loop</var> times through from start to finish.  The previous music will be halted, or if fading out it waits (blocking) for that to finish.<br>
+Please use the <a href="#Mix_005fPlayMusicStream">Mix_PlayMusicStream</a> function to play multiple music streams in parallel.
 </p>
 <p><b>Returns</b>: 0 on success, or -1 on errors.
 </p>
@@ -4966,7 +5002,8 @@ if(Mix_PlayMusic(music, -1)==-1) {
 <p>Fade in over <var>ms</var> milliseconds of time, the loaded <var>music</var>, playing it <var>loop</var> times through from start to finish.<br>
 The fade in effect only applies to the first loop.<br>
 Any previous music will be halted, or if it is fading out it will wait (blocking) for the fade to complete.<br>
-This function is the same as <code>Mix_FadeInMusicPos(<var>music</var>, <var>loops</var>, <var>ms</var>, 0)</code>.
+This function is the same as <code>Mix_FadeInMusicPos(<var>music</var>, <var>loops</var>, <var>ms</var>, 0)</code>.<br>
+Please use the <a href="#Mix_005fFadeInMusicStream">Mix_FadeInMusicStream</a> function to play multiple music streams in parallel.
 </p>
 <p><b>Returns</b>: 0 on success, or -1 on errors.
 </p>
@@ -5030,6 +5067,7 @@ if(Mix_FadeInMusic(music, -1, 2000)==-1) {
 The fade in effect only applies to the first loop.<br>
 The first time the music is played, it posistion will be set to <var>posistion</var>, which means different things for different types of music files, see <code>Mix_SetMusicPosition</code> for more info on that.<br>
 Any previous music will be halted, or if it is fading out it will wait (blocking) for the fade to complete.<br>
+Please use the <a href="#Mix_005fFadeInMusicStreamPos">Mix_FadeInMusicStreamPos</a> function to play multiple music streams in parallel.<br>
 </p>
 <p><b>Returns</b>: 0 on success, or -1 on errors.
 </p>
