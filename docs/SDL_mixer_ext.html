@@ -3660,7 +3660,11 @@ Mix_HaltGroup(1);
 <h2 class="section">5.5 Music</h2>
 
 <p>These functions work with music.  Music is not played on a normal mixer channel.
-Music is therefore manipulated separately, except in post-processing hooks.
+Music is therefore manipulated separately, except in post-processing hooks.<br>
+<br>
+There are two different music sub-systems providen:<br>
+- <b>single-music</b>: the old API of the SDL_mixer. The most of given calls don&rsquo;t even has the <a href="#Mix_005fMusic">Mix_Music</a> argument and intended to manipulate the currently playing music.<br>
+- <b>multi-music</b>: the new API of the MixerX. Every given call intended to work with the multi-music has the <a href="#Mix_005fMusic">Mix_Music</a> argument to manipulate every music individually as they are able to work in parallel.
 </p>
 <table class="menu" border="0" cellspacing="0">
 <tr><th colspan="3" align="left" valign="top"><pre class="menu-comment"><b>Loading</b>
@@ -3680,7 +3684,7 @@ Music is therefore manipulated separately, except in post-processing hooks.
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fLoadMUSType_005fRW">5.5.8 Mix_LoadMUSType_RW</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">       Load a music file from an SDL RWops object assuming a specific format
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fLoadMUSType_005fRW_005fARG">5.5.9 Mix_LoadMUSType_RW_ARG</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">   Load a music file from an SDL RWops object assuming a specific format with passing of extra arguments string <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fLoadMUSType_005fRW_005fARG">5.5.9 Mix_LoadMUSType_RW_ARG</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">   Load a music file from an SDL RWops object assuming a specific format with passing of extra <a href="#Music-Arguments">Music Arguments</a> string <b>[Mixer X]</b>
 </td></tr>
 <tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
 <b>Free</b>
@@ -3806,11 +3810,11 @@ Music is therefore manipulated separately, except in post-processing hooks.
 <b>Info</b>
 </pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fGetMusicType">5.5.62 Mix_GetMusicType</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">         Get the music encoding type
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fPlayingMusicStream">5.5.63 Mix_PlayingMusicStream</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">   Test whether music is playing
+<tr><td align="left" valign="top"><a href="#Mix_005fPlayingMusicStream">5.5.63 Mix_PlayingMusicStream</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">   Test whether music is playing <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fPausedMusicStream">5.5.64 Mix_PausedMusicStream</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">    Test whether music is paused
+<tr><td align="left" valign="top"><a href="#Mix_005fPausedMusicStream">5.5.64 Mix_PausedMusicStream</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">    Test whether music is paused <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fFadingMusicStream">5.5.65 Mix_FadingMusicStream</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">    Get status of current music fade activity
+<tr><td align="left" valign="top"><a href="#Mix_005fFadingMusicStream">5.5.65 Mix_FadingMusicStream</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">    Get status of current music fade activity <b>[Mixer X]</b>
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fGetMusicHookData">5.5.66 Mix_GetMusicHookData</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">     Retrieve the Mix_HookMusic <var>arg</var>
 </td></tr>
@@ -3876,17 +3880,17 @@ Music is therefore manipulated separately, except in post-processing hooks.
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetVolumeModel">5.5.92 Mix_ADLMIDI_setVolumeModel</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">              Change current volume model. Applying on MIDI file reopen. <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fgetFullRangeBrightness">5.5.93 Mix_ADLMIDI_getFullRangeBrightness</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">      Get full range mode for CC74-Brightness controller
+<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fgetFullRangeBrightness">5.5.93 Mix_ADLMIDI_getFullRangeBrightness</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">      Get full range mode for CC74-Brightness controller <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetFullRangeBrightness">5.5.94 Mix_ADLMIDI_setFullRangeBrightness</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">      Set full range mode for CC74-Brightness controller
+<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetFullRangeBrightness">5.5.94 Mix_ADLMIDI_setFullRangeBrightness</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">      Set full range mode for CC74-Brightness controller <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fgetFullPanStereo">5.5.95 Mix_ADLMIDI_getFullPanStereo</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Get full panning stereo mode
+<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fgetFullPanStereo">5.5.95 Mix_ADLMIDI_getFullPanStereo</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Get full panning stereo mode <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetFullPanStereo">5.5.96 Mix_ADLMIDI_setFullPanStereo</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Set full panning stereo mode
+<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetFullPanStereo">5.5.96 Mix_ADLMIDI_setFullPanStereo</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Set full panning stereo mode <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fgetEmulator">5.5.97 Mix_ADLMIDI_getEmulator</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                 Get the OPL3 Emulator for ADLMIDI
+<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fgetEmulator">5.5.97 Mix_ADLMIDI_getEmulator</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                 Get the OPL3 Emulator for ADLMIDI <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetEmulator">5.5.98 Mix_ADLMIDI_setEmulator</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                 Select the OPL3 Emulator for ADLMIDI
+<tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fsetEmulator">5.5.98 Mix_ADLMIDI_setEmulator</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                 Select the OPL3 Emulator for ADLMIDI <b>[Mixer X]</b>
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fADLMIDI_005fgetChipsCount">5.5.99 Mix_ADLMIDI_getChipsCount</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">               Get the number of parallel emulated OPL3 chips to get the available polyphony range <b>[Mixer X]</b>
 </td></tr>
@@ -3902,17 +3906,17 @@ Music is therefore manipulated separately, except in post-processing hooks.
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fOPNMIDI_005fsetVolumeModel">5.5.104 Mix_OPNMIDI_setVolumeModel</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">              Change current volume model. Applying on MIDI file reopen. <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fOPNMIDI_005fgetFullRangeBrightness">5.5.105 Mix_OPNMIDI_getFullRangeBrightness</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">      Get full range mode for CC74-Brightness controller
+<tr><td align="left" valign="top"><a href="#Mix_005fOPNMIDI_005fgetFullRangeBrightness">5.5.105 Mix_OPNMIDI_getFullRangeBrightness</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">      Get full range mode for CC74-Brightness controller <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fOPNMIDI_005fsetFullRangeBrightness">5.5.106 Mix_OPNMIDI_setFullRangeBrightness</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">      Set full range mode for CC74-Brightness controller
+<tr><td align="left" valign="top"><a href="#Mix_005fOPNMIDI_005fsetFullRangeBrightness">5.5.106 Mix_OPNMIDI_setFullRangeBrightness</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">      Set full range mode for CC74-Brightness controller <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fOPNMIDI_005fgetFullPanStereo">5.5.107 Mix_OPNMIDI_getFullPanStereo</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Get full panning stereo mode
+<tr><td align="left" valign="top"><a href="#Mix_005fOPNMIDI_005fgetFullPanStereo">5.5.107 Mix_OPNMIDI_getFullPanStereo</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Get full panning stereo mode <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fOPNMIDI_005fsetFullPanStereo">5.5.108 Mix_OPNMIDI_setFullPanStereo</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Set full panning stereo mode
+<tr><td align="left" valign="top"><a href="#Mix_005fOPNMIDI_005fsetFullPanStereo">5.5.108 Mix_OPNMIDI_setFullPanStereo</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Set full panning stereo mode <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fOPNMIDI_005fgetEmulator">5.5.109 Mix_OPNMIDI_getEmulator</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                 Get the OPN2/OPNA Emulator for OPNMIDI
+<tr><td align="left" valign="top"><a href="#Mix_005fOPNMIDI_005fgetEmulator">5.5.109 Mix_OPNMIDI_getEmulator</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                 Get the OPN2/OPNA Emulator for OPNMIDI <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fOPNMIDI_005fsetEmulator">5.5.110 Mix_OPNMIDI_setEmulator</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                 Select the OPN2/OPNA Emulator for OPNMIDI
+<tr><td align="left" valign="top"><a href="#Mix_005fOPNMIDI_005fsetEmulator">5.5.110 Mix_OPNMIDI_setEmulator</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                 Select the OPN2/OPNA Emulator for OPNMIDI <b>[Mixer X]</b>
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fOPNMIDI_005fgetChipsCount">5.5.111 Mix_OPNMIDI_getChipsCount</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">               Get the number of parallel emulated OPN2/OPNA chips to get the available polyphony range <b>[Mixer X]</b>
 </td></tr>
@@ -3923,7 +3927,10 @@ Music is therefore manipulated separately, except in post-processing hooks.
 <tr><td align="left" valign="top"><a href="#Mix_005fOPNMIDI_005fsetCustomBankFile">5.5.114 Mix_OPNMIDI_setCustomBankFile</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">           Path to custom WOPN bank file. Applying on MIDI file reopen. <b>[Mixer X]</b>
 </td></tr>
 <tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
-
+<b>Extra</b>
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Music-Arguments">5.5.115 Music Arguments</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                         The special arguments string that can be passed together with the music file path to set up individual music settings.<b>[Mixer X]</b>
+</td></tr>
+<tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
 </pre></th></tr></table>
 
 
@@ -4087,7 +4094,7 @@ for(i=0; i&lt;max; ++i)
 </p>
 <dl compact="compact">
 <dt> <var>file</var></dt>
-<dd><p>Name of music file to use.
+<dd><p>Name of music file to use. You may add the <a href="#Music-Arguments">Music Arguments</a> after the filepath using the <b>|</b> symbol as the separator.
 </p></dd>
 </dl>
 
@@ -4102,6 +4109,16 @@ Mix_Music *music;
 music=Mix_LoadMUS(&quot;music.mp3&quot;);
 if(!music) {
     printf(&quot;Mix_LoadMUS(\&quot;music.mp3\&quot;): %s\n&quot;, Mix_GetError());
+    // this might be a critical error...
+}
+</pre></td></tr></table>
+
+<table><tr><td>&nbsp;</td><td><pre class="example">// load the MIDI file &quot;music.mid&quot; to play as music
+// and add the Music Arguments string &quot;s3;c2;&quot; into it
+Mix_Music *music;
+music=Mix_LoadMUS(&quot;music.mid|s3;c2;&quot;);
+if(!music) {
+    printf(&quot;Mix_LoadMUS(\&quot;music.mid|s3;c2;\&quot;): %s\n&quot;, Mix_GetError());
     // this might be a critical error...
 }
 </pre></td></tr></table>
@@ -4208,7 +4225,7 @@ if(!music) {
 <dd><p>Automatically close SDL_RWops instance on complete loading of music
 </p></dd>
 <dt> <var>args</var></dt>
-<dd><p>An arguments string supported by specific library
+<dd><p>The <a href="#Music-Arguments">Music Arguments</a> string supported by specific library
 </p></dd>
 </dl>
 
@@ -4402,7 +4419,7 @@ if(!music) {
 <dd><p>Automatically close SDL_RWops instance on complete loading of music
 </p></dd>
 <dt> <var>args</var></dt>
-<dd><p>An arguments string supported by specific library
+<dd><p>The <a href="#Music-Arguments">Music Arguments</a> string supported by specific library
 </p></dd>
 </dl>
 
@@ -9095,7 +9112,7 @@ Mix_ADLMIDI_setCustomBankFile(&quot;./music/my-gm-bank.wonl&quot;);
 <a name="Mix_005fOPNMIDI_005fsetCustomBankFile"></a>
 <table cellpadding="1" cellspacing="1" border="0">
 <tr><td valign="middle" align="left">[<a href="#Mix_005fOPNMIDI_005fsetSetDefaults" title="Previous section in reading order"> &lt; </a>]</td>
-<td valign="middle" align="left">[<a href="#Effects" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Music-Arguments" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Functions" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#Music" title="Up section"> Up </a>]</td>
@@ -9131,10 +9148,376 @@ Mix_OPNMIDI_setCustomBankFile(&quot;./music/my-gm-bank.wonp&quot;);
 </td></tr></table>
 
 
+
 <hr size="6">
-<a name="Effects"></a>
+<a name="Music-Arguments"></a>
 <table cellpadding="1" cellspacing="1" border="0">
 <tr><td valign="middle" align="left">[<a href="#Mix_005fOPNMIDI_005fsetCustomBankFile" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Effects" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#Functions" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Music" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="#Types" title="Next chapter"> &gt;&gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<a name="Music-Arguments-1"></a>
+<h3 class="subsection">5.5.115 Music Arguments</h3>
+<a name="index-Music-Arguments"></a>
+
+<p>Also known as a <b>Path arguments</b>. This is a special formatted string that can be concoctated with the music file path using the <b>|</b> separator,
+or being passed as a dedicated argument. There are individual music properties given to it during the load time.
+Using these arguments you can choose the track to play (suitable for files that contains multiple songs inside the same file), or select
+the MIDI synthesizer or its porperties and a banks or SoundFont paths, etc.<br>
+</p>
+<dl compact="compact">
+<dd><p>Depending on the music format and the codec library there are different arguments supported
+</p></dd>
+<dt> <b>Game music emulators</b></dt>
+<dd><p>The first argument - an integer from 0 to n - a number of the track from multi-track file formats like NSF, NSFE, HES, GBS, etc.<br>
+</p>
+<p>Example 1 of the music path with music arguments given:
+</p><table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">/path/to/mymusic.nsf|21
+</pre></td></tr></table>
+</td></tr></table>
+
+<p>Example 2 of the music path with music arguments given:
+</p><table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">/path/to/mymusic.nsf|21;g=1.0;t=1.0;
+</pre></td></tr></table>
+</td></tr></table>
+
+<p>Example music arguments strings to be sent as a dedicated argument:
+</p><table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">21;g=1.0;t=1.0;
+</pre></td></tr></table>
+</td></tr></table>
+
+<p>All arguments after the first integer are optional. The leading integer is required, even it&rsquo;s a single-track file. The last argument must be closed with semicolon.<br>
+</p><dl compact="compact">
+<dt> <b>t=</b></dt>
+<dd><p>Initial tempo factor (1.0 is the default value, accepting positive floating-point number values, for example, <code>t=1.75;</code>), increase or decrease the initial tempo of the song.
+</p></dd>
+<dt> <b>g=</b></dt>
+<dd><p>Gain factor (1.0 is the default value, accepting positive floating-point number values, for example, <code>g=1.75;</code>), increase or decrease the volume level of the song. Use it to increase the volume of too silent songs, or decrease the volume of too loud songs.
+</p></dd>
+</dl>
+
+</dd>
+<dt> <b>MIDI</b></dt>
+<dd><p>Accepts a list of letter-marked integer arguments separated by semicolons.<br>
+</p>
+<p>Example 1 of the music path with music arguments given:
+</p><table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">mymusic.mid|s0;b62;t0;v0;a0;m0;t=1.0;g=2.0;x=/path/to/bank1.wopl;
+</pre></td></tr></table>
+</td></tr></table>
+
+<p>Example 2 of the music path with music arguments given:
+</p><table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">mymusic.mid|s4;r1;rr0.2;rd0.4;rw0.9;rl0.8;c1;cn10;cl4.2;cs3.5;p256;t=1.0;g=1.0;x=/path/to/bank1.sf2&amp;/path/to/bank2.sf2&amp;/path/to/bank3.sf2;
+</pre></td></tr></table>
+</td></tr></table>
+
+<p>Example music arguments strings to be sent as a dedicated argument:
+</p><table class="cartouche" border="1"><tr><td>
+<table><tr><td>&nbsp;</td><td><pre class="example">s0;b62;t0;v0;a0;m0;t=1.0;g=2.0;x=/path/to/bank1.wopl;
+</pre></td></tr></table>
+</td></tr></table>
+
+<p>All arguments are optional. The last argument must be closed with semicolon.<br>
+</p>
+<dl compact="compact">
+<dt> <b>s</b></dt>
+<dd><p><b>Synthesizer type:</b><br>
+    <code>0</code> - ADLMIDI, emulated OPL3 (YMF262) synthesizer with loop tags and System Exclusive Messages support. Working by Default. (Recorded examples to listen to are presented here). OPL3 chip was widely used on PC sound cards in 80/90&rsquo;th years.<br>
+    <code>1</code> - Timidity, requires the set of patches to be properly installed (can be customized with <a href="#Mix_005fSetTimidityCfg">Mix_SetTimidityCfg</a> function).<br>
+    <code>2</code> - Native MIDI, uses the default operating system MIDI interface.<br>
+    <code>3</code> - OPNMIDI, emulated OPN2 (YM2612) synthesizer with loop tags and System Exclusive Messages support. OPN2 chip is used on the Sega MegaDrive / Genesis game console.<br>
+    <code>4</code> - FluidSynth, the WaveTable MIDI synthesizer with SoundFont banks support, has the support for loop tags support.<br>
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>s3;</code>
+    </pre></td></tr></table>
+
+</dd>
+<dt> <b>General flags:</b></dt>
+<dd><dl compact="compact">
+<dt> <b>t=</b></dt>
+<dd><p>    <b>ADLMIDI, OPNMIDI, and FluidSynth</b><br>
+    Initial tempo factor (1.0 is the default value, accepting positive floating-point number values, for example, <code>t=1.75;</code>), increase or decrease the initial tempo of the song. Don&rsquo;t confuse with <code>t0</code> and <code>t1</code> which is a different setting.
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>t=1.4;</code>
+    </pre></td></tr></table>
+</dd>
+<dt> <b>g=</b></dt>
+<dd><p>    <b>ADLMIDI, OPNMIDI, and FluidSynth</b><br>
+    Gain factor (2.0 is the default value, accepting positive floating-point number values, for example, <code>g=1.75;</code>), increase or decrease the volume level of the song. Use it to increase the volume of too silent songs, or decrease the volume of too loud songs.
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>g=5.5;</code>
+    </pre></td></tr></table>
+</dd>
+</dl>
+
+</dd>
+<dt> <b>ADLMIDI and OPNMIDI:</b></dt>
+<dd><dl compact="compact">
+<dt> <b>b</b></dt>
+<dd><p>    <b>ADLMIDI</b><br>
+    Set bank ID (look for available banks list into PGE MusPlay application to preview them). Default is 58.
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>b72;</code>
+    </pre></td></tr></table>
+
+</dd>
+<dt> <b>t</b></dt>
+<dd><p>    <b>ADLMIDI</b><br>
+    Deep tremolo (1 or 0, or -1 an auto-mode), increase the amplitude of tremolo effect for instruments that are using tremolo OPL flag. Default -1. Don&rsquo;t confuse with <code>t=</code> which is a different setting.
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>t1;</code>
+    </pre></td></tr></table>
+
+</dd>
+<dt> <b>v</b></dt>
+<dd><p>    <b>ADLMIDI</b><br>
+    Deep vibrato (1 or 0, or -1 an auto-mode), increase the amplitude of vibrato effect for instruments that are using vibrato OPL flag. Default -1.
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>v1;</code>
+    </pre></td></tr></table>
+
+</dd>
+<dt> <b>m</b></dt>
+<dd><p>    <b>ADLMIDI</b><br>
+    Enables scalable modulation (1 or 0), Allows dynamic scaling of the modulator result with volume. Default 0.
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>m1;</code>
+    </pre></td></tr></table>
+
+</dd>
+<dt> <b>c</b></dt>
+<dd><p>    <b>ADLMIDI AND OPNMIDI</b><br>
+    Count of chip emulators are allowing to excite limit of voice channels. Default 4 for ADLMIDI and 8 for OPNMIDI. Allowed value from 1 to 100.
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>c2;</code>
+    </pre></td></tr></table>
+
+</dd>
+<dt> <b>f</b></dt>
+<dd><p>    <b>ADLMIDI</b><br>
+    Count of four-operator channels between all chip emulators (6 channels maximum per every chip. For example, you have used 2 chips, you can have 12 four-op channels maximum).
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>f8;</code>
+    </pre></td></tr></table>
+
+</dd>
+<dt> <b>l</b></dt>
+<dd><p>    <b>ADLMIDI AND OPNMIDI</b><br>
+    Volume scaling model code (0 - auto, 1 - Generic, - 2 OPL3-Native, 3 - DMX, 4 - Apogee, - 5 - Win9X-like) - an algorithm to scale a volume level, affects music expressionism.
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>l1;</code>
+    </pre></td></tr></table>
+
+</dd>
+<dt> <b>r</b></dt>
+<dd><p>    <b>ADLMIDI AND OPNMIDI</b><br>
+    Use full-ranged CC74 Brightness MIDI controller (1 or 0). Default 0.
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>r1;</code>
+    </pre></td></tr></table>
+
+</dd>
+<dt> <b>p</b></dt>
+<dd><p>    <b>ADLMIDI AND OPNMIDI</b><br>
+    Enable full-panning stereo support (1 or 0). Default 1.
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>p0;</code>
+    </pre></td></tr></table>
+
+</dd>
+<dt> <b>e</b></dt>
+<dd><p>    <b>ADLMIDI</b><br>
+    Choose OPL3 emulator: 0 - Nuked OPL3 (Very accurate, may lag on older CPUs), 1 - Nuked OPL3 1.7.4 that was optimized by Troosh, and 2 - DosBox 0.74 (Well-accurate, fastest).
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>e2;</code>
+    </pre></td></tr></table>
+
+</dd>
+<dt> <b>e</b></dt>
+<dd><p>    <b>OPNMIDI</b><br>
+    Choose OPN2 emulator: 0 - Mame YM2612 (Well-accurate, fast), 1 - Nuked OPN2 (Very accurate, requires VERY powerful CPU. Suggested to use up to 2 chips max with it), 2 - GENS 2.10 (Very outdated, inaccurate, but fastest)
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>e2;</code>
+    </pre></td></tr></table>
+
+</dd>
+<dt> <b>x=</b></dt>
+<dd><p>    <b>ADLMIDI and OPNMIDI</b><br>
+    Load custom bank file by absolute path (WOPN bank for OPNMIDI or WOPL for ADLMIDI). Accepting strings without quotes.
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>x=/path/to/bank/file.wopn;</code>
+    </pre></td></tr></table>
+</dd>
+</dl>
+
+</dd>
+<dt> <b>FluidSynth:</b></dt>
+<dd><dl compact="compact">
+<dt> <b>r</b></dt>
+<dd><p>    <b>FluidSynth</b><br>
+    Enable or disable the reverb effect: 0 - disabled, 1 - enabled.
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>r1;</code>
+    </pre></td></tr></table>
+
+</dd>
+<dt> <b>rr</b></dt>
+<dd><p>    <b>FluidSynth</b><br>
+    Reverb room size value (0.0-1.0).
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>rr0.2;</code>
+    </pre></td></tr></table>
+
+</dd>
+<dt> <b>rd</b></dt>
+<dd><p>    <b>FluidSynth</b><br>
+    Reverb damping value (0.0-1.0).
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>rd0.4;</code>
+    </pre></td></tr></table>
+
+</dd>
+<dt> <b>rw</b></dt>
+<dd><p>    <b>FluidSynth</b><br>
+    Reverb width value (0.0-100.0).
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>rw0.9;</code>
+    </pre></td></tr></table>
+
+</dd>
+<dt> <b>rl</b></dt>
+<dd><p>    <b>FluidSynth</b><br>
+    Reverb level value (0.0-1.0).
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>rl0.8;</code>
+    </pre></td></tr></table>
+
+</dd>
+<dt> <b>c</b></dt>
+<dd><p>    <b>FluidSynth</b><br>
+    Enable or disable the chorus effect: 0 - disabled, 1 - enabled.
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>c1;</code>
+    </pre></td></tr></table>
+
+</dd>
+<dt> <b>cn</b></dt>
+<dd><p>    <b>FluidSynth</b><br>
+    Chorus voice count (0-99, CPU time consumption proportional to this value).
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>cn10;</code>
+    </pre></td></tr></table>
+
+</dd>
+<dt> <b>cl</b></dt>
+<dd><p>    <b>FluidSynth</b><br>
+    Chorus level (0.0-10.0).
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>cl4;</code>
+    </pre></td></tr></table>
+
+</dd>
+<dt> <b>cs</b></dt>
+<dd><p>    <b>FluidSynth</b><br>
+    Chorus speed in Hz (0.1-5.0).
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>cs3.5;</code>
+    </pre></td></tr></table>
+
+</dd>
+<dt> <b>cd</b></dt>
+<dd><p>    <b>FluidSynth</b><br>
+    Chorus depth (max value depends on synth sample-rate, 0.0-21.0 is safe for sample-rate values up to 96KHz).
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>cd10.1;</code>
+    </pre></td></tr></table>
+
+</dd>
+<dt> <b>ct</b></dt>
+<dd><p>    <b>FluidSynth</b><br>
+    Chorus waveform type: 0 - Sine, 1 - Triangle.
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>ct1;</code>
+    </pre></td></tr></table>
+
+</dd>
+<dt> <b>p</b></dt>
+<dd><p>    <b>FluidSynth</b><br>
+    Define the allowed polyphony (8-512).
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>p256;</code>
+    </pre></td></tr></table>
+
+</dd>
+<dt> <b>x=</b></dt>
+<dd><p>    <b>FluidSynth</b><br>
+    Load custom SoundFont files by absolute path. Accepting strings without quotes, for example, <code>x=/path/to/bank/file.sf2;</code>. You can specify multiple SoundFont files by using an ampersand separator: <code>x=/p/file1.sf2&amp;/p/file2.sf2&amp;/p/filen.sf2;</code>
+</p>
+    <p>    Example:
+    </p><table><tr><td>&nbsp;</td><td><pre class="example">    <code>x=/p/file1.sf2&amp;/p/file2.sf2&amp;/p/filen.sf2;</code>
+    </pre></td></tr></table>
+
+</dd>
+</dl>
+
+</dd>
+</dl>
+
+</dd>
+</dl>
+
+
+<p><b>See Also</b>:<br>
+<a href="#Mix_005fLoadMUS">Mix_LoadMUS</a>,
+<a href="#Mix_005fLoadMUS_005fRW_005fARG">Mix_LoadMUS_RW_ARG</a>,
+<a href="#Mix_005fLoadMUSType_005fRW_005fARG">Mix_LoadMUSType_RW_ARG</a>
+
+</p><hr size="6">
+<a name="Effects"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#Music-Arguments" title="Previous section in reading order"> &lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#Mix_005fRegisterEffect" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Functions" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
@@ -11209,6 +11592,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <tr><td></td><td valign="top"><a href="#index-Mix_005fVolumeMusicGeneral"><code>Mix_VolumeMusicGeneral</code></a></td><td valign="top"><a href="#Mix_005fVolumeMusicGeneral">5.5.23 Mix_VolumeMusicGeneral</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fVolumeMusicStream"><code>Mix_VolumeMusicStream</code></a></td><td valign="top"><a href="#Mix_005fVolumeMusicStream">5.5.20 Mix_VolumeMusicStream</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-MSB">MSB</a></td><td valign="top"><a href="#Glossary">8. Glossary</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Music-Arguments"><code>Music Arguments</code></a></td><td valign="top"><a href="#Music-Arguments">5.5.115 Music Arguments</a></td></tr>
 <tr><td colspan="3"> <hr></td></tr>
 <tr><th><a name="Index-1_cp_letter-R">R</a></th><td></td><td></td></tr>
 <tr><td></td><td valign="top"><a href="#index-README">README</a></td><td valign="top"><a href="#Overview">1. Overview</a></td></tr>
@@ -11444,6 +11828,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
       <li><a name="toc-Mix_005fOPNMIDI_005fsetChipsCount-1" href="#Mix_005fOPNMIDI_005fsetChipsCount">5.5.112 Mix_OPNMIDI_setChipsCount</a></li>
       <li><a name="toc-Mix_005fOPNMIDI_005fsetSetDefaults-1" href="#Mix_005fOPNMIDI_005fsetSetDefaults">5.5.113 Mix_OPNMIDI_setSetDefaults</a></li>
       <li><a name="toc-Mix_005fOPNMIDI_005fsetCustomBankFile-1" href="#Mix_005fOPNMIDI_005fsetCustomBankFile">5.5.114 Mix_OPNMIDI_setCustomBankFile</a></li>
+      <li><a name="toc-Music-Arguments-1" href="#Music-Arguments">5.5.115 Music Arguments</a></li>
     </ul></li>
     <li><a name="toc-Effects-1" href="#Effects">5.6 Effects</a>
     <ul class="toc">

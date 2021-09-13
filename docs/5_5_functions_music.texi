@@ -5,7 +5,11 @@
 @section Music
 
 These functions work with music.  Music is not played on a normal mixer channel.
-Music is therefore manipulated separately, except in post-processing hooks.
+Music is therefore manipulated separately, except in post-processing hooks.@*
+@*
+There are two different music sub-systems providen:@*
+- @b{single-music}: the old API of the SDL_mixer. The most of given calls don't even has the @ref{Mix_Music} argument and intended to manipulate the currently playing music.@*
+- @b{multi-music}: the new API of the MixerX. Every given call intended to work with the multi-music has the @ref{Mix_Music} argument to manipulate every music individually as they are able to work in parallel.
 
 @menu
 @b{Loading}
@@ -17,7 +21,7 @@ Music is therefore manipulated separately, except in post-processing hooks.
 * Mix_LoadMUS_RW_ARG::       Load music through SDL RWops with passing of extra arguments string @b{[Mixer X]}
 * Mix_LoadMUS_RW_GME::       Load music through SDL RWops with passing of GME track number @b{[Mixer X]}
 * Mix_LoadMUSType_RW::       Load a music file from an SDL RWops object assuming a specific format
-* Mix_LoadMUSType_RW_ARG::   Load a music file from an SDL RWops object assuming a specific format with passing of extra arguments string @b{[Mixer X]}
+* Mix_LoadMUSType_RW_ARG::   Load a music file from an SDL RWops object assuming a specific format with passing of extra @ref{Music Arguments} string @b{[Mixer X]}
 
 @b{Free}
 * Mix_FreeMusic::            Free a Mix_Music
@@ -90,9 +94,9 @@ Music is therefore manipulated separately, except in post-processing hooks.
 
 @b{Info}
 * Mix_GetMusicType::         Get the music encoding type
-* Mix_PlayingMusicStream::   Test whether music is playing
-* Mix_PausedMusicStream::    Test whether music is paused
-* Mix_FadingMusicStream::    Get status of current music fade activity
+* Mix_PlayingMusicStream::   Test whether music is playing @b{[Mixer X]}
+* Mix_PausedMusicStream::    Test whether music is paused @b{[Mixer X]}
+* Mix_FadingMusicStream::    Get status of current music fade activity @b{[Mixer X]}
 * Mix_GetMusicHookData::     Retrieve the Mix_HookMusic @var{arg}
 
 @b{Info (legacy single-stream)}
@@ -131,12 +135,12 @@ Music is therefore manipulated separately, except in post-processing hooks.
 * Mix_ADLMIDI_setScaleMod::                 Turn on/off scalable modulation mode flag. Applying on MIDI file reopen. @b{[Mixer X]}
 * Mix_ADLMIDI_getVolumeModel::              Get ID of current volumes model @b{[Mixer X]}
 * Mix_ADLMIDI_setVolumeModel::              Change current volume model. Applying on MIDI file reopen. @b{[Mixer X]}
-* Mix_ADLMIDI_getFullRangeBrightness::      Get full range mode for CC74-Brightness controller
-* Mix_ADLMIDI_setFullRangeBrightness::      Set full range mode for CC74-Brightness controller
-* Mix_ADLMIDI_getFullPanStereo::            Get full panning stereo mode
-* Mix_ADLMIDI_setFullPanStereo::            Set full panning stereo mode
-* Mix_ADLMIDI_getEmulator::                 Get the OPL3 Emulator for ADLMIDI
-* Mix_ADLMIDI_setEmulator::                 Select the OPL3 Emulator for ADLMIDI
+* Mix_ADLMIDI_getFullRangeBrightness::      Get full range mode for CC74-Brightness controller @b{[Mixer X]}
+* Mix_ADLMIDI_setFullRangeBrightness::      Set full range mode for CC74-Brightness controller @b{[Mixer X]}
+* Mix_ADLMIDI_getFullPanStereo::            Get full panning stereo mode @b{[Mixer X]}
+* Mix_ADLMIDI_setFullPanStereo::            Set full panning stereo mode @b{[Mixer X]}
+* Mix_ADLMIDI_getEmulator::                 Get the OPL3 Emulator for ADLMIDI @b{[Mixer X]}
+* Mix_ADLMIDI_setEmulator::                 Select the OPL3 Emulator for ADLMIDI @b{[Mixer X]}
 * Mix_ADLMIDI_getChipsCount::               Get the number of parallel emulated OPL3 chips to get the available polyphony range @b{[Mixer X]}
 * Mix_ADLMIDI_setChipsCount::               Set the number of parallel emulated OPL3 chips to define the available polyphony range @b{[Mixer X]}
 * Mix_ADLMIDI_setSetDefaults::              Reset ADLMIDI settings to default state. Applying on MIDI file reopen. @b{[Mixer X]}
@@ -145,17 +149,19 @@ Music is therefore manipulated separately, except in post-processing hooks.
 @b{libOPNMIDI Extra Settings}
 * Mix_OPNMIDI_getVolumeModel::              Get ID of current volumes model @b{[Mixer X]}
 * Mix_OPNMIDI_setVolumeModel::              Change current volume model. Applying on MIDI file reopen. @b{[Mixer X]}
-* Mix_OPNMIDI_getFullRangeBrightness::      Get full range mode for CC74-Brightness controller
-* Mix_OPNMIDI_setFullRangeBrightness::      Set full range mode for CC74-Brightness controller
-* Mix_OPNMIDI_getFullPanStereo::            Get full panning stereo mode
-* Mix_OPNMIDI_setFullPanStereo::            Set full panning stereo mode
-* Mix_OPNMIDI_getEmulator::                 Get the OPN2/OPNA Emulator for OPNMIDI
-* Mix_OPNMIDI_setEmulator::                 Select the OPN2/OPNA Emulator for OPNMIDI
+* Mix_OPNMIDI_getFullRangeBrightness::      Get full range mode for CC74-Brightness controller @b{[Mixer X]}
+* Mix_OPNMIDI_setFullRangeBrightness::      Set full range mode for CC74-Brightness controller @b{[Mixer X]}
+* Mix_OPNMIDI_getFullPanStereo::            Get full panning stereo mode @b{[Mixer X]}
+* Mix_OPNMIDI_setFullPanStereo::            Set full panning stereo mode @b{[Mixer X]}
+* Mix_OPNMIDI_getEmulator::                 Get the OPN2/OPNA Emulator for OPNMIDI @b{[Mixer X]}
+* Mix_OPNMIDI_setEmulator::                 Select the OPN2/OPNA Emulator for OPNMIDI @b{[Mixer X]}
 * Mix_OPNMIDI_getChipsCount::               Get the number of parallel emulated OPN2/OPNA chips to get the available polyphony range @b{[Mixer X]}
 * Mix_OPNMIDI_setChipsCount::               Set the number of parallel emulated OPN2/OPNA chips to define the available polyphony range @b{[Mixer X]}
 * Mix_OPNMIDI_setSetDefaults::              Reset OPNMIDI settings to default state. Applying on MIDI file reopen. @b{[Mixer X]}
 * Mix_OPNMIDI_setCustomBankFile::           Path to custom WOPN bank file. Applying on MIDI file reopen. @b{[Mixer X]}
 
+@b{Extra}
+* Music Arguments::                         The special arguments string that can be passed together with the music file path to set up individual music settings.@b{[Mixer X]}
 
 @end menu
 
@@ -265,7 +271,7 @@ Check if the music decoder named as @var{name} presented in this library build.
 
 @table @var
 @item file
-Name of music file to use.
+Name of music file to use. You may add the @ref{Music Arguments} after the filepath using the @b{|} symbol as the separator.
 @end table
 
 @noindent
@@ -282,6 +288,17 @@ Mix_Music *music;
 music=Mix_LoadMUS("music.mp3");
 if(!music) @{
     printf("Mix_LoadMUS(\"music.mp3\"): %s\n", Mix_GetError());
+    // this might be a critical error...
+@}
+@end example
+
+@example
+// load the MIDI file "music.mid" to play as music
+// and add the Music Arguments string "s3;c2;" into it
+Mix_Music *music;
+music=Mix_LoadMUS("music.mid|s3;c2;");
+if(!music) @{
+    printf("Mix_LoadMUS(\"music.mid|s3;c2;\"): %s\n", Mix_GetError());
     // this might be a critical error...
 @}
 @end example
@@ -357,7 +374,7 @@ SDL RWops instance of music file / memory
 @item freesrc
 Automatically close SDL_RWops instance on complete loading of music
 @item args
-An arguments string supported by specific library
+The @ref{Music Arguments} string supported by specific library
 @end table
 
 @noindent
@@ -505,7 +522,7 @@ A music type identificator
 @item freesrc
 Automatically close SDL_RWops instance on complete loading of music
 @item args
-An arguments string supported by specific library
+The @ref{Music Arguments} string supported by specific library
 @end table
 
 @noindent
@@ -3737,3 +3754,381 @@ Mix_OPNMIDI_setCustomBankFile("./music/my-gm-bank.wonp");
 @end example
 @end cartouche
 
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Music Arguments
+@subsection Music Arguments
+@findex Music Arguments
+
+@noindent
+Also known as a @b{Path arguments}. This is a special formatted string that can be concoctated with the music file path using the @b{|} separator,
+or being passed as a dedicated argument. There are individual music properties given to it during the load time.
+Using these arguments you can choose the track to play (suitable for files that contains multiple songs inside the same file), or select
+the MIDI synthesizer or its porperties and a banks or SoundFont paths, etc.@*
+
+@table @b
+Depending on the music format and the codec library there are different arguments supported
+@item Game music emulators
+The first argument - an integer from 0 to n - a number of the track from multi-track file formats like NSF, NSFE, HES, GBS, etc.@*
+
+Example 1 of the music path with music arguments given:
+@cartouche
+@example
+/path/to/mymusic.nsf|21
+@end example
+@end cartouche
+
+Example 2 of the music path with music arguments given:
+@cartouche
+@example
+/path/to/mymusic.nsf|21;g=1.0;t=1.0;
+@end example
+@end cartouche
+
+Example music arguments strings to be sent as a dedicated argument:
+@cartouche
+@example
+21;g=1.0;t=1.0;
+@end example
+@end cartouche
+
+All arguments after the first integer are optional. The leading integer is required, even it's a single-track file. The last argument must be closed with semicolon.@*
+@table @b
+@item t=
+Initial tempo factor (1.0 is the default value, accepting positive floating-point number values, for example, @code{t=1.75;}), increase or decrease the initial tempo of the song.
+@item g=
+Gain factor (1.0 is the default value, accepting positive floating-point number values, for example, @code{g=1.75;}), increase or decrease the volume level of the song. Use it to increase the volume of too silent songs, or decrease the volume of too loud songs.
+@end table
+
+@item MIDI
+Accepts a list of letter-marked integer arguments separated by semicolons.@*
+
+Example 1 of the music path with music arguments given:
+@cartouche
+@example
+mymusic.mid|s0;b62;t0;v0;a0;m0;t=1.0;g=2.0;x=/path/to/bank1.wopl;
+@end example
+@end cartouche
+
+Example 2 of the music path with music arguments given:
+@cartouche
+@example
+mymusic.mid|s4;r1;rr0.2;rd0.4;rw0.9;rl0.8;c1;cn10;cl4.2;cs3.5;p256;t=1.0;g=1.0;x=/path/to/bank1.sf2&/path/to/bank2.sf2&/path/to/bank3.sf2;
+@end example
+@end cartouche
+
+Example music arguments strings to be sent as a dedicated argument:
+@cartouche
+@example
+s0;b62;t0;v0;a0;m0;t=1.0;g=2.0;x=/path/to/bank1.wopl;
+@end example
+@end cartouche
+
+@noindent
+All arguments are optional. The last argument must be closed with semicolon.@*
+
+@table @b
+@item s
+@b{Synthesizer type:}@*
+    @code{0} - ADLMIDI, emulated OPL3 (YMF262) synthesizer with loop tags and System Exclusive Messages support. Working by Default. (Recorded examples to listen to are presented here). OPL3 chip was widely used on PC sound cards in 80/90'th years.@*
+    @code{1} - Timidity, requires the set of patches to be properly installed (can be customized with @ref{Mix_SetTimidityCfg} function).@*
+    @code{2} - Native MIDI, uses the default operating system MIDI interface.@*
+    @code{3} - OPNMIDI, emulated OPN2 (YM2612) synthesizer with loop tags and System Exclusive Messages support. OPN2 chip is used on the Sega MegaDrive / Genesis game console.@*
+    @code{4} - FluidSynth, the WaveTable MIDI synthesizer with SoundFont banks support, has the support for loop tags support.@*
+
+    @noindent
+    Example:
+    @example
+    @code{s3;}
+    @end example
+
+@item General flags:
+@table @b
+@item t=
+    @b{ADLMIDI, OPNMIDI, and FluidSynth}@*
+    Initial tempo factor (1.0 is the default value, accepting positive floating-point number values, for example, @code{t=1.75;}), increase or decrease the initial tempo of the song. Don't confuse with @code{t0} and @code{t1} which is a different setting.
+
+    @noindent
+    Example:
+    @example
+    @code{t=1.4;}
+    @end example
+@item g=
+    @b{ADLMIDI, OPNMIDI, and FluidSynth}@*
+    Gain factor (2.0 is the default value, accepting positive floating-point number values, for example, @code{g=1.75;}), increase or decrease the volume level of the song. Use it to increase the volume of too silent songs, or decrease the volume of too loud songs.
+
+    @noindent
+    Example:
+    @example
+    @code{g=5.5;}
+    @end example
+@end table
+
+@item ADLMIDI and OPNMIDI:
+@table @b
+@item b
+    @b{ADLMIDI}@*
+    Set bank ID (look for available banks list into PGE MusPlay application to preview them). Default is 58.
+
+    @noindent
+    Example:
+    @example
+    @code{b72;}
+    @end example
+
+@item t
+    @b{ADLMIDI}@*
+    Deep tremolo (1 or 0, or -1 an auto-mode), increase the amplitude of tremolo effect for instruments that are using tremolo OPL flag. Default -1. Don't confuse with @code{t=} which is a different setting.
+
+    @noindent
+    Example:
+    @example
+    @code{t1;}
+    @end example
+
+@item v
+    @b{ADLMIDI}@*
+    Deep vibrato (1 or 0, or -1 an auto-mode), increase the amplitude of vibrato effect for instruments that are using vibrato OPL flag. Default -1.
+
+    @noindent
+    Example:
+    @example
+    @code{v1;}
+    @end example
+
+@item m
+    @b{ADLMIDI}@*
+    Enables scalable modulation (1 or 0), Allows dynamic scaling of the modulator result with volume. Default 0.
+
+    @noindent
+    Example:
+    @example
+    @code{m1;}
+    @end example
+
+@item c
+    @b{ADLMIDI AND OPNMIDI}@*
+    Count of chip emulators are allowing to excite limit of voice channels. Default 4 for ADLMIDI and 8 for OPNMIDI. Allowed value from 1 to 100.
+
+    @noindent
+    Example:
+    @example
+    @code{c2;}
+    @end example
+
+@item f
+    @b{ADLMIDI}@*
+    Count of four-operator channels between all chip emulators (6 channels maximum per every chip. For example, you have used 2 chips, you can have 12 four-op channels maximum).
+
+    @noindent
+    Example:
+    @example
+    @code{f8;}
+    @end example
+
+@item l
+    @b{ADLMIDI AND OPNMIDI}@*
+    Volume scaling model code (0 - auto, 1 - Generic, - 2 OPL3-Native, 3 - DMX, 4 - Apogee, - 5 - Win9X-like) - an algorithm to scale a volume level, affects music expressionism.
+
+    @noindent
+    Example:
+    @example
+    @code{l1;}
+    @end example
+
+@item r
+    @b{ADLMIDI AND OPNMIDI}@*
+    Use full-ranged CC74 Brightness MIDI controller (1 or 0). Default 0.
+
+    @noindent
+    Example:
+    @example
+    @code{r1;}
+    @end example
+
+@item p
+    @b{ADLMIDI AND OPNMIDI}@*
+    Enable full-panning stereo support (1 or 0). Default 1.
+
+    @noindent
+    Example:
+    @example
+    @code{p0;}
+    @end example
+
+@item e
+    @b{ADLMIDI}@*
+    Choose OPL3 emulator: 0 - Nuked OPL3 (Very accurate, may lag on older CPUs), 1 - Nuked OPL3 1.7.4 that was optimized by Troosh, and 2 - DosBox 0.74 (Well-accurate, fastest).
+
+    @noindent
+    Example:
+    @example
+    @code{e2;}
+    @end example
+
+@item e
+    @b{OPNMIDI}@*
+    Choose OPN2 emulator: 0 - Mame YM2612 (Well-accurate, fast), 1 - Nuked OPN2 (Very accurate, requires VERY powerful CPU. Suggested to use up to 2 chips max with it), 2 - GENS 2.10 (Very outdated, inaccurate, but fastest)
+
+    @noindent
+    Example:
+    @example
+    @code{e2;}
+    @end example
+
+@item x=
+    @b{ADLMIDI and OPNMIDI}@*
+    Load custom bank file by absolute path (WOPN bank for OPNMIDI or WOPL for ADLMIDI). Accepting strings without quotes.
+
+    @noindent
+    Example:
+    @example
+    @code{x=/path/to/bank/file.wopn;}
+    @end example
+@end table
+
+@item FluidSynth:
+@table @b
+@item r
+    @b{FluidSynth}@*
+    Enable or disable the reverb effect: 0 - disabled, 1 - enabled.
+
+    @noindent
+    Example:
+    @example
+    @code{r1;}
+    @end example
+
+@item rr
+    @b{FluidSynth}@*
+    Reverb room size value (0.0-1.0).
+
+    @noindent
+    Example:
+    @example
+    @code{rr0.2;}
+    @end example
+
+@item rd
+    @b{FluidSynth}@*
+    Reverb damping value (0.0-1.0).
+
+    @noindent
+    Example:
+    @example
+    @code{rd0.4;}
+    @end example
+
+@item rw
+    @b{FluidSynth}@*
+    Reverb width value (0.0-100.0).
+
+    @noindent
+    Example:
+    @example
+    @code{rw0.9;}
+    @end example
+
+@item rl
+    @b{FluidSynth}@*
+    Reverb level value (0.0-1.0).
+
+    @noindent
+    Example:
+    @example
+    @code{rl0.8;}
+    @end example
+
+@item c
+    @b{FluidSynth}@*
+    Enable or disable the chorus effect: 0 - disabled, 1 - enabled.
+
+    @noindent
+    Example:
+    @example
+    @code{c1;}
+    @end example
+
+@item cn
+    @b{FluidSynth}@*
+    Chorus voice count (0-99, CPU time consumption proportional to this value).
+
+    @noindent
+    Example:
+    @example
+    @code{cn10;}
+    @end example
+
+@item cl
+    @b{FluidSynth}@*
+    Chorus level (0.0-10.0).
+
+    @noindent
+    Example:
+    @example
+    @code{cl4;}
+    @end example
+
+@item cs
+    @b{FluidSynth}@*
+    Chorus speed in Hz (0.1-5.0).
+
+    @noindent
+    Example:
+    @example
+    @code{cs3.5;}
+    @end example
+
+@item cd
+    @b{FluidSynth}@*
+    Chorus depth (max value depends on synth sample-rate, 0.0-21.0 is safe for sample-rate values up to 96KHz).
+
+    @noindent
+    Example:
+    @example
+    @code{cd10.1;}
+    @end example
+
+@item ct
+    @b{FluidSynth}@*
+    Chorus waveform type: 0 - Sine, 1 - Triangle.
+
+    @noindent
+    Example:
+    @example
+    @code{ct1;}
+    @end example
+
+@item p
+    @b{FluidSynth}@*
+    Define the allowed polyphony (8-512).
+
+    @noindent
+    Example:
+    @example
+    @code{p256;}
+    @end example
+
+@item x=
+    @b{FluidSynth}@*
+    Load custom SoundFont files by absolute path. Accepting strings without quotes, for example, @code{x=/path/to/bank/file.sf2;}. You can specify multiple SoundFont files by using an ampersand separator: @code{x=/p/file1.sf2&/p/file2.sf2&/p/filen.sf2;}
+
+    @noindent
+    Example:
+    @example
+    @code{x=/p/file1.sf2&/p/file2.sf2&/p/filen.sf2;}
+    @end example
+
+@end table
+
+@end table
+
+@end table
+
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_LoadMUS},
+@ref{Mix_LoadMUS_RW_ARG},
+@ref{Mix_LoadMUSType_RW_ARG}
