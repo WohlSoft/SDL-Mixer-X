@@ -285,6 +285,13 @@ static int XMP_Play(void *context, int play_count)
     return XMP_Seek(music, 0);
 }
 
+/* Clean-up the output buffer */
+static void XMP_Stop(void *context)
+{
+    XMP_Music *music = (XMP_Music *)context;
+    SDL_AudioStreamClear(music->stream);
+}
+
 /* Play some of a stream previously started with xmp_play() */
 static int XMP_GetSome(void *context, void *data, int bytes, SDL_bool *done)
 {
@@ -349,7 +356,6 @@ static int XMP_Jump(void *context, int order)
 static int XMP_Seek(void *context, double pos)
 {
     XMP_Music *music = (XMP_Music *)context;
-    SDL_AudioStreamClear(music->stream);
     libxmp.xmp_seek_time(music->ctx, (int)(pos * 1000));
     libxmp.xmp_play_buffer(music->ctx, NULL, 0, 0); /* reset internal state. */
     return 0;
@@ -476,7 +482,7 @@ Mix_MusicInterface Mix_MusicInterface_XMP =
     XMP_GetMetaTag,
     NULL,   /* Pause */
     NULL,   /* Resume */
-    NULL,   /* Stop */
+    XMP_Stop,
     XMP_Delete,
     NULL,   /* Close */
     XMP_Unload

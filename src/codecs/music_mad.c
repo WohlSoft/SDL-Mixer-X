@@ -370,6 +370,12 @@ static int MAD_Play(void *context, int play_count)
     return MAD_Seek(music, 0.0);
 }
 
+static void MAD_Stop(void *context)
+{
+    MAD_Music *music = (MAD_Music *)context;
+    SDL_AudioStreamClear(music->audiostream);
+}
+
 
 /* Reads the next frame from the file.
    Returns true on success or false on failure.
@@ -575,8 +581,6 @@ static int MAD_Seek(void *context, double position)
     mad_timer_t target;
     int int_part;
 
-    SDL_AudioStreamClear(music->audiostream);
-
     int_part = (int)position;
     mad_timer_set(&target, (unsigned long)int_part, (unsigned long)((position - int_part) * 1000000), 1000000);
 
@@ -685,7 +689,7 @@ Mix_MusicInterface Mix_MusicInterface_MAD =
     MAD_GetMetaTag,
     NULL,   /* Pause */
     NULL,   /* Resume */
-    NULL,   /* Stop */
+    MAD_Stop,
     MAD_Delete,
     NULL,   /* Close */
     NULL    /* Unload */

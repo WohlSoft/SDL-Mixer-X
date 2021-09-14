@@ -343,6 +343,13 @@ static int OPUS_Play(void *context, int play_count)
     return OPUS_Seek(music, 0.0);
 }
 
+/* Clean-up the output buffer */
+static void OPUS_Stop(void *context)
+{
+    OPUS_music *music = (OPUS_music *)context;
+    SDL_AudioStreamClear(music->stream);
+}
+
 /* Play some of a stream previously started with OPUS_Play() */
 static int OPUS_GetSome(void *context, void *data, int bytes, SDL_bool *done)
 {
@@ -426,7 +433,6 @@ static int OPUS_GetAudio(void *context, void *data, int bytes)
 static int OPUS_Seek(void *context, double time)
 {
     OPUS_music *music = (OPUS_music *)context;
-    SDL_AudioStreamClear(music->stream);
     int result = opus.op_pcm_seek(music->of, (ogg_int64_t)(time * 48000));
     if (result < 0) {
         return set_op_error("op_pcm_seek", result);
@@ -524,7 +530,7 @@ Mix_MusicInterface Mix_MusicInterface_Opus =
     OPUS_GetMetaTag,
     NULL,   /* Pause */
     NULL,   /* Resume */
-    NULL,   /* Stop */
+    OPUS_Stop,
     OPUS_Delete,
     NULL,   /* Close */
     OPUS_Unload

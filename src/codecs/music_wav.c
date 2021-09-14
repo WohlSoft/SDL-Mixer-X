@@ -234,7 +234,6 @@ static int WAV_Play(void *context, int play_count)
     WAV_Music *music = (WAV_Music *)context;
     unsigned int i;
 
-    SDL_AudioStreamClear(music->stream);
     for (i = 0; i < music->numloops; ++i) {
         WAVLoopPoint *loop = &music->loops[i];
         loop->active = SDL_TRUE;
@@ -244,6 +243,13 @@ static int WAV_Play(void *context, int play_count)
     if (SDL_RWseek(music->src, music->start, RW_SEEK_SET) < 0) {
         return -1;
     }
+    return 0;
+}
+
+static int WAV_Stop(void *context)
+{
+    WAV_Music *music = (WAV_Music *)context;
+    SDL_AudioStreamClear(music->stream);
     return 0;
 }
 
@@ -1250,7 +1256,7 @@ Mix_MusicInterface Mix_MusicInterface_WAV =
     WAV_GetMetaTag,   /* GetMetaTag */
     NULL,   /* Pause */
     NULL,   /* Resume */
-    NULL,   /* Stop */
+    WAV_Stop, /* Stop */
     WAV_Delete,
     NULL,   /* Close */
     NULL    /* Unload */

@@ -357,6 +357,12 @@ static int OGG_Play(void *context, int play_count)
     return OGG_Seek(music, 0.0);
 }
 
+static void OGG_Stop(void *context)
+{
+    OGG_music *music = (OGG_music *)context;
+    SDL_AudioStreamClear(music->stream);
+}
+
 /* Play some of a stream previously started with OGG_play() */
 static int OGG_GetSome(void *context, void *data, int bytes, SDL_bool *done)
 {
@@ -444,7 +450,6 @@ static int OGG_Seek(void *context, double time)
     OGG_music *music = (OGG_music *)context;
     int result;
 
-    SDL_AudioStreamClear(music->stream);
 #ifdef OGG_USE_TREMOR
     result = vorbis.ov_time_seek(&music->vf, (ogg_int64_t)(time * 1000.0));
 #else
@@ -556,7 +561,7 @@ Mix_MusicInterface Mix_MusicInterface_OGG =
     OGG_GetMetaTag,   /* GetMetaTag */
     NULL,   /* Pause */
     NULL,   /* Resume */
-    NULL,   /* Stop */
+    OGG_Stop,
     OGG_Delete,
     NULL,   /* Close */
     OGG_Unload

@@ -241,6 +241,12 @@ static int MODPLUG_Play(void *context, int play_count)
     return MODPLUG_Seek(music, 0.0);
 }
 
+static void MODPLUG_Stop(void *context)
+{
+    MODPLUG_Music *music = (MODPLUG_Music *)context;
+    SDL_AudioStreamClear(music->stream);
+}
+
 /* Play some of a stream previously started with modplug_play() */
 static int MODPLUG_GetSome(void *context, void *data, int bytes, SDL_bool *done)
 {
@@ -296,7 +302,6 @@ static int MODPLUG_Jump(void *context, int order)
 static int MODPLUG_Seek(void *context, double position)
 {
     MODPLUG_Music *music = (MODPLUG_Music *)context;
-    SDL_AudioStreamClear(music->stream);
     modplug.ModPlug_Seek(music->file, (int)(position*1000));
     return 0;
 }
@@ -374,7 +379,7 @@ Mix_MusicInterface Mix_MusicInterface_MODPLUG =
     MODPLUG_GetMetaTag,
     NULL,   /* Pause */
     NULL,   /* Resume */
-    NULL,   /* Stop */
+    MODPLUG_Stop,
     MODPLUG_Delete,
     NULL,   /* Close */
     MODPLUG_Unload

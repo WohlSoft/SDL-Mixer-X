@@ -584,6 +584,12 @@ static int FLAC_Play(void *context, int play_count)
     return FLAC_Seek(music, 0.0);
 }
 
+static void FLAC_Stop(void *context)
+{
+    FLAC_Music *music = (FLAC_Music *)context;
+    SDL_AudioStreamClear(music->stream);
+}
+
 /* Read some FLAC stream data and convert it for output */
 static int FLAC_GetSome(void *context, void *data, int bytes, SDL_bool *done)
 {
@@ -653,7 +659,6 @@ static int FLAC_Seek(void *context, double position)
     FLAC_Music *music = (FLAC_Music *)context;
     FLAC__uint64 seek_sample = (FLAC__uint64) (music->sample_rate * position);
 
-    SDL_AudioStreamClear(music->stream);
     music->pcm_pos = (FLAC__int64) seek_sample;
     if (!flac.FLAC__stream_decoder_seek_absolute(music->flac_decoder, seek_sample)) {
         if (flac.FLAC__stream_decoder_get_state(music->flac_decoder) == FLAC__STREAM_DECODER_SEEK_ERROR) {
@@ -759,7 +764,7 @@ Mix_MusicInterface Mix_MusicInterface_FLAC =
     FLAC_GetMetaTag,/* GetMetaTag */
     NULL,   /* Pause */
     NULL,   /* Resume */
-    NULL,   /* Stop */
+    FLAC_Stop,   /* Stop */
     FLAC_Delete,
     NULL,   /* Close */
     FLAC_Unload

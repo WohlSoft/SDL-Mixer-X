@@ -341,6 +341,12 @@ static int MPG123_Play(void *context, int play_count)
     return MPG123_Seek(music, 0.0);
 }
 
+static void MPG123_Stop(void *context)
+{
+    MPG123_Music *music = (MPG123_Music *)context;
+    SDL_AudioStreamClear(music->stream);
+}
+
 /* read some mp3 stream data and convert it for output */
 static int MPG123_GetSome(void *context, void *data, int bytes, SDL_bool *done)
 {
@@ -427,8 +433,6 @@ static int MPG123_Seek(void *context, double secs)
 {
     MPG123_Music *music = (MPG123_Music *)context;
     off_t offset = (off_t)(music->sample_rate * secs);
-
-    SDL_AudioStreamClear(music->stream);
     if ((offset = mpg123.mpg123_seek(music->handle, offset, SEEK_SET)) < 0) {
         return Mix_SetError("mpg123_seek: %s", mpg_err(music->handle, (int)-offset));
     }
@@ -523,7 +527,7 @@ Mix_MusicInterface Mix_MusicInterface_MPG123 =
     MPG123_GetMetaTag,
     NULL,   /* Pause */
     NULL,   /* Resume */
-    NULL,   /* Stop */
+    MPG123_Stop,
     MPG123_Delete,
     MPG123_Close,
     MPG123_Unload
