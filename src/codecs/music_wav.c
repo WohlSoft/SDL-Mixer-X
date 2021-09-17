@@ -246,11 +246,10 @@ static int WAV_Play(void *context, int play_count)
     return 0;
 }
 
-static int WAV_Stop(void *context)
+static void WAV_Stop(void *context)
 {
     WAV_Music *music = (WAV_Music *)context;
     SDL_AudioStreamClear(music->stream);
-    return 0;
 }
 
 static int fetch_pcm(void *context, int length)
