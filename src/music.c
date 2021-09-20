@@ -1671,7 +1671,9 @@ Mix_Music * SDLCALLCC Mix_LoadMUS(const char *file)
             /* Allocate memory for the music structure */
             Mix_Music *music = (Mix_Music *)SDL_calloc(1, sizeof(Mix_Music));
             if (music == NULL) {
-                Mix_SetError("Out of memory");
+                SDL_OutOfMemory();
+                SDL_free(music_file);
+                SDL_free(music_args);
                 return NULL;
             }
             music->interface = interface;
