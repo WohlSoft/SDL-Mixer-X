@@ -7,7 +7,7 @@
 These functions work with music.  Music is not played on a normal mixer channel.
 Music is therefore manipulated separately, except in post-processing hooks.@*
 @*
-There are two different music sub-systems providen:@*
+There are two different music sub-systems provided:@*
 - @b{single-music}: the old API of the SDL_mixer. The most of given calls don't even has the @ref{Mix_Music} argument and intended to manipulate the currently playing music.@*
 - @b{multi-music}: the new API of the MixerX. Every given call intended to work with the multi-music has the @ref{Mix_Music} argument to manipulate every music individually as they are able to work in parallel.
 
@@ -41,9 +41,9 @@ There are two different music sub-systems providen:@*
 * Mix_FadeInMusicPos::       Play single-stream music from a start point, with looping, and fade in
 
 @b{Settings}
-* Mix_VolumeMusicStream::           Set music volume @b{[Mixer X]}
-* Mix_GetMusicVolume::              Set music volume @b{[Mixer 2.0]}
-* Mix_GetVolumeMusicStream::        Set music volume, alias to @b{Mix_GetMusicVolume} @b{[Mixer X]}
+* Mix_VolumeMusicStream::           Set the individual music volume @b{[Mixer X]}
+* Mix_GetMusicVolume::              Get the individual music volume @b{[Mixer 2.0]}
+* Mix_GetVolumeMusicStream::        Get the individual music volume, alias to @b{Mix_GetMusicVolume} @b{[Mixer X]}
 * Mix_VolumeMusicGeneral::          Set the general music volume @b{[Mixer X]}
 * Mix_GetVolumeMusicGeneral::       Get the general music volume @b{[Mixer X]}
 * Mix_PauseMusicStream::            Pause music @b{[Mixer X]}
