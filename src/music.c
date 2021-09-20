@@ -2015,7 +2015,7 @@ static int music_internal_play(Mix_Music *music, int play_count, double position
     if (retval == 0) {
         if (position > 0.0) {
             if (music_internal_position(music_playing, position) < 0) {
-                Mix_SetError("Position not implemented for music type");
+                Mix_SetError("Position not implemented for music type, or another error: %s", Mix_GetError());
                 retval = -1;
             }
         } else {
@@ -2105,7 +2105,7 @@ static int music_internal_play_stream(Mix_Music *music, int play_count, double p
     if (retval == 0) {
         if (position > 0.0) {
             if (music_internal_position(music, position) < 0) {
-                Mix_SetError("Position not implemented for music type");
+                Mix_SetError("Position not implemented for music type, or another error: %s", Mix_GetError());
                 retval = -1;
             }
         } else {
@@ -2241,12 +2241,12 @@ int SDLCALLCC Mix_SetMusicPositionStream(Mix_Music *music, double position)
     if (music) {
         retval = music_internal_position(music, position);
         if (retval < 0) {
-            Mix_SetError("Position not implemented for music type");
+            Mix_SetError("Position not implemented for music type, or another error: %s", Mix_GetError());
         }
     } else if (music_playing) {
         retval = music_internal_position(music_playing, position);
         if (retval < 0) {
-            Mix_SetError("Position not implemented for music type");
+            Mix_SetError("Position not implemented for music type, or another error: %s", Mix_GetError());
         }
     } else {
         Mix_SetError("Music isn't playing");
