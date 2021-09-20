@@ -755,13 +755,13 @@ number of times to play through the music.@*
 @item ms
 Milliseconds for the fade-in effect to complete.
 @item position
-Posistion to play from, see @code{Mix_SetMusicPositionStream} for meaning.
+Position to play from, see @code{Mix_SetMusicPositionStream} for meaning.
 @end table
 
 @noindent
 Fade in over @var{ms} milliseconds of time, the loaded @var{music}, playing it @var{loop} times through from start to finish.@*
 The fade in effect only applies to the first loop.@*
-The first time the music is played, it posistion will be set to @var{posistion}, which means different things for different types of music files, see @code{Mix_SetMusicPosition} for more info on that.@*
+The first time the music is played, it position will be set to @var{position}, which means different things for different types of music files, see @code{Mix_SetMusicPosition} for more info on that.@*
 Any previous music will continue play or fade concurrently.
 You can use this function to play multiple parallel music files
 (or long atmosphere sound effects).@*
@@ -872,7 +872,7 @@ number of times to play through the music.@*
 @item ms
 Milliseconds for the fade-in effect to complete.
 @item position
-Posistion to play from, see @code{Mix_SetMusicPositionStream} for meaning.
+Position to play from, see @code{Mix_SetMusicPositionStream} for meaning.
 @item free_old
 Automatically free the old music after it will complete the fade out.@*
 0 keeps the old music untouched.@*
@@ -883,7 +883,7 @@ Automatically free the old music after it will complete the fade out.@*
 Fade in over @var{ms} milliseconds of time, the loaded @var{music}, playing it @var{loop} times through from start to finish.@*
 Fade out the @var{old_music} at the same time as fade in the @var{new_music}.@*
 The fade in effect only applies to the first loop.@*
-The first time the music is played, it posistion will be set to @var{posistion}, which means different things for different types of music files, see @code{Mix_SetMusicPosition} for more info on that.@*
+The first time the music is played, it position will be set to @var{position}, which means different things for different types of music files, see @code{Mix_SetMusicPosition} for more info on that.@*
 Any previous music will continue play or fade concurrently.@*
 @*
 @b{CAUTION:} You can't use this function with modules played through @b{MikMod} and
@@ -1070,13 +1070,13 @@ number of times to play through the music.@*
 @item ms
 Milliseconds for the fade-in effect to complete.
 @item position
-Posistion to play from, see @code{Mix_SetMusicPosition} for meaning.
+Position to play from, see @code{Mix_SetMusicPosition} for meaning.
 @end table
 
 @noindent
 Fade in over @var{ms} milliseconds of time, the loaded @var{music}, playing it @var{loop} times through from start to finish.@*
 The fade in effect only applies to the first loop.@*
-The first time the music is played, it posistion will be set to @var{posistion}, which means different things for different types of music files, see @code{Mix_SetMusicPosition} for more info on that.@*
+The first time the music is played, it position will be set to @var{position}, which means different things for different types of music files, see @code{Mix_SetMusicPosition} for more info on that.@*
 Any previous music will be halted, or if it is fading out it will wait (blocking) for the fade to complete.@*
 Please use the @ref{Mix_FadeInMusicStreamPos} function to play multiple music streams in parallel.@*
 
@@ -1432,7 +1432,7 @@ Mix_RewindMusicStream(music);
 @item music
 Music to change the position.
 @item position
-Posistion to play from in seconds.
+Position to play from in seconds.
 @end table
 
 @noindent
@@ -1987,7 +1987,7 @@ Mix_RewindMusic();
 
 @table @var
 @item position
-Posistion to play from.
+Position to play from.
 @end table
 
 @noindent
