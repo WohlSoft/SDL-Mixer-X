@@ -2227,7 +2227,7 @@ int music_internal_position(Mix_Music *music, double position)
     }
     return -1;
 }
-int SDLCALLCC Mix_SetMusicStreamPosition(Mix_Music *music, double position)
+int SDLCALLCC Mix_SetMusicPositionStream(Mix_Music *music, double position)
 {
     int retval;
 
@@ -2254,7 +2254,7 @@ int SDLCALLCC Mix_SetMusicStreamPosition(Mix_Music *music, double position)
 /* Deprecated call, kept for ABI compatibility */
 int SDLCALLCC Mix_SetMusicPosition(double position)
 {
-    return Mix_SetMusicStreamPosition(NULL, position);
+    return Mix_SetMusicPositionStream(NULL, position);
 }
 
 /* Set the playing music position */
@@ -2823,11 +2823,11 @@ void SDLCALLCC Mix_ResumeMusicStreamAll(void)
 
 void SDLCALLCC Mix_RewindMusicStream(Mix_Music *music)
 {
-    Mix_SetMusicStreamPosition(music, 0.0);
+    Mix_SetMusicPositionStream(music, 0.0);
 }
 void SDLCALLCC Mix_RewindMusic(void)
 {
-    Mix_SetMusicStreamPosition(NULL, 0.0);
+    Mix_SetMusicPositionStream(NULL, 0.0);
 }
 
 int SDLCALLCC Mix_PausedMusicStream(Mix_Music *music)

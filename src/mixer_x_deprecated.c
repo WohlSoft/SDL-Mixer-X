@@ -73,3 +73,8 @@ void SDLCALLCC Mix_ADLMIDI_setLogarithmicVolumes(int vm)
     (void)vm;
 #endif
 }
+
+int SDLCALLCC Mix_SetMusicStreamPosition(Mix_Music *music, double position)
+{
+    return Mix_SetMusicPositionStream(music, position);
+}

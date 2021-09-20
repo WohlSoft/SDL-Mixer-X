@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html401/loose.dtd">
 <html>
-<!-- Created on September 13, 2021 by texi2html 1.82
+<!-- Created on September 20, 2021 by texi2html 1.82
 texi2html was written by: 
             Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -3736,7 +3736,7 @@ There are two different music sub-systems providen:<br>
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fRewindMusicStream">5.5.30 Mix_RewindMusicStream</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">           Rewind music to beginning <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fSetMusicStreamPosition">5.5.31 Mix_SetMusicStreamPosition</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">      Set position of playback in music <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fSetMusicPositionStream">5.5.31 Mix_SetMusicPositionStream</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">      Set position of playback in music <b>[Mixer X]</b>
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fGetMusicPosition">5.5.32 Mix_GetMusicPosition</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Get the time current position of music stream <b>[Mixer X]</b>
 </td></tr>
@@ -4727,7 +4727,7 @@ if(Mix_FadeInMusicStream(music, -1, 2000)==-1) {
 <dd><p>Milliseconds for the fade-in effect to complete.
 </p></dd>
 <dt> <var>position</var></dt>
-<dd><p>Posistion to play from, see <code>Mix_SetMusicStreamPosition</code> for meaning.
+<dd><p>Posistion to play from, see <code>Mix_SetMusicPositionStream</code> for meaning.
 </p></dd>
 </dl>
 
@@ -4878,7 +4878,7 @@ if(Mix_CrossFadeMusicStream(old_music, new_music, -1, 2000, 0)==-1) {
 <dd><p>Milliseconds for the fade-in effect to complete.
 </p></dd>
 <dt> <var>position</var></dt>
-<dd><p>Posistion to play from, see <code>Mix_SetMusicStreamPosition</code> for meaning.
+<dd><p>Posistion to play from, see <code>Mix_SetMusicPositionStream</code> for meaning.
 </p></dd>
 <dt> <var>free_old</var></dt>
 <dd><p>Automatically free the old music after it will complete the fade out.<br>
@@ -5578,7 +5578,7 @@ Mix_ResumeMusicStreamAll();
 <a name="Mix_005fRewindMusicStream"></a>
 <table cellpadding="1" cellspacing="1" border="0">
 <tr><td valign="middle" align="left">[<a href="#Mix_005fResumeMusicStreamAll" title="Previous section in reading order"> &lt; </a>]</td>
-<td valign="middle" align="left">[<a href="#Mix_005fSetMusicStreamPosition" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left">[<a href="#Mix_005fSetMusicPositionStream" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Functions" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#Music" title="Up section"> Up </a>]</td>
@@ -5622,7 +5622,7 @@ Mix_RewindMusicStream(music);
 
 
 <hr size="6">
-<a name="Mix_005fSetMusicStreamPosition"></a>
+<a name="Mix_005fSetMusicPositionStream"></a>
 <table cellpadding="1" cellspacing="1" border="0">
 <tr><td valign="middle" align="left">[<a href="#Mix_005fRewindMusicStream" title="Previous section in reading order"> &lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#Mix_005fGetMusicPosition" title="Next section in reading order"> &gt; </a>]</td>
@@ -5639,11 +5639,11 @@ Mix_RewindMusicStream(music);
 <td valign="middle" align="left">[<a href="#Index" title="Index">Index</a>]</td>
 <td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
-<a name="Mix_005fSetMusicStreamPosition-1"></a>
-<h3 class="subsection">5.5.31 Mix_SetMusicStreamPosition</h3>
-<a name="index-Mix_005fSetMusicStreamPosition"></a>
+<a name="Mix_005fSetMusicPositionStream-1"></a>
+<h3 class="subsection">5.5.31 Mix_SetMusicPositionStream</h3>
+<a name="index-Mix_005fSetMusicPositionStream"></a>
 
-<p><code>int <b>Mix_SetMusicStreamPosition</b>(Mix_Music *<var>music</var>, double <var>position</var>)</code>
+<p><code>int <b>Mix_SetMusicPositionStream</b>(Mix_Music *<var>music</var>, double <var>position</var>)</code>
 </p>
 <dl compact="compact">
 <dt> <var>music</var></dt>
@@ -5692,8 +5692,8 @@ Jumps to <var>position</var> seconds from the beginning of the song.
 </p>
 <table class="cartouche" border="1"><tr><td>
 <table><tr><td>&nbsp;</td><td><pre class="example">// skip one minute into the song, from the start
-if(Mix_SetMusicStreamPosition(music, 60.0)==-1) {
-    printf(&quot;Mix_SetMusicStreamPosition: %s\n&quot;, Mix_GetError());
+if(Mix_SetMusicPositionStream(music, 60.0)==-1) {
+    printf(&quot;Mix_SetMusicPositionStream: %s\n&quot;, Mix_GetError());
 }
 </pre></td></tr></table>
 </td></tr></table>
@@ -5708,7 +5708,7 @@ if(Mix_SetMusicStreamPosition(music, 60.0)==-1) {
 <hr size="6">
 <a name="Mix_005fGetMusicPosition"></a>
 <table cellpadding="1" cellspacing="1" border="0">
-<tr><td valign="middle" align="left">[<a href="#Mix_005fSetMusicStreamPosition" title="Previous section in reading order"> &lt; </a>]</td>
+<tr><td valign="middle" align="left">[<a href="#Mix_005fSetMusicPositionStream" title="Previous section in reading order"> &lt; </a>]</td>
 <td valign="middle" align="left">[<a href="#Mix_005fModMusicStreamJumpToOrder" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="#Functions" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
@@ -5741,7 +5741,7 @@ if(Mix_SetMusicStreamPosition(music, 60.0)==-1) {
 </p>
 <p><b>See Also</b>:<br>
 <a href="#Mix_005fFadeInMusicStreamPos">Mix_FadeInMusicStreamPos</a>
-<a href="#Mix_005fSetMusicStreamPosition">Mix_SetMusicStreamPosition</a>
+<a href="#Mix_005fSetMusicPositionStream">Mix_SetMusicPositionStream</a>
 <a href="#Mix_005fMusicDuration">Mix_MusicDuration</a>
 </p>
 
@@ -5786,7 +5786,7 @@ if(Mix_SetMusicStreamPosition(music, 60.0)==-1) {
 </p>
 <p><b>See Also</b>:<br>
 <a href="#Mix_005fFadeInMusicStreamPos">Mix_FadeInMusicStreamPos</a>
-<a href="#Mix_005fSetMusicStreamPosition">Mix_SetMusicStreamPosition</a>
+<a href="#Mix_005fSetMusicPositionStream">Mix_SetMusicPositionStream</a>
 <a href="#Mix_005fMusicDuration">Mix_MusicDuration</a>
 </p>
 
@@ -5992,7 +5992,7 @@ if(Mix_SetMusicStreamPosition(music, 60.0)==-1) {
 <p><b>See Also</b>:<br>
 <a href="#Mix_005fGetMusicTempo">Mix_GetMusicTempo</a>
 <a href="#Mix_005fFadeInMusicStreamPos">Mix_FadeInMusicStreamPos</a>
-<a href="#Mix_005fSetMusicStreamPosition">Mix_SetMusicStreamPosition</a>
+<a href="#Mix_005fSetMusicPositionStream">Mix_SetMusicPositionStream</a>
 <a href="#Mix_005fMusicDuration">Mix_MusicDuration</a>
 </p>
 
@@ -6034,7 +6034,7 @@ if(Mix_SetMusicStreamPosition(music, 60.0)==-1) {
 <p><b>See Also</b>:<br>
 <a href="#Mix_005fSetMusicTempo">Mix_SetMusicTempo</a>
 <a href="#Mix_005fFadeInMusicStreamPos">Mix_FadeInMusicStreamPos</a>
-<a href="#Mix_005fSetMusicStreamPosition">Mix_SetMusicStreamPosition</a>
+<a href="#Mix_005fSetMusicPositionStream">Mix_SetMusicPositionStream</a>
 <a href="#Mix_005fMusicDuration">Mix_MusicDuration</a>
 </p>
 
@@ -6077,7 +6077,7 @@ if(Mix_SetMusicStreamPosition(music, 60.0)==-1) {
 <p><b>See Also</b>:<br>
 <a href="#Mix_005fSetMusicTrackMute">Mix_SetMusicTrackMute</a>
 <a href="#Mix_005fFadeInMusicStreamPos">Mix_FadeInMusicStreamPos</a>
-<a href="#Mix_005fSetMusicStreamPosition">Mix_SetMusicStreamPosition</a>
+<a href="#Mix_005fSetMusicPositionStream">Mix_SetMusicPositionStream</a>
 <a href="#Mix_005fMusicDuration">Mix_MusicDuration</a>
 </p>
 
@@ -6126,7 +6126,7 @@ if(Mix_SetMusicStreamPosition(music, 60.0)==-1) {
 <p><b>See Also</b>:<br>
 <a href="#Mix_005fGetMusicTracks">Mix_GetMusicTracks</a>
 <a href="#Mix_005fFadeInMusicStreamPos">Mix_FadeInMusicStreamPos</a>
-<a href="#Mix_005fSetMusicStreamPosition">Mix_SetMusicStreamPosition</a>
+<a href="#Mix_005fSetMusicPositionStream">Mix_SetMusicPositionStream</a>
 <a href="#Mix_005fMusicDuration">Mix_MusicDuration</a>
 </p>
 
@@ -11639,7 +11639,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <tr><td></td><td valign="top"><a href="#index-Mix_005fSetMusicEffectReverseStereo"><code>Mix_SetMusicEffectReverseStereo</code></a></td><td valign="top"><a href="#Mix_005fSetMusicEffectReverseStereo">5.6.15 Mix_SetMusicEffectReverseStereo</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fSetMusicFileName"><code>Mix_SetMusicFileName</code></a></td><td valign="top"><a href="#Mix_005fSetMusicFileName">5.5.45 Mix_SetMusicFileName</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fSetMusicPosition"><code>Mix_SetMusicPosition</code></a></td><td valign="top"><a href="#Mix_005fSetMusicPosition">5.5.50 Mix_SetMusicPosition</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Mix_005fSetMusicStreamPosition"><code>Mix_SetMusicStreamPosition</code></a></td><td valign="top"><a href="#Mix_005fSetMusicStreamPosition">5.5.31 Mix_SetMusicStreamPosition</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-Mix_005fSetMusicPositionStream"><code>Mix_SetMusicPositionStream</code></a></td><td valign="top"><a href="#Mix_005fSetMusicPositionStream">5.5.31 Mix_SetMusicPositionStream</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fSetMusicTempo"><code>Mix_SetMusicTempo</code></a></td><td valign="top"><a href="#Mix_005fSetMusicTempo">5.5.38 Mix_SetMusicTempo</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fSetMusicTrackMute"><code>Mix_SetMusicTrackMute</code></a></td><td valign="top"><a href="#Mix_005fSetMusicTrackMute">5.5.41 Mix_SetMusicTrackMute</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Mix_005fSetPanning"><code>Mix_SetPanning</code></a></td><td valign="top"><a href="#Mix_005fSetPanning">5.6.8 Mix_SetPanning</a></td></tr>
@@ -11811,7 +11811,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
       <li><a name="toc-Mix_005fResumeMusicStream-1" href="#Mix_005fResumeMusicStream">5.5.28 Mix_ResumeMusicStream</a></li>
       <li><a name="toc-Mix_005fResumeMusicStreamAll-1" href="#Mix_005fResumeMusicStreamAll">5.5.29 Mix_ResumeMusicStreamAll</a></li>
       <li><a name="toc-Mix_005fRewindMusicStream-1" href="#Mix_005fRewindMusicStream">5.5.30 Mix_RewindMusicStream</a></li>
-      <li><a name="toc-Mix_005fSetMusicStreamPosition-1" href="#Mix_005fSetMusicStreamPosition">5.5.31 Mix_SetMusicStreamPosition</a></li>
+      <li><a name="toc-Mix_005fSetMusicPositionStream-1" href="#Mix_005fSetMusicPositionStream">5.5.31 Mix_SetMusicPositionStream</a></li>
       <li><a name="toc-Mix_005fGetMusicPosition-1" href="#Mix_005fGetMusicPosition">5.5.32 Mix_GetMusicPosition</a></li>
       <li><a name="toc-Mix_005fModMusicStreamJumpToOrder-1" href="#Mix_005fModMusicStreamJumpToOrder">5.5.33 Mix_ModMusicStreamJumpToOrder</a></li>
       <li><a name="toc-Mix_005fMusicDuration-1" href="#Mix_005fMusicDuration">5.5.34 Mix_MusicDuration</a></li>
@@ -11972,7 +11972,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 </tr></table>
 <h1>About This Document</h1>
 <p>
-  This document was generated by <em>Wohlstand Fox</em> on <em>September 13, 2021</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
+  This document was generated by <em>Wohlstand Fox</em> on <em>September 20, 2021</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
 </p>
 <p>
   The buttons in the navigation panels have the following meaning:
@@ -12074,7 +12074,7 @@ Also known as <em>Big-Endian</em>.  Which means the most significant byte comes 
 <hr size="1">
 <p>
  <font size="-1">
-  This document was generated by <em>Wohlstand Fox</em> on <em>September 13, 2021</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
+  This document was generated by <em>Wohlstand Fox</em> on <em>September 20, 2021</em> using <a href="http://www.nongnu.org/texi2html/"><em>texi2html 1.82</em></a>.
  </font>
  <br>
 

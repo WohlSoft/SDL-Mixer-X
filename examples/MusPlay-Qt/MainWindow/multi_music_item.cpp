@@ -302,7 +302,7 @@ void MultiMusicItem::musicPosition_seeked(double value)
     qDebug() << "Seek to: " << value;
     if(Mix_PlayingMusicStream(m_curMus))
     {
-        Mix_SetMusicStreamPosition(m_curMus, value);
+        Mix_SetMusicPositionStream(m_curMus, value);
         ui->playingTimeLabel->setText(QDateTime::fromTime_t((uint)value).toUTC().toString("hh:mm:ss"));
     }
 }

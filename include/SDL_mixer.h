@@ -998,6 +998,9 @@ extern DECLSPEC int SDLCALL Mix_ModMusicStreamJumpToOrder(Mix_Music *music, int 
    order number) and for WAV, OGG, FLAC, MP3_MAD, MP3_MPG, and MODPLUG music
    (set position in seconds), at the moment.
 */
+extern DECLSPEC int SDLCALL Mix_SetMusicPositionStream(Mix_Music *music, double position);
+
+MIXERX_DEPRECATED("Use Mix_SetMusicPositionStream(Mix_Music*, double) instead")
 extern DECLSPEC int SDLCALL Mix_SetMusicStreamPosition(Mix_Music *music, double position);
 /*
     Deprecated analogue of Mix_SetMusicStreamPosition() which lacks Mix_Music* argument

@@ -51,7 +51,7 @@ There are two different music sub-systems providen:@*
 * Mix_ResumeMusicStream::           Resume music @b{[Mixer X]}
 * Mix_ResumeMusicStreamAll::        Resume all music (except the single-stream music) @b{[Mixer X]}
 * Mix_RewindMusicStream::           Rewind music to beginning @b{[Mixer X]}
-* Mix_SetMusicStreamPosition::      Set position of playback in music @b{[Mixer X]}
+* Mix_SetMusicPositionStream::      Set position of playback in music @b{[Mixer X]}
 * Mix_GetMusicPosition::            Get the time current position of music stream @b{[Mixer X]}
 * Mix_ModMusicStreamJumpToOrder::   Jump to a given order in mod music. Only for MOD music formats. @b{[Mixer X]}
 * Mix_MusicDuration::               Get the total time length of music stream @b{[Mixer X]}
@@ -755,7 +755,7 @@ number of times to play through the music.@*
 @item ms
 Milliseconds for the fade-in effect to complete.
 @item position
-Posistion to play from, see @code{Mix_SetMusicStreamPosition} for meaning.
+Posistion to play from, see @code{Mix_SetMusicPositionStream} for meaning.
 @end table
 
 @noindent
@@ -872,7 +872,7 @@ number of times to play through the music.@*
 @item ms
 Milliseconds for the fade-in effect to complete.
 @item position
-Posistion to play from, see @code{Mix_SetMusicStreamPosition} for meaning.
+Posistion to play from, see @code{Mix_SetMusicPositionStream} for meaning.
 @item free_old
 Automatically free the old music after it will complete the fade out.@*
 0 keeps the old music untouched.@*
@@ -1421,12 +1421,12 @@ Mix_RewindMusicStream(music);
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
-@node Mix_SetMusicStreamPosition
-@subsection Mix_SetMusicStreamPosition
-@findex Mix_SetMusicStreamPosition
+@node Mix_SetMusicPositionStream
+@subsection Mix_SetMusicPositionStream
+@findex Mix_SetMusicPositionStream
 
 @noindent
-@code{int @b{Mix_SetMusicStreamPosition}(Mix_Music *@var{music}, double @var{position})}
+@code{int @b{Mix_SetMusicPositionStream}(Mix_Music *@var{music}, double @var{position})}
 
 @table @var
 @item music
@@ -1468,8 +1468,8 @@ Jumps to @var{position} seconds from the beginning of the song.
 @cartouche
 @example
 // skip one minute into the song, from the start
-if(Mix_SetMusicStreamPosition(music, 60.0)==-1) @{
-    printf("Mix_SetMusicStreamPosition: %s\n", Mix_GetError());
+if(Mix_SetMusicPositionStream(music, 60.0)==-1) @{
+    printf("Mix_SetMusicPositionStream: %s\n", Mix_GetError());
 @}
 @end example
 @end cartouche
@@ -1504,7 +1504,7 @@ Get the time current position of music stream. It only works on some of music so
 @noindent
 @b{See Also}:@*
 @ref{Mix_FadeInMusicStreamPos}
-@ref{Mix_SetMusicStreamPosition}
+@ref{Mix_SetMusicPositionStream}
 @ref{Mix_MusicDuration}
 
 
@@ -1534,7 +1534,7 @@ Jump to a given order in mod music. Only for MOD music formats.
 @noindent
 @b{See Also}:@*
 @ref{Mix_FadeInMusicStreamPos}
-@ref{Mix_SetMusicStreamPosition}
+@ref{Mix_SetMusicPositionStream}
 @ref{Mix_MusicDuration}
 
 
@@ -1669,7 +1669,7 @@ Set the current tempo multiplier in the music stream.
 @b{See Also}:@*
 @ref{Mix_GetMusicTempo}
 @ref{Mix_FadeInMusicStreamPos}
-@ref{Mix_SetMusicStreamPosition}
+@ref{Mix_SetMusicPositionStream}
 @ref{Mix_MusicDuration}
 
 
@@ -1697,7 +1697,7 @@ Returns the current tempo multiplier of the music stream.
 @b{See Also}:@*
 @ref{Mix_SetMusicTempo}
 @ref{Mix_FadeInMusicStreamPos}
-@ref{Mix_SetMusicStreamPosition}
+@ref{Mix_SetMusicPositionStream}
 @ref{Mix_MusicDuration}
 
 
@@ -1726,7 +1726,7 @@ Get the count of concurrently playing tracks at the song (MIDI, Tracker, Chiptun
 @b{See Also}:@*
 @ref{Mix_SetMusicTrackMute}
 @ref{Mix_FadeInMusicStreamPos}
-@ref{Mix_SetMusicStreamPosition}
+@ref{Mix_SetMusicPositionStream}
 @ref{Mix_MusicDuration}
 
 
@@ -1759,7 +1759,7 @@ Mute one of playing tracks (or channels) at the song (MIDI, Tracker, Chiptune, e
 @b{See Also}:@*
 @ref{Mix_GetMusicTracks}
 @ref{Mix_FadeInMusicStreamPos}
-@ref{Mix_SetMusicStreamPosition}
+@ref{Mix_SetMusicPositionStream}
 @ref{Mix_MusicDuration}
 
 
