@@ -38,6 +38,7 @@
 #include "music_opus.h"
 #include "music_mpg123.h"
 #include "music_mad.h"
+#include "music_minimp3.h"
 #include "music_flac.h"
 #include "native_midi/native_midi.h"
 #include "music_gme.h"
@@ -573,6 +574,9 @@ static Mix_MusicInterface *s_music_interfaces[] =
 #ifdef MUSIC_MID_OPNMIDI
     &Mix_MusicInterface_OPNMIDI,
     &Mix_MusicInterface_OPNXMI,
+#endif
+#ifdef MUSIC_MP3_MINIMP3
+    &Mix_MusicInterface_MINIMP3,
 #endif
 #ifdef MUSIC_MP3_MAD
     &Mix_MusicInterface_MAD,
@@ -1303,7 +1307,7 @@ static int detect_ea_rsxx(SDL_RWops *in, Sint64 start, Uint8 magic_byte)
 }
 #endif
 
-#if defined(MUSIC_MP3_MAD) || defined(MUSIC_MP3_MPG123) || defined(MUSIC_MP3_SMPEG)
+#if defined(MUSIC_MP3_MAD) || defined(MUSIC_MP3_MPG123) || defined(MUSIC_MP3_MINIMP3)
 static int detect_mp3(Uint8 *magic, SDL_RWops *src, Sint64 start)
 {
     Uint32 null = 0;
@@ -1527,7 +1531,7 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
     if (SDL_memcmp(magic, "if", 2) == 0)
         return MUS_MOD;
 
-#if defined(MUSIC_MP3_MAD) || defined(MUSIC_MP3_MPG123) || defined(MUSIC_MP3_SMPEG)
+#if defined(MUSIC_MP3_MAD) || defined(MUSIC_MP3_MPG123) || defined(MUSIC_MP3_MINIMP3)
     /* Detect MP3 format [needs scanning of bigger part of the file] */
     if (detect_mp3(magic, src, start)) {
         return MUS_MP3;

@@ -43,6 +43,7 @@ typedef enum
     MIX_MUSIC_GME,/*MIXER-X*/
     MIX_MUSIC_ADLMIDI,/*MIXER-X*/
     MIX_MUSIC_OPNMIDI,/*MIXER-X*/
+    MIX_MUSIC_MINIMP3,/*MIXER-X*/
     MIX_MUSIC_LAST
 } Mix_MusicAPI;
 

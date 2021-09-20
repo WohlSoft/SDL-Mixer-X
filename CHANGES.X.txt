@@ -1,4 +1,6 @@
 2.5.0:
+Vitaly Novichkov - 2021-09-20 23:27
+ * Added minimp3 codec library for MP3
 Vitaly Novichkov - 2021-09-10
  * Added an ability to mute individual channels/tracks of MIDI/Tracker/Chiptune musics, added Mix_GetMusicTracks() and Mix_SetMusicTrackMute() calls
 Vitaly Novichkov - 2021-09-09

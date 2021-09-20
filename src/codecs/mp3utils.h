@@ -26,7 +26,7 @@
 
 #include "music.h"
 
-#if defined(MUSIC_MP3_MAD) || defined(MUSIC_MP3_MPG123)
+#if defined(MUSIC_MP3_MAD) || defined(MUSIC_MP3_MPG123) || defined(MUSIC_MP3_MINIMP3)
 #define ENABLE_ALL_MP3_TAGS
 #endif
 

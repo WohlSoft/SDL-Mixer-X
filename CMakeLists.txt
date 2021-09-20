@@ -225,6 +225,7 @@ include(music_ogg)
 
 include(music_mad)
 include(music_mpg123)
+include(music_minimp3)
 
 if(USE_MP3_MAD OR USE_MP3_MPG123 OR USE_WAV)
     list(APPEND SDLMixerX_SOURCES

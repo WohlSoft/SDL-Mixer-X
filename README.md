@@ -43,6 +43,7 @@ the `-DSDL_MIXER_CLEAR_FOR_ZLIB_LICENSE=ON` flag):
 * libTimidity-SDL
 * libVorbis
 * libZlib
+* minimp3
 
 ### LGPL-license libraries
 LGPL allows usage in closed-source projects when LGPL-licensed components are linked dynamically.
