@@ -3662,7 +3662,7 @@ Mix_HaltGroup(1);
 <p>These functions work with music.  Music is not played on a normal mixer channel.
 Music is therefore manipulated separately, except in post-processing hooks.<br>
 <br>
-There are two different music sub-systems providen:<br>
+There are two different music sub-systems provided:<br>
 - <b>single-music</b>: the old API of the SDL_mixer. The most of given calls don&rsquo;t even has the <a href="#Mix_005fMusic">Mix_Music</a> argument and intended to manipulate the currently playing music.<br>
 - <b>multi-music</b>: the new API of the MixerX. Every given call intended to work with the multi-music has the <a href="#Mix_005fMusic">Mix_Music</a> argument to manipulate every music individually as they are able to work in parallel.
 </p>
@@ -3716,11 +3716,11 @@ There are two different music sub-systems providen:<br>
 </td></tr>
 <tr><th colspan="3" align="left" valign="top"><pre class="menu-comment">
 <b>Settings</b>
-</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fVolumeMusicStream">5.5.21 Mix_VolumeMusicStream</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">           Set music volume <b>[Mixer X]</b>
+</pre></th></tr><tr><td align="left" valign="top"><a href="#Mix_005fVolumeMusicStream">5.5.21 Mix_VolumeMusicStream</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">           Set the individual music volume <b>[Mixer X]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicVolume">5.5.22 Mix_GetMusicVolume</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">              Set music volume <b>[Mixer 2.0]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fGetMusicVolume">5.5.22 Mix_GetMusicVolume</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">              Get the individual music volume <b>[Mixer 2.0]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fGetVolumeMusicStream">5.5.23 Mix_GetVolumeMusicStream</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Set music volume, alias to <b>Mix_GetMusicVolume</b> <b>[Mixer X]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fGetVolumeMusicStream">5.5.23 Mix_GetVolumeMusicStream</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">        Get the individual music volume, alias to <b>Mix_GetMusicVolume</b> <b>[Mixer X]</b>
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fVolumeMusicGeneral">5.5.24 Mix_VolumeMusicGeneral</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">          Set the general music volume <b>[Mixer X]</b>
 </td></tr>
