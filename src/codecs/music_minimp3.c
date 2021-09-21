@@ -40,6 +40,7 @@ typedef struct {
     mp3d_sample_t *buffer;
     int buffer_size;
     uint64_t second_length;
+    int channels;
 
     Mix_MusicMetaTags tags;
 } MiniMP3_Music;
@@ -112,8 +113,9 @@ static void *MINIMP3_CreateFromRW(SDL_RWops *src, int freesrc)
         return NULL;
     }
 
-    music->second_length = music->dec.info.channels * music->dec.info.hz;
-    music->buffer_size = music_spec.samples * sizeof(mp3d_sample_t) * music->dec.info.channels;
+    music->channels = music->dec.info.channels;
+    music->second_length = music->channels * music->dec.info.hz;
+    music->buffer_size = music_spec.samples * sizeof(mp3d_sample_t) * music->channels;
     music->buffer = (mp3d_sample_t*)SDL_calloc(1, music->buffer_size);
     if (!music->buffer) {
         mp3dec_ex_close(&music->dec);
@@ -170,7 +172,7 @@ static int MINIMP3_GetSome(void *context, void *data, int bytes, SDL_bool *done)
         return 0;
     }
 
-    amount = mp3dec_ex_read(&music->dec, music->buffer, music_spec.samples);
+    amount = mp3dec_ex_read(&music->dec, music->buffer, music_spec.samples * music->channels);
     if (amount > 0) {
         if (SDL_AudioStreamPut(music->stream, music->buffer, (int)amount * sizeof(mp3d_sample_t)) < 0) {
             return -1;
@@ -203,7 +205,9 @@ static int MINIMP3_Seek(void *context, double position)
 {
     MiniMP3_Music *music = (MiniMP3_Music *)context;
     uint64_t destpos = (uint64_t)(position * music->second_length);
-    destpos -= destpos % music->dec.info.channels;
+    if (destpos % music->channels != 0) {
+        destpos -= destpos % music->channels;
+    }
     mp3dec_ex_seek(&music->dec, destpos);
     return 0;
 }
