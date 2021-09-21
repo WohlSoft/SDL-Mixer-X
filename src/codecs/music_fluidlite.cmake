@@ -1,6 +1,7 @@
 option(USE_MIDI_FLUIDLITE "Build with an FluidLite wave table MIDI sequencer support (a light-weight of the FluidSynth)" ON)
 if(USE_MIDI_FLUIDLITE AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE)
     option(USE_MIDI_FLUIDLITE_DYNAMIC "Use dynamical loading of FluidLite" OFF)
+    option(USE_MIDI_FLUIDLITE_OGG_STB "Don't require the vorbis linking (set this flag if FluidLite build has std_vorbis used)" OFF)
 
     if(USE_SYSTEM_AUDIO_LIBRARIES)
         find_package(FluidLite QUIET)
@@ -8,16 +9,14 @@ if(USE_MIDI_FLUIDLITE AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE)
         if(USE_MIDI_FLUIDLITE_DYNAMIC)
             list(APPEND SDL_MIXER_DEFINITIONS -DFLUIDSYNTH_DYNAMIC=\"${FluidLite_DYNAMIC_LIBRARY}\")
             message("Dynamic FluidLite: ${FluidLite_DYNAMIC_LIBRARY}")
-        else()
-            if(USE_OGG_VORBIS_STB)
-                find_package(Vorbis QUIET)
-                list(APPEND FluidLite_LIBRARIES ${Vorbis_LIBRARIES})
-                set(LIBOGG_NEEDED ON)
-            endif()
+        elseif(USE_OGG_VORBIS_STB AND NOT USE_MIDI_FLUIDLITE_OGG_STB)
+            find_package(Vorbis QUIET)
+            list(APPEND FluidLite_LIBRARIES ${Vorbis_LIBRARIES})
+            set(LIBOGG_NEEDED ON)
         endif()
     else()
         if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
-            if(USE_OGG_VORBIS_STB AND AUDIOCODECS_BUILD_OGG_VORBIS)  # Keep the vorbis linking
+            if(USE_OGG_VORBIS_STB AND AUDIOCODECS_BUILD_OGG_VORBIS AND NOT USE_MIDI_FLUIDLITE_OGG_STB)  # Keep the vorbis linking
                 set(FluidLite_LIBRARIES fluidlite vorbisfile vorbis)
                 set(LIBOGG_NEEDED ON)
             else()
@@ -26,7 +25,7 @@ if(USE_MIDI_FLUIDLITE AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE)
         else()
             find_library(FluidLite_LIBRARIES NAMES fluidlite
                          HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
-            if(USE_OGG_VORBIS_STB)
+            if(USE_OGG_VORBIS_STB AND NOT USE_MIDI_FLUIDLITE_OGG_STB)
                 find_library(Vorbis_LIBRARY NAMES vorbis
                             HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
                 find_library(VorbisFile_LIBRARY NAMES vorbisfile
