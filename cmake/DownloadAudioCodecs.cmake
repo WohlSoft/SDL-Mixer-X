@@ -54,6 +54,25 @@ if(APPLE)
     )
 endif()
 
+
+if(ANDROID)
+    set(libMikModDefault OFF)
+else()
+    set(libMikModDefault ON)
+endif()
+option(AUDIOCODECS_BUILD_OGG_VORBIS "Build OGG Vorbis at AudioCodecs" ON)
+option(AUDIOCODECS_BUILD_FLAC "Build FLAC at AudioCodecs" ON)
+option(AUDIOCODECS_BUILD_MP3_MAD "Build libMAD MP3 decoder at AudioCodecs" ON)
+option(AUDIOCODECS_BUILD_GME "Build GME at AudioCodecs" ON)
+option(AUDIOCODECS_BUILD_TIMIDITYSDL "Build Timidity-SDL at AudioCodecs" ON)
+option(AUDIOCODECS_BUILD_MODPLUG "Build libModPlug at AudioCodecs" ON)
+option(AUDIOCODECS_BUILD_MIKMOD "Build MikMod at AudioCodecs" ${libMikModDefault})
+option(AUDIOCODECS_BUILD_LIBXMP "Build libXMP at AudioCodecs" ON)
+option(AUDIOCODECS_BUILD_OPUS "Build Opus at AudioCodecs" ON)
+option(AUDIOCODECS_BUILD_FLUIDLITE "Build FluidLite at AudioCodecs" ON)
+option(AUDIOCODECS_BUILD_ADLMIDI "Build libADLMIDI at AudioCodecs" ON)
+option(AUDIOCODECS_BUILD_OPNMIDI "Build libOPNMIDI at AudioCodecs" ON)
+
 ExternalProject_Add(
     AudioCodecs
     PREFIX ${CMAKE_BINARY_DIR}/external/AudioCodecs
@@ -69,6 +88,19 @@ ExternalProject_Add(
         ${SDL2_TAGS}
         ${ADLMIDI_FLAGS}
         ${APPLE_FLAGS}
+        # Library enable/disable
+        "-DBUILD_OGG_VORBIS=${AUDIOCODECS_BUILD_OGG_VORBIS}"
+        "-DBUILD_FLAC=${AUDIOCODECS_BUILD_FLAC}"
+        "-DBUILD_MP3_MAD=${AUDIOCODECS_BUILD_MP3_MAD}"
+        "-DBUILD_GME=${AUDIOCODECS_BUILD_GME}"
+        "-DBUILD_TIMIDITYSDL=${AUDIOCODECS_BUILD_TIMIDITYSDL}"
+        "-DBUILD_MODPLUG=${AUDIOCODECS_BUILD_MODPLUG}"
+        "-DBUILD_MIKMOD=${AUDIOCODECS_BUILD_MIKMOD}"
+        "-DBUILD_LIBXMP=${AUDIOCODECS_BUILD_LIBXMP}"
+        "-DBUILD_OPUS=${AUDIOCODECS_BUILD_OPUS}"
+        "-DBUILD_FLUIDLITE=${AUDIOCODECS_BUILD_FLUIDLITE}"
+        "-DBUILD_ADLMIDI=${AUDIOCODECS_BUILD_ADLMIDI}"
+        "-DBUILD_OPNMIDI=${AUDIOCODECS_BUILD_OPNMIDI}"
 )
 
 message("AudioCodecs can see SDL2 is stored in ${SDL2_REPO_PATH}...")
