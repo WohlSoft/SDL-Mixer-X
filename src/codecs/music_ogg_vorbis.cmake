@@ -97,7 +97,10 @@ if(USE_OGG_VORBIS)
         message("== using STB-Vorbis (BSD 3-Clause) ==")
     endif()
 
-    if(Vorbis_FOUND OR Tremor_FOUND OR USE_OGG_VORBIS_STB)
+    if(Vorbis_FOUND OR Tremor_FOUND)
+        list(APPEND SDLMixerX_SOURCES
+            ${CMAKE_CURRENT_LIST_DIR}/music_ogg.c)
+    else(USE_OGG_VORBIS_STB)
         list(APPEND SDLMixerX_SOURCES
             ${CMAKE_CURRENT_LIST_DIR}/music_ogg_stb.c)
     endif()
