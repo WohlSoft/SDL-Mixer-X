@@ -221,7 +221,6 @@ include(music_wav)
 include(music_ogg_vorbis)
 include(music_opus)
 include(music_flac)
-include(music_ogg)
 
 include(music_mad)
 include(music_mpg123)
@@ -263,6 +262,8 @@ if(USE_MIDI)
 else()
     message("== !!! MIDI SUPORT HAS BEEN DISABLED !!! ==")
 endif()
+
+include(music_ogg)
 
 include(libSDL2)
 
