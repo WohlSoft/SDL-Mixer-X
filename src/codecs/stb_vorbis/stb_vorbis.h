@@ -1407,7 +1407,7 @@ static void skip(vorb *z, int n)
 {
    if (USE_RWOPS(z)) {
       long x = SDL_RWtell(z->rw);
-      SDL_RWseek(z->rw, x+n, SEEK_SET);
+      SDL_RWseek(z->rw, x+n, RW_SEEK_SET);
       return;
    }
    if (USE_MEMORY(z)) {
@@ -1418,7 +1418,7 @@ static void skip(vorb *z, int n)
    #ifndef STB_VORBIS_NO_STDIO
    {
       long x = ftell(z->f);
-      fseek(z->f, x+n, SEEK_SET);
+      fseek(z->f, x+n, RW_SEEK_SET);
    }
    #endif
 }
@@ -1437,10 +1437,10 @@ static int set_file_offset(stb_vorbis *f, unsigned int loc)
       } else {
          loc += f->f_start;
       }
-      if (SDL_RWseek(f->rw, loc, SEEK_SET) == loc)
+      if (SDL_RWseek(f->rw, loc, RW_SEEK_SET) == loc)
          return 1;
       f->eof = 1;
-      SDL_RWseek(f->rw, f->f_start, SEEK_END);
+      SDL_RWseek(f->rw, f->f_start, RW_SEEK_END);
       return 0;
    }
 
@@ -1462,10 +1462,10 @@ static int set_file_offset(stb_vorbis *f, unsigned int loc)
    } else {
       loc += f->f_start;
    }
-   if (!fseek(f->f, loc, SEEK_SET))
+   if (!fseek(f->f, loc, RW_SEEK_SET))
       return 1;
    f->eof = 1;
-   fseek(f->f, f->f_start, SEEK_END);
+   fseek(f->f, f->f_start, RW_SEEK_END);
    return 0;
    #endif
 }
@@ -5124,9 +5124,9 @@ stb_vorbis * stb_vorbis_open_file(FILE *file, int close_on_free, int *error, con
 {
    unsigned int len, start;
    start = (unsigned int) ftell(file);
-   fseek(file, 0, SEEK_END);
+   fseek(file, 0, RW_SEEK_END);
    len = (unsigned int) (ftell(file) - start);
-   fseek(file, start, SEEK_SET);
+   fseek(file, start, RW_SEEK_SET);
    return stb_vorbis_open_file_section(file, close_on_free, error, alloc, len);
 }
 
@@ -5151,9 +5151,9 @@ stb_vorbis * stb_vorbis_open_rwops(SDL_RWops *f, int close_on_free,
 {
     unsigned int len, start;
     start = (unsigned int) SDL_RWtell(f);
-    SDL_RWseek(f, 0, SEEK_END);
+    SDL_RWseek(f, 0, RW_SEEK_END);
     len = (unsigned int) (SDL_RWtell(f) - start);
-    SDL_RWseek(f, start, SEEK_SET);
+    SDL_RWseek(f, start, RW_SEEK_SET);
     return stb_vorbis_open_rwops_section(f, close_on_free, error, alloc, len);
 }
 
