@@ -125,6 +125,24 @@ static SDL_bool _Mix_MultiMusic_Add(Mix_Music *mus)
     return SDL_TRUE;
 }
 
+/* Check if song is already playing */
+static SDL_bool _Mix_MultiMusic_InPlayQueue(Mix_Music *mus)
+{
+    int i;
+
+    if (!mix_streams) {
+        return SDL_FALSE;
+    }
+
+    for (i = 0; i < num_streams; ++i) {
+        if (mix_streams[i] == mus) {
+            return SDL_TRUE;
+        }
+    }
+
+    return SDL_FALSE;
+}
+
 /* Remove music from the chain of playing songs */
 static SDL_bool _Mix_MultiMusic_Remove(Mix_Music *mus)
 {
@@ -2033,7 +2051,7 @@ static int music_internal_play(Mix_Music *music, int play_count, double position
 
 int SDLCALLCC Mix_FadeInMusicPos(Mix_Music *music, int loops, int ms, double position)
 {
-    int retval;
+    int retval, reverse_fade = 0;
 
     if (ms_per_step == 0) {
         SDL_SetError("Audio device hasn't been opened");
@@ -2048,22 +2066,44 @@ int SDLCALLCC Mix_FadeInMusicPos(Mix_Music *music, int loops, int ms, double pos
 
     Mix_LockAudio();
 
+    if (_Mix_MultiMusic_InPlayQueue(music)) {
+        Mix_SetError("Music stream is already playing through Multi-Music API");
+        Mix_UnlockAudio();
+        return(-1);
+    }
+
     /* Setup the data */
     if (ms) {
+        if (music->fading == MIX_FADING_IN) {
+            Mix_UnlockAudio();
+            Mix_SetError("Music is already fading in");
+            return(-1);
+        }
+        reverse_fade = (music->fading == MIX_FADING_OUT);
         music->fading = MIX_FADING_IN;
     } else {
         music->fading = MIX_NO_FADING;
     }
-    music->fade_step = 0;
-    music->fade_steps = ms/ms_per_step;
+
+    if (reverse_fade) { /* Reverse the fade-out and prevent song to be halted */
+        int fade_steps = (ms + ms_per_step - 1) / ms_per_step;
+        int step = fade_steps - music->fade_step + 1;
+        music->fade_step = (step * fade_steps) / fade_steps;
+        music->fade_steps = fade_steps;
+    } else { /* Normal fade-in from the ground up */
+        music->fade_step = 0;
+        music->fade_steps = ms/ms_per_step;
+    }
 
     /* Play the puppy */
+#if 0 /* This code even not working because of the logic from above */
     /* If the current music is fading out, wait for the fade to complete */
     while (music_playing && (music_playing->fading == MIX_FADING_OUT)) {
         Mix_UnlockAudio();
         SDL_Delay(100);
         Mix_LockAudio();
     }
+#endif
     if (loops == 0) {
         /* Loop is the number of times to play the audio */
         loops = 1;
@@ -2088,9 +2128,13 @@ static int music_internal_play_stream(Mix_Music *music, int play_count, double p
 {
     int retval = 0;
 
+    if (_Mix_MultiMusic_InPlayQueue(music)) {
+        return(0);
+    }
+
     /* Note the music we're playing */
     if (!_Mix_MultiMusic_Add(music)) {
-        return -1;
+        return(-1);
     }
 
     music->is_multimusic = 1;
@@ -2124,7 +2168,7 @@ static int music_internal_play_stream(Mix_Music *music, int play_count, double p
 }
 int SDLCALLCC Mix_FadeInMusicStreamPos(Mix_Music *music, int loops, int ms, double position)
 {
-    int retval;
+    int retval, reverse_fade = 0;
 
 #if defined(MID_MUSIC_NATIVE)
     if (music->interface->api == MIX_MUSIC_NATIVEMIDI) {
@@ -2145,6 +2189,11 @@ int SDLCALLCC Mix_FadeInMusicStreamPos(Mix_Music *music, int loops, int ms, doub
         return(-1);
     }
 
+    if (music_playing == music) {
+        Mix_SetError("Music stream is already playing through old Music API");
+        return(-1);
+    }
+
     /* Don't play null pointers :-) */
     if (music == NULL) {
         Mix_SetError("music parameter was NULL");
@@ -2155,12 +2204,26 @@ int SDLCALLCC Mix_FadeInMusicStreamPos(Mix_Music *music, int loops, int ms, doub
 
     /* Setup the data */
     if (ms) {
+        if (music->fading == MIX_FADING_IN) {
+            Mix_UnlockAudio();
+            Mix_SetError("Music is already fading in");
+            return(-1);
+        }
+        reverse_fade = (music->fading == MIX_FADING_OUT);
         music->fading = MIX_FADING_IN;
     } else {
         music->fading = MIX_NO_FADING;
     }
-    music->fade_step = 0;
-    music->fade_steps = ms/ms_per_step;
+
+    if (reverse_fade) { /* Reverse the fade-out and prevent song to be halted */
+        int fade_steps = (ms + ms_per_step - 1) / ms_per_step;
+        int step = fade_steps - music->fade_step + 1;
+        music->fade_step = (step * fade_steps) / fade_steps;
+        music->fade_steps = fade_steps;
+    } else { /* Normal fade-in from the ground up */
+        music->fade_step = 0;
+        music->fade_steps = ms/ms_per_step;
+    }
 
     music->is_multimusic = 1;
     music->music_active = 1;
@@ -2171,7 +2234,9 @@ int SDLCALLCC Mix_FadeInMusicStreamPos(Mix_Music *music, int loops, int ms, doub
         /* Loop is the number of times to play the audio */
         loops = 1;
     }
+
     retval = music_internal_play_stream(music, loops, position);
+
     /* Set music as active */
     music->music_active = (retval == 0);
     music->music_halted = (music->music_active == 0);
