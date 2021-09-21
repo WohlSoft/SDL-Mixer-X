@@ -2046,6 +2046,8 @@ int SDLCALLCC Mix_FadeInMusicPos(Mix_Music *music, int loops, int ms, double pos
         return(-1);
     }
 
+    Mix_LockAudio();
+
     /* Setup the data */
     if (ms) {
         music->fading = MIX_FADING_IN;
@@ -2056,7 +2058,6 @@ int SDLCALLCC Mix_FadeInMusicPos(Mix_Music *music, int loops, int ms, double pos
     music->fade_steps = ms/ms_per_step;
 
     /* Play the puppy */
-    Mix_LockAudio();
     /* If the current music is fading out, wait for the fade to complete */
     while (music_playing && (music_playing->fading == MIX_FADING_OUT)) {
         Mix_UnlockAudio();
@@ -2150,6 +2151,8 @@ int SDLCALLCC Mix_FadeInMusicStreamPos(Mix_Music *music, int loops, int ms, doub
         return(-1);
     }
 
+    Mix_LockAudio();
+
     /* Setup the data */
     if (ms) {
         music->fading = MIX_FADING_IN;
@@ -2164,7 +2167,6 @@ int SDLCALLCC Mix_FadeInMusicStreamPos(Mix_Music *music, int loops, int ms, doub
     music->music_halted = 0;
 
     /* Play the puppy */
-    Mix_LockAudio();
     if (loops == 0) {
         /* Loop is the number of times to play the audio */
         loops = 1;
