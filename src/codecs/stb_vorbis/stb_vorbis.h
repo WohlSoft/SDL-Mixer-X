@@ -928,9 +928,16 @@ static int error(vorb *f, enum STBVorbisError e)
 /*  allocate out of those. */
 
 #define array_size_required(count,size)  (count*(sizeof(void *)+(size)))
-
-#define temp_alloc(f,size)              (f->alloc.alloc_buffer ? setup_temp_malloc(f,size) : alloca(size))
-#define temp_free(f,p)                  (void)0
+#if defined(HAVE_ALLOCA)
+#   define temp_alloc(f,size)              (f->alloc.alloc_buffer ? setup_temp_malloc(f,size) : alloca(size))
+#   define temp_free(f,p)                  (void)0
+#   define temp_buffer
+#else
+#   define temp_alloc(f,size)              (f->alloc.alloc_buffer ? setup_temp_malloc(f,size) : \
+                                           (size > 20480 ? SDL_malloc(size) : (void*)temp_buffer_fixed))
+#   define temp_free(f,p)                  if(temp_buffer_fixed != (Uint8*)p) SDL_free(p);
+#   define temp_buffer                     Uint8 temp_buffer_fixed[20480];
+#endif
 #define temp_alloc_save(f)              ((f)->temp_offset)
 #define temp_alloc_restore(f,p)         ((f)->temp_offset = (p))
 
@@ -2148,6 +2155,7 @@ static int residue_decode(vorb *f, Codebook *book, float *target, int offset, in
 /* specification: "Correct per-vector decod//  specification:  */
 static void decode_residue(vorb *f, float *residue_buffers[], int ch, int n, int rn, Uint8 *do_not_decode)
 {
+   temp_buffer;
    int i,j,pass;
    Residue *r = f->residue_config + rn;
    int rtype = f->residue_types[rn];
@@ -2673,6 +2681,7 @@ static void imdct_step3_inner_s_loop_ld654(int n, float *e, int i_off, float *A,
 
 static void inverse_mdct(float *buffer, int n, vorb *f, int blocktype)
 {
+   temp_buffer;
    int n2 = n >> 1, n4 = n >> 2, n8 = n >> 3, l;
    int ld;
    /*  @OPTIMIZE: reduce register pressure by using fewer variables? */
