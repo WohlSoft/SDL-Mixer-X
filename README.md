@@ -44,6 +44,7 @@ the `-DSDL_MIXER_CLEAR_FOR_ZLIB_LICENSE=ON` flag):
 * libVorbis
 * libZlib
 * minimp3
+* stb-vorbis
 
 ### LGPL-license libraries
 LGPL allows usage in closed-source projects when LGPL-licensed components are linked dynamically.

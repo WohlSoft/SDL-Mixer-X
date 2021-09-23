@@ -147,13 +147,13 @@ typedef enum @{
     MIDI_OPNMIDI,
     MIDI_Fluidsynth,
     MIDI_ANY,
-    MIDI_KnuwnDevices   /* Count of MIDI device types */
+    MIDI_KnownDevices   /* Count of MIDI device types */
 @} Mix_MIDI_Device;
 @end example
 @end cartouche
 
 @c Return values from @code{Mix_GetMusicType} are of these enumerated values.@* @cNOT IMPLEMENTED YET
-@b{MIDI_KnuwnDevices} is a count of known MIDI sequencers. Used internally.@*
+@b{MIDI_KnownDevices} is a count of known MIDI sequencers. Used internally.@*
 Otherwise they are self explanatory.
 
 @c -----------------------------------------------------------------------------
