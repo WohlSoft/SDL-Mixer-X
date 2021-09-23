@@ -198,8 +198,11 @@ typedef enum {
     MIDI_OPNMIDI,
     MIDI_Fluidsynth,
     MIDI_ANY,
-    MIDI_KnuwnDevices   /* Count of MIDI device types */
+    MIDI_KnownDevices   /* Count of MIDI device types */
 } Mix_MIDI_Device;
+
+/* The field with a typo, kept for backward compatibility  */
+#define MIDI_KnuwnDevices MIDI_KnownDevices
 
 /* Volume model type in the ADLMIDI */
 typedef enum {
