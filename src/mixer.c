@@ -961,7 +961,7 @@ void SDLCALLCC Mix_HookMusic(void (SDLCALL *mix_func)(void *udata, Uint8 *stream
     } else {
         music_data = NULL;
         mix_music = music_mixer;
-        mix_multi_music = mix_multi_music;
+        mix_multi_music = multi_music_mixer;
     }
     Mix_UnlockAudio();
 }
