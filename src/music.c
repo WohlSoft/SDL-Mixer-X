@@ -2170,7 +2170,7 @@ int SDLCALLCC Mix_FadeInMusicStreamPos(Mix_Music *music, int loops, int ms, doub
 {
     int retval, reverse_fade = 0;
 
-#if defined(MID_MUSIC_NATIVE)
+#if defined(MUSIC_MID_NATIVE)
     if (music->interface->api == MIX_MUSIC_NATIVEMIDI) {
         Mix_SetError("Native MIDI can't be used with Multi-Music API");
         return(-1);
