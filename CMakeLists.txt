@@ -29,8 +29,7 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
 endif()
 
 if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
-    message("== Using default build configuration which is a Release!")
+    message("== Using default build configuration ==")
 endif()
 
 
