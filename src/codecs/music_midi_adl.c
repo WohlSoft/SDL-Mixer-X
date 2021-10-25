@@ -47,17 +47,20 @@ typedef struct {
     void (*adl_setScaleModulators)(struct ADL_MIDIPlayer *device, int smod);
     void (*adl_setVolumeRangeModel)(struct ADL_MIDIPlayer *device, int volumeModel);
     void (*adl_setFullRangeBrightness)(struct ADL_MIDIPlayer *device, int fr_brightness);
+    void (*adl_setAutoArpeggio)(struct ADL_MIDIPlayer *device, int aaEn);
     void (*adl_setSoftPanEnabled)(struct ADL_MIDIPlayer *device, int softPanEn);
     int (*adl_setNumChips)(struct ADL_MIDIPlayer *device, int numChips);
     int (*adl_setNumFourOpsChn)(struct ADL_MIDIPlayer *device, int ops4);
     void (*adl_setTempo)(struct ADL_MIDIPlayer *device, double tempo);
     size_t (*adl_trackCount)(struct ADL_MIDIPlayer *device);
     int (*adl_setTrackOptions)(struct ADL_MIDIPlayer *device, size_t trackNumber, unsigned trackOptions);
+    int (*adl_setChannelEnabled)(struct ADL_MIDIPlayer *device, size_t channelNumber, int enabled);
     int (*adl_openData)(struct ADL_MIDIPlayer *device, const void *mem, unsigned long size);
     const char *(*adl_metaMusicTitle)(struct ADL_MIDIPlayer *device);
     const char *(*adl_metaMusicCopyright)(struct ADL_MIDIPlayer *device);
     void (*adl_positionRewind)(struct ADL_MIDIPlayer *device);
     void (*adl_setLoopEnabled)(struct ADL_MIDIPlayer *device, int loopEn);
+    void (*adl_setLoopCount)(struct ADL_MIDIPlayer *device, int loopCount);
     int  (*adl_playFormat)(struct ADL_MIDIPlayer *device, int sampleCount,
                            ADL_UInt8 *left, ADL_UInt8 *right,
                            const struct ADLMIDI_AudioFormat *format);
@@ -110,17 +113,20 @@ static int ADLMIDI_Load(void)
         FUNCTION_LOADER(adl_setScaleModulators, void(*)(struct ADL_MIDIPlayer*,int))
         FUNCTION_LOADER(adl_setVolumeRangeModel, void(*)(struct ADL_MIDIPlayer*,int))
         FUNCTION_LOADER(adl_setFullRangeBrightness, void(*)(struct ADL_MIDIPlayer*,int))
+        FUNCTION_LOADER(adl_setAutoArpeggio, void(*)(struct ADL_MIDIPlayer*,int))
         FUNCTION_LOADER(adl_setSoftPanEnabled, void(*)(struct ADL_MIDIPlayer*,int))
         FUNCTION_LOADER(adl_setNumChips, int(*)(struct ADL_MIDIPlayer *, int))
         FUNCTION_LOADER(adl_setNumFourOpsChn, int(*)(struct ADL_MIDIPlayer*,int))
         FUNCTION_LOADER(adl_setTempo, void(*)(struct ADL_MIDIPlayer*,double))
         FUNCTION_LOADER(adl_trackCount, size_t(*)(struct ADL_MIDIPlayer *))
         FUNCTION_LOADER(adl_setTrackOptions, int(*)(struct ADL_MIDIPlayer *, size_t, unsigned))
+        FUNCTION_LOADER(adl_setChannelEnabled, int(*)(struct ADL_MIDIPlayer *, size_t, int))
         FUNCTION_LOADER(adl_openData, int(*)(struct ADL_MIDIPlayer *, const void *, unsigned long))
         FUNCTION_LOADER(adl_metaMusicTitle, const char*(*)(struct ADL_MIDIPlayer*))
         FUNCTION_LOADER(adl_metaMusicCopyright, const char*(*)(struct ADL_MIDIPlayer*))
         FUNCTION_LOADER(adl_positionRewind, void (*)(struct ADL_MIDIPlayer*))
         FUNCTION_LOADER(adl_setLoopEnabled, void(*)(struct ADL_MIDIPlayer*,int))
+        FUNCTION_LOADER(adl_setLoopCount, void(*)(struct ADL_MIDIPlayer*,int))
         FUNCTION_LOADER(adl_playFormat, int(*)(struct ADL_MIDIPlayer *,int,
                                ADL_UInt8*,ADL_UInt8*,const struct ADLMIDI_AudioFormat*))
         FUNCTION_LOADER(adl_positionSeek, void(*)(struct ADL_MIDIPlayer*,double))
@@ -158,6 +164,7 @@ typedef struct {
     int chips_count;
     int four_op_channels;
     int full_brightness_range;
+    int auto_arpeggio;
     int soft_pan;
     int emulator;
     char custom_bank_path[2048];
@@ -168,7 +175,7 @@ typedef struct {
 #define ADLMIDI_DEFAULT_CHIPS_COUNT     4
 
 static AdlMidi_Setup adlmidi_setup = {
-    58, -1, -1, -1, 0, -1, -1, 0, 1, ADLMIDI_EMU_DOSBOX, "", 1.0, 2.0
+    58, -1, -1, -1, 0, -1, -1, 0, 1, 1, ADLMIDI_EMU_DOSBOX, "", 1.0, 2.0
 };
 
 static void ADLMIDI_SetDefault(AdlMidi_Setup *setup)
@@ -181,6 +188,7 @@ static void ADLMIDI_SetDefault(AdlMidi_Setup *setup)
     setup->chips_count = -1;
     setup->four_op_channels = -1;
     setup->full_brightness_range = 0;
+    setup->auto_arpeggio = 1;
     setup->soft_pan = 1;
     setup->emulator = -1;
     setup->custom_bank_path[0] = '\0';
@@ -275,6 +283,16 @@ int _Mix_ADLMIDI_getFullRangeBrightness()
 void _Mix_ADLMIDI_setFullRangeBrightness(int frb)
 {
     adlmidi_setup.full_brightness_range = frb;
+}
+
+int _Mix_ADLMIDI_getAutoArpeggio()
+{
+    return adlmidi_setup.auto_arpeggio;
+}
+
+void _Mix_ADLMIDI_setAutoArpeggio(int aa_en)
+{
+    adlmidi_setup.auto_arpeggio = aa_en;
 }
 
 int _Mix_ADLMIDI_getFullPanStereo()
@@ -415,6 +433,9 @@ static void process_args(const char *args, AdlMidi_Setup *setup)
                     break;
                 case 'a':
                     /* Deprecated and useless */
+                    break;
+                case 'j':
+                    setup->auto_arpeggio = value;
                     break;
                 case 'm':
                     setup->scalemod = value;
@@ -596,6 +617,7 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
     ADLMIDI.adl_setVolumeRangeModel(music->adlmidi, setup.volume_model);
     ADLMIDI.adl_setFullRangeBrightness(music->adlmidi, setup.full_brightness_range);
     ADLMIDI.adl_setSoftPanEnabled(music->adlmidi, setup.soft_pan);
+    ADLMIDI.adl_setAutoArpeggio(music->adlmidi, setup.auto_arpeggio);
     ADLMIDI.adl_setNumChips(music->adlmidi, (setup.chips_count >= 0) ? setup.chips_count : ADLMIDI_DEFAULT_CHIPS_COUNT);
     if (setup.four_op_channels >= 0) {
         ADLMIDI.adl_setNumFourOpsChn(music->adlmidi, setup.four_op_channels);
@@ -639,9 +661,10 @@ static void *ADLMIDI_new_RW(struct SDL_RWops *src, int freesrc)
 static int ADLMIDI_play(void *music_p, int play_counts)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
+    ADLMIDI.adl_setLoopEnabled(music->adlmidi, 1);
+    ADLMIDI.adl_setLoopCount(music->adlmidi, play_counts);
     ADLMIDI.adl_positionRewind(music->adlmidi);
     music->play_count = play_counts;
-    ADLMIDI.adl_setLoopEnabled(music->adlmidi, (play_counts < 0));
     return 0;
 }
 
@@ -776,7 +799,7 @@ static int ADLMIDI_GetTracksCount(void *music_p)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
     if (music) {
-        return (int)ADLMIDI.adl_trackCount(music->adlmidi);
+        return 16;
     }
     return -1;
 }
@@ -786,7 +809,7 @@ static int ADLMIDI_SetTrackMute(void *music_p, int track, int mute)
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
     int ret = -1;
     if (music) {
-        ret = ADLMIDI.adl_setTrackOptions(music->adlmidi, track, mute ? ADLMIDI_TrackOption_Off : ADLMIDI_TrackOption_On);
+        ret = ADLMIDI.adl_setChannelEnabled(music->adlmidi, track, mute ? 0 : 1);
         if (ret < 0) {
             Mix_SetError("ADLMIDI: %s", adl_errorInfo(music->adlmidi));
         }

@@ -83,7 +83,7 @@ extern "C" {
 */
 #define SDL_MIXER_MAJOR_VERSION 2
 #define SDL_MIXER_MINOR_VERSION 5
-#define SDL_MIXER_PATCHLEVEL    0
+#define SDL_MIXER_PATCHLEVEL    1
 
 /* This macro can be used to fill a version structure with the compile-time
  * version of the SDL_mixer library.
@@ -1146,6 +1146,10 @@ extern DECLSPEC void SDLCALL Mix_ADLMIDI_setVolumeModel(int vm);
 extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getFullRangeBrightness(void);
 /* Set full range mode for CC74-Brightness controller */
 extern DECLSPEC void SDLCALL Mix_ADLMIDI_setFullRangeBrightness(int frb);
+/* Get the automatic arpeggio enabled or disabled setting */
+extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getAutoArpeggio();
+/* Set the automatic arpeggio enabled or disabled */
+extern DECLSPEC void SDLCALL Mix_ADLMIDI_setAutoArpeggio(int aa_en);
 /* Get full panning stereo mode */
 extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getFullPanStereo(void);
 /* Set full panning stereo mode */
@@ -1174,6 +1178,10 @@ extern DECLSPEC void SDLCALL Mix_OPNMIDI_setVolumeModel(int vm);
 extern DECLSPEC int  SDLCALL Mix_OPNMIDI_getFullRangeBrightness(void);
 /* Set full range mode for CC74-Brightness controller */
 extern DECLSPEC void SDLCALL Mix_OPNMIDI_setFullRangeBrightness(int frb);
+/* Get the automatic arpeggio enabled or disabled setting */
+extern DECLSPEC int  SDLCALL Mix_OPNMIDI_getAutoArpeggio();
+/* Set the automatic arpeggio enabled or disabled */
+extern DECLSPEC void SDLCALL Mix_OPNMIDI_setAutoArpeggio(int aa_en);
 /* Get full panning stereo mode */
 extern DECLSPEC int  SDLCALL Mix_OPNMIDI_getFullPanStereo(void);
 /* Set full panning stereo mode */

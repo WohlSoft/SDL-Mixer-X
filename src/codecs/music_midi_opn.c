@@ -44,16 +44,19 @@ typedef struct {
     void (*opn2_setScaleModulators)(struct OPN2_MIDIPlayer *device, int smod);
     void (*opn2_setVolumeRangeModel)(struct OPN2_MIDIPlayer *device, int volumeModel);
     void (*opn2_setFullRangeBrightness)(struct OPN2_MIDIPlayer *device, int fr_brightness);
+    void (*opn2_setAutoArpeggio)(struct OPN2_MIDIPlayer *device, int aaEn);
     void (*opn2_setSoftPanEnabled)(struct OPN2_MIDIPlayer *device, int softPanEn);
     int (*opn2_setNumChips)(struct OPN2_MIDIPlayer *device, int numChips);
     void (*opn2_setTempo)(struct OPN2_MIDIPlayer *device, double tempo);
     size_t (*opn2_trackCount)(struct OPN2_MIDIPlayer *device);
     int (*opn2_setTrackOptions)(struct OPN2_MIDIPlayer *device, size_t trackNumber, unsigned trackOptions);
+    int (*opn2_setChannelEnabled)(struct OPN2_MIDIPlayer *device, size_t channelNumber, int enabled);
     int (*opn2_openData)(struct OPN2_MIDIPlayer *device, const void *mem, unsigned long size);
     const char *(*opn2_metaMusicTitle)(struct OPN2_MIDIPlayer *device);
     const char *(*opn2_metaMusicCopyright)(struct OPN2_MIDIPlayer *device);
     void (*opn2_positionRewind)(struct OPN2_MIDIPlayer *device);
     void (*opn2_setLoopEnabled)(struct OPN2_MIDIPlayer *device, int loopEn);
+    void (*opn2_setLoopCount)(struct OPN2_MIDIPlayer *device, int loopCount);
     int  (*opn2_playFormat)(struct OPN2_MIDIPlayer *device, int sampleCount,
                            OPN2_UInt8 *left, OPN2_UInt8 *right,
                            const struct OPNMIDI_AudioFormat *format);
@@ -102,16 +105,19 @@ static int OPNMIDI_Load(void)
         FUNCTION_LOADER(opn2_setScaleModulators, void(*)(struct OPN2_MIDIPlayer*,int))
         FUNCTION_LOADER(opn2_setVolumeRangeModel, void(*)(struct OPN2_MIDIPlayer*,int))
         FUNCTION_LOADER(opn2_setFullRangeBrightness, void(*)(struct OPN2_MIDIPlayer*,int))
+        FUNCTION_LOADER(opn2_setAutoArpeggio, void(*)(struct OPN2_MIDIPlayer*,int))
         FUNCTION_LOADER(opn2_setSoftPanEnabled, void(*)(struct OPN2_MIDIPlayer*,int))
         FUNCTION_LOADER(opn2_setNumChips, int(*)(struct OPN2_MIDIPlayer *, int))
         FUNCTION_LOADER(opn2_setTempo, void(*)(struct OPN2_MIDIPlayer*,double))
         FUNCTION_LOADER(opn2_trackCount, size_t(*)(struct OPN2_MIDIPlayer *))
         FUNCTION_LOADER(opn2_setTrackOptions, int(*)(struct OPN2_MIDIPlayer *, size_t, unsigned))
+        FUNCTION_LOADER(opn2_setChannelEnabled, int(*)(struct OPN2_MIDIPlayer *, size_t, int))
         FUNCTION_LOADER(opn2_openData, int(*)(struct OPN2_MIDIPlayer *, const void *, unsigned long))
         FUNCTION_LOADER(opn2_metaMusicTitle, const char*(*)(struct OPN2_MIDIPlayer*))
         FUNCTION_LOADER(opn2_metaMusicCopyright, const char*(*)(struct OPN2_MIDIPlayer*))
         FUNCTION_LOADER(opn2_positionRewind, void (*)(struct OPN2_MIDIPlayer*))
         FUNCTION_LOADER(opn2_setLoopEnabled, void(*)(struct OPN2_MIDIPlayer*,int))
+        FUNCTION_LOADER(opn2_setLoopCount, void(*)(struct OPN2_MIDIPlayer*,int))
         FUNCTION_LOADER(opn2_playFormat, int(*)(struct OPN2_MIDIPlayer *,int,
                                OPN2_UInt8*,OPN2_UInt8*,const struct OPNMIDI_AudioFormat*))
         FUNCTION_LOADER(opn2_positionSeek, void(*)(struct OPN2_MIDIPlayer*,double))
@@ -143,6 +149,7 @@ typedef struct {
     int volume_model;
     int chips_count;
     int full_brightness_range;
+    int auto_arpeggio;
     int soft_pan;
     int emulator;
     char custom_bank_path[2048];
@@ -153,7 +160,7 @@ typedef struct {
 #define OPNMIDI_DEFAULT_CHIPS_COUNT     6
 
 static OpnMidi_Setup opnmidi_setup = {
-    0, -1, 0, 1, -1, "", 1.0, 2.0
+    0, -1, 0, 1, 1, -1, "", 1.0, 2.0
 };
 
 static void OPNMIDI_SetDefault(OpnMidi_Setup *setup)
@@ -161,6 +168,7 @@ static void OPNMIDI_SetDefault(OpnMidi_Setup *setup)
     setup->volume_model = 0;
     setup->chips_count = -1;
     setup->full_brightness_range = 0;
+    setup->auto_arpeggio = 1;
     setup->soft_pan = 1;
     setup->emulator = -1;
     setup->custom_bank_path[0] = '\0';
@@ -189,6 +197,16 @@ int _Mix_OPNMIDI_getFullRangeBrightness(void)
 void _Mix_OPNMIDI_setFullRangeBrightness(int frb)
 {
     opnmidi_setup.full_brightness_range = frb;
+}
+
+int _Mix_OPNMIDI_getAutoArpeggio()
+{
+    return opnmidi_setup.auto_arpeggio;
+}
+
+void _Mix_OPNMIDI_setAutoArpeggio(int aa_en)
+{
+    opnmidi_setup.auto_arpeggio = aa_en;
 }
 
 int _Mix_OPNMIDI_getFullPanStereo(void)
@@ -303,6 +321,9 @@ static void process_args(const char *args, OpnMidi_Setup *setup)
                 {
                 case 'c':
                     setup->chips_count = value;
+                    break;
+                case 'j':
+                    setup->auto_arpeggio = value;
                     break;
                 case 'v':
                     setup->volume_model = value;
@@ -498,6 +519,7 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
     OPNMIDI.opn2_setVolumeRangeModel(music->opnmidi, setup.volume_model);
     OPNMIDI.opn2_setFullRangeBrightness(music->opnmidi, setup.full_brightness_range);
     OPNMIDI.opn2_setSoftPanEnabled(music->opnmidi, setup.soft_pan);
+    OPNMIDI.opn2_setAutoArpeggio(music->opnmidi, setup.auto_arpeggio);
     OPNMIDI.opn2_setNumChips(music->opnmidi, (setup.chips_count >= 0) ? setup.chips_count : OPNMIDI_DEFAULT_CHIPS_COUNT);
     OPNMIDI.opn2_setTempo(music->opnmidi, music->tempo);
 
@@ -537,9 +559,10 @@ static void *OPNMIDI_new_RW(struct SDL_RWops *src, int freesrc)
 static int OPNMIDI_play(void *music_p, int play_counts)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music*)music_p;
+    OPNMIDI.opn2_setLoopEnabled(music->opnmidi, 1);
+    OPNMIDI.opn2_setLoopCount(music->opnmidi, play_counts);
     OPNMIDI.opn2_positionRewind(music->opnmidi);
     music->play_count = play_counts;
-    OPNMIDI.opn2_setLoopEnabled(music->opnmidi, (play_counts < 0));
     return 0;
 }
 
@@ -669,7 +692,7 @@ static int OPNMIDI_GetTracksCount(void *music_p)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music *)music_p;
     if (music) {
-        return (int)OPNMIDI.opn2_trackCount(music->opnmidi);
+        return 16;
     }
     return -1;
 }
@@ -679,7 +702,7 @@ static int OPNMIDI_SetTrackMute(void *music_p, int track, int mute)
     OpnMIDI_Music *music = (OpnMIDI_Music *)music_p;
     int ret = -1;
     if (music) {
-        ret = OPNMIDI.opn2_setTrackOptions(music->opnmidi, track, mute ? OPNMIDI_TrackOption_Off : OPNMIDI_TrackOption_On);
+        ret = OPNMIDI.opn2_setChannelEnabled(music->opnmidi, track, mute ? 0 : 1);
         if (ret < 0) {
             Mix_SetError("OPNMIDI: %s", opn2_errorInfo(music->opnmidi));
         }

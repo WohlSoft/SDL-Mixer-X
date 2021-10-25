@@ -138,6 +138,8 @@ There are two different music sub-systems provided:@*
 * Mix_ADLMIDI_setVolumeModel::              Change current volume model. Applying on MIDI file reopen. @b{[Mixer X]}
 * Mix_ADLMIDI_getFullRangeBrightness::      Get full range mode for CC74-Brightness controller @b{[Mixer X]}
 * Mix_ADLMIDI_setFullRangeBrightness::      Set full range mode for CC74-Brightness controller @b{[Mixer X]}
+* Mix_ADLMIDI_getAutoArpeggio::             Get the automatic arpeggio enable/disable setting state @b{[Mixer X]}
+* Mix_ADLMIDI_setAutoArpeggio::             Get the automatic arpeggio enable/disable setting state @b{[Mixer X]}
 * Mix_ADLMIDI_getFullPanStereo::            Get full panning stereo mode @b{[Mixer X]}
 * Mix_ADLMIDI_setFullPanStereo::            Set full panning stereo mode @b{[Mixer X]}
 * Mix_ADLMIDI_getEmulator::                 Get the OPL3 Emulator for ADLMIDI @b{[Mixer X]}
@@ -152,6 +154,8 @@ There are two different music sub-systems provided:@*
 * Mix_OPNMIDI_setVolumeModel::              Change current volume model. Applying on MIDI file reopen. @b{[Mixer X]}
 * Mix_OPNMIDI_getFullRangeBrightness::      Get full range mode for CC74-Brightness controller @b{[Mixer X]}
 * Mix_OPNMIDI_setFullRangeBrightness::      Set full range mode for CC74-Brightness controller @b{[Mixer X]}
+* Mix_OPNMIDI_getAutoArpeggio::             Get the automatic arpeggio enable/disable setting state @b{[Mixer X]}
+* Mix_OPNMIDI_setAutoArpeggio::             Get the automatic arpeggio enable/disable setting state @b{[Mixer X]}
 * Mix_OPNMIDI_getFullPanStereo::            Get full panning stereo mode @b{[Mixer X]}
 * Mix_OPNMIDI_setFullPanStereo::            Set full panning stereo mode @b{[Mixer X]}
 * Mix_OPNMIDI_getEmulator::                 Get the OPN2/OPNA Emulator for OPNMIDI @b{[Mixer X]}
@@ -3456,6 +3460,39 @@ Set full range mode for CC74-Brightness controller
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
+@node Mix_ADLMIDI_getAutoArpeggio
+@subsection Mix_ADLMIDI_getAutoArpeggio
+@findex Mix_ADLMIDI_getAutoArpeggio
+
+@noindent
+@code{int @b{Mix_ADLMIDI_getAutoArpeggio}()}
+
+@noindent
+@b{Returns}: 0 when automatic arpeggio disabled, or 1 when automatic arpeggio is enabled
+
+@noindent
+Get the automatic apreggion enable/disable setting state
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_ADLMIDI_setAutoArpeggio
+@subsection Mix_ADLMIDI_setAutoArpeggio
+@findex Mix_ADLMIDI_setAutoArpeggio
+
+@noindent
+@code{void @b{Mix_ADLMIDI_setAutoArpeggio}(int @var{aa_en})}
+
+@table @var
+@item aa_en
+0 to disable the automatic arpeggio, or 1 to enable automatic arpeggio
+@end table
+
+@noindent
+Set the automatic apreggion enable/disable setting state
+@b{NOTE}: Applies on MIDI file reopen
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
 @node Mix_ADLMIDI_getFullPanStereo
 @subsection Mix_ADLMIDI_getFullPanStereo
 @findex Mix_ADLMIDI_getFullPanStereo
@@ -3662,6 +3699,39 @@ Get full range mode for CC74-Brightness controller
 
 @noindent
 Set full range mode for CC74-Brightness controller
+@b{NOTE}: Applies on MIDI file reopen
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_OPNMIDI_getAutoArpeggio
+@subsection Mix_OPNMIDI_getAutoArpeggio
+@findex Mix_OPNMIDI_getAutoArpeggio
+
+@noindent
+@code{int @b{Mix_OPNMIDI_getAutoArpeggio}()}
+
+@noindent
+@b{Returns}: 0 when automatic arpeggio disabled, or 1 when automatic arpeggio is enabled
+
+@noindent
+Get the automatic apreggion enable/disable setting state
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_OPNMIDI_setAutoArpeggio
+@subsection Mix_OPNMIDI_setAutoArpeggio
+@findex Mix_OPNMIDI_setAutoArpeggio
+
+@noindent
+@code{void @b{Mix_OPNMIDI_setAutoArpeggio}(int @var{aa_en})}
+
+@table @var
+@item aa_en
+0 to disable the automatic arpeggio, or 1 to enable automatic arpeggio
+@end table
+
+@noindent
+Set the automatic apreggion enable/disable setting state
 @b{NOTE}: Applies on MIDI file reopen
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -3975,6 +4045,16 @@ All arguments are optional. The last argument must be closed with semicolon.@*
     Example:
     @example
     @code{f8;}
+    @end example
+
+@item j
+    @b{ADLMIDI AND OPNMIDI}@*
+    Enable or disable the automatic arpeggio (1 or 0). Default 1.
+
+    @noindent
+    Example:
+    @example
+    @code{j0;}
     @end example
 
 @item l

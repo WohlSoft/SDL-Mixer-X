@@ -3327,6 +3327,24 @@ void SDLCALLCC Mix_ADLMIDI_setFullRangeBrightness(int frb)
 #endif
 }
 
+int SDLCALLCC Mix_ADLMIDI_getAutoArpeggio(void)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    return _Mix_ADLMIDI_getAutoArpeggio();
+#else
+    return -1;
+#endif
+}
+
+void SDLCALLCC Mix_ADLMIDI_setAutoArpeggio(int aa_en)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    _Mix_ADLMIDI_setAutoArpeggio(aa_en);
+#else
+    (void)frb;
+#endif
+}
+
 int SDLCALLCC Mix_ADLMIDI_getFullPanStereo(void)
 {
 #ifdef MUSIC_MID_ADLMIDI
@@ -3432,6 +3450,24 @@ void SDLCALLCC Mix_OPNMIDI_setFullRangeBrightness(int frb)
 {
 #ifdef MUSIC_MID_OPNMIDI
     _Mix_OPNMIDI_setFullRangeBrightness(frb);
+#else
+    (void)frb;
+#endif
+}
+
+int SDLCALLCC Mix_OPNMIDI_getAutoArpeggio(void)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    return _Mix_OPNMIDI_getAutoArpeggio();
+#else
+    return -1;
+#endif
+}
+
+void SDLCALLCC Mix_OPNMIDI_setAutoArpeggio(int aa_en)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    _Mix_OPNMIDI_setAutoArpeggio(aa_en);
 #else
     (void)frb;
 #endif
