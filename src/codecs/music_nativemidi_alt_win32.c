@@ -293,7 +293,8 @@ static int NativeMidiThread(void *context)
 
     init_midi_out(music);
 
-    midi_seq_set_loop_enabled(music->song, music->loops < 0 ? 1 : 0);
+    midi_seq_set_loop_enabled(music->song, 1);
+    midi_seq_set_loop_count(music->song, music->loops < 0 ? -1 : (music->loops + 1));
     midi_seq_set_tempo_multiplier(music->song, music->tempo);
 
     SDL_AtomicSet(&music->running, 1);
