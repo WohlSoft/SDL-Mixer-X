@@ -714,7 +714,7 @@ static int FLUIDSYNTH_GetTracksCount(void *context)
 {
     FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
     if (music) {
-        return midi_get_tracks_number(music->player);
+        return 16; /* MIDI Channels count */
     }
     return -1;
 }
@@ -723,7 +723,7 @@ static int FLUIDSYNTH_SetTrackMuted(void *context, int track, int mute)
 {
     FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
     if (music) {
-        return midi_set_track_enabled(music->player, track, mute ? 0 : 1);
+        return midi_set_channel_enabled(music->player, track, mute ? 0 : 1);
     }
     return -1;
 }
