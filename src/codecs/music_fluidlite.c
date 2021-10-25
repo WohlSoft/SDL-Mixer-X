@@ -657,9 +657,10 @@ static int FLUIDSYNTH_Play(void *context, int play_count)
 {
     FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
     SDL_AudioStreamClear(music->stream);
+    midi_seq_set_loop_enabled(music->player, 1);
+    midi_seq_set_loop_count(music->player, play_count);
     midi_seq_rewind(music->player);
     music->play_count = play_count;
-    midi_seq_set_loop_enabled(music->player,  (play_count < 0));
     return 0;
 }
 
