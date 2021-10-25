@@ -168,6 +168,12 @@ void midi_seq_set_loop_enabled(void *seq, int loopEn)
     seqi->seq.setLoopEnabled(loopEn > 0);
 }
 
+void midi_seq_set_loop_count(void *seq, int loops)
+{
+    MixerSeqInternal *seqi = reinterpret_cast<MixerSeqInternal*>(seq);
+    seqi->seq.setLoopsCount(loops);
+}
+
 double midi_seq_tick(void *seq, double s, double granularity)
 {
     MixerSeqInternal *seqi = reinterpret_cast<MixerSeqInternal*>(seq);
@@ -192,4 +198,10 @@ int midi_set_track_enabled(void *seq, int track, int enabled)
 {
     MixerSeqInternal *seqi = reinterpret_cast<MixerSeqInternal*>(seq);
     return (int)seqi->seq.setTrackEnabled(track, enabled);
+}
+
+int midi_set_channel_enabled(void *seq, int channel, int enabled)
+{
+    MixerSeqInternal *seqi = reinterpret_cast<MixerSeqInternal*>(seq);
+    return (int)seqi->seq.setChannelEnabled(channel, enabled);
 }

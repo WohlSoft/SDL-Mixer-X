@@ -52,12 +52,14 @@ extern int midi_seq_at_end(void *seq);
 extern double midi_seq_get_tempo_multiplier(void *seq);
 extern void midi_seq_set_tempo_multiplier(void *seq, double tempo);
 extern void midi_seq_set_loop_enabled(void *seq, int loopEn);
+extern void midi_seq_set_loop_count(void *seq, int loops);
 
 extern double midi_seq_tick(void *seq, double s, double granularity);
 extern int midi_seq_play_buffer(void *seq, uint8_t *stream, int len);
 
 extern int midi_get_tracks_number(void *seq);
 extern int midi_set_track_enabled(void *seq, int track, int enabled);
+extern int midi_set_channel_enabled(void *seq, int channel, int enabled);
 
 #ifdef __cplusplus
 }
