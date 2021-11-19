@@ -1,6 +1,7 @@
 2.5.1:
 Vitaly Novichkov - 2021-10-25 06:48 +0300
  * Added new calls: Mix_ADLMIDI_getAutoArpeggio(), Mix_ADLMIDI_setAutoArpeggio(), Mix_OPNMIDI_getAutoArpeggio(), Mix_OPNMIDI_setAutoArpeggio()
+ * Fixed memory damages and crashes while playing XMI files
 
 2.5.0:
 Vitaly Novichkov - 2021-09-21 16:46
