@@ -42,6 +42,7 @@
 #include "music_flac.h"
 #include "native_midi/native_midi.h"
 #include "music_gme.h"
+#include "music_vgm.h"
 #include "music_midi_adl.h"
 #include "music_midi_opn.h"
 
@@ -581,6 +582,9 @@ static Mix_MusicInterface *s_music_interfaces[] =
 #endif
 #ifdef MUSIC_MP3_MPG123
     &Mix_MusicInterface_MPG123,
+#endif
+#ifdef MUSIC_VGM
+    &Mix_MusicInterface_VGM,
 #endif
 #ifdef MUSIC_GME
     &Mix_MusicInterface_GME,
@@ -1504,7 +1508,7 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
     if (SDL_memcmp(magic, "SNES", 4) == 0)
         return MUS_GME;
     if (SDL_memcmp(magic, "Vgm ", 4) == 0)
-        return MUS_GME;
+        return MUS_VGM;
     if (SDL_memcmp(magic, "\x1f\x8b", 2) == 0)
         return MUS_GME;
 

@@ -234,6 +234,7 @@ include(music_modplug)
 include(music_mikmod)
 include(music_xmp)
 include(music_gme)
+include(music_vgm)
 
 include(music_cmd)
 

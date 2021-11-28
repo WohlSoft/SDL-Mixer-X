@@ -1,0 +1,20 @@
+option(USE_VGM             "Build with libVGM library" ON)
+if(USE_GME AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE AND NOT SDL_MIXER_CLEAR_FOR_LGPL_LICENSE)
+    set(LIBVGM_LIB vgm-player vgm-emu vgm-utils)
+    set(VGM_LIBRARIES ${LIBVGM_LIB})
+    set(VGM_FOUND 1)
+    set(STDCPP_NEEDED 1) # Required as this is C++-based module
+    set(LIBMATH_NEEDED 1)
+
+    if(VGM_FOUND)
+        message("== using libVGM (GPLv2+) ==")
+        setLicense(LICENSE_GPL_2p)
+        list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_VGM)
+        #list(APPEND SDL_MIXER_INCLUDE_PATHS ${VGM_INCLUDE_DIRS})
+        list(APPEND SDLMixerX_LINK_LIBS ${VGM_LIBRARIES})
+        list(APPEND SDLMixerX_SOURCES
+            ${CMAKE_CURRENT_LIST_DIR}/music_vgm.cpp)
+    else()
+        message("-- skipping VGM --")
+    endif()
+endif()
