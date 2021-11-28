@@ -3469,7 +3469,7 @@ void SDLCALLCC Mix_OPNMIDI_setAutoArpeggio(int aa_en)
 #ifdef MUSIC_MID_OPNMIDI
     _Mix_OPNMIDI_setAutoArpeggio(aa_en);
 #else
-    (void)frb;
+    (void)aa_en;
 #endif
 }
 
