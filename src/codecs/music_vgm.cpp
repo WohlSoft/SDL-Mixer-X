@@ -325,8 +325,8 @@ VGM_Music *VGM_LoadSongRW(SDL_RWops *src, int freesrc, const char *args)
     SDL_RWseek(src, 0, RW_SEEK_SET);
     music->mem = (Uint8*)SDL_LoadFile_RW(src, &music->mem_size, SDL_FALSE);
 
-    //music->loader = MemoryLoader_Init(music->mem, music->mem_size);
-    music->loader = RWOpsLoader_Init(src);
+    music->loader = MemoryLoader_Init(music->mem, music->mem_size);
+//    music->loader = RWOpsLoader_Init(src);
     if (!music->loader) {
         SDL_OutOfMemory();
         VGM_delete(music);
@@ -553,6 +553,11 @@ static int VGM_SetTempo(void *music_p, double tempo)
     if (music && (tempo > 0.0)) {
         music->tempo = tempo;
         music->player->SetPlaybackSpeed(tempo);
+        PlayerBase *plrEngine = music->player->GetPlayer();
+        if (plrEngine->GetPlayerType() == FCC_VGM) {
+            VGMPlayer* vgmplay = dynamic_cast<VGMPlayer*>(plrEngine);
+            vgmplay->SetPlaybackSpeed(tempo);
+        }
         return 0;
     }
     return -1;

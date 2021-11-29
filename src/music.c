@@ -1510,7 +1510,7 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
     if (SDL_memcmp(magic, "Vgm ", 4) == 0)
         return MUS_VGM;
     if (SDL_memcmp(magic, "\x1f\x8b", 2) == 0)
-        return MUS_GME;
+        return MUS_VGM;
 
     /* Detect some module files */
     if (SDL_memcmp(magic, "Extended Module", 15) == 0)
