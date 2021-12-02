@@ -188,6 +188,7 @@ typedef enum {
     MUS_ADLMIDI = 200,
     MUS_OPNMIDI,
     MUS_FLUIDLITE,
+    MUS_EDMIDI,
     MUS_NATIVEMIDI
 } Mix_MusicType;
 
@@ -197,6 +198,7 @@ typedef enum {
     MIDI_Timidity,
     MIDI_OPNMIDI,
     MIDI_Fluidsynth,
+    MIDI_EDMIDI,
     MIDI_ANY,
     MIDI_KnownDevices   /* Count of MIDI device types */
 } Mix_MIDI_Device;

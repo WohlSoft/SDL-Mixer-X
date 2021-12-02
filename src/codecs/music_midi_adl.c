@@ -864,7 +864,7 @@ Mix_MusicInterface Mix_MusicInterface_ADLMIDI =
     NULL,   /* CreateFromFile */
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     ADLMIDI_setvolume,
-    NULL,   /* GetVolume [MIXER-X]*/
+    ADLMIDI_getvolume,
     ADLMIDI_play,
     NULL,   /* IsPlaying */
     ADLMIDI_playAudio,

@@ -44,6 +44,7 @@
 #include "music_gme.h"
 #include "music_midi_adl.h"
 #include "music_midi_opn.h"
+#include "music_midi_edmidi.h"
 
 #include "utils.h"
 
@@ -614,6 +615,9 @@ static Mix_MusicInterface *s_music_interfaces[] =
 #ifdef MUSIC_MID_FLUIDLITE
     &Mix_MusicInterface_FLUIDXMI,
 #endif
+#ifdef MUSIC_MID_EDMIDI
+    &Mix_MusicInterface_EDMIDI,
+#endif
 #ifdef MUSIC_MID_TIMIDITY
     &Mix_MusicInterface_TIMIDITY,
 #endif
@@ -1006,6 +1010,11 @@ Mix_MusicAPI get_current_midi_api(int *device)
             target_midi_api = MIX_MUSIC_FLUIDSYNTH;
             break;
         #endif
+        #ifdef MUSIC_MID_EDMIDI
+        case MIDI_EDMIDI:
+            target_midi_api = MIX_MUSIC_EDMIDI;
+            break;
+        #endif
         #ifdef MUSIC_MID_NATIVE
         case MIDI_Native:
             target_midi_api = MIX_MUSIC_NATIVEMIDI;
@@ -1192,7 +1201,7 @@ SDL_bool has_music(Mix_MusicType type)
     return SDL_FALSE;
 }
 
-#if defined(MUSIC_MID_ADLMIDI) || defined(MUSIC_MID_OPNMIDI) || defined(MUSIC_MID_NATIVE_ALT) || defined(MUSIC_MID_FLUIDLITE)
+#if defined(MUSIC_MID_ADLMIDI) || defined(MUSIC_MID_OPNMIDI) || defined(MUSIC_MID_NATIVE_ALT) || defined(MUSIC_MID_FLUIDLITE) || defined(MUSIC_MID_EDMIDI)
 #define MUSIC_HAS_XMI_SUPPORT
 #endif
 
@@ -1228,6 +1237,12 @@ static Mix_MusicType xmi_compatible_midi_player()
     }
 #endif
 
+#if defined(MUSIC_MID_EDMIDI)
+    if (mididevice_current == MIDI_EDMIDI) {
+        is_compatible |= 1;
+    }
+#endif
+
     if (is_compatible) {
         return MUS_MID;
     } else {
@@ -1237,6 +1252,8 @@ static Mix_MusicType xmi_compatible_midi_player()
         return MUS_OPNMIDI;
 #elif defined(MUSIC_MID_FLUIDLITE)
         return MUS_FLUIDLITE;
+#elif defined(MUSIC_MID_EDMIDI)
+        return MUS_EDMIDI;
 #elif defined(MUSIC_MID_NATIVE_ALT)
         return MUS_NATIVEMIDI;
 #else
@@ -3179,6 +3196,9 @@ int SDLCALLCC Mix_SetMidiPlayer(int player)
 #   endif
 #   ifdef MUSIC_MID_FLUIDSYNTH
     case MIDI_Fluidsynth:
+#   endif
+#   ifdef MUSIC_MID_EDMIDI
+    case MIDI_EDMIDI:
 #   endif
         mididevice_current = player;
         return 0;
