@@ -194,6 +194,7 @@ namespace PGE_MusicPlayer
 #   endif
                    type == MUS_ADLMIDI ? "IMF/MUS/XMI" :
                    type == MUS_OPNMIDI ? "MUS/XMI(OPN)" :
+                   type == MUS_EDMIDI ? "MUS/XMI(ED)" :
                    type == MUS_FLUIDLITE ? "MUS/XMI(Fluid)" :
                    type == MUS_NATIVEMIDI ? "MUS/XMI(Native)" :
                    type == MUS_GME ? "GME Chiptune" :
