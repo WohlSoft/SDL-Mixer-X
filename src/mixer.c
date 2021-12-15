@@ -653,14 +653,12 @@ static SDL_AudioSpec *Mix_LoadMusic_RW(SDL_RWops *src, int freesrc, SDL_AudioSpe
         fragment = (MusicFragment *)SDL_malloc(sizeof(*fragment));
         if (!fragment) {
             /* Uh oh, out of memory, let's return what we have */
-            fragment = last;
             break;
         }
         fragment->data = (Uint8 *)SDL_malloc(fragment_size);
         if (!fragment->data) {
             /* Uh oh, out of memory, let's return what we have */
             SDL_free(fragment);
-            fragment = last;
             break;
         }
         fragment->next = NULL;
@@ -693,8 +691,8 @@ static SDL_AudioSpec *Mix_LoadMusic_RW(SDL_RWops *src, int freesrc, SDL_AudioSpe
 
     Mix_UnlockAudio();
 
-    if (count > 0 && fragment) {
-        *audio_len = (count - 1) * fragment_size + fragment->size;
+    if (count > 0) {
+        *audio_len = (count - 1) * fragment_size + last->size;
         *audio_buf = (Uint8 *)SDL_malloc(*audio_len);
         if (*audio_buf) {
             Uint8 *dst = *audio_buf;
