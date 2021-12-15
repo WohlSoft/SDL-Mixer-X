@@ -48,11 +48,7 @@ typedef struct {
     ogg_int64_t (*op_pcm_total)(const OggOpusFile *, int);
 } opus_loader;
 
-static opus_loader opus = {
-    0, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL
-};
+static opus_loader opus;
 
 #ifdef OPUS_DYNAMIC
 #define FUNCTION_LOADER(FUNC, SIG) \

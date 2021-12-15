@@ -59,12 +59,7 @@ typedef struct {
     int (*xmp_channel_mute)(xmp_context, int, int);
 } xmp_loader;
 
-static xmp_loader libxmp = {
-    0, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL
-};
+static xmp_loader libxmp;
 
 #ifdef XMP_DYNAMIC
 #define FUNCTION_LOADER(FUNC, SIG) \

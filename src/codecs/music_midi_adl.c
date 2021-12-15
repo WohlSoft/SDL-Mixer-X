@@ -71,16 +71,7 @@ typedef struct {
     double (*adl_loopEndTime)(struct ADL_MIDIPlayer *device);
 } adlmidi_loader;
 
-static adlmidi_loader ADLMIDI = {
-    0, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL
-};
+static adlmidi_loader ADLMIDI;
 
 #ifdef ADLMIDI_DYNAMIC
 #define FUNCTION_LOADER(FUNC, SIG) \

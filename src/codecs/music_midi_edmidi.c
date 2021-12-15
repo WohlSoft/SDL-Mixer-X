@@ -58,13 +58,7 @@ typedef struct {
     double (*edmidi_loopEndTime)(struct EDMIDIPlayer *device);
 } edmidi_loader;
 
-static edmidi_loader EDMIDI = {
-    0, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL
-};
+static edmidi_loader EDMIDI;
 
 #ifdef EDMIDI_DYNAMIC
 #define FUNCTION_LOADER(FUNC, SIG) \

@@ -52,12 +52,7 @@ typedef struct {
     void (*gme_delete)(Music_Emu*);
 } gme_loader;
 
-static gme_loader gme = {
-    0, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL
-};
+static gme_loader gme;
 
 #ifdef GME_DYNAMIC
 #define FUNCTION_LOADER(FUNC, SIG) \

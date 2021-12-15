@@ -72,15 +72,7 @@ typedef struct {
     MODULE* cur_module;
 } mikmod_loader;
 
-static mikmod_loader mikmod = {
-    0, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL
-};
+static mikmod_loader mikmod;
 
 #ifdef MIKMOD_DYNAMIC
 #define FUNCTION_LOADER(FUNC, SIG) \

@@ -67,15 +67,7 @@ typedef struct {
     double (*opn2_loopEndTime)(struct OPN2_MIDIPlayer *device);
 } opnmidi_loader;
 
-static opnmidi_loader OPNMIDI = {
-    0, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL
-};
+static opnmidi_loader OPNMIDI;
 
 #ifdef OPNMIDI_DYNAMIC
 #define FUNCTION_LOADER(FUNC, SIG) \
