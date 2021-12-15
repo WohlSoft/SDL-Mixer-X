@@ -63,7 +63,11 @@ typedef struct {
 } fluidsynth_loader;
 
 static fluidsynth_loader fluidsynth = {
-    0, NULL
+    0, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL
 };
 
 #ifdef FLUIDSYNTH_DYNAMIC

@@ -60,7 +60,10 @@ typedef struct {
 } xmp_loader;
 
 static xmp_loader libxmp = {
-    0, NULL
+    0, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL
 };
 
 #ifdef XMP_DYNAMIC

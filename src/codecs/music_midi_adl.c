@@ -72,7 +72,14 @@ typedef struct {
 } adlmidi_loader;
 
 static adlmidi_loader ADLMIDI = {
-    0, NULL
+    0, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL
 };
 
 #ifdef ADLMIDI_DYNAMIC

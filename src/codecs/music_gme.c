@@ -53,7 +53,10 @@ typedef struct {
 } gme_loader;
 
 static gme_loader gme = {
-    0, NULL
+    0, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL
 };
 
 #ifdef GME_DYNAMIC

@@ -73,7 +73,13 @@ typedef struct {
 } mikmod_loader;
 
 static mikmod_loader mikmod = {
-    0, NULL
+    0, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL
 };
 
 #ifdef MIKMOD_DYNAMIC

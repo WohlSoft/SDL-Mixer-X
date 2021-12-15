@@ -59,7 +59,11 @@ typedef struct {
 } edmidi_loader;
 
 static edmidi_loader EDMIDI = {
-    0, NULL
+    0, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL
 };
 
 #ifdef EDMIDI_DYNAMIC
