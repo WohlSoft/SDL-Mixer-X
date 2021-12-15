@@ -47,7 +47,6 @@ typedef struct {
     int (*xmp_start_player)(xmp_context, int, int);
     void (*xmp_end_player)(xmp_context);
     void (*xmp_get_module_info)(xmp_context, struct xmp_module_info *);
-    int (*xmp_test_module_from_memory)(const void *, long, struct xmp_test_info *);
     int (*xmp_play_buffer)(xmp_context, void *, int, int);
     int (*xmp_set_position)(xmp_context, int);
     int (*xmp_seek_time)(xmp_context, int);
@@ -95,7 +94,6 @@ static int XMP_Load(void)
         FUNCTION_LOADER(xmp_start_player, int(*)(xmp_context,int,int))
         FUNCTION_LOADER(xmp_end_player, void(*)(xmp_context))
         FUNCTION_LOADER(xmp_get_module_info, void(*)(xmp_context,struct xmp_module_info*))
-        FUNCTION_LOADER(xmp_test_module_from_memory, void(*)(xmp_context,struct xmp_module_info*))
         FUNCTION_LOADER(xmp_play_buffer, int(*)(xmp_context,void*,int,int))
         FUNCTION_LOADER(xmp_set_position, int(*)(xmp_context,int))
         FUNCTION_LOADER(xmp_seek_time, int(*)(xmp_context,int))
@@ -182,8 +180,6 @@ static void libxmp_set_error(int e)
 void *XMP_CreateFromRW(SDL_RWops *src, int freesrc)
 {
     XMP_Music *music;
-    struct xmp_test_info info;
-    int info_ret;
     void *mem;
     size_t size;
     int err;
@@ -210,7 +206,6 @@ void *XMP_CreateFromRW(SDL_RWops *src, int freesrc)
     mem = SDL_LoadFile_RW(src, &size, SDL_FALSE);
     if (mem) {
         err = libxmp.xmp_load_module_from_memory(music->ctx, mem, (long)size);
-        info_ret = libxmp.xmp_test_module_from_memory(mem, (long)size, &info);
         SDL_free(mem);
         if (err < 0) {
             libxmp_set_error(err);
@@ -238,11 +233,12 @@ void *XMP_CreateFromRW(SDL_RWops *src, int freesrc)
 
     meta_tags_init(&music->tags);
 
-    if (info_ret == 0) {
-        meta_tags_set(&music->tags, MIX_META_TITLE, info.name);
+    libxmp.xmp_get_module_info(music->ctx, &music->mi);
+
+    if (music->mi.mod && music->mi.mod->name[0]) {
+        meta_tags_set(&music->tags, MIX_META_TITLE, music->mi.mod->name);
     }
 
-    libxmp.xmp_get_module_info(music->ctx, &music->mi);
     if (music->mi.comment) {
         meta_tags_set(&music->tags, MIX_META_COPYRIGHT, music->mi.comment);
     }
