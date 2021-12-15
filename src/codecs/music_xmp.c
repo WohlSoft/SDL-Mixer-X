@@ -254,6 +254,7 @@ void *XMP_CreateFromRW(SDL_RWops *src, int freesrc)
         SDL_RWclose(src);
     }
     return music;
+
 e3: libxmp.xmp_end_player(music->ctx);
 e2: libxmp.xmp_release_module(music->ctx);
 e1: libxmp.xmp_free_context(music->ctx);
