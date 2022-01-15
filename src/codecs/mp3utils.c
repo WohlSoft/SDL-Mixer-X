@@ -553,10 +553,12 @@ static SDL_bool is_apetag(const Uint8 *data, size_t length)
     if (v != APE_V2 && v != APE_V1) {
         return SDL_FALSE;
     }
+#if 0 /* Skip this check as reserved bits at some wild files are non-zero */
     v = 0; /* reserved bits : */
     if (SDL_memcmp(&data[24],&v,4) != 0 || SDL_memcmp(&data[28],&v,4) != 0) {
         return SDL_FALSE;
     }
+#endif
     return SDL_TRUE;
 }
 
