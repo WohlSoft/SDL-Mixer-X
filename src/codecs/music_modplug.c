@@ -282,6 +282,7 @@ static int MODPLUG_GetSome(void *context, void *data, int bytes, SDL_bool *done)
     }
     return 0;
 }
+
 static int MODPLUG_GetAudio(void *context, void *data, int bytes)
 {
     return music_pcm_getaudio(context, data, bytes, MIX_MAX_VOLUME, MODPLUG_GetSome);

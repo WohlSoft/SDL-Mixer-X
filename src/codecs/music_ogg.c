@@ -447,7 +447,6 @@ static int OGG_Seek(void *context, double time)
 {
     OGG_music *music = (OGG_music *)context;
     int result;
-
 #ifdef OGG_USE_TREMOR
     result = vorbis.ov_time_seek(&music->vf, (ogg_int64_t)(time * 1000.0));
 #else

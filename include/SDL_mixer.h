@@ -1232,6 +1232,7 @@ extern DECLSPEC int  SDLCALL Mix_SetMidiDevice(int player);
 #define Mix_SetError    SDL_SetError
 #define Mix_GetError    SDL_GetError
 #define Mix_ClearError  SDL_ClearError
+#define Mix_OutOfMemory SDL_OutOfMemory
 
 /* Ends C function definitions when using C++ */
 #ifdef __cplusplus

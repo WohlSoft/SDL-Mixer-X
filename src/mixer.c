@@ -701,7 +701,7 @@ static SDL_AudioSpec *Mix_LoadMusic_RW(SDL_RWops *src, int freesrc, SDL_AudioSpe
                 dst += fragment->size;
             }
         } else {
-            SDL_OutOfMemory();
+            Mix_OutOfMemory();
             spec = NULL;
         }
     } else {
@@ -733,13 +733,13 @@ Mix_Chunk * SDLCALLCC Mix_LoadWAV_RW(SDL_RWops *src, int freesrc)
 
     /* rcg06012001 Make sure src is valid */
     if (!src) {
-        SDL_SetError("Mix_LoadWAV_RW with NULL src");
+        Mix_SetError("Mix_LoadWAV_RW with NULL src");
         return(NULL);
     }
 
     /* Make sure audio has been opened */
     if (!audio_opened) {
-        SDL_SetError("Audio device hasn't been opened");
+        Mix_SetError("Audio device hasn't been opened");
         if (freesrc) {
             SDL_RWclose(src);
         }
@@ -749,7 +749,7 @@ Mix_Chunk * SDLCALLCC Mix_LoadWAV_RW(SDL_RWops *src, int freesrc)
     /* Allocate the chunk memory */
     chunk = (Mix_Chunk *)SDL_malloc(sizeof(Mix_Chunk));
     if (chunk == NULL) {
-        SDL_SetError("Out of memory");
+        Mix_OutOfMemory();
         if (freesrc) {
             SDL_RWclose(src);
         }
@@ -803,7 +803,7 @@ Mix_Chunk * SDLCALLCC Mix_LoadWAV_RW(SDL_RWops *src, int freesrc)
         wavecvt.len = chunk->alen & ~(samplesize-1);
         wavecvt.buf = (Uint8 *)SDL_calloc(1, wavecvt.len*wavecvt.len_mult);
         if (wavecvt.buf == NULL) {
-            SDL_SetError("Out of memory");
+            Mix_OutOfMemory();
             SDL_free(chunk->abuf);
             SDL_free(chunk);
             return(NULL);
@@ -836,14 +836,14 @@ Mix_Chunk * SDLCALLCC Mix_QuickLoad_WAV(Uint8 *mem)
 
     /* Make sure audio has been opened */
     if (! audio_opened) {
-        SDL_SetError("Audio device hasn't been opened");
+        Mix_SetError("Audio device hasn't been opened");
         return(NULL);
     }
 
     /* Allocate the chunk memory */
     chunk = (Mix_Chunk *)SDL_calloc(1,sizeof(Mix_Chunk));
     if (chunk == NULL) {
-        SDL_SetError("Out of memory");
+        Mix_OutOfMemory();
         return(NULL);
     }
 
@@ -870,14 +870,14 @@ Mix_Chunk * SDLCALLCC Mix_QuickLoad_RAW(Uint8 *mem, Uint32 len)
 
     /* Make sure audio has been opened */
     if (! audio_opened) {
-        SDL_SetError("Audio device hasn't been opened");
+        Mix_SetError("Audio device hasn't been opened");
         return(NULL);
     }
 
     /* Allocate the chunk memory */
     chunk = (Mix_Chunk *)SDL_malloc(sizeof(Mix_Chunk));
     if (chunk == NULL) {
-        SDL_SetError("Out of memory");
+        Mix_OutOfMemory();
         return(NULL);
     }
 
