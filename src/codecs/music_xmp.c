@@ -101,7 +101,7 @@ static int XMP_Load(void)
         FUNCTION_LOADER(xmp_stop_module, void(*)(xmp_context))
         FUNCTION_LOADER(xmp_release_module, void(*)(xmp_context))
         FUNCTION_LOADER(xmp_free_context, void(*)(xmp_context))
-#if XMP_VER_MAJOR > 4 || (XMP_VER_MAJOR == 4 && XMP_VER_MINOR >= 5)
+#ifdef XMP_HAS_TEMPO
         FUNCTION_LOADER_OPTIONAL(xmp_set_tempo_factor, int(*)(xmp_context, double))
 #endif
         FUNCTION_LOADER(xmp_channel_mute, int(*)(xmp_context, int, int))
@@ -370,7 +370,7 @@ static double XMP_Duration(void *context)
 
 static int XMP_SetTempo(void *context, double tempo)
 {
-#if XMP_VER_MAJOR > 4 || (XMP_VER_MAJOR == 4 && XMP_VER_MINOR >= 5)
+#ifdef XMP_HAS_TEMPO
     XMP_Music *music = (XMP_Music *)context;
     if (libxmp.xmp_set_tempo_factor && music && (tempo > 0.0)) {
         libxmp.xmp_set_tempo_factor(music->ctx, (1.0 / tempo));
@@ -386,7 +386,7 @@ static int XMP_SetTempo(void *context, double tempo)
 
 static double XMP_GetTempo(void *context)
 {
-#if XMP_VER_MAJOR > 4 || (XMP_VER_MAJOR == 4 && XMP_VER_MINOR >= 5)
+#ifdef XMP_HAS_TEMPO
     XMP_Music *music = (XMP_Music *)context;
     if (music) {
         return music->tempo;
