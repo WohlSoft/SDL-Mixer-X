@@ -11,12 +11,14 @@ if(USE_MIDI_EDMIDI)
             message("Dynamic libEDMIDI: ${EDMIDI_DYNAMIC_LIBRARY}")
         endif()
 
-        cpp_needed(${SDLMixerX_SOURCE_DIR}/cmake/tests/cpp_needed/edmidi.c
-            ""
-            ${EDMIDI_INCLUDE_DIRS}
-            "${EDMIDI_LIBRARIES};${M_LIBRARY}"
-            STDCPP_NEEDED
-        )
+        if(EDMIDI_FOUND)
+            cpp_needed(${SDLMixerX_SOURCE_DIR}/cmake/tests/cpp_needed/edmidi.c
+                ""
+                ${EDMIDI_INCLUDE_DIRS}
+                "${EDMIDI_LIBRARIES};${M_LIBRARY}"
+                STDCPP_NEEDED
+            )
+        endif()
 
     else()
         if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)

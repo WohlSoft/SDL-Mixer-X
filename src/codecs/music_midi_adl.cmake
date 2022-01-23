@@ -10,12 +10,14 @@ if(USE_MIDI_ADLMIDI AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE AND NOT SDL_MIXER_C
             message("Dynamic libADLMIDI: ${ADLMIDI_DYNAMIC_LIBRARY}")
         endif()
 
-        cpp_needed(${SDLMixerX_SOURCE_DIR}/cmake/tests/cpp_needed/adlmidi.c
-            ""
-            ${ADLMIDI_INCLUDE_DIRS}
-            "${ADLMIDI_LIBRARIES};${M_LIBRARY}"
-            STDCPP_NEEDED
-        )
+        if(ADLMIDI_FOUND)
+            cpp_needed(${SDLMixerX_SOURCE_DIR}/cmake/tests/cpp_needed/adlmidi.c
+                ""
+                ${ADLMIDI_INCLUDE_DIRS}
+                "${ADLMIDI_LIBRARIES};${M_LIBRARY}"
+                STDCPP_NEEDED
+            )
+        endif()
 
     else()
         if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
