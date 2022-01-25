@@ -809,7 +809,7 @@ static int ADLMIDI_SetTrackMute(void *music_p, int track, int mute)
     if (music) {
         ret = ADLMIDI.adl_setChannelEnabled(music->adlmidi, track, mute ? 0 : 1);
         if (ret < 0) {
-            Mix_SetError("ADLMIDI: %s", adl_errorInfo(music->adlmidi));
+            Mix_SetError("ADLMIDI: %s", ADLMIDI.adl_errorInfo(music->adlmidi));
         }
     }
     return ret;

@@ -702,7 +702,7 @@ static int OPNMIDI_SetTrackMute(void *music_p, int track, int mute)
     if (music) {
         ret = OPNMIDI.opn2_setChannelEnabled(music->opnmidi, track, mute ? 0 : 1);
         if (ret < 0) {
-            Mix_SetError("OPNMIDI: %s", opn2_errorInfo(music->opnmidi));
+            Mix_SetError("OPNMIDI: %s", OPNMIDI.opn2_errorInfo(music->opnmidi));
         }
     }
     return ret;

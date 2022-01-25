@@ -100,7 +100,7 @@ static int EDMIDI_Load(void)
         FUNCTION_LOADER(edmidi_setLoopEnabled, void(*)(struct EDMIDIPlayer*,int))
         FUNCTION_LOADER(edmidi_setLoopCount, void(*)(struct EDMIDIPlayer*,int))
         FUNCTION_LOADER(edmidi_playFormat, int(*)(struct EDMIDIPlayer *,int,
-                               edmidi_UInt8*,edmidi_UInt8*,const struct EDMIDI_AudioFormat*))
+                               EDMIDI_UInt8*,EDMIDI_UInt8*,const struct EDMIDI_AudioFormat*))
         FUNCTION_LOADER(edmidi_positionSeek, void(*)(struct EDMIDIPlayer*,double))
         FUNCTION_LOADER(edmidi_positionTell, double(*)(struct EDMIDIPlayer*))
         FUNCTION_LOADER(edmidi_totalTimeLength, double(*)(struct EDMIDIPlayer*))
@@ -567,7 +567,7 @@ static int EDMIDI_SetTrackMute(void *music_p, int track, int mute)
     if (music) {
         ret = EDMIDI.edmidi_setChannelEnabled(music->edmidi, track, mute ? 0 : 1);
         if (ret < 0) {
-            Mix_SetError("EDMIDI: %s", edmidi_errorInfo(music->edmidi));
+            Mix_SetError("EDMIDI: %s", EDMIDI.edmidi_errorInfo(music->edmidi));
         }
     }
     return ret;
