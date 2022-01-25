@@ -553,12 +553,10 @@ static SDL_bool is_apetag(const Uint8 *data, size_t length)
     if (v != APE_V2 && v != APE_V1) {
         return SDL_FALSE;
     }
-#if 0 /* Skip this check as reserved bits at some wild files are non-zero */
     v = 0; /* reserved bits : */
     if (SDL_memcmp(&data[24],&v,4) != 0 || SDL_memcmp(&data[28],&v,4) != 0) {
         return SDL_FALSE;
     }
-#endif
     return SDL_TRUE;
 }
 
@@ -975,7 +973,8 @@ static int probe_apetag(Mix_MusicMetaTags *out_tags, struct mp3file_t *fil, Uint
                     return TAG_INVALID;
                 }
                 if (!is_apetag(buf, APE_HEADER_SIZE)) {
-                    return TAG_INVALID;
+                    fil->length -= len;
+                    return TAG_NOT_FOUND;
                 }
                 if (!tag_handled) {
                     parse_ape(out_tags, fil, ape_tag_pos, APE_V2);
@@ -986,7 +985,8 @@ static int probe_apetag(Mix_MusicMetaTags *out_tags, struct mp3file_t *fil, Uint
                 ape_tag_pos = MP3_RWtell(fil);
                 ape_tag_valid = parse_ape(out_tags, fil, ape_tag_pos, APE_V1);
                 if (!ape_tag_valid) {
-                    return TAG_INVALID;
+                    fil->length -= len;
+                    return TAG_NOT_FOUND;
                 }
             }
             fil->length -= len;
@@ -1064,9 +1064,9 @@ int mp3_read_tags(Mix_MusicMetaTags *out_tags, struct mp3file_t *fil, SDL_bool k
         Uint32 v;
         len = get_ape_len(buf, &v);
         if (len >= fil->length) goto fail;
-        if (v != APE_V2) goto fail;
-        parse_ape(out_tags, fil, 0, v);
-        tag_handled = SDL_TRUE;
+        if (v == APE_V1 || v == APE_V2) {
+            tag_handled = parse_ape(out_tags, fil, 0, v);
+        }
         fil->start += len;
         fil->length -= len;
     }
