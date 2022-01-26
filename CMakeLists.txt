@@ -280,8 +280,9 @@ if(WIN32 AND NOT EMSCRIPTEN)
         list(REMOVE_ITEM SDLMixerX_LINK_LIBS "${LIBSDL2CUSTOM_LIB}")
         list(REMOVE_ITEM SDLMixerX_LINK_LIBS SDL2)
         list(REMOVE_ITEM SDLMixerX_LINK_LIBS SDL2d)
+        message("== VB6 binding: SDL2 name to link: ${AUDIOCODECS_SDL2_LIB_NAME}")
         list(APPEND SDLMixerX_LINK_LIBS
-                    SDL2-static
+                    ${AUDIOCODECS_SDL2_LIB_NAME}
                     uuid winmm ole32 imm32 version oleaut32 user32 gdi32 setupapi)
         if(NOT MSVC)
             list(APPEND SDLMixerX_LINK_LIBS stdc++ gcc pthread)
