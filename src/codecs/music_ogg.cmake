@@ -3,7 +3,7 @@ if(LIBOGG_NEEDED)
         find_package(OGG REQUIRED)
     else()
         if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
-            set(OGG_LIBRARIES ogg)
+            set(OGG_LIBRARIES ogg${MIX_DEBUG_SUFFIX})
         else()
             find_library(OGG_LIBRARIES NAMES ogg
                          HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
