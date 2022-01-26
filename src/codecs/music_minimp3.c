@@ -21,7 +21,7 @@
 
 #ifdef MUSIC_MP3_MINIMP3
 
-#include "music_mad.h"
+#include "music_minimp3.h"
 #include "mp3utils.h"
 
 #define MINIMP3_IMPLEMENTATION
