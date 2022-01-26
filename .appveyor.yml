@@ -172,6 +172,10 @@ environment:
       PLATFORM: Win32
       PLATFORMTOOLSET: "v142"
 
+install:
+  - appveyor DownloadFile https://github.com/yasm/yasm/releases/download/v1.3.0/yasm-1.3.0-win64.exe -FileName yasm.exe
+  - set PATH=%PATH%;%APPVEYOR_BUILD_FOLDER%
+
 build_script:
   - md build-%COMPILER%-%BUILD_TYPE%-%PLATFORM%
   - cd build-%COMPILER%-%BUILD_TYPE%-%PLATFORM%
