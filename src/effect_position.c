@@ -2186,9 +2186,9 @@ static void set_amplitudes(Uint8 *speaker_amplitude, int channels, int angle, in
     speaker_amplitude[5] = 255;
 }
 
-DECLSPEC int SDLCALL Mix_SetPosition(int channel, Sint16 angle, Uint8 distance);
+DECLSPEC int MIXCALL Mix_SetPosition(int channel, Sint16 angle, Uint8 distance);
 
-int SDLCALLCC Mix_SetPanning(int channel, Uint8 left, Uint8 right)
+int MIXCALLCC Mix_SetPanning(int channel, Uint8 left, Uint8 right)
 {
     Mix_EffectFunc_t f = NULL;
     int channels;
@@ -2253,7 +2253,7 @@ int SDLCALLCC Mix_SetPanning(int channel, Uint8 left, Uint8 right)
 }
 
 
-int SDLCALLCC Mix_SetDistance(int channel, Uint8 distance)
+int MIXCALLCC Mix_SetDistance(int channel, Uint8 distance)
 {
     Mix_EffectFunc_t f = NULL;
     Uint16 format;
@@ -2299,7 +2299,7 @@ int SDLCALLCC Mix_SetDistance(int channel, Uint8 distance)
 }
 
 
-int SDLCALLCC Mix_SetPosition(int channel, Sint16 angle, Uint8 distance)
+int MIXCALLCC Mix_SetPosition(int channel, Sint16 angle, Uint8 distance)
 {
     Uint8 speaker_amplitude[6];
     Mix_EffectFunc_t f = NULL;
@@ -2387,9 +2387,9 @@ int SDLCALLCC Mix_SetPosition(int channel, Sint16 angle, Uint8 distance)
 
 
 
-DECLSPEC int SDLCALL Mix_SetMusicEffectPosition(Mix_Music *mus, Sint16 angle, Uint8 distance);
+DECLSPEC int MIXCALL Mix_SetMusicEffectPosition(Mix_Music *mus, Sint16 angle, Uint8 distance);
 
-int SDLCALLCC Mix_SetMusicEffectPanning(Mix_Music *mus, Uint8 left, Uint8 right)
+int MIXCALLCC Mix_SetMusicEffectPanning(Mix_Music *mus, Uint8 left, Uint8 right)
 {
     Mix_MusicEffectFunc_t f = NULL;
     int channels;
@@ -2453,7 +2453,7 @@ int SDLCALLCC Mix_SetMusicEffectPanning(Mix_Music *mus, Uint8 left, Uint8 right)
     return(retval);
 }
 
-int SDLCALLCC Mix_SetMusicEffectDistance(Mix_Music *mus, Uint8 distance)
+int MIXCALLCC Mix_SetMusicEffectDistance(Mix_Music *mus, Uint8 distance)
 {
     Mix_MusicEffectFunc_t f = NULL;
     Uint16 format;
@@ -2498,7 +2498,7 @@ int SDLCALLCC Mix_SetMusicEffectDistance(Mix_Music *mus, Uint8 distance)
     return(retval);
 }
 
-int SDLCALLCC Mix_SetMusicEffectPosition(Mix_Music *mus, Sint16 angle, Uint8 distance)
+int MIXCALLCC Mix_SetMusicEffectPosition(Mix_Music *mus, Sint16 angle, Uint8 distance)
 {
     Mix_MusicEffectFunc_t f = NULL;
     Uint16 format;

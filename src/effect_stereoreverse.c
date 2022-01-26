@@ -101,7 +101,7 @@ static void SDLCALL _Eff_reversestereo8(int chan, void *stream, int len, void *u
     }
 }
 
-int SDLCALLCC Mix_SetReverseStereo(int channel, int flip)
+int MIXCALLCC Mix_SetReverseStereo(int channel, int flip)
 {
     Mix_EffectFunc_t f = NULL;
     int channels;
@@ -148,7 +148,7 @@ MUS_FUNCTION(_Eff_reversestereo32)
 #undef MUS_FUNCTION
 
 
-int SDLCALLCC Mix_SetMusicEffectReverseStereo(Mix_Music *mus, int flip)
+int MIXCALLCC Mix_SetMusicEffectReverseStereo(Mix_Music *mus, int flip)
 {
     Mix_MusicEffectFunc_t f = NULL;
     int channels;
