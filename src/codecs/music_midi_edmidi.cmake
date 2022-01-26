@@ -22,7 +22,7 @@ if(USE_MIDI_EDMIDI)
 
     else()
         if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
-            set(EDMIDI_LIBRARIES EDMIDI)
+            set(EDMIDI_LIBRARIES EDMIDI${MIX_DEBUG_SUFFIX})
         else()
             find_library(EDMIDI_LIBRARIES NAMES EDMIDI HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
         endif()

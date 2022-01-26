@@ -11,7 +11,7 @@ if(USE_OPUS)
         endif()
     else()
         if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
-            set(Opus_LIBRARIES opusfile opus)
+            set(Opus_LIBRARIES opusfile${MIX_DEBUG_SUFFIX} opus${MIX_DEBUG_SUFFIX})
         else()
             find_library(LIBOPUSFILE_LIB NAMES opusfile
                          HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")

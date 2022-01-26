@@ -54,7 +54,7 @@ if(USE_XMP AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE)
             endif()
         endif()
         if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
-            set(XMP_LIBRARIES ${xmplib})
+            set(XMP_LIBRARIES ${xmplib}${MIX_DEBUG_SUFFIX})
         else()
             find_library(XMP_LIBRARIES NAMES ${xmplib} libxmp
                          HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")

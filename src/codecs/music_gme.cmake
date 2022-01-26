@@ -30,8 +30,8 @@ if(USE_GME AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE AND NOT SDL_MIXER_CLEAR_FOR_
 
     else()
         if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
-            set(LIBGME_LIB gme)
-            set(LIBZLIB_LIB zlib)
+            set(LIBGME_LIB gme${MIX_DEBUG_SUFFIX})
+            set(LIBZLIB_LIB zlib${MIX_DEBUG_SUFFIX})
         else()
             find_library(LIBGME_LIB NAMES gme
                          HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")

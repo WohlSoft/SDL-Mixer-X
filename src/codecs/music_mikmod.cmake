@@ -11,7 +11,7 @@ if(USE_MIKMOD AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE)
         endif()
     else()
         if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
-            set(MikMod_LIBRARIES mikmod)
+            set(MikMod_LIBRARIES mikmod${MIX_DEBUG_SUFFIX})
         else()
             find_library(MikMod_LIBRARIES NAMES mikmod
                          HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")

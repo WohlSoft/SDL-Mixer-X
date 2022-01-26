@@ -11,7 +11,7 @@ if(USE_FLAC)
         endif()
     else()
         if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
-            set(FLAC_LIBRARIES FLAC)
+            set(FLAC_LIBRARIES FLAC${MIX_DEBUG_SUFFIX})
         else()
             find_library(FLAC_LIBRARIES NAMES FLAC
                          HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")

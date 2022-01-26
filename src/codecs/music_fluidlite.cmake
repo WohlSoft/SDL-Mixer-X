@@ -17,10 +17,10 @@ if(USE_MIDI_FLUIDLITE AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE)
     else()
         if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
             if(USE_OGG_VORBIS_STB AND AUDIOCODECS_BUILD_OGG_VORBIS AND NOT USE_MIDI_FLUIDLITE_OGG_STB)  # Keep the vorbis linking
-                set(FluidLite_LIBRARIES fluidlite vorbisfile vorbis)
+                set(FluidLite_LIBRARIES fluidlite${MIX_DEBUG_SUFFIX} vorbisfile${MIX_DEBUG_SUFFIX} vorbis${MIX_DEBUG_SUFFIX})
                 set(LIBOGG_NEEDED ON)
             else()
-                set(FluidLite_LIBRARIES fluidlite)
+                set(FluidLite_LIBRARIES fluidlite${MIX_DEBUG_SUFFIX})
             endif()
         else()
             find_library(FluidLite_LIBRARIES NAMES fluidlite
