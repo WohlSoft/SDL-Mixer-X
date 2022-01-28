@@ -5,10 +5,6 @@
 //#define RESAMPLED_FIR
 //#define CUBE_INTERPOLATION
 
-#ifndef RESAMPLED_FIR
-#include <SDL2/SDL_types.h>
-#include <SDL2/SDL_audio.h>
-#endif
 
 //#define WAVE_DEEP_DEBUG
 #ifdef WAVE_DEEP_DEBUG // Dirty debug
