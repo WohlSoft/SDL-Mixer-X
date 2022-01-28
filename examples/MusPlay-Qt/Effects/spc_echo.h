@@ -2,8 +2,6 @@
 #define SPC_ECHO_HHHH
 
 #include <stdint.h>
-//#include <SDL2/SDL_types.h>
-//#include <SDL2/SDL_audio.h>
 
 #ifndef AUDIO_U8
 #define AUDIO_U8        0x0008  /**< Unsigned 8-bit samples */
