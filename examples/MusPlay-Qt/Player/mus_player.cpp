@@ -4,6 +4,7 @@
 #include <QSettings>
 #include "../MainWindow/musplayer_qt.h"
 #include "../Effects/spc_echo.h"
+#include "../Effects/reverb.h"
 
 #include "../wave_writer.h"
 
@@ -19,6 +20,7 @@ namespace PGE_MusicPlayer
     bool reverbEnabled = false;
     bool echoEnabled = false;
     SpcEcho *effectEcho = nullptr;
+    FxReverb *effectReverb = nullptr;
 
     static bool g_playlistMode = false;
     static int  g_loopsCount = -1;
@@ -505,5 +507,31 @@ namespace PGE_MusicPlayer
         if(!effectEcho)
             return 0;
         return echoEffectGetReg(effectEcho, (EchoSetup)key);
+    }
+
+
+    void reverbEabled(bool enabled)
+    {
+        if(enabled && !effectReverb)
+        {
+            effectReverb = reverbEffectInit(g_sample_rate, g_sample_format, g_channels);
+            Mix_RegisterEffect(MIX_CHANNEL_POST, reverbEffect, reverbEffectDone, effectReverb);
+        }
+        else if(!enabled && effectReverb)
+        {
+            Mix_UnregisterEffect(MIX_CHANNEL_POST, reverbEffect);
+            reverbEffectFree(effectReverb);
+            effectReverb = nullptr;
+        }
+    }
+
+    void reverbEffectDone(int, void *context)
+    {
+        FxReverb *out = reinterpret_cast<FxReverb *>(context);
+        if(out == effectReverb)
+        {
+            reverbEffectFree(effectReverb);
+            effectReverb = nullptr;
+        }
     }
 }

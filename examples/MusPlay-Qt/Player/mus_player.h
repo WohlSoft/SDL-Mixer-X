@@ -155,6 +155,9 @@ namespace PGE_MusicPlayer
     extern void echoResetDefaults();
     extern void echoSetReg(int key, int val);
     extern int  echoGetReg(int key);
+
+    extern void reverbEabled(bool enabled);
+    extern void reverbEffectDone(int, void *context);
 }
 
 #endif // MUS_PLAYER_H

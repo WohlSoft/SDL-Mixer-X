@@ -1,61 +1,315 @@
 #include <vector>
 #include <deque>
 #include <cmath>
-#ifdef USE_SDL_MIXER_X
-#   include "SDL_mixer_ext.h"
-#else
-#   include "SDL_mixer.h"
-#endif
+#include <tgmath.h>
 #include "reverb.h"
+
+
+#ifndef INT8_MIN
+#define INT8_MIN    (-0x7f - 1)
+#endif
+#ifndef INT8_MAX
+#define INT8_MAX    0x7f
+#endif
+
+#ifndef UINT8_MAX
+#define UINT8_MAX   0xff
+#endif
+
+#ifndef INT16_MIN
+#define INT16_MIN   (-0x7fff - 1)
+#endif
+#ifndef INT16_MAX
+#define INT16_MAX   0x7fff
+#endif
+
+#ifndef UINT16_MAX
+#define UINT16_MAX  0xffff
+#endif
+
+#ifndef INT32_MIN
+#define INT32_MIN   (-0x7fffffff - 1)
+#endif
+
+#ifndef INT32_MAX
+#define INT32_MAX   0x7fffffff
+#endif
+
+#define MAX_CHANNELS    10
+
+
+// Float32-LE
+static float getFloatLSBSample(uint8_t* raw, int c)
+{
+    uint32_t r;
+    float f;
+    void* t;
+    raw += (c * sizeof(float));
+    r = (((uint32_t)raw[0] <<  0) & 0x000000FF) |
+        (((uint32_t)raw[1] <<  8) & 0x0000FF00) |
+        (((uint32_t)raw[2] << 16) & 0x00FF0000) |
+        (((uint32_t)raw[3] << 24) & 0xFF000000);
+    t = &r;
+    f = *(float*)t;
+    return f;
+}
+static void setFloatLSBSample(uint8_t** raw, float ov)
+{
+    void* t = &ov;
+    uint32_t r = *(uint32_t*)t;
+    *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 16) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 24) & 0xFF);
+}
+
+// Float32-BE
+static float getFloatMSBSample(uint8_t* raw, int c)
+{
+    uint32_t r;
+    float f;
+    void* t;
+    raw += (c * sizeof(float));
+    r = (((uint32_t)raw[3] <<  0) & 0x000000FF) |
+        (((uint32_t)raw[2] <<  8) & 0x0000FF00) |
+        (((uint32_t)raw[1] << 16) & 0x00FF0000) |
+        (((uint32_t)raw[0] << 24) & 0xFF000000);
+    t = &r;
+    f = *(float*)t;
+    return f;
+}
+static void setFloatMSBSample(uint8_t** raw, float ov)
+{
+    void* t = &ov;
+    uint32_t r = *(uint32_t*)t;
+    *(*raw)++ = (uint8_t)((r >> 24) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 16) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
+}
+
+// int32_t-LE
+static float getInt32LSB(uint8_t* raw, int c)
+{
+    uint32_t r;
+    int32_t f;
+    raw += (c * sizeof(int32_t));
+    r = (((uint32_t)raw[0] <<  0) & 0x000000FF) |
+        (((uint32_t)raw[1] <<  8) & 0x0000FF00) |
+        (((uint32_t)raw[2] << 16) & 0x00FF0000) |
+        (((uint32_t)raw[3] << 24) & 0xFF000000);
+    f = *(int32_t*)(&r);
+    return (float)((double)f / INT32_MAX);
+}
+static void setInt32LSB(uint8_t** raw, float ov)
+{
+    int32_t f = ((int32_t)(double(ov) * INT32_MAX));
+    uint32_t r = *(uint32_t*)(&f);
+    *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 16) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 24) & 0xFF);
+}
+
+// int32_t-BE
+static float getInt32MSB(uint8_t* raw, int c)
+{
+    uint32_t r;
+    int32_t f;
+    raw += (c * sizeof(int32_t));
+    r = (((uint32_t)raw[3] <<  0) & 0x000000FF) |
+        (((uint32_t)raw[2] <<  8) & 0x0000FF00) |
+        (((uint32_t)raw[1] << 16) & 0x00FF0000) |
+        (((uint32_t)raw[0] << 24) & 0xFF000000);
+    f = *(int32_t*)(&r);
+    return (float)((double)f / INT32_MAX);
+}
+static void setInt32MSB(uint8_t** raw, float ov)
+{
+    int32_t f = (int32_t(double(ov) * INT32_MAX));
+    uint32_t r = *(uint32_t*)(&f);
+    *(*raw)++ = (uint8_t)((r >> 24) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 16) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
+}
+
+// int16_t-LE
+static float getInt16LSB(uint8_t* raw, int c)
+{
+    uint16_t r;
+    int16_t f;
+    raw += (c * sizeof(int16_t));
+    r = (((uint16_t)raw[0] <<  0) & 0x00FF) |
+        (((uint16_t)raw[1] <<  8) & 0xFF00);
+    f = *(int16_t*)(&r);
+    return (float)f / INT16_MAX;
+}
+static void setInt16LSB(uint8_t** raw, float ov)
+{
+    int16_t f = int16_t(ov * INT16_MAX);
+    uint16_t r = *(uint16_t*)(&f);
+    *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
+}
+
+// int16_t-BE
+static float getInt16MSB(uint8_t* raw, int c)
+{
+    uint16_t r;
+    int16_t f;
+    raw += (c * sizeof(int16_t));
+    r = (((uint16_t)raw[1] <<  0) & 0x00FF) |
+        (((uint16_t)raw[0] <<  8) & 0xFF00);
+    f = *(int16_t*)(&r);
+    return (float)f / INT16_MIN;
+}
+static void setInt16MSB(uint8_t** raw, float ov)
+{
+    int16_t f = int16_t(ov * INT16_MAX);
+    uint16_t r = *(uint16_t*)(&f);
+    *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
+}
+
+// uint16_t-LE
+static float getuint16_tLSB(uint8_t* raw, int c)
+{
+    uint16_t r;
+    float f;
+    raw += (c * sizeof(uint16_t));
+    r = (((uint16_t)raw[0] <<  0) & 0x00FF) |
+        (((uint16_t)raw[1] <<  8) & 0xFF00);
+    f = ((float)r + INT16_MIN) / INT16_MAX;
+    return f;
+}
+static void setuint16_tLSB(uint8_t** raw, float ov)
+{
+    int16_t f = int16_t((ov * INT16_MAX) - INT16_MIN);
+    uint16_t r = *(uint16_t*)(&f);
+    *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
+}
+
+// uint16_t-BE
+static float getuint16_tMSB(uint8_t* raw, int c)
+{
+    uint16_t r;
+    float f;
+    raw += (c * sizeof(uint16_t));
+    r = (((uint16_t)raw[1] <<  0) & 0x00FF) |
+        (((uint16_t)raw[0] <<  8) & 0xFF00);
+    f = ((float)r + INT16_MIN) / INT16_MAX;
+    return f;
+}
+static void setuint16_tMSB(uint8_t** raw, float ov)
+{
+    int16_t f = int16_t((ov * INT16_MAX) - INT16_MIN);
+    uint16_t r = *(uint16_t*)(&f);
+    *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
+    *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
+}
+
+// int8_t
+static float getInt8(uint8_t* raw, int c)
+{
+    float f;
+    raw += (c * sizeof(int8_t));
+    f = (float)(int8_t)(*raw) / INT8_MAX;
+    return f;
+}
+static void setInt8(uint8_t** raw, float ov)
+{
+    *(*raw)++ = (uint8_t)(ov * INT8_MAX);
+}
+
+// uint8_t
+static float getuint8_t(uint8_t* raw, int c)
+{
+    float f;
+    raw += (c * sizeof(int8_t));
+    f = (float)((int) * raw + INT8_MIN) / INT8_MAX;
+    return f;
+}
+static void setuint8_t(uint8_t** raw, float ov)
+{
+    *(*raw)++ = (uint8_t)((ov * INT8_MAX) - INT8_MIN);
+}
+
 
 struct Reverb /* This reverb implementation is based on Freeverb impl. in Sox */
 {
-    float feedback, hf_damping, gain;
+    float feedback = 0.f, hf_damping = 0.f, gain = 0.f;
+
     struct FilterArray
     {
         struct Filter
         {
-            std::vector<float> Ptr;  size_t pos;  float Store;
-            void Create(size_t size) { Ptr.resize(size); pos = 0; Store = 0.f; }
+            std::vector<float> Ptr;
+            size_t pos;
+            float Store;
+
+            void Create(size_t size)
+            {
+                Ptr.resize(size);
+                pos = 0;
+                Store = 0.f;
+            }
+
             float Update(float a, float b)
             {
                 Ptr[pos] = a;
-                if(!pos) pos = Ptr.size()-1; else --pos;
+
+                if(!pos)
+                    pos = Ptr.size() - 1;
+                else
+                    --pos;
+
                 return b;
             }
+
             float ProcessComb(float input, const float feedback, const float hf_damping)
             {
                 Store = Ptr[pos] + (Store - Ptr[pos]) * hf_damping;
                 return Update(input + feedback * Store, Ptr[pos]);
             }
+
             float ProcessAllPass(float input)
             {
-                return Update(input + Ptr[pos] * .5f, Ptr[pos]-input);
+                return Update(input + Ptr[pos] * .5f, Ptr[pos] - input);
             }
+
         } comb[8], allpass[4];
 
         void Create(double rate, double scale, double offset)
         {
             /* Filter delay lengths in samples (44100Hz sample-rate) */
-            static const int comb_lengths[8] = {1116,1188,1277,1356,1422,1491,1557,1617};
-            static const int allpass_lengths[4] = {225,341,441,556};
+            static const int comb_lengths[8] = {1116, 1188, 1277, 1356, 1422, 1491, 1557, 1617};
+            static const int allpass_lengths[4] = {225, 341, 441, 556};
             double r = rate * (1 / 44100.0); // Compensate for actual sample-rate
             const int stereo_adjust = 12;
-            for(size_t i=0; i<8; ++i, offset=-offset)
-                comb[i].Create(static_cast<size_t>(scale * r * (comb_lengths[i] + stereo_adjust * offset) + .5));
-            for(size_t i=0; i<4; ++i, offset=-offset)
-                allpass[i].Create(static_cast<size_t>(r * (allpass_lengths[i] + stereo_adjust * offset) + .5));
+
+            for(size_t i = 0; i < 8; ++i, offset = -offset)
+                comb[i].Create(scale * r * (comb_lengths[i] + stereo_adjust * offset) + 0.5);
+
+            for(size_t i = 0; i < 4; ++i, offset = -offset)
+                allpass[i].Create(r * (allpass_lengths[i] + stereo_adjust * offset) + 0.5);
         }
 
         void Process(size_t length,
-            const std::deque<float>& input, std::vector<float>& output,
-            const float feedback, const float hf_damping, const float gain)
+                     const std::deque<float>& input, std::vector<float>& output,
+                     const float feedback, const float hf_damping, const float gain)
         {
-            for(size_t a=0; a<length; ++a)
+            for(size_t a = 0; a < length; ++a)
             {
                 float out = 0, in = input[a];
-                for(size_t i=8; i-- > 0; ) out += comb[i].ProcessComb(in, feedback, hf_damping);
-                for(size_t i=4; i-- > 0; ) out += allpass[i].ProcessAllPass(out);
+
+                for(size_t i = 8; i-- > 0;)
+                    out += comb[i].ProcessComb(in, feedback, hf_damping);
+
+                for(size_t i = 4; i-- > 0;)
+                    out += allpass[i].ProcessAllPass(out);
+
                 output[a] = out * gain;
             }
         }
@@ -65,20 +319,22 @@ struct Reverb /* This reverb implementation is based on Freeverb impl. in Sox */
     std::deque<float> input_fifo;
 
     void Create(double sample_rate_Hz,
-        double wet_gain_dB,
-        double room_scale, double reverberance, double fhf_damping, /* 0..1 */
-        double pre_delay_s, double stereo_depth,
-        size_t buffer_size)
+                double wet_gain_dB,
+                double room_scale, double reverberance, double fhf_damping, /* 0..1 */
+                double pre_delay_s, double stereo_depth,
+                size_t buffer_size)
     {
         size_t delay = static_cast<size_t>(pre_delay_s  * sample_rate_Hz + .5);
         double scale = room_scale * .9 + .1;
         double depth = stereo_depth;
         double a =  -1 /  std::log(1 - /**/.3 /**/);          // Set minimum feedback
         double b = 100 / (std::log(1 - /**/.98/**/) * a + 1); // Set maximum feedback
+
         feedback = static_cast<float>(1 - std::exp((reverberance * 100.0 - b) / (a * b)));
         hf_damping = static_cast<float>(fhf_damping * .3 + .2);
         gain = static_cast<float>(std::exp(wet_gain_dB * (std::log(10.0) * 0.05)) * .015);
         input_fifo.insert(input_fifo.end(), delay, 0.f);
+
         for(size_t i = 0; i <= std::ceil(depth); ++i)
         {
             chan[i].Create(sample_rate_Hz, scale, i * depth);
@@ -88,132 +344,218 @@ struct Reverb /* This reverb implementation is based on Freeverb impl. in Sox */
 
     void Process(size_t length)
     {
-        for(size_t i=0; i<2; ++i)
+        for(int i = 0; i < 2; ++i)
         {
             if(!out[i].empty())
                 chan[i].Process(length, input_fifo, out[i], feedback, hf_damping, gain);
         }
+
         input_fifo.erase(input_fifo.begin(),
                          input_fifo.begin() +
                          static_cast<std::deque<float>::iterator::difference_type>(length));
     }
 };
 
-struct MyReverbData
+struct FxReverb
 {
-    bool        wetonly;
+    bool        wetonly = false;
     unsigned    amplitude_display_counter = 0;
-    float       prev_avg_flt[2];
+    float       prev_avg_flt[MAX_CHANNELS] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    int         channels = 0;
+    int         sampleRate = 0;
+    uint16_t    format = AUDIO_F32LSB;
+    bool        isValid = false;
+    int         sample_size = 2;
 
-    Reverb chan[2];
-    MyReverbData() :
-        wetonly(false),
-        amplitude_display_counter(0),
-        prev_avg_flt{0,0}
+    Reverb      chan[MAX_CHANNELS];
+    std::vector<std::vector<float>> dry;
+
+    float (*readSample)(uint8_t* raw, int channel);
+    void (*writeSample)(uint8_t** raw, float sample);
+
+    int init(int i_rate, uint16_t i_format, int i_channels)
     {
+        isValid = false;
 
-        for(size_t i=0; i<2; ++i)
-            chan[i].Create(44100,
-                4.0,  // wet_gain_dB  (-10..10)
-                .7,   // room_scale   (0..1)
-                .8,   // reverberance (0..1)
-                .3,   // hf_damping   (0..1)
-                .000, // pre_delay_s  (0.. 0.5)
-                1,   // stereo_depth (0..1)
-                16384);
+        if(channels > MAX_CHANNELS)
+            return -1;
+
+        format = i_format;
+        sampleRate = i_rate;
+        channels = i_channels;
+
+        switch(format)
+        {
+        case AUDIO_U8:
+            readSample = getuint8_t;
+            writeSample = setuint8_t;
+            sample_size = sizeof(uint8_t);
+            break;
+
+        case AUDIO_S8:
+            readSample = getInt8;
+            writeSample = setInt8;
+            sample_size = sizeof(int8_t);
+            break;
+
+        case AUDIO_S16LSB:
+            readSample = getInt16LSB;
+            writeSample = setInt16LSB;
+            sample_size = sizeof(int16_t);
+            break;
+
+        case AUDIO_S16MSB:
+            readSample = getInt16MSB;
+            writeSample = setInt16MSB;
+            sample_size = sizeof(int16_t);
+            break;
+
+        case AUDIO_U16LSB:
+            readSample = getuint16_tLSB;
+            writeSample = setuint16_tLSB;
+            sample_size = sizeof(uint16_t);
+            break;
+
+        case AUDIO_U16MSB:
+            readSample = getuint16_tMSB;
+            writeSample = setuint16_tMSB;
+            sample_size = sizeof(uint16_t);
+            break;
+
+        case AUDIO_S32LSB:
+            readSample = getInt32LSB;
+            writeSample = setInt32LSB;
+            sample_size = sizeof(int32_t);
+            break;
+
+        case AUDIO_S32MSB:
+            readSample = getInt32MSB;
+            writeSample = setInt32MSB;
+            sample_size = sizeof(int32_t);
+            break;
+
+        case AUDIO_F32LSB:
+            readSample = getFloatLSBSample;
+            writeSample = setFloatLSBSample;
+            sample_size = sizeof(float);
+            break;
+
+        case AUDIO_F32MSB:
+            readSample = getFloatMSBSample;
+            writeSample = setFloatMSBSample;
+            sample_size = sizeof(float);
+            break;
+
+        default:
+            return -1; /* Unsupported format */
+        }
+
+        ReverbSetup set;
+        setSettings(set);
+
+        dry.resize(channels);
+
+        isValid = true;
+        return 0;
+    }
+
+    void setSettings(const ReverbSetup& setup)
+    {
+        for(int i = 0; i < channels; ++i)
+        {
+            chan[i].Create(sampleRate,
+                           setup.gain,  // wet_gain_dB  (-10..10)
+                           setup.roomScale,   // room_scale   (0..1)
+                           setup.balance,   // reverberance (0..1)
+                           setup.hfDamping,   // hf_damping   (0..1)
+                           setup.preDelayS, // pre_delay_s  (0.. 0.5)
+                           setup.stereoDepth,   // stereo_depth (0..1)
+                           16384);
+        }
+    }
+
+    void close()
+    {
+        isValid = false;
+    }
+
+    void process(uint8_t* stream, int len)
+    {
+        if(!isValid)
+            return; // Do nothing
+
+        int frames = len / (sample_size * channels);
+        uint8_t* in_stream = stream;
+        uint8_t* out_stream = stream;
+
+        for(int i = 0; i < channels; ++i)
+        {
+            if(dry[i].size() != size_t(frames))
+                dry[i].resize(frames);
+        }
+
+        for(int i = 0; i < frames; ++i)
+        {
+            for(int c = 0; c < channels; ++c)
+                dry[c][i] = readSample(in_stream, c);
+
+            in_stream += sample_size * channels;
+        }
+
+        // Store reverb buffer
+        for(int w = 0; w < channels; ++w)
+        {
+            // ^  Note: ftree-vectorize causes an error in this loop on g++-4.4.5
+            chan[w].input_fifo.insert(chan[w].input_fifo.end(), dry[w].begin(), dry[w].end());
+        }
+
+        // Reverbify it
+        for(int w = 0; w < channels; ++w)
+            chan[w].Process(static_cast<size_t>(frames));
+
+        for(int p = 0; p < frames; ++p)
+        {
+            for(int w = 0; w < channels; ++w)
+            {
+                double f = double(dry[w][size_t(p)]);
+                float  l = ((size_t)w < chan[0 + (w / 2)].out->size()) ? chan[0 + (w / 2)].out[w][size_t(p)] : 0.0f;
+                float  r = ((size_t)w < chan[1 + (w / 2)].out->size()) ? chan[1 + (w / 2)].out[w][size_t(p)] : 0.0f;
+                float out = static_cast<float>(static_cast<double>(1 - wetonly) * f + .5 * static_cast<double>(l + r))/* + average_flt[w]*/;
+                writeSample(&out_stream, out);
+            }
+        }
     }
 };
 
-static MyReverbData* reverb_data = nullptr;
 
-void reverbEffect(int, void *stream, int len, void *)
+FxReverb* reverbEffectInit(int rate, uint16_t format, int channels)
 {
-    if(!reverb_data)
-        reverb_data = new MyReverbData();
+    FxReverb* out = new FxReverb();
+    out->init(rate, format, channels);
+    return out;
+}
 
-    int count = len / 4;
-    short* samples = (short*)stream;
-    if(count % 2 == 1)
+void reverbEffectFree(FxReverb* context)
+{
+    if(context)
     {
-        // An uneven number of samples? To avoid complicating matters,
-        // just ignore the odd sample.
-        count -= 1;
-    }
-
-    if(!count)
-        return;
-
-    // Attempt to filter out the DC component. However, avoid doing
-    // sudden changes to the offset, for it can be audible.
-    double average[2] = {0, 0};
-    for(size_t w = 0; w < 2; ++w)
-    {
-        for(int p = 0; p < count; ++p)
-          average[w] += samples[static_cast<size_t>(p * 2) + w];
-    }
-
-    float *prev_avg_flt = reverb_data->prev_avg_flt;
-
-    float average_flt[2] =
-    {
-        prev_avg_flt[0] = static_cast<float>(((static_cast<double>(prev_avg_flt[0]) + average[0]) * 0.04 / double(count)) / 1.04),
-        prev_avg_flt[1] = static_cast<float>(((static_cast<double>(prev_avg_flt[1]) + average[1]) * 0.04 / double(count)) / 1.04)
-    };
-
-    if(!reverb_data->amplitude_display_counter--)
-    {
-        reverb_data->amplitude_display_counter = static_cast<unsigned>((44100 / count) / 24);
-        double amp[2]={0,0};
-        for(int w = 0; w < 2; ++w)
-        {
-            average[w] /= double(count);
-            for(int p = 0; p < count; ++p)
-                amp[w] += std::fabs(samples[p*2+w] - average[w]);
-            amp[w] /= double(count);
-            // Turn into logarithmic scale
-            const double dB = std::log(amp[w] < 1 ? 1 : amp[w]) * 4.328085123;
-            const double maxdB = 3 * 16; // = 3 * log2(65536)
-            amp[w] = dB / maxdB;
-        }
-        //UI.IllustrateVolumes(amp[0], amp[1]);
-    }
-
-    Reverb *chan = reverb_data->chan;
-
-    // Convert input to float format
-    std::vector<float> dry[2];
-    for(int w = 0; w < 2; ++w)
-    {
-        dry[w].resize(static_cast<size_t>(count));
-        float a = average_flt[w];
-        for(int p = 0; p < count; ++p)
-        {
-            int s = samples[p * 2 + w];
-            dry[w][static_cast<size_t>(p)] = static_cast<float>(static_cast<double>(s - a) * double(0.3 / 32768.0));
-        }
-        // ^  Note: ftree-vectorize causes an error in this loop on g++-4.4.5
-        chan[w].input_fifo.insert(chan[w].input_fifo.end(), dry[w].begin(), dry[w].end());
-    }
-
-    // Reverbify it
-    for(size_t w = 0; w < 2; ++w)
-        reverb_data->chan[w].Process(static_cast<size_t>(count));
-
-    for(int p = 0; p < count; ++p)
-    {
-        for(int w = 0; w < 2; ++w)
-        {
-            float out = static_cast<float>(static_cast<double>(1 - reverb_data->wetonly) * double(dry[w][size_t(p)]) +
-                         .5 * static_cast<double>(chan[0].out[w][size_t(p)] + chan[1].out[w][size_t(p)])) * 32768.0f
-                            + average_flt[w];
-            samples[p*2+w] = short(out<-32768.f ? -32768 : out>32767.f ?  32767 : out);
-        }
+        context->close();
+        delete context;
     }
 }
 
-void reverbEffectDone(int, void *)
+void reverbEffect(int, void* stream, int len, void* context)
 {
-    if(reverb_data)
-        delete reverb_data;
-    reverb_data = nullptr;
+    FxReverb* out = reinterpret_cast<FxReverb*>(context);
+
+    if(!out)
+        return; // Effect doesn't working
+
+    out->process((uint8_t*)stream, len);
+}
+
+void reverbUpdateSetup(FxReverb* context, const ReverbSetup& setup)
+{
+    if(context)
+        context->setSettings(setup);
 }

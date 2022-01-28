@@ -19,8 +19,6 @@
 #include "track_muter.h"
 #include "../Player/mus_player.h"
 #include "../AssocFiles/assoc_files.h"
-#include "../Effects/reverb.h"
-#include "../Effects/spc_echo.h"
 #include <math.h>
 #include "../version.h"
 
@@ -685,10 +683,7 @@ void MusPlayer_Qt::on_actionTracksMuter_triggered()
 void MusPlayer_Qt::on_actionEnableReverb_triggered(bool checked)
 {
     PGE_MusicPlayer::reverbEnabled = checked;
-    if(PGE_MusicPlayer::reverbEnabled)
-        Mix_RegisterEffect(MIX_CHANNEL_POST, reverbEffect, reverbEffectDone, nullptr);
-    else
-        Mix_UnregisterEffect(MIX_CHANNEL_POST, reverbEffect);
+    PGE_MusicPlayer::reverbEabled(PGE_MusicPlayer::reverbEnabled);
 }
 
 void MusPlayer_Qt::on_actionEnableEcho_triggered(bool checked)
