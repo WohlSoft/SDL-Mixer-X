@@ -42,6 +42,12 @@ public slots:
     void on_echo_fir7_sliderMoved(int arg1);
     void on_resetFir_clicked();
 
+private slots:
+    void on_pasteSetup_clicked();
+
+private slots:
+    void on_copySetup_clicked();
+
 private:
     Ui::EchoTune *ui;
 };
