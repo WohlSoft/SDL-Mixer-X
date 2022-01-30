@@ -553,6 +553,7 @@ struct FxReverb
     int         sampleRate = 0;
     uint16_t    format = AUDIO_F32LSB;
     bool        isValid = false;
+    ReverbSetup m_setup;
 
     revmodel    rev[MAX_CHANNELS / 2];
 
@@ -584,8 +585,7 @@ struct FxReverb
             c.setSampleRate(sampleRate);
         }
 
-        ReverbSetup set;
-        setSettings(set);
+        setSettings(m_setup);
 
         inBuffer.clear();
         outBuffer.clear();
@@ -595,6 +595,16 @@ struct FxReverb
 
         isValid = true;
         return 0;
+    }
+
+    void updateSetup(const ReverbSetup& setup)
+    {
+        m_setup = setup;
+    }
+
+    void getSetup(ReverbSetup& setup)
+    {
+        setup = m_setup;
     }
 
     void setSettings(const ReverbSetup& setup)
@@ -608,6 +618,66 @@ struct FxReverb
             c.setdry(setup.dryLevel);
             c.setwet(setup.wetLevel);
             c.setwidth(setup.width);
+        }
+    }
+
+    void setMode(float val)
+    {
+        m_setup.mode = val;
+        for(int i = 0; i < channels; i += 2)
+        {
+            auto &c = rev[i / 2];
+            c.setmode(val);
+        }
+    }
+
+    void setRoomSize(float val)
+    {
+        m_setup.roomSize = val;
+        for(int i = 0; i < channels; i += 2)
+        {
+            auto &c = rev[i / 2];
+            c.setroomsize(val);
+        }
+    }
+
+    void setDamping(float val)
+    {
+        m_setup.damping = val;
+        for(int i = 0; i < channels; i += 2)
+        {
+            auto &c = rev[i / 2];
+            c.setdamp(val);
+        }
+    }
+
+    void setWetLevel(float val)
+    {
+        m_setup.wetLevel = val;
+        for(int i = 0; i < channels; i += 2)
+        {
+            auto &c = rev[i / 2];
+            c.setwet(val);
+        }
+    }
+
+    void setDryLevel(float val)
+    {
+        m_setup.dryLevel = val;
+        for(int i = 0; i < channels; i += 2)
+        {
+            auto &c = rev[i / 2];
+            c.setdry(val);
+        }
+    }
+
+    void setWidth(float val)
+    {
+        m_setup.width = val;
+        for(int i = 0; i < channels; i += 2)
+        {
+            auto &c = rev[i / 2];
+            c.setwidth(val);
         }
     }
 
@@ -699,5 +769,50 @@ void reverbEffect(int, void* stream, int len, void* context)
 void reverbUpdateSetup(FxReverb* context, const ReverbSetup& setup)
 {
     if(context)
+    {
         context->setSettings(setup);
+        context->updateSetup(setup);
+    }
+}
+
+void reverbGetSetup(FxReverb *context, ReverbSetup &setup)
+{
+    if(context)
+        context->getSetup(setup);
+}
+
+void reverbUpdateMode(FxReverb *context, float mode)
+{
+    if(context)
+        context->setMode(mode);
+}
+
+void reverbUpdateRoomSize(FxReverb *context, float roomSize)
+{
+    if(context)
+        context->setRoomSize(roomSize);
+}
+
+void reverbUpdateDamping(FxReverb *context, float damping)
+{
+    if(context)
+        context->setDamping(damping);
+}
+
+void reverbUpdateWetLevel(FxReverb *context, float wet)
+{
+    if(context)
+        context->setWetLevel(wet);
+}
+
+void reverbUpdateDryLevel(FxReverb *context, float dry)
+{
+    if(context)
+        context->setDryLevel(dry);
+}
+
+void reverbUpdateWidth(FxReverb *context, float width)
+{
+    if(context)
+        context->setWidth(width);
 }

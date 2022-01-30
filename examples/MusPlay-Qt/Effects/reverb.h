@@ -45,6 +45,16 @@ extern void reverbEffectFree(FxReverb *context);
 
 extern void reverbEffect(int chan, void *stream, int len, void *context);
 
+// Update all setup at once
 extern void reverbUpdateSetup(FxReverb *context, const ReverbSetup &setup);
+extern void reverbGetSetup(FxReverb *context, ReverbSetup &setup);
+
+// Update every single setting
+extern void reverbUpdateMode(FxReverb *context, float mode);
+extern void reverbUpdateRoomSize(FxReverb *context, float roomSize);
+extern void reverbUpdateDamping(FxReverb *context, float damping);
+extern void reverbUpdateWetLevel(FxReverb *context, float wet);
+extern void reverbUpdateDryLevel(FxReverb *context, float dry);
+extern void reverbUpdateWidth(FxReverb *context, float width);
 
 #endif // REVERB_H
