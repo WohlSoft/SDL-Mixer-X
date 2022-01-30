@@ -88,6 +88,7 @@ qt5_wrap_ui(UIS_HDRS
     MainWindow/setup_midi.ui
     MainWindow/track_muter.ui
     MainWindow/echo_tune.ui
+    MainWindow/reverb_tune.ui
     AssocFiles/assoc_files.ui
 )
 
@@ -113,6 +114,7 @@ list(APPEND SDLMixer_MusPlay_SRC
     MainWindow/sfx_tester.cpp
     MainWindow/track_muter.cpp
     MainWindow/echo_tune.cpp
+    MainWindow/reverb_tune.cpp
     Player/mus_player.cpp
     SingleApplication/localserver.cpp
     SingleApplication/pge_application.cpp

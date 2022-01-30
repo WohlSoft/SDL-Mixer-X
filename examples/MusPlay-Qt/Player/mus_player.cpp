@@ -534,4 +534,84 @@ namespace PGE_MusicPlayer
             effectReverb = nullptr;
         }
     }
+
+    void reverbUpdateSetup(ReverbSetup *setup)
+    {
+        if(!effectReverb)
+            return;
+
+        SDL_LockAudio();
+        ::reverbUpdateSetup(effectReverb, *setup);
+        SDL_UnlockAudio();
+    }
+
+    void reverbGetSetup(ReverbSetup *setup)
+    {
+        if(!effectReverb)
+            return;
+
+        SDL_LockAudio();
+        ::reverbGetSetup(effectReverb, *setup);
+        SDL_UnlockAudio();
+    }
+
+    void reverbSetMode(int mode)
+    {
+        if(!effectReverb)
+            return;
+
+        SDL_LockAudio();
+        ::reverbUpdateMode(effectReverb, (float)mode);
+        SDL_UnlockAudio();
+    }
+
+    void reverbSetRoomSize(float val)
+    {
+        if(!effectReverb)
+            return;
+
+        SDL_LockAudio();
+        ::reverbUpdateRoomSize(effectReverb, val);
+        SDL_UnlockAudio();
+    }
+
+    void reverbSetDamping(float val)
+    {
+        if(!effectReverb)
+            return;
+
+        SDL_LockAudio();
+        ::reverbUpdateDamping(effectReverb, val);
+        SDL_UnlockAudio();
+    }
+
+    void reverbSetWet(float val)
+    {
+        if(!effectReverb)
+            return;
+
+        SDL_LockAudio();
+        ::reverbUpdateWetLevel(effectReverb, val);
+        SDL_UnlockAudio();
+    }
+
+    void reverbSetDry(float val)
+    {
+        if(!effectReverb)
+            return;
+
+        SDL_LockAudio();
+        ::reverbUpdateDryLevel(effectReverb, val);
+        SDL_UnlockAudio();
+    }
+
+    void reverbSetWidth(float val)
+    {
+        if(!effectReverb)
+            return;
+
+        SDL_LockAudio();
+        ::reverbUpdateWidth(effectReverb, val);
+        SDL_UnlockAudio();
+    }
 }

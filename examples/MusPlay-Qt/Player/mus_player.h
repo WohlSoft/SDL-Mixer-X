@@ -58,6 +58,7 @@ inline int Mix_FadeInChannelTimedVolume(int which, Mix_Chunk *chunk, int loops, 
 #endif
 
 struct SpcEcho;
+struct ReverbSetup;
 
 namespace PGE_MusicPlayer
 {
@@ -158,6 +159,16 @@ namespace PGE_MusicPlayer
 
     extern void reverbEabled(bool enabled);
     extern void reverbEffectDone(int, void *context);
+
+    extern void reverbUpdateSetup(ReverbSetup *setup);
+    extern void reverbGetSetup(ReverbSetup *setup);
+
+    extern void reverbSetMode(int mode);
+    extern void reverbSetRoomSize(float val);
+    extern void reverbSetDamping(float val);
+    extern void reverbSetWet(float val);
+    extern void reverbSetDry(float val);
+    extern void reverbSetWidth(float val);
 }
 
 #endif // MUS_PLAYER_H

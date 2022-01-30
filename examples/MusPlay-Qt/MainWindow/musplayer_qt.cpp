@@ -26,6 +26,7 @@
 #include "setup_midi.h"
 #include "setup_audio.h"
 #include "echo_tune.h"
+#include "reverb_tune.h"
 #include "seek_bar.h"
 
 #include "qfile_dialogs_default_options.hpp"
@@ -83,6 +84,9 @@ MusPlayer_Qt::MusPlayer_Qt(QWidget *parent) : QMainWindow(parent),
     m_echoTune = new EchoTune(this);
     m_echoTune->setModal(false);
 
+    m_reverbTune = new ReverbTune(this);
+    m_reverbTune->setModal(false);
+
     connect(m_setupMidi, &SetupMidi::songRestartNeeded, this, &MusPlayer_Qt::restartMusic);
 
     m_seekBar = new SeekBar(this);
@@ -108,6 +112,9 @@ MusPlayer_Qt::MusPlayer_Qt(QWidget *parent) : QMainWindow(parent),
     });
 
     QObject::connect(m_seekBar, &SeekBar::positionSeeked, this, &MusPlayer_Qt::musicPosition_seeked);
+
+    ui->actionTuneReverb->setEnabled(PGE_MusicPlayer::reverbEnabled);
+    ui->actionTuneEcho->setEnabled(PGE_MusicPlayer::echoEnabled);
 
     QSettings setup;
     m_seekBar->setEnabled(false);
@@ -191,6 +198,10 @@ void MusPlayer_Qt::moveEvent(QMoveEvent *event)
         m_setupMidi->move(g.x() + deltaX, g.y() + deltaY);
     }
     {
+        QRect g = m_reverbTune->frameGeometry();
+        m_reverbTune->move(g.x() + deltaX, g.y() + deltaY);
+    }
+    {
         QRect g = m_echoTune->frameGeometry();
         m_echoTune->move(g.x() + deltaX, g.y() + deltaY);
     }
@@ -218,6 +229,7 @@ void MusPlayer_Qt::contextMenu(const QPoint &pos)
     QAction *stop        = x.addAction("Stop");
     x.addSeparator();
     QAction *reverb       = x.addAction("Reverb");
+    QAction *reverbTuner  = x.addAction("Reverb tuner...");
     QAction *echo         = x.addAction("Echo");
     QAction *echoTuner    = x.addAction("Echo tuner...");
     QAction *musicFX      = x.addAction("Music FX...");
@@ -225,6 +237,7 @@ void MusPlayer_Qt::contextMenu(const QPoint &pos)
     resetTempo->setEnabled(ui->tempoFrame->isEnabled());
     reverb->setCheckable(true);
     reverb->setChecked(PGE_MusicPlayer::reverbEnabled);
+    reverbTuner->setEnabled(PGE_MusicPlayer::reverbEnabled);
     echo->setCheckable(true);
     echo->setChecked(PGE_MusicPlayer::echoEnabled);
     echoTuner->setEnabled(PGE_MusicPlayer::echoEnabled);
@@ -262,6 +275,8 @@ void MusPlayer_Qt::contextMenu(const QPoint &pos)
         ui->actionEnableEcho->setChecked(echo->isChecked());
         on_actionEnableEcho_triggered(echo->isChecked());
     }
+    else if(reverbTuner == ret)
+        on_actionTuneReverb_triggered();
     else if(echoTuner == ret)
         on_actionTuneEcho_triggered();
     else if(musicFX == ret)
@@ -631,6 +646,16 @@ void MusPlayer_Qt::on_actionAudioSetup_triggered()
     }
 }
 
+void MusPlayer_Qt::on_actionTuneReverb_triggered()
+{
+    m_reverbTune->show();
+    QRect g = this->frameGeometry();
+    m_reverbTune->move(g.right(), g.top());
+    m_reverbTune->on_reverb_reload_clicked();
+    m_reverbTune->update();
+    m_reverbTune->repaint();
+}
+
 void MusPlayer_Qt::on_actionTuneEcho_triggered()
 {
     m_echoTune->show();
@@ -684,12 +709,20 @@ void MusPlayer_Qt::on_actionEnableReverb_triggered(bool checked)
 {
     PGE_MusicPlayer::reverbEnabled = checked;
     PGE_MusicPlayer::reverbEabled(PGE_MusicPlayer::reverbEnabled);
+    ui->actionTuneReverb->setEnabled(PGE_MusicPlayer::reverbEnabled);
+
+    if(PGE_MusicPlayer::reverbEnabled)
+    {
+        m_reverbTune->loadSetup();
+        m_reverbTune->sendAll();
+    }
 }
 
 void MusPlayer_Qt::on_actionEnableEcho_triggered(bool checked)
 {
     PGE_MusicPlayer::echoEnabled = checked;
     PGE_MusicPlayer::echoEabled(PGE_MusicPlayer::echoEnabled);
+    ui->actionTuneEcho->setEnabled(PGE_MusicPlayer::echoEnabled);
 
     if(PGE_MusicPlayer::echoEnabled)
     {

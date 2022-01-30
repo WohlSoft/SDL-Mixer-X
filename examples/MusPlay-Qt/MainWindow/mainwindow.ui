@@ -237,7 +237,6 @@ border-bottom-color: rgb(0, 120, 0);
      <widget class="QLabel" name="label">
       <property name="font">
        <font>
-        <weight>75</weight>
         <bold>true</bold>
        </font>
       </property>
@@ -549,6 +548,7 @@ border-bottom-color: rgb(0, 120, 0);
     <addaction name="actionFileAssoc"/>
     <addaction name="separator"/>
     <addaction name="actionEnableReverb"/>
+    <addaction name="actionTuneReverb"/>
     <addaction name="actionEnableEcho"/>
     <addaction name="actionTuneEcho"/>
     <addaction name="separator"/>
@@ -692,6 +692,11 @@ border-bottom-color: rgb(0, 120, 0);
     <string>Pause the audio stream</string>
    </property>
   </action>
+  <action name="actionTuneReverb">
+   <property name="text">
+    <string>Tune reverb...</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -702,7 +707,6 @@ border-bottom-color: rgb(0, 120, 0);
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../_resources/musicplayer.qrc"/>
   <include location="../_resources/musicplayer.qrc"/>
  </resources>
  <connections/>
