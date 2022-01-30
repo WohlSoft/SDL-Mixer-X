@@ -1,35 +1,43 @@
+/*
+ * Simple Reverb sound effect
+ *
+ * Copyright (c) 2022-2022 Vitaly Novichkov <admin@wohlnet.ru>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ */
+
 #ifndef REVERB_H
 #define REVERB_H
 
 #include <stdint.h>
-
-#ifndef AUDIO_U8 /* Copied from SDL2 heads */
-#define AUDIO_U8        0x0008  /**< Unsigned 8-bit samples */
-#define AUDIO_S8        0x8008  /**< Signed 8-bit samples */
-#define AUDIO_U16LSB    0x0010  /**< Unsigned 16-bit samples */
-#define AUDIO_S16LSB    0x8010  /**< Signed 16-bit samples */
-#define AUDIO_U16MSB    0x1010  /**< As above, but big-endian byte order */
-#define AUDIO_S16MSB    0x9010  /**< As above, but big-endian byte order */
-#define AUDIO_U16       AUDIO_U16LSB
-#define AUDIO_S16       AUDIO_S16LSB
-#define AUDIO_S32LSB    0x8020  /**< 32-bit integer samples */
-#define AUDIO_S32MSB    0x9020  /**< As above, but big-endian byte order */
-#define AUDIO_S32       AUDIO_S32LSB
-#define AUDIO_F32LSB    0x8120  /**< 32-bit floating point samples */
-#define AUDIO_F32MSB    0x9120  /**< As above, but big-endian byte order */
-#define AUDIO_F32       AUDIO_F32LSB
-#endif
+#include "fx_format.h"
 
 struct FxReverb;
 
 struct ReverbSetup
 {
-    double gain         = 6.0;
-    double roomScale    = 0.7;
-    double balance      = 0.6;
-    double hfDamping    = 0.8;
-    double preDelayS    = 0.0;
-    double stereoDepth  = 1.0;
+    float mode         = 0.0f; // Normal (0) or Freeze (>0.5)
+    float roomSize     = 0.7f;
+    float damping      = 0.5f; // 0.0...1.0
+    float wetLevel     = 0.2f;
+    float dryLevel     = 0.4f;
+    float width        = 1.0f; // 0.0...1.0
 };
 
 extern FxReverb *reverbEffectInit(int rate, uint16_t format, int channels);
