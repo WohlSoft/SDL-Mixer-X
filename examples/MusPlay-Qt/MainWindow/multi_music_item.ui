@@ -128,7 +128,7 @@
     </spacer>
    </item>
    <item row="0" column="10">
-    <widget class="QPushButton" name="closeMusic">
+    <widget class="QPushButton" name="closeSfx">
      <property name="enabled">
       <bool>true</bool>
      </property>
@@ -204,7 +204,6 @@
   </layout>
  </widget>
  <resources>
-  <include location="../_resources/musicplayer.qrc"/>
   <include location="../_resources/musicplayer.qrc"/>
  </resources>
  <connections/>

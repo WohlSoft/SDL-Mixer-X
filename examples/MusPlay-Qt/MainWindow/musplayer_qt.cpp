@@ -15,6 +15,7 @@
 #include "ui_mainwindow.h"
 #include "musplayer_qt.h"
 #include "multi_music_test.h"
+#include "multi_sfx_test.h"
 #include "musicfx.h"
 #include "track_muter.h"
 #include "../Player/mus_player.h"
@@ -71,6 +72,9 @@ MusPlayer_Qt::MusPlayer_Qt(QWidget *parent) : QMainWindow(parent),
 
     m_multiMusicTest = new MultiMusicTest(this);
     m_multiMusicTest->setModal(false);
+
+    m_multiSfxTest = new MultiSfxTester(this);
+    m_multiSfxTest->setModal(false);
 
     m_musicFx = new MusicFX(this);
     m_musicFx->setModal(false);
@@ -685,6 +689,15 @@ void MusPlayer_Qt::on_actionMultiMusicTesting_triggered()
     m_multiMusicTest->move(g.left(), g.bottom());
     m_multiMusicTest->update();
     m_multiMusicTest->repaint();
+}
+
+void MusPlayer_Qt::on_actionMultiSFXTesting_triggered()
+{
+    m_multiSfxTest->show();
+    QRect g = this->frameGeometry();
+    m_multiSfxTest->move(g.left(), g.bottom());
+    m_multiSfxTest->update();
+    m_multiSfxTest->repaint();
 }
 
 void MusPlayer_Qt::on_actionMusicFX_triggered()

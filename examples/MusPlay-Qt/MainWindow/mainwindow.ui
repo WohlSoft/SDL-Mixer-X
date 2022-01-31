@@ -542,6 +542,7 @@ border-bottom-color: rgb(0, 120, 0);
     <addaction name="actionAudioSetup"/>
     <addaction name="actionMidiSetup"/>
     <addaction name="actionMultiMusicTesting"/>
+    <addaction name="actionMultiSFXTesting"/>
     <addaction name="actionSfxTesting"/>
     <addaction name="actionMusicFX"/>
     <addaction name="actionTracksMuter"/>
@@ -554,6 +555,7 @@ border-bottom-color: rgb(0, 120, 0);
     <addaction name="separator"/>
     <addaction name="menuMusicLooping"/>
     <addaction name="actionPause_the_audio_stream"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -695,6 +697,11 @@ border-bottom-color: rgb(0, 120, 0);
   <action name="actionTuneReverb">
    <property name="text">
     <string>Tune reverb...</string>
+   </property>
+  </action>
+  <action name="actionMultiSFXTesting">
+   <property name="text">
+    <string>Multi-SFX testing</string>
    </property>
   </action>
  </widget>

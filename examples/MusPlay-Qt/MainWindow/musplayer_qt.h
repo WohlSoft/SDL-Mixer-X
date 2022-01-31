@@ -16,6 +16,7 @@ class SetupMidi;
 class EchoTune;
 class ReverbTune;
 class MultiMusicTest;
+class MultiSfxTester;
 class MusicFX;
 class TrackMuter;
 
@@ -96,6 +97,7 @@ private slots:
     void on_actionMidiSetup_triggered();
     void on_actionSfxTesting_triggered();
     void on_actionMultiMusicTesting_triggered();
+    void on_actionMultiSFXTesting_triggered();
     void on_actionMusicFX_triggered();
     void on_actionTracksMuter_triggered();
     void on_actionEnableReverb_triggered(bool checked);
@@ -127,6 +129,7 @@ private:
     EchoTune  *m_echoTune = nullptr;
     ReverbTune  *m_reverbTune = nullptr;
     MultiMusicTest *m_multiMusicTest = nullptr;
+    MultiSfxTester *m_multiSfxTest = nullptr;
     MusicFX *m_musicFx = nullptr;
     TrackMuter *m_trackMuter = nullptr;
 };
