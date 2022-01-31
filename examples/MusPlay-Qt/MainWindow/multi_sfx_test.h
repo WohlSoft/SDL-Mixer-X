@@ -24,7 +24,7 @@ public:
     explicit MultiSfxTester(QWidget* parent = nullptr);
     ~MultiSfxTester();
 
-    void openSfxByArg(QString musPath);
+    MultiSfxItem *openSfxByArg(QString musPath);
     void reloadAll();
 
 protected:
@@ -50,7 +50,11 @@ private slots:
 
     void wannaClose(MultiSfxItem* item);
 
+    void on_saveList_clicked();
+    void on_loadList_clicked();
+
 private:
+    void closeAll();
     static void sfxFinished(int numChannel);
     Ui::MultiSfxTester* ui;
 };

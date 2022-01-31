@@ -19,6 +19,41 @@ MultiSfxItem::~MultiSfxItem()
     delete ui;
 }
 
+QString MultiSfxItem::path() const
+{
+    return m_sfxPath;
+}
+
+int MultiSfxItem::channel() const
+{
+    return ui->playChannel->value();
+}
+
+void MultiSfxItem::setChannel(int c)
+{
+    ui->playChannel->setValue(c);
+}
+
+int MultiSfxItem::fadeDelay() const
+{
+    return ui->fadeLen->value();
+}
+
+void MultiSfxItem::setFadeDelay(int f)
+{
+    ui->fadeLen->setValue(f);
+}
+
+int MultiSfxItem::initVolume() const
+{
+    return ui->initialVolume->value();
+}
+
+void MultiSfxItem::setInitVolume(int v)
+{
+    ui->initialVolume->setValue(v);
+}
+
 void MultiSfxItem::on_closeSfx_clicked()
 {
     closeSfx();

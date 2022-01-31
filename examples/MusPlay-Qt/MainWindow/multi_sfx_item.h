@@ -28,6 +28,17 @@ public:
     explicit MultiSfxItem(QString sfx, QWidget *parent = nullptr);
     ~MultiSfxItem();
 
+    QString path() const;
+
+    int channel() const;
+    void setChannel(int c);
+
+    int fadeDelay() const;
+    void setFadeDelay(int f);
+
+    int initVolume() const;
+    void setInitVolume(int v);
+
 signals:
     void wannaClose(MultiSfxItem *self);
 

@@ -3,6 +3,8 @@
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QMimeData>
+#include <QSettings>
+#include <QMessageBox>
 
 #include "multi_sfx_test.h"
 #include "multi_sfx_item.h"
@@ -35,7 +37,7 @@ MultiSfxTester::~MultiSfxTester()
     m_testerSelf = nullptr;
 }
 
-void MultiSfxTester::openSfxByArg(QString musPath)
+MultiSfxItem *MultiSfxTester::openSfxByArg(QString musPath)
 {
     auto* it = new MultiSfxItem(musPath, this);
     m_items.push_back(it);
@@ -45,6 +47,7 @@ void MultiSfxTester::openSfxByArg(QString musPath)
                      &MultiSfxTester::wannaClose);
     auto* l = qobject_cast<QVBoxLayout*>(ui->sfxList->widget()->layout());
     l->insertWidget(l->count() - 1, it);
+    return it;
 }
 
 void MultiSfxTester::reloadAll()
@@ -68,17 +71,11 @@ void MultiSfxTester::changeEvent(QEvent* e)
     }
 }
 
-void MultiSfxTester::closeEvent(QCloseEvent* e)
+void MultiSfxTester::closeEvent(QCloseEvent*)
 {
-    for(auto* it : m_items)
-    {
-        auto* l = qobject_cast<QVBoxLayout*>(ui->sfxList->widget()->layout());
-        l->removeWidget(it);
-        it->on_stop_clicked();
-        it->deleteLater();
-    }
-
-    m_items.clear();
+    closeAll();
+    ui->randomPlaying->setChecked(false);
+    on_randomPlaying_clicked(false);
 }
 
 void MultiSfxTester::dropEvent(QDropEvent* e)
@@ -155,6 +152,85 @@ void MultiSfxTester::wannaClose(MultiSfxItem* item)
     m_items.removeAll(item);
     item->on_stop_clicked();
     item->deleteLater();
+}
+
+void MultiSfxTester::on_saveList_clicked()
+{
+    int ret = QMessageBox::question(this,
+                                    tr("Save list?"),
+                                    tr("You are trying to save the SFX list for future use. "
+                                       "If you saved the SFX list previously, it will be overriden. Do you want to save the SFX list?"),
+                                    QMessageBox::Yes|QMessageBox::No);
+
+    if(ret != QMessageBox::Yes)
+        return;
+
+    QSettings setup;
+    setup.beginGroup("sfx-test-list");
+    setup.beginWriteArray("sfx", m_items.size());
+
+    int i = 0;
+    for(auto* it : m_items)
+    {
+        setup.setArrayIndex(i++);
+        setup.setValue("path", it->path());
+        setup.setValue("channel", it->channel());
+        setup.setValue("fade-delay", it->fadeDelay());
+        setup.setValue("init-volume", it->initVolume());
+    }
+
+    setup.endArray();
+    setup.endGroup();
+    setup.sync();
+    QMessageBox::information(this,
+                             tr("SFX list has been saved"),
+                             tr("The SFX list has been saved (%1 entries)").arg(m_items.size()),
+                             QMessageBox::Ok);
+}
+
+void MultiSfxTester::on_loadList_clicked()
+{
+    closeAll();
+
+    QSettings setup;
+    setup.beginGroup("sfx-test-list");
+    int size = setup.beginReadArray("sfx");
+
+    for(int i = 0; i < size; ++i)
+    {
+        setup.setArrayIndex(i);
+        auto val = setup.value("path").toString();
+        auto ch = setup.value("channel", -1).toInt();
+        auto fade = setup.value("fade-delay", 1000).toInt();
+        auto ivol = setup.value("init-volume", 128).toInt();
+
+        if(val.isEmpty())
+            continue;
+
+        auto *m = openSfxByArg(val);
+        if(m)
+        {
+            m->setChannel(ch);
+            m->setFadeDelay(fade);
+            m->setInitVolume(ivol);
+        }
+    }
+
+    setup.endArray();
+    setup.endGroup();
+}
+
+void MultiSfxTester::closeAll()
+{
+    for(auto* it : m_items)
+    {
+        auto* l = qobject_cast<QVBoxLayout*>(ui->sfxList->widget()->layout());
+        l->removeWidget(it);
+        it->on_stop_clicked();
+        it->deleteLater();
+    }
+
+    m_items.clear();
 }
 
 void MultiSfxTester::sfxFinished(int numChannel)
