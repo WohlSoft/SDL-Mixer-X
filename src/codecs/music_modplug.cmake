@@ -32,7 +32,7 @@ if(USE_MODPLUG)
 
     else()
         if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
-            set(ModPlug_LIBRARIES modplug)
+            set(ModPlug_LIBRARIES modplug${MIX_DEBUG_SUFFIX})
         else()
             find_library(ModPlug_LIBRARIES NAMES modplug
                          HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")

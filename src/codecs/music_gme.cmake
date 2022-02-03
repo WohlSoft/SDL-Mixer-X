@@ -10,25 +10,28 @@ if(USE_GME AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE AND NOT SDL_MIXER_CLEAR_FOR_
             message("Dynamic GME: ${GME_DYNAMIC_LIBRARY}")
         endif()
 
-        cpp_needed(${SDLMixerX_SOURCE_DIR}/cmake/tests/cpp_needed/gme.c
-            ""
-            ${GME_INCLUDE_DIRS}
-            "${GME_LIBRARIES};${M_LIBRARY}"
-            STDCPP_NEEDED
-        )
+        if(GME_FOUND)
+            cpp_needed(${SDLMixerX_SOURCE_DIR}/cmake/tests/cpp_needed/gme.c
+                ""
+                ${GME_INCLUDE_DIRS}
+                "${GME_LIBRARIES};${M_LIBRARY}"
+                STDCPP_NEEDED
+            )
 
-        try_compile(GME_HAS_SET_AUTOLOAD_PLAYBACK_LIMIT
-            ${CMAKE_BINARY_DIR}/compile_tests
-            ${SDLMixerX_SOURCE_DIR}/cmake/tests/gme_has_gme_set_autoload_playback_limit.c
-            LINK_LIBRARIES ${GME_LIBRARIES} ${STDCPP_LIBRARY} ${M_LIBRARY}
-            CMAKE_FLAGS "-DINCLUDE_DIRECTORIES=${GME_INCLUDE_DIRS}"
-            OUTPUT_VARIABLE GME_TEST_RESULT
-        )
-        message("gme_set_autoload_playback_limit() compile test result: ${GME_HAS_SET_AUTOLOAD_PLAYBACK_LIMIT}")
+            try_compile(GME_HAS_SET_AUTOLOAD_PLAYBACK_LIMIT
+                ${CMAKE_BINARY_DIR}/compile_tests
+                ${SDLMixerX_SOURCE_DIR}/cmake/tests/gme_has_gme_set_autoload_playback_limit.c
+                LINK_LIBRARIES ${GME_LIBRARIES} ${STDCPP_LIBRARY} ${M_LIBRARY}
+                CMAKE_FLAGS "-DINCLUDE_DIRECTORIES=${GME_INCLUDE_DIRS}"
+                OUTPUT_VARIABLE GME_TEST_RESULT
+            )
+            message("gme_set_autoload_playback_limit() compile test result: ${GME_HAS_SET_AUTOLOAD_PLAYBACK_LIMIT}")
+        endif()
+
     else()
         if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
-            set(LIBGME_LIB gme)
-            set(LIBZLIB_LIB zlib)
+            set(LIBGME_LIB gme${MIX_DEBUG_SUFFIX})
+            set(LIBZLIB_LIB zlib${MIX_DEBUG_SUFFIX})
         else()
             find_library(LIBGME_LIB NAMES gme
                          HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")

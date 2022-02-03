@@ -71,9 +71,7 @@ typedef struct {
     double (*adl_loopEndTime)(struct ADL_MIDIPlayer *device);
 } adlmidi_loader;
 
-static adlmidi_loader ADLMIDI = {
-    0, NULL
-};
+static adlmidi_loader ADLMIDI;
 
 #ifdef ADLMIDI_DYNAMIC
 #define FUNCTION_LOADER(FUNC, SIG) \
@@ -811,7 +809,7 @@ static int ADLMIDI_SetTrackMute(void *music_p, int track, int mute)
     if (music) {
         ret = ADLMIDI.adl_setChannelEnabled(music->adlmidi, track, mute ? 0 : 1);
         if (ret < 0) {
-            Mix_SetError("ADLMIDI: %s", adl_errorInfo(music->adlmidi));
+            Mix_SetError("ADLMIDI: %s", ADLMIDI.adl_errorInfo(music->adlmidi));
         }
     }
     return ret;
@@ -864,7 +862,7 @@ Mix_MusicInterface Mix_MusicInterface_ADLMIDI =
     NULL,   /* CreateFromFile */
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     ADLMIDI_setvolume,
-    NULL,   /* GetVolume [MIXER-X]*/
+    ADLMIDI_getvolume,
     ADLMIDI_play,
     NULL,   /* IsPlaying */
     ADLMIDI_playAudio,

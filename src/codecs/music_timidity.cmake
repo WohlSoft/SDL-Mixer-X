@@ -3,7 +3,7 @@ if(USE_MIDI_TIMIDITY)
     message("== using Timidity-SDL (Artistic Public License) ==")
 
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
-        set(TIMIDITYSDL_LIBRARIES timidity_sdl2)
+        set(TIMIDITYSDL_LIBRARIES timidity_sdl2${MIX_DEBUG_SUFFIX})
         set(TIMIDITYSDL_FOUND True)
     elseif(NOT USE_SYSTEM_AUDIO_LIBRARIES)
         find_library(TIMIDITYSDL_LIBRARIES NAMES timidity_sdl2

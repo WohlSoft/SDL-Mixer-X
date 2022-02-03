@@ -62,9 +62,7 @@ typedef struct {
     fluid_synth_t* (*new_fluid_synth)(fluid_settings_t*);
 } fluidsynth_loader;
 
-static fluidsynth_loader fluidsynth = {
-    0, NULL
-};
+static fluidsynth_loader fluidsynth;
 
 #ifdef FLUIDSYNTH_DYNAMIC
 #define FUNCTION_LOADER(FUNC, SIG) \
@@ -136,7 +134,6 @@ typedef struct {
     SDL_AudioStream *stream;
     void *buffer;
     int buffer_size;
-    int sample_size;
     int volume;
 } FLUIDSYNTH_Music;
 
@@ -190,8 +187,6 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusic(void *data)
 
     music->volume = MIX_MAX_VOLUME;
     music->buffer_size = music_spec.samples * sizeof(Sint16) * channels;
-
-    src_format = AUDIO_S16SYS;
     music->synth_write = fluidsynth.fluid_synth_write_s16;
     if (music_spec.format & 0x0020) { /* 32 bit. */
         src_format = AUDIO_F32SYS;

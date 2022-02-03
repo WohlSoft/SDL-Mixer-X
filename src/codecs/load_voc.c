@@ -291,7 +291,6 @@ static int voc_get_block(SDL_RWops *src, vs_t *v, SDL_AudioSpec *spec)
                     spec->channels = 2;  /* Stereo */
                 /* VOC_EXTENDED may be read before spec->channels inited: */
                 else spec->channels = 1;
-
                 /* Needed number of channels before finishing
                    compute for rate */
                 spec->freq = (256000000L/(65536L - v->rate))/spec->channels;

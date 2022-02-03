@@ -8,6 +8,8 @@
 #include "multi_music_item.h"
 #include "ui_multi_music_test.h"
 
+#include "qfile_dialogs_default_options.hpp"
+
 
 MultiMusicTest::MultiMusicTest(QWidget *parent) :
     QDialog(parent),
@@ -82,7 +84,8 @@ void MultiMusicTest::on_open_clicked()
                                                 (m_lastMusic.isEmpty() ?
                                                 QApplication::applicationDirPath() :
                                                 m_lastMusic),
-                                                "All (*.*)");
+                                                "All (*.*)", nullptr,
+                                                c_fileDialogOptions);
 
     if(file.isEmpty())
         return;
@@ -104,9 +107,7 @@ void MultiMusicTest::wannaClose(MultiMusicItem *item)
 void MultiMusicTest::on_playAll_clicked()
 {
     for(auto *it : m_items)
-    {
         it->on_playpause_clicked();
-    }
 }
 
 

@@ -10,6 +10,8 @@
 #include <QDropEvent>
 #include <QMimeData>
 
+#include "qfile_dialogs_default_options.hpp"
+
 #include "../Player/mus_player.h"
 
 SfxTester::SfxTester(QWidget *parent) :
@@ -28,6 +30,12 @@ SfxTester::SfxTester(QWidget *parent) :
 SfxTester::~SfxTester()
 {
     delete ui;
+}
+
+void SfxTester::reloadSfx()
+{
+    if(!m_recentSfxFile.isEmpty())
+        openSfx(m_recentSfxFile);
 }
 
 void SfxTester::dropEvent(QDropEvent *e)
@@ -78,13 +86,17 @@ void SfxTester::closeEvent(QCloseEvent *)
 
     QSettings setup;
     setup.setValue("RecentSfxDir", m_testSfxDir);
+    setup.setValue("RecentSfxFile", m_recentSfxFile);
     setup.sync();
+
+    m_recentSfxFile.clear();
 }
 
 void SfxTester::on_sfx_open_clicked()
 {
     QString file = QFileDialog::getOpenFileName(this, tr("Open SFX file"),
-                   (m_testSfxDir.isEmpty() ? QApplication::applicationDirPath() : m_testSfxDir), "All (*.*)");
+                   (m_testSfxDir.isEmpty() ? QApplication::applicationDirPath() : m_testSfxDir),
+                   "All (*.*)", nullptr, c_fileDialogOptions);
 
     if(file.isEmpty())
         return;
@@ -108,6 +120,7 @@ void SfxTester::openSfx(const QString &path)
         QFileInfo f(path);
         m_testSfxDir = f.absoluteDir().absolutePath();
         ui->sfx_file->setText(f.fileName());
+        m_recentSfxFile = path;
     }
 }
 

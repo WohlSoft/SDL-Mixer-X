@@ -10,16 +10,18 @@ if(USE_MIDI_OPNMIDI AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE AND NOT SDL_MIXER_C
             message("Dynamic libOPNMIDI: ${OPNMIDI_DYNAMIC_LIBRARY}")
         endif()
 
-        cpp_needed(${SDLMixerX_SOURCE_DIR}/cmake/tests/cpp_needed/opnmidi.c
-            ""
-            ${OPNMIDI_INCLUDE_DIRS}
-            "${OPNMIDI_LIBRARIES};${M_LIBRARY}"
-            STDCPP_NEEDED
-        )
+        if(OPNMIDI_FOUND)
+            cpp_needed(${SDLMixerX_SOURCE_DIR}/cmake/tests/cpp_needed/opnmidi.c
+                ""
+                ${OPNMIDI_INCLUDE_DIRS}
+                "${OPNMIDI_LIBRARIES};${M_LIBRARY}"
+                STDCPP_NEEDED
+            )
+        endif()
 
     else()
         if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
-            set(OPNMIDI_LIBRARIES OPNMIDI)
+            set(OPNMIDI_LIBRARIES OPNMIDI${MIX_DEBUG_SUFFIX})
         else()
             find_library(OPNMIDI_LIBRARIES NAMES OPNMIDI HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
         endif()

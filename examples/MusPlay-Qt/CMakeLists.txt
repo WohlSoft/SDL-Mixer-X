@@ -78,54 +78,13 @@ add_definitions(${Qt5Widgets_DEFINITIONS} ${Qt5Network_DEFINITIONS})
 # without -fPIE. We add that here.
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS} ${Qt5Network_EXECUTABLE_COMPILE_FLAGS}")
 
-qt5_wrap_ui(UIS_HDRS
-    MainWindow/mainwindow.ui
-    MainWindow/multi_music_test.ui
-    MainWindow/multi_music_item.ui
-    MainWindow/musicfx.ui
-    MainWindow/sfx_tester.ui
-    MainWindow/setup_audio.ui
-    MainWindow/setup_midi.ui
-    MainWindow/track_muter.ui
-    MainWindow/echo_tune.ui
-    AssocFiles/assoc_files.ui
-)
-
-set(RESOURCE ${SDLMixerMusPlayer_SOURCE_DIR}/_resources/musicplayer.qrc)
-qt5_add_resources(RESOURCE_ADDED ${RESOURCE})
-
 set(SDLMixer_MusPlay_SRC)
+include(sources.cmake)
 
 list(APPEND SDLMixer_MusPlay_SRC
-    AssocFiles/assoc_files.cpp
-    Effects/reverb.cpp
-    Effects/spc_echo.cpp
-    MainWindow/flowlayout.cpp
-    MainWindow/label_marquee.cpp
-    MainWindow/multi_music_test.cpp
-    MainWindow/multi_music_item.cpp
-    MainWindow/musplayer_base.cpp
-    MainWindow/musplayer_qt.cpp
-    MainWindow/musicfx.cpp
-    MainWindow/seek_bar.cpp
-    MainWindow/setup_audio.cpp
-    MainWindow/setup_midi.cpp
-    MainWindow/sfx_tester.cpp
-    MainWindow/track_muter.cpp
-    MainWindow/echo_tune.cpp
-    Player/mus_player.cpp
-    SingleApplication/localserver.cpp
-    SingleApplication/pge_application.cpp
-    SingleApplication/singleapplication.cpp
-    main.cpp
-    wave_writer.c
     ${UIS_HDRS}
     ${RESOURCE_ADDED}
 )
-
-if(WIN32)
-    list(APPEND SDLMixer_MusPlay_SRC _resources/musicplayer.rc)
-endif()
 
 add_executable(sdlmixer_musplay
     ${SDLMixer_MusPlay_SRC}

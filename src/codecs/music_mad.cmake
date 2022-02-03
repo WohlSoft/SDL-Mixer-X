@@ -7,7 +7,7 @@ if(USE_MP3_MAD AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE AND NOT SDL_MIXER_CLEAR_
         message("MAD: [${MAD_FOUND}] ${MAD_INCLUDE_DIRS} ${MAD_LIBRARIES}")
     else()
         if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
-            set(MAD_LIBRARIES mad)
+            set(MAD_LIBRARIES mad${MIX_DEBUG_SUFFIX})
         else()
             find_library(MAD_LIBRARIES NAMES mad
                          HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")

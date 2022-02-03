@@ -47,7 +47,6 @@ typedef struct {
     int (*xmp_start_player)(xmp_context, int, int);
     void (*xmp_end_player)(xmp_context);
     void (*xmp_get_module_info)(xmp_context, struct xmp_module_info *);
-    int (*xmp_test_module_from_memory)(const void *, long, struct xmp_test_info *);
     int (*xmp_play_buffer)(xmp_context, void *, int, int);
     int (*xmp_set_position)(xmp_context, int);
     int (*xmp_seek_time)(xmp_context, int);
@@ -59,9 +58,7 @@ typedef struct {
     int (*xmp_channel_mute)(xmp_context, int, int);
 } xmp_loader;
 
-static xmp_loader libxmp = {
-    0, NULL
-};
+static xmp_loader libxmp;
 
 #ifdef XMP_DYNAMIC
 #define FUNCTION_LOADER(FUNC, SIG) \
@@ -97,7 +94,6 @@ static int XMP_Load(void)
         FUNCTION_LOADER(xmp_start_player, int(*)(xmp_context,int,int))
         FUNCTION_LOADER(xmp_end_player, void(*)(xmp_context))
         FUNCTION_LOADER(xmp_get_module_info, void(*)(xmp_context,struct xmp_module_info*))
-        FUNCTION_LOADER(xmp_test_module_from_memory, void(*)(xmp_context,struct xmp_module_info*))
         FUNCTION_LOADER(xmp_play_buffer, int(*)(xmp_context,void*,int,int))
         FUNCTION_LOADER(xmp_set_position, int(*)(xmp_context,int))
         FUNCTION_LOADER(xmp_seek_time, int(*)(xmp_context,int))
@@ -105,7 +101,7 @@ static int XMP_Load(void)
         FUNCTION_LOADER(xmp_stop_module, void(*)(xmp_context))
         FUNCTION_LOADER(xmp_release_module, void(*)(xmp_context))
         FUNCTION_LOADER(xmp_free_context, void(*)(xmp_context))
-#if XMP_VER_MAJOR > 4 || (XMP_VER_MAJOR == 4 && XMP_VER_MINOR >= 5)
+#ifdef XMP_HAS_TEMPO
         FUNCTION_LOADER_OPTIONAL(xmp_set_tempo_factor, int(*)(xmp_context, double))
 #endif
         FUNCTION_LOADER(xmp_channel_mute, int(*)(xmp_context, int, int))
@@ -184,8 +180,6 @@ static void libxmp_set_error(int e)
 void *XMP_CreateFromRW(SDL_RWops *src, int freesrc)
 {
     XMP_Music *music;
-    struct xmp_test_info info;
-    int info_ret;
     void *mem;
     size_t size;
     int err;
@@ -212,7 +206,6 @@ void *XMP_CreateFromRW(SDL_RWops *src, int freesrc)
     mem = SDL_LoadFile_RW(src, &size, SDL_FALSE);
     if (mem) {
         err = libxmp.xmp_load_module_from_memory(music->ctx, mem, (long)size);
-        info_ret = libxmp.xmp_test_module_from_memory(mem, (long)size, &info);
         SDL_free(mem);
         if (err < 0) {
             libxmp_set_error(err);
@@ -240,11 +233,10 @@ void *XMP_CreateFromRW(SDL_RWops *src, int freesrc)
 
     meta_tags_init(&music->tags);
 
-    if (info_ret == 0) {
-        meta_tags_set(&music->tags, MIX_META_TITLE, info.name);
-    }
-
     libxmp.xmp_get_module_info(music->ctx, &music->mi);
+    if (music->mi.mod->name[0]) {
+        meta_tags_set(&music->tags, MIX_META_TITLE, music->mi.mod->name);
+    }
     if (music->mi.comment) {
         meta_tags_set(&music->tags, MIX_META_COPYRIGHT, music->mi.comment);
     }
@@ -256,6 +248,7 @@ void *XMP_CreateFromRW(SDL_RWops *src, int freesrc)
         SDL_RWclose(src);
     }
     return music;
+
 e3: libxmp.xmp_end_player(music->ctx);
 e2: libxmp.xmp_release_module(music->ctx);
 e1: libxmp.xmp_free_context(music->ctx);
@@ -377,7 +370,7 @@ static double XMP_Duration(void *context)
 
 static int XMP_SetTempo(void *context, double tempo)
 {
-#if XMP_VER_MAJOR > 4 || (XMP_VER_MAJOR == 4 && XMP_VER_MINOR >= 5)
+#ifdef XMP_HAS_TEMPO
     XMP_Music *music = (XMP_Music *)context;
     if (libxmp.xmp_set_tempo_factor && music && (tempo > 0.0)) {
         libxmp.xmp_set_tempo_factor(music->ctx, (1.0 / tempo));
@@ -393,7 +386,7 @@ static int XMP_SetTempo(void *context, double tempo)
 
 static double XMP_GetTempo(void *context)
 {
-#if XMP_VER_MAJOR > 4 || (XMP_VER_MAJOR == 4 && XMP_VER_MINOR >= 5)
+#ifdef XMP_HAS_TEMPO
     XMP_Music *music = (XMP_Music *)context;
     if (music) {
         return music->tempo;

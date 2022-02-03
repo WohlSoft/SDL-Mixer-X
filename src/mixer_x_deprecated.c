@@ -26,37 +26,37 @@
     There are kept to don't break ABI with existing apps.
 */
 
-void SDLCALLCC Mix_Timidity_addToPathList(const char *path)
+void MIXCALLCC Mix_Timidity_addToPathList(const char *path)
 {
     Mix_SetTimidityCfg(path);
 }
 
-int SDLCALLCC Mix_GetMidiDevice()
+int MIXCALLCC Mix_GetMidiDevice()
 {
     return Mix_GetMidiPlayer();
 }
 
-int SDLCALLCC Mix_GetNextMidiDevice()
+int MIXCALLCC Mix_GetNextMidiDevice()
 {
     return Mix_GetNextMidiPlayer();
 }
 
-int SDLCALLCC Mix_SetMidiDevice(int player)
+int MIXCALLCC Mix_SetMidiDevice(int player)
 {
     return Mix_SetMidiPlayer(player);
 }
 
-int SDLCALLCC Mix_ADLMIDI_getAdLibMode()
+int MIXCALLCC Mix_ADLMIDI_getAdLibMode()
 {
     return -1;
 }
 
-void SDLCALLCC Mix_ADLMIDI_setAdLibMode(int ald)
+void MIXCALLCC Mix_ADLMIDI_setAdLibMode(int ald)
 {
     (void)ald;
 }
 
-int SDLCALLCC Mix_ADLMIDI_getLogarithmicVolumes()
+int MIXCALLCC Mix_ADLMIDI_getLogarithmicVolumes()
 {
 #ifdef MUSIC_MID_ADLMIDI
     return (Mix_ADLMIDI_getVolumeModel() == ADLMIDI_VM_NATIVE);
@@ -65,7 +65,7 @@ int SDLCALLCC Mix_ADLMIDI_getLogarithmicVolumes()
 #endif
 }
 
-void SDLCALLCC Mix_ADLMIDI_setLogarithmicVolumes(int vm)
+void MIXCALLCC Mix_ADLMIDI_setLogarithmicVolumes(int vm)
 {
 #ifdef MUSIC_MID_ADLMIDI
     Mix_ADLMIDI_setVolumeModel(vm ? ADLMIDI_VM_NATIVE : ADLMIDI_VM_AUTO);
@@ -74,7 +74,7 @@ void SDLCALLCC Mix_ADLMIDI_setLogarithmicVolumes(int vm)
 #endif
 }
 
-int SDLCALLCC Mix_SetMusicStreamPosition(Mix_Music *music, double position)
+int MIXCALLCC Mix_SetMusicStreamPosition(Mix_Music *music, double position)
 {
     return Mix_SetMusicPositionStream(music, position);
 }

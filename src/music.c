@@ -45,6 +45,7 @@
 #include "music_vgm.h"
 #include "music_midi_adl.h"
 #include "music_midi_opn.h"
+#include "music_midi_edmidi.h"
 
 #include "utils.h"
 
@@ -398,7 +399,7 @@ int _Mix_RegisterMusicEffect_locked(Mix_Music *mus, Mix_MusicEffectFunc_t f,
     return _Mix_register_mus_effect(e, f, d, arg);
 }
 
-int SDLCALLCC Mix_RegisterMusicEffect(Mix_Music *mus, Mix_MusicEffectFunc_t f,
+int MIXCALLCC Mix_RegisterMusicEffect(Mix_Music *mus, Mix_MusicEffectFunc_t f,
             Mix_MusicEffectDone_t d, void *arg)
 {
     int retval;
@@ -423,7 +424,7 @@ int _Mix_UnregisterMusicEffect_locked(Mix_Music *mus, Mix_MusicEffectFunc_t f)
     return _Mix_remove_mus_effect(mus, e, f);
 }
 
-int SDLCALLCC Mix_UnregisterMusicEffect(Mix_Music *mus, Mix_MusicEffectFunc_t f)
+int MIXCALLCC Mix_UnregisterMusicEffect(Mix_Music *mus, Mix_MusicEffectFunc_t f)
 {
     int retval;
     Mix_LockAudio();
@@ -446,7 +447,7 @@ int _Mix_UnregisterAllMusicEffects_locked(Mix_Music *mus)
     return _Mix_remove_all_mus_effects(mus, e);
 }
 
-int SDLCALLCC Mix_UnregisterAllMusicEffects(Mix_Music *mus)
+int MIXCALLCC Mix_UnregisterAllMusicEffects(Mix_Music *mus)
 {
     int retval;
     Mix_LockAudio();
@@ -618,6 +619,9 @@ static Mix_MusicInterface *s_music_interfaces[] =
 #ifdef MUSIC_MID_FLUIDLITE
     &Mix_MusicInterface_FLUIDXMI,
 #endif
+#ifdef MUSIC_MID_EDMIDI
+    &Mix_MusicInterface_EDMIDI,
+#endif
 #ifdef MUSIC_MID_TIMIDITY
     &Mix_MusicInterface_TIMIDITY,
 #endif
@@ -639,12 +643,12 @@ Mix_MusicInterface *get_music_interface(int index)
     return s_music_interfaces[index];
 }
 
-int SDLCALLCC Mix_GetNumMusicDecoders(void)
+int MIXCALLCC Mix_GetNumMusicDecoders(void)
 {
     return(num_decoders);
 }
 
-const char *SDLCALLCC Mix_GetMusicDecoder(int index)
+const char *MIXCALLCC Mix_GetMusicDecoder(int index)
 {
     if ((index < 0) || (index >= num_decoders)) {
         return NULL;
@@ -652,7 +656,7 @@ const char *SDLCALLCC Mix_GetMusicDecoder(int index)
     return(music_decoders[index]);
 }
 
-SDL_bool SDLCALLCC Mix_HasMusicDecoder(const char *name)
+SDL_bool MIXCALLCC Mix_HasMusicDecoder(const char *name)
 {
     int index;
     for (index = 0; index < num_decoders; ++index) {
@@ -698,21 +702,21 @@ static void (SDLCALL *music_finished_hook)(void) = NULL;
 /* Support for hooking when the any multi-music has finished */
 static void (SDLCALL *music_finished_hook_mm)(void) = NULL;
 
-void SDLCALLCC Mix_HookMusicFinished(void (SDLCALL *music_finished)(void))
+void MIXCALLCC Mix_HookMusicFinished(void (SDLCALL *music_finished)(void))
 {
     Mix_LockAudio();
     music_finished_hook = music_finished;
     Mix_UnlockAudio();
 }
 
-void SDLCALLCC Mix_HookMusicStreamFinishedAny(void (SDLCALL *music_finished)(void))
+void MIXCALLCC Mix_HookMusicStreamFinishedAny(void (SDLCALL *music_finished)(void))
 {
     Mix_LockAudio();
     music_finished_hook_mm = music_finished;
     Mix_UnlockAudio();
 }
 
-void SDLCALLCC Mix_HookMusicStreamFinished(Mix_Music *music, void (SDLCALL *music_finished)(Mix_Music*, void*), void *user_data)
+void MIXCALLCC Mix_HookMusicStreamFinished(Mix_Music *music, void (SDLCALL *music_finished)(Mix_Music*, void*), void *user_data)
 {
     Mix_LockAudio();
     music->music_finished_hook = music_finished;
@@ -1010,6 +1014,11 @@ Mix_MusicAPI get_current_midi_api(int *device)
             target_midi_api = MIX_MUSIC_FLUIDSYNTH;
             break;
         #endif
+        #ifdef MUSIC_MID_EDMIDI
+        case MIDI_EDMIDI:
+            target_midi_api = MIX_MUSIC_EDMIDI;
+            break;
+        #endif
         #ifdef MUSIC_MID_NATIVE
         case MIDI_Native:
             target_midi_api = MIX_MUSIC_NATIVEMIDI;
@@ -1196,7 +1205,7 @@ SDL_bool has_music(Mix_MusicType type)
     return SDL_FALSE;
 }
 
-#if defined(MUSIC_MID_ADLMIDI) || defined(MUSIC_MID_OPNMIDI) || defined(MUSIC_MID_NATIVE_ALT) || defined(MUSIC_MID_FLUIDLITE)
+#if defined(MUSIC_MID_ADLMIDI) || defined(MUSIC_MID_OPNMIDI) || defined(MUSIC_MID_NATIVE_ALT) || defined(MUSIC_MID_FLUIDLITE) || defined(MUSIC_MID_EDMIDI)
 #define MUSIC_HAS_XMI_SUPPORT
 #endif
 
@@ -1232,6 +1241,12 @@ static Mix_MusicType xmi_compatible_midi_player()
     }
 #endif
 
+#if defined(MUSIC_MID_EDMIDI)
+    if (mididevice_current == MIDI_EDMIDI) {
+        is_compatible |= 1;
+    }
+#endif
+
     if (is_compatible) {
         return MUS_MID;
     } else {
@@ -1241,6 +1256,8 @@ static Mix_MusicType xmi_compatible_midi_player()
         return MUS_OPNMIDI;
 #elif defined(MUSIC_MID_FLUIDLITE)
         return MUS_FLUIDLITE;
+#elif defined(MUSIC_MID_EDMIDI)
+        return MUS_EDMIDI;
 #elif defined(MUSIC_MID_NATIVE_ALT)
         return MUS_NATIVEMIDI;
 #else
@@ -1633,7 +1650,7 @@ static int split_path_and_params(const char *path, char **file, char **args)
 }
 
 /* Load a music file */
-Mix_Music * SDLCALLCC Mix_LoadMUS(const char *file)
+Mix_Music * MIXCALLCC Mix_LoadMUS(const char *file)
 {
     size_t i;
     void *context;
@@ -1755,7 +1772,7 @@ Mix_Music * SDLCALLCC Mix_LoadMUS(const char *file)
     return ret;
 }
 
-void SDLCALLCC Mix_SetMusicFileName(Mix_Music *music, const char *file)
+void MIXCALLCC Mix_SetMusicFileName(Mix_Music *music, const char *file)
 {
     if (music) {
         const char *p = get_last_dirsep(file);
@@ -1763,17 +1780,17 @@ void SDLCALLCC Mix_SetMusicFileName(Mix_Music *music, const char *file)
     }
 }
 
-Mix_Music * SDLCALLCC Mix_LoadMUS_RW(SDL_RWops *src, int freesrc)
+Mix_Music * MIXCALLCC Mix_LoadMUS_RW(SDL_RWops *src, int freesrc)
 {
     return Mix_LoadMUSType_RW(src, MUS_NONE, freesrc);
 }
 
-Mix_Music *SDLCALLCC Mix_LoadMUS_RW_ARG(SDL_RWops *src, int freesrc, const char *args)
+Mix_Music *MIXCALLCC Mix_LoadMUS_RW_ARG(SDL_RWops *src, int freesrc, const char *args)
 {
     return Mix_LoadMUSType_RW_ARG(src, MUS_NONE, freesrc, args);
 }
 
-Mix_Music *SDLCALLCC Mix_LoadMUS_RW_GME(SDL_RWops *src, int freesrc, int trackID)
+Mix_Music *MIXCALLCC Mix_LoadMUS_RW_GME(SDL_RWops *src, int freesrc, int trackID)
 {
     char music_args[25];
     music_args[0] = '\0';
@@ -1781,12 +1798,12 @@ Mix_Music *SDLCALLCC Mix_LoadMUS_RW_GME(SDL_RWops *src, int freesrc, int trackID
     return Mix_LoadMUSType_RW_ARG(src, MUS_NONE, freesrc, music_args);
 }
 
-Mix_Music * SDLCALLCC Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int freesrc)
+Mix_Music * MIXCALLCC Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int freesrc)
 {
     return Mix_LoadMUSType_RW_ARG(src, type, freesrc, "");
 }
 
-Mix_Music * SDLCALLCC Mix_LoadMUSType_RW_ARG(SDL_RWops *src, Mix_MusicType type, int freesrc, const char *args)
+Mix_Music * MIXCALLCC Mix_LoadMUSType_RW_ARG(SDL_RWops *src, Mix_MusicType type, int freesrc, const char *args)
 {
     size_t i;
     void *context;
@@ -1878,7 +1895,7 @@ Mix_Music * SDLCALLCC Mix_LoadMUSType_RW_ARG(SDL_RWops *src, Mix_MusicType type,
 }
 
 /* Free a music chunk previously loaded */
-void SDLCALLCC Mix_FreeMusic(Mix_Music *music)
+void MIXCALLCC Mix_FreeMusic(Mix_Music *music)
 {
     if (music) {
         /* Stop the music if it's currently playing */
@@ -1910,7 +1927,7 @@ void SDLCALLCC Mix_FreeMusic(Mix_Music *music)
 }
 
 /* Set the music to be self-destroyed once playback has get finished. */
-int SDLCALLCC Mix_SetFreeOnStop(Mix_Music *music, int free_on_stop)
+int MIXCALLCC Mix_SetFreeOnStop(Mix_Music *music, int free_on_stop)
 {
     int ret = 0;
 
@@ -1935,7 +1952,7 @@ int SDLCALLCC Mix_SetFreeOnStop(Mix_Music *music, int free_on_stop)
 /* Find out the music format of a mixer music, or the currently playing
    music, if 'music' is NULL.
 */
-Mix_MusicType SDLCALLCC Mix_GetMusicType(const Mix_Music *music)
+Mix_MusicType MIXCALLCC Mix_GetMusicType(const Mix_Music *music)
 {
     Mix_MusicType type = MUS_NONE;
 
@@ -1967,13 +1984,13 @@ static const char * get_music_tag_internal(const Mix_Music *music, Mix_MusicMeta
     return tag;
 }
 
-const char *SDLCALLCC Mix_GetMusicTitleTag(const Mix_Music *music)
+const char *MIXCALLCC Mix_GetMusicTitleTag(const Mix_Music *music)
 {
     return get_music_tag_internal(music, MIX_META_TITLE);
 }
 
 /* Get music title from meta-tag if possible */
-const char *SDLCALLCC Mix_GetMusicTitle(const Mix_Music *music)
+const char *MIXCALLCC Mix_GetMusicTitle(const Mix_Music *music)
 {
     const char *tag = Mix_GetMusicTitleTag(music);
     if (SDL_strlen(tag) > 0) {
@@ -1988,17 +2005,17 @@ const char *SDLCALLCC Mix_GetMusicTitle(const Mix_Music *music)
     return "";
 }
 
-const char *SDLCALLCC Mix_GetMusicArtistTag(const Mix_Music *music)
+const char *MIXCALLCC Mix_GetMusicArtistTag(const Mix_Music *music)
 {
     return get_music_tag_internal(music, MIX_META_ARTIST);
 }
 
-const char *SDLCALLCC Mix_GetMusicAlbumTag(const Mix_Music *music)
+const char *MIXCALLCC Mix_GetMusicAlbumTag(const Mix_Music *music)
 {
     return get_music_tag_internal(music, MIX_META_ALBUM);
 }
 
-const char *SDLCALLCC Mix_GetMusicCopyrightTag(const Mix_Music *music)
+const char *MIXCALLCC Mix_GetMusicCopyrightTag(const Mix_Music *music)
 {
     return get_music_tag_internal(music, MIX_META_COPYRIGHT);
 }
@@ -2053,7 +2070,7 @@ static int music_internal_play(Mix_Music *music, int play_count, double position
     return(retval);
 }
 
-int SDLCALLCC Mix_FadeInMusicPos(Mix_Music *music, int loops, int ms, double position)
+int MIXCALLCC Mix_FadeInMusicPos(Mix_Music *music, int loops, int ms, double position)
 {
     int retval, reverse_fade = 0;
 
@@ -2119,11 +2136,11 @@ int SDLCALLCC Mix_FadeInMusicPos(Mix_Music *music, int loops, int ms, double pos
 
     return(retval);
 }
-int SDLCALLCC Mix_FadeInMusic(Mix_Music *music, int loops, int ms)
+int MIXCALLCC Mix_FadeInMusic(Mix_Music *music, int loops, int ms)
 {
     return Mix_FadeInMusicPos(music, loops, ms, 0.0);
 }
-int SDLCALLCC Mix_PlayMusic(Mix_Music *music, int loops)
+int MIXCALLCC Mix_PlayMusic(Mix_Music *music, int loops)
 {
     return Mix_FadeInMusicPos(music, loops, 0, 0.0);
 }
@@ -2170,7 +2187,7 @@ static int music_internal_play_stream(Mix_Music *music, int play_count, double p
     }
     return(retval);
 }
-int SDLCALLCC Mix_FadeInMusicStreamPos(Mix_Music *music, int loops, int ms, double position)
+int MIXCALLCC Mix_FadeInMusicStreamPos(Mix_Music *music, int loops, int ms, double position)
 {
     int retval, reverse_fade = 0;
 
@@ -2248,18 +2265,18 @@ int SDLCALLCC Mix_FadeInMusicStreamPos(Mix_Music *music, int loops, int ms, doub
 
     return(retval);
 }
-int SDLCALLCC Mix_PlayMusicStream(Mix_Music *music, int loops)
+int MIXCALLCC Mix_PlayMusicStream(Mix_Music *music, int loops)
 {
     return Mix_FadeInMusicStreamPos(music, loops, 0, 0.0);
 }
-int SDLCALLCC Mix_FadeInMusicStream(Mix_Music *music, int loops, int ms)
+int MIXCALLCC Mix_FadeInMusicStream(Mix_Music *music, int loops, int ms)
 {
     return Mix_FadeInMusicStreamPos(music, loops, ms, 0.0);
 }
 
 
 /* Jump to a given order in mod music. */
-int SDLCALLCC Mix_ModMusicJumpToOrder(int order)
+int MIXCALLCC Mix_ModMusicJumpToOrder(int order)
 {
     int retval = -1;
 
@@ -2277,7 +2294,7 @@ int SDLCALLCC Mix_ModMusicJumpToOrder(int order)
 
     return retval;
 }
-int SDLCALLCC Mix_ModMusicStreamJumpToOrder(Mix_Music *music, int order)
+int MIXCALLCC Mix_ModMusicStreamJumpToOrder(Mix_Music *music, int order)
 {
     int retval = -1;
 
@@ -2304,7 +2321,7 @@ int music_internal_position(Mix_Music *music, double position)
     }
     return -1;
 }
-int SDLCALLCC Mix_SetMusicPositionStream(Mix_Music *music, double position)
+int MIXCALLCC Mix_SetMusicPositionStream(Mix_Music *music, double position)
 {
     int retval;
 
@@ -2329,7 +2346,7 @@ int SDLCALLCC Mix_SetMusicPositionStream(Mix_Music *music, double position)
 }
 
 /* Deprecated call, kept for ABI compatibility */
-int SDLCALLCC Mix_SetMusicPosition(double position)
+int MIXCALLCC Mix_SetMusicPosition(double position)
 {
     return Mix_SetMusicPositionStream(NULL, position);
 }
@@ -2342,7 +2359,7 @@ static double music_internal_position_get(Mix_Music *music)
     }
     return -1;
 }
-double SDLCALLCC Mix_GetMusicPosition(Mix_Music *music)
+double MIXCALLCC Mix_GetMusicPosition(Mix_Music *music)
 {
     double retval;
 
@@ -2369,7 +2386,7 @@ static double music_internal_duration(Mix_Music *music)
         return -1;
     }
 }
-double SDLCALLCC Mix_MusicDuration(Mix_Music *music)
+double MIXCALLCC Mix_MusicDuration(Mix_Music *music)
 {
     double retval;
 
@@ -2388,7 +2405,7 @@ double SDLCALLCC Mix_MusicDuration(Mix_Music *music)
 }
 
 /* Old name call, kept for ABI compatibility */
-double SDLCALLCC Mix_GetMusicTotalTime(Mix_Music *music)
+double MIXCALLCC Mix_GetMusicTotalTime(Mix_Music *music)
 {
     return Mix_MusicDuration(music);
 }
@@ -2401,7 +2418,7 @@ int music_internal_set_tempo(Mix_Music *music, double tempo)
     }
     return -1;
 }
-int SDLCALLCC Mix_SetMusicTempo(Mix_Music *music, double tempo)
+int MIXCALLCC Mix_SetMusicTempo(Mix_Music *music, double tempo)
 {
     int retval;
 
@@ -2433,7 +2450,7 @@ static double music_internal_tempo(Mix_Music *music)
     }
     return -1.0;
 }
-double SDLCALLCC Mix_GetMusicTempo(Mix_Music *music)
+double MIXCALLCC Mix_GetMusicTempo(Mix_Music *music)
 {
     double retval;
 
@@ -2459,7 +2476,7 @@ static int music_internal_tracks(Mix_Music *music)
     }
     return -1;
 }
-int SDLCALLCC Mix_GetMusicTracks(Mix_Music *music)
+int MIXCALLCC Mix_GetMusicTracks(Mix_Music *music)
 {
     int retval;
 
@@ -2485,7 +2502,7 @@ int music_internal_set_track_mute(Mix_Music *music, int track, int mute)
     }
     return -1;
 }
-int SDLCALLCC Mix_SetMusicTrackMute(Mix_Music *music, int track, int mute)
+int MIXCALLCC Mix_SetMusicTrackMute(Mix_Music *music, int track, int mute)
 {
     int retval;
 
@@ -2518,7 +2535,7 @@ static double music_internal_loop_start(Mix_Music *music)
     }
     return -1;
 }
-double SDLCALLCC Mix_GetMusicLoopStartTime(Mix_Music *music)
+double MIXCALLCC Mix_GetMusicLoopStartTime(Mix_Music *music)
 {
     double retval;
 
@@ -2544,7 +2561,7 @@ static double music_internal_loop_end(Mix_Music *music)
     }
     return -1;
 }
-double SDLCALLCC Mix_GetMusicLoopEndTime(Mix_Music *music)
+double MIXCALLCC Mix_GetMusicLoopEndTime(Mix_Music *music)
 {
     double retval;
 
@@ -2570,7 +2587,7 @@ static double music_internal_loop_length(Mix_Music *music)
     }
     return -1;
 }
-double SDLCALLCC Mix_GetMusicLoopLengthTime(Mix_Music *music)
+double MIXCALLCC Mix_GetMusicLoopLengthTime(Mix_Music *music)
 {
     double retval;
 
@@ -2616,7 +2633,7 @@ static void music_internal_volume(Mix_Music *music, int volume)
         music->interface->SetVolume(music->context, volume);
     }
 }
-int SDLCALLCC Mix_VolumeMusicStream(Mix_Music *music, int volume)
+int MIXCALLCC Mix_VolumeMusicStream(Mix_Music *music, int volume)
 {
     int prev_volume;
 
@@ -2644,12 +2661,12 @@ int SDLCALLCC Mix_VolumeMusicStream(Mix_Music *music, int volume)
     Mix_UnlockAudio();
     return(prev_volume);
 }
-int SDLCALLCC Mix_VolumeMusic(int volume)
+int MIXCALLCC Mix_VolumeMusic(int volume)
 {
     return Mix_VolumeMusicStream(NULL, volume);
 }
 
-int SDLCALLCC Mix_GetMusicVolume(Mix_Music *music)
+int MIXCALLCC Mix_GetMusicVolume(Mix_Music *music)
 {
     int prev_volume;
 
@@ -2664,12 +2681,12 @@ int SDLCALLCC Mix_GetMusicVolume(Mix_Music *music)
     return prev_volume;
 }
 
-int SDLCALLCC Mix_GetVolumeMusicStream(Mix_Music *music)
+int MIXCALLCC Mix_GetVolumeMusicStream(Mix_Music *music)
 {
     return Mix_GetMusicVolume(music);
 }
 
-void SDLCALLCC Mix_VolumeMusicGeneral(int volume)
+void MIXCALLCC Mix_VolumeMusicGeneral(int volume)
 {
     Mix_LockAudio();
     if (volume < 0) {
@@ -2682,7 +2699,7 @@ void SDLCALLCC Mix_VolumeMusicGeneral(int volume)
     Mix_UnlockAudio();
 }
 
-int SDLCALLCC Mix_GetVolumeMusicGeneral(void)
+int MIXCALLCC Mix_GetVolumeMusicGeneral(void)
 {
     return music_general_volume;
 }
@@ -2707,7 +2724,7 @@ static void music_internal_halt(Mix_Music *music)
         music_playing = NULL;
     }
 }
-int SDLCALLCC Mix_HaltMusicStream(Mix_Music *music)
+int MIXCALLCC Mix_HaltMusicStream(Mix_Music *music)
 {
     int is_multi_music;
 
@@ -2749,13 +2766,13 @@ int SDLCALLCC Mix_HaltMusicStream(Mix_Music *music)
 
     return(0);
 }
-int SDLCALLCC Mix_HaltMusic(void)
+int MIXCALLCC Mix_HaltMusic(void)
 {
     return Mix_HaltMusicStream(NULL);
 }
 
 /* Progressively stop the music */
-int SDLCALLCC Mix_FadeOutMusicStream(Mix_Music *music, int ms)
+int MIXCALLCC Mix_FadeOutMusicStream(Mix_Music *music, int ms)
 {
     int retval = 0;
 
@@ -2796,11 +2813,11 @@ int SDLCALLCC Mix_FadeOutMusicStream(Mix_Music *music, int ms)
 
     return(retval);
 }
-int SDLCALLCC Mix_FadeOutMusic(int ms)
+int MIXCALLCC Mix_FadeOutMusic(int ms)
 {
     return Mix_FadeOutMusicStream(NULL, ms);
 }
-int SDLCALLCC Mix_CrossFadeMusicStreamPos(Mix_Music *old_music, Mix_Music *new_music, int loops, int ms, double pos, int free_old)
+int MIXCALLCC Mix_CrossFadeMusicStreamPos(Mix_Music *old_music, Mix_Music *new_music, int loops, int ms, double pos, int free_old)
 {
     int retval1, retval2;
 
@@ -2814,12 +2831,12 @@ int SDLCALLCC Mix_CrossFadeMusicStreamPos(Mix_Music *old_music, Mix_Music *new_m
         return(-1);
     }
 }
-int SDLCALLCC Mix_CrossFadeMusicStream(Mix_Music *old_music, Mix_Music *new_music, int loops, int ms, int free_old)
+int MIXCALLCC Mix_CrossFadeMusicStream(Mix_Music *old_music, Mix_Music *new_music, int loops, int ms, int free_old)
 {
     return Mix_CrossFadeMusicStreamPos(old_music, new_music, loops, ms, 0.0, free_old);
 }
 
-Mix_Fading SDLCALLCC Mix_FadingMusicStream(Mix_Music *music)
+Mix_Fading MIXCALLCC Mix_FadingMusicStream(Mix_Music *music)
 {
     Mix_Fading fading = MIX_NO_FADING;
 
@@ -2833,13 +2850,13 @@ Mix_Fading SDLCALLCC Mix_FadingMusicStream(Mix_Music *music)
 
     return(fading);
 }
-Mix_Fading SDLCALLCC Mix_FadingMusic(void)
+Mix_Fading MIXCALLCC Mix_FadingMusic(void)
 {
     return Mix_FadingMusicStream(NULL);
 }
 
 /* Pause/Resume the music stream */
-void SDLCALLCC Mix_PauseMusicStream(Mix_Music *music)
+void MIXCALLCC Mix_PauseMusicStream(Mix_Music *music)
 {
     Mix_LockAudio();
     if (music) {
@@ -2859,12 +2876,12 @@ void SDLCALLCC Mix_PauseMusicStream(Mix_Music *music)
     }
     Mix_UnlockAudio();
 }
-void SDLCALLCC Mix_PauseMusic(void)
+void MIXCALLCC Mix_PauseMusic(void)
 {
     Mix_PauseMusicStream(NULL);
 }
 
-void SDLCALLCC Mix_ResumeMusicStream(Mix_Music *music)
+void MIXCALLCC Mix_ResumeMusicStream(Mix_Music *music)
 {
     Mix_LockAudio();
     if (music) {
@@ -2885,29 +2902,29 @@ void SDLCALLCC Mix_ResumeMusicStream(Mix_Music *music)
 
     Mix_UnlockAudio();
 }
-void SDLCALLCC Mix_ResumeMusic(void)
+void MIXCALLCC Mix_ResumeMusic(void)
 {
     Mix_ResumeMusicStream(NULL);
 }
-void SDLCALLCC Mix_PauseMusicStreamAll(void)
+void MIXCALLCC Mix_PauseMusicStreamAll(void)
 {
     _Mix_MultiMusic_PauseAll();
 }
-void SDLCALLCC Mix_ResumeMusicStreamAll(void)
+void MIXCALLCC Mix_ResumeMusicStreamAll(void)
 {
     _Mix_MultiMusic_ResumeAll();
 }
 
-void SDLCALLCC Mix_RewindMusicStream(Mix_Music *music)
+void MIXCALLCC Mix_RewindMusicStream(Mix_Music *music)
 {
     Mix_SetMusicPositionStream(music, 0.0);
 }
-void SDLCALLCC Mix_RewindMusic(void)
+void MIXCALLCC Mix_RewindMusic(void)
 {
     Mix_SetMusicPositionStream(NULL, 0.0);
 }
 
-int SDLCALLCC Mix_PausedMusicStream(Mix_Music *music)
+int MIXCALLCC Mix_PausedMusicStream(Mix_Music *music)
 {
     (void)music;
 
@@ -2918,7 +2935,7 @@ int SDLCALLCC Mix_PausedMusicStream(Mix_Music *music)
     return (music_active == SDL_FALSE);/*isPaused;*/
 }
 
-int SDLCALLCC Mix_PausedMusic(void)
+int MIXCALLCC Mix_PausedMusic(void)
 {
     return (music_active == SDL_FALSE);
 }
@@ -2935,7 +2952,7 @@ static SDL_bool music_internal_playing(Mix_Music *music)
     }
     return music->playing;
 }
-int SDLCALLCC Mix_PlayingMusicStream(Mix_Music *music)
+int MIXCALLCC Mix_PlayingMusicStream(Mix_Music *music)
 {
     SDL_bool playing;
 
@@ -2950,13 +2967,13 @@ int SDLCALLCC Mix_PlayingMusicStream(Mix_Music *music)
     return playing ? 1 : 0;
 }
 /* Deprecated call, kept for ABI compatibility */
-int SDLCALLCC Mix_PlayingMusic(void)
+int MIXCALLCC Mix_PlayingMusic(void)
 {
     return Mix_PlayingMusicStream(NULL);
 }
 
 /* Set the external music playback command */
-int SDLCALLCC Mix_SetMusicCMD(const char *command)
+int MIXCALLCC Mix_SetMusicCMD(const char *command)
 {
     Mix_HaltMusicStream(music_playing);
     _Mix_MultiMusic_HaltAll();
@@ -2975,14 +2992,14 @@ int SDLCALLCC Mix_SetMusicCMD(const char *command)
     return 0;
 }
 
-int SDLCALLCC Mix_SetSynchroValue(int i)
+int MIXCALLCC Mix_SetSynchroValue(int i)
 {
     /* Not supported by any players at this time */
     (void) i;
     return -1;
 }
 
-int SDLCALLCC Mix_GetSynchroValue(void)
+int MIXCALLCC Mix_GetSynchroValue(void)
 {
     /* Not supported by any players at this time */
     return(-1);
@@ -3044,7 +3061,7 @@ void unload_music(void)
     }
 }
 
-int SDLCALLCC Mix_SetTimidityCfg(const char *path)
+int MIXCALLCC Mix_SetTimidityCfg(const char *path)
 {
     if (timidity_cfg) {
         SDL_free(timidity_cfg);
@@ -3061,12 +3078,12 @@ int SDLCALLCC Mix_SetTimidityCfg(const char *path)
     return 0;
 }
 
-const char* SDLCALLCC Mix_GetTimidityCfg(void)
+const char* MIXCALLCC Mix_GetTimidityCfg(void)
 {
     return timidity_cfg;
 }
 
-int SDLCALLCC Mix_SetSoundFonts(const char *paths)
+int MIXCALLCC Mix_SetSoundFonts(const char *paths)
 {
     if (soundfont_paths) {
         SDL_free(soundfont_paths);
@@ -3082,7 +3099,7 @@ int SDLCALLCC Mix_SetSoundFonts(const char *paths)
     return 1;
 }
 
-const char* SDLCALLCC Mix_GetSoundFonts(void)
+const char* MIXCALLCC Mix_GetSoundFonts(void)
 {
     const char *env_paths = SDL_getenv("SDL_SOUNDFONTS");
     SDL_bool force_env_paths = SDL_GetHintBoolean("SDL_FORCE_SOUNDFONTS", SDL_FALSE);
@@ -3116,12 +3133,12 @@ const char* SDLCALLCC Mix_GetSoundFonts(void)
     return NULL;
 }
 
-int SDLCALLCC Mix_EachSoundFont(int (SDLCALL *function)(const char*, void*), void *data)
+int MIXCALLCC Mix_EachSoundFont(int (SDLCALL *function)(const char*, void*), void *data)
 {
     return Mix_EachSoundFontEx(Mix_GetSoundFonts(), function, data);
 }
 
-int SDLCALLCC Mix_EachSoundFontEx(const char* cpaths, int (SDLCALL *function)(const char*, void*), void *data)
+int MIXCALLCC Mix_EachSoundFontEx(const char* cpaths, int (SDLCALL *function)(const char*, void*), void *data)
 {
     char *context, *path, *paths;
     int soundfonts_found = 0;
@@ -3155,17 +3172,17 @@ int SDLCALLCC Mix_EachSoundFontEx(const char* cpaths, int (SDLCALL *function)(co
 }
 
 
-int SDLCALLCC Mix_GetMidiPlayer()
+int MIXCALLCC Mix_GetMidiPlayer()
 {
     return mididevice_current;
 }
 
-int SDLCALLCC Mix_GetNextMidiPlayer()
+int MIXCALLCC Mix_GetNextMidiPlayer()
 {
     return mididevice_current;
 }
 
-int SDLCALLCC Mix_SetMidiPlayer(int player)
+int MIXCALLCC Mix_SetMidiPlayer(int player)
 {
 #ifdef MUSIC_USE_MIDI
     switch (player) {
@@ -3184,6 +3201,9 @@ int SDLCALLCC Mix_SetMidiPlayer(int player)
 #   ifdef MUSIC_MID_FLUIDSYNTH
     case MIDI_Fluidsynth:
 #   endif
+#   ifdef MUSIC_MID_EDMIDI
+    case MIDI_EDMIDI:
+#   endif
         mididevice_current = player;
         return 0;
     default:
@@ -3197,7 +3217,7 @@ int SDLCALLCC Mix_SetMidiPlayer(int player)
 #endif
 }
 
-void SDLCALLCC Mix_SetLockMIDIArgs(int lock_midiargs)
+void MIXCALLCC Mix_SetLockMIDIArgs(int lock_midiargs)
 {
     mididevice_args_lock = lock_midiargs;
 }
@@ -3206,7 +3226,7 @@ void SDLCALLCC Mix_SetLockMIDIArgs(int lock_midiargs)
 
 /* ADLMIDI module setup calls */
 
-int SDLCALLCC Mix_ADLMIDI_getTotalBanks(void)
+int MIXCALLCC Mix_ADLMIDI_getTotalBanks(void)
 {
 #ifdef MUSIC_MID_ADLMIDI
     return _Mix_ADLMIDI_getTotalBanks();
@@ -3214,7 +3234,7 @@ int SDLCALLCC Mix_ADLMIDI_getTotalBanks(void)
     return 0;
 }
 
-const char *const * SDLCALLCC Mix_ADLMIDI_getBankNames()
+const char *const * MIXCALLCC Mix_ADLMIDI_getBankNames()
 {
 #ifdef MUSIC_MID_ADLMIDI
     return _Mix_ADLMIDI_getBankNames();
@@ -3224,7 +3244,7 @@ const char *const * SDLCALLCC Mix_ADLMIDI_getBankNames()
 #endif
 }
 
-int SDLCALLCC Mix_ADLMIDI_getBankID(void)
+int MIXCALLCC Mix_ADLMIDI_getBankID(void)
 {
 #ifdef MUSIC_MID_ADLMIDI
     return _Mix_ADLMIDI_getBankID();
@@ -3233,7 +3253,7 @@ int SDLCALLCC Mix_ADLMIDI_getBankID(void)
 #endif
 }
 
-void SDLCALLCC Mix_ADLMIDI_setBankID(int bnk)
+void MIXCALLCC Mix_ADLMIDI_setBankID(int bnk)
 {
 #ifdef MUSIC_MID_ADLMIDI
     _Mix_ADLMIDI_setBankID(bnk);
@@ -3242,7 +3262,7 @@ void SDLCALLCC Mix_ADLMIDI_setBankID(int bnk)
 #endif
 }
 
-int SDLCALLCC Mix_ADLMIDI_getTremolo(void)
+int MIXCALLCC Mix_ADLMIDI_getTremolo(void)
 {
 #ifdef MUSIC_MID_ADLMIDI
     return _Mix_ADLMIDI_getTremolo();
@@ -3250,7 +3270,7 @@ int SDLCALLCC Mix_ADLMIDI_getTremolo(void)
     return -1;
 #endif
 }
-void SDLCALLCC Mix_ADLMIDI_setTremolo(int tr)
+void MIXCALLCC Mix_ADLMIDI_setTremolo(int tr)
 {
 #ifdef MUSIC_MID_ADLMIDI
     _Mix_ADLMIDI_setTremolo(tr);
@@ -3259,7 +3279,7 @@ void SDLCALLCC Mix_ADLMIDI_setTremolo(int tr)
 #endif
 }
 
-int SDLCALLCC Mix_ADLMIDI_getVibrato(void)
+int MIXCALLCC Mix_ADLMIDI_getVibrato(void)
 {
 #ifdef MUSIC_MID_ADLMIDI
     return _Mix_ADLMIDI_getVibrato();
@@ -3268,7 +3288,7 @@ int SDLCALLCC Mix_ADLMIDI_getVibrato(void)
 #endif
 }
 
-void SDLCALLCC Mix_ADLMIDI_setVibrato(int vib)
+void MIXCALLCC Mix_ADLMIDI_setVibrato(int vib)
 {
 #ifdef MUSIC_MID_ADLMIDI
     _Mix_ADLMIDI_setVibrato(vib);
@@ -3277,7 +3297,7 @@ void SDLCALLCC Mix_ADLMIDI_setVibrato(int vib)
 #endif
 }
 
-int SDLCALLCC Mix_ADLMIDI_getScaleMod(void)
+int MIXCALLCC Mix_ADLMIDI_getScaleMod(void)
 {
 #ifdef MUSIC_MID_ADLMIDI
     return _Mix_ADLMIDI_getScaleMod();
@@ -3286,7 +3306,7 @@ int SDLCALLCC Mix_ADLMIDI_getScaleMod(void)
 #endif
 }
 
-void SDLCALLCC Mix_ADLMIDI_setScaleMod(int sc)
+void MIXCALLCC Mix_ADLMIDI_setScaleMod(int sc)
 {
 #ifdef MUSIC_MID_ADLMIDI
     _Mix_ADLMIDI_setScaleMod(sc);
@@ -3295,7 +3315,7 @@ void SDLCALLCC Mix_ADLMIDI_setScaleMod(int sc)
 #endif
 }
 
-int SDLCALLCC Mix_ADLMIDI_getVolumeModel(void)
+int MIXCALLCC Mix_ADLMIDI_getVolumeModel(void)
 {
 #ifdef MUSIC_MID_ADLMIDI
     return _Mix_ADLMIDI_getVolumeModel();
@@ -3304,7 +3324,7 @@ int SDLCALLCC Mix_ADLMIDI_getVolumeModel(void)
 #endif
 }
 
-void SDLCALLCC Mix_ADLMIDI_setVolumeModel(int vm)
+void MIXCALLCC Mix_ADLMIDI_setVolumeModel(int vm)
 {
 #ifdef MUSIC_MID_ADLMIDI
     _Mix_ADLMIDI_setVolumeModel(vm);
@@ -3313,7 +3333,7 @@ void SDLCALLCC Mix_ADLMIDI_setVolumeModel(int vm)
 #endif
 }
 
-int SDLCALLCC Mix_ADLMIDI_getFullRangeBrightness(void)
+int MIXCALLCC Mix_ADLMIDI_getFullRangeBrightness(void)
 {
 #ifdef MUSIC_MID_ADLMIDI
     return _Mix_ADLMIDI_getFullRangeBrightness();
@@ -3322,7 +3342,7 @@ int SDLCALLCC Mix_ADLMIDI_getFullRangeBrightness(void)
 #endif
 }
 
-void SDLCALLCC Mix_ADLMIDI_setFullRangeBrightness(int frb)
+void MIXCALLCC Mix_ADLMIDI_setFullRangeBrightness(int frb)
 {
 #ifdef MUSIC_MID_ADLMIDI
     _Mix_ADLMIDI_setFullRangeBrightness(frb);
@@ -3331,7 +3351,7 @@ void SDLCALLCC Mix_ADLMIDI_setFullRangeBrightness(int frb)
 #endif
 }
 
-int SDLCALLCC Mix_ADLMIDI_getAutoArpeggio(void)
+int MIXCALLCC Mix_ADLMIDI_getAutoArpeggio(void)
 {
 #ifdef MUSIC_MID_ADLMIDI
     return _Mix_ADLMIDI_getAutoArpeggio();
@@ -3340,7 +3360,7 @@ int SDLCALLCC Mix_ADLMIDI_getAutoArpeggio(void)
 #endif
 }
 
-void SDLCALLCC Mix_ADLMIDI_setAutoArpeggio(int aa_en)
+void MIXCALLCC Mix_ADLMIDI_setAutoArpeggio(int aa_en)
 {
 #ifdef MUSIC_MID_ADLMIDI
     _Mix_ADLMIDI_setAutoArpeggio(aa_en);
@@ -3349,7 +3369,7 @@ void SDLCALLCC Mix_ADLMIDI_setAutoArpeggio(int aa_en)
 #endif
 }
 
-int SDLCALLCC Mix_ADLMIDI_getFullPanStereo(void)
+int MIXCALLCC Mix_ADLMIDI_getFullPanStereo(void)
 {
 #ifdef MUSIC_MID_ADLMIDI
     return _Mix_ADLMIDI_getFullPanStereo();
@@ -3358,7 +3378,7 @@ int SDLCALLCC Mix_ADLMIDI_getFullPanStereo(void)
 #endif
 }
 
-void SDLCALLCC Mix_ADLMIDI_setFullPanStereo(int fp)
+void MIXCALLCC Mix_ADLMIDI_setFullPanStereo(int fp)
 {
 #ifdef MUSIC_MID_ADLMIDI
     _Mix_ADLMIDI_setFullPanStereo(fp);
@@ -3367,7 +3387,7 @@ void SDLCALLCC Mix_ADLMIDI_setFullPanStereo(int fp)
 #endif
 }
 
-int SDLCALLCC Mix_ADLMIDI_getEmulator(void)
+int MIXCALLCC Mix_ADLMIDI_getEmulator(void)
 {
 #ifdef MUSIC_MID_ADLMIDI
     return _Mix_ADLMIDI_getEmulator();
@@ -3376,7 +3396,7 @@ int SDLCALLCC Mix_ADLMIDI_getEmulator(void)
 #endif
 }
 
-void SDLCALLCC Mix_ADLMIDI_setEmulator(int emu)
+void MIXCALLCC Mix_ADLMIDI_setEmulator(int emu)
 {
 #ifdef MUSIC_MID_ADLMIDI
     _Mix_ADLMIDI_setEmulator(emu);
@@ -3385,7 +3405,7 @@ void SDLCALLCC Mix_ADLMIDI_setEmulator(int emu)
 #endif
 }
 
-int SDLCALLCC Mix_ADLMIDI_getChipsCount(void)
+int MIXCALLCC Mix_ADLMIDI_getChipsCount(void)
 {
 #ifdef MUSIC_MID_ADLMIDI
     return _Mix_ADLMIDI_getChipsCount();
@@ -3394,7 +3414,7 @@ int SDLCALLCC Mix_ADLMIDI_getChipsCount(void)
 #endif
 }
 
-void SDLCALLCC Mix_ADLMIDI_setChipsCount(int chips)
+void MIXCALLCC Mix_ADLMIDI_setChipsCount(int chips)
 {
 #ifdef MUSIC_MID_ADLMIDI
     _Mix_ADLMIDI_setChipsCount(chips);
@@ -3403,14 +3423,14 @@ void SDLCALLCC Mix_ADLMIDI_setChipsCount(int chips)
 #endif
 }
 
-void SDLCALLCC Mix_ADLMIDI_setSetDefaults(void)
+void MIXCALLCC Mix_ADLMIDI_setSetDefaults(void)
 {
 #ifdef MUSIC_MID_ADLMIDI
     _Mix_ADLMIDI_setSetDefaults();
 #endif
 }
 
-void SDLCALLCC Mix_ADLMIDI_setCustomBankFile(const char *bank_wonl_path)
+void MIXCALLCC Mix_ADLMIDI_setCustomBankFile(const char *bank_wonl_path)
 {
 #ifdef MUSIC_MID_ADLMIDI
     _Mix_ADLMIDI_setCustomBankFile(bank_wonl_path);
@@ -3423,7 +3443,7 @@ void SDLCALLCC Mix_ADLMIDI_setCustomBankFile(const char *bank_wonl_path)
 
 /* OPNMIDI module setup calls */
 
-int SDLCALLCC Mix_OPNMIDI_getVolumeModel(void)
+int MIXCALLCC Mix_OPNMIDI_getVolumeModel(void)
 {
 #ifdef MUSIC_MID_OPNMIDI
     return _Mix_OPNMIDI_getVolumeModel();
@@ -3432,7 +3452,7 @@ int SDLCALLCC Mix_OPNMIDI_getVolumeModel(void)
 #endif
 }
 
-void SDLCALLCC Mix_OPNMIDI_setVolumeModel(int vm)
+void MIXCALLCC Mix_OPNMIDI_setVolumeModel(int vm)
 {
 #ifdef MUSIC_MID_OPNMIDI
     _Mix_OPNMIDI_setVolumeModel(vm);
@@ -3441,7 +3461,7 @@ void SDLCALLCC Mix_OPNMIDI_setVolumeModel(int vm)
 #endif
 }
 
-int SDLCALLCC Mix_OPNMIDI_getFullRangeBrightness(void)
+int MIXCALLCC Mix_OPNMIDI_getFullRangeBrightness(void)
 {
 #ifdef MUSIC_MID_OPNMIDI
     return _Mix_OPNMIDI_getFullRangeBrightness();
@@ -3450,7 +3470,7 @@ int SDLCALLCC Mix_OPNMIDI_getFullRangeBrightness(void)
 #endif
 }
 
-void SDLCALLCC Mix_OPNMIDI_setFullRangeBrightness(int frb)
+void MIXCALLCC Mix_OPNMIDI_setFullRangeBrightness(int frb)
 {
 #ifdef MUSIC_MID_OPNMIDI
     _Mix_OPNMIDI_setFullRangeBrightness(frb);
@@ -3459,7 +3479,7 @@ void SDLCALLCC Mix_OPNMIDI_setFullRangeBrightness(int frb)
 #endif
 }
 
-int SDLCALLCC Mix_OPNMIDI_getAutoArpeggio(void)
+int MIXCALLCC Mix_OPNMIDI_getAutoArpeggio(void)
 {
 #ifdef MUSIC_MID_OPNMIDI
     return _Mix_OPNMIDI_getAutoArpeggio();
@@ -3468,7 +3488,7 @@ int SDLCALLCC Mix_OPNMIDI_getAutoArpeggio(void)
 #endif
 }
 
-void SDLCALLCC Mix_OPNMIDI_setAutoArpeggio(int aa_en)
+void MIXCALLCC Mix_OPNMIDI_setAutoArpeggio(int aa_en)
 {
 #ifdef MUSIC_MID_OPNMIDI
     _Mix_OPNMIDI_setAutoArpeggio(aa_en);
@@ -3477,7 +3497,7 @@ void SDLCALLCC Mix_OPNMIDI_setAutoArpeggio(int aa_en)
 #endif
 }
 
-int SDLCALLCC Mix_OPNMIDI_getFullPanStereo(void)
+int MIXCALLCC Mix_OPNMIDI_getFullPanStereo(void)
 {
 #ifdef MUSIC_MID_OPNMIDI
     return _Mix_OPNMIDI_getFullPanStereo();
@@ -3486,7 +3506,7 @@ int SDLCALLCC Mix_OPNMIDI_getFullPanStereo(void)
 #endif
 }
 
-void SDLCALLCC Mix_OPNMIDI_setFullPanStereo(int fp)
+void MIXCALLCC Mix_OPNMIDI_setFullPanStereo(int fp)
 {
 #ifdef MUSIC_MID_OPNMIDI
     _Mix_OPNMIDI_setFullPanStereo(fp);
@@ -3495,7 +3515,7 @@ void SDLCALLCC Mix_OPNMIDI_setFullPanStereo(int fp)
 #endif
 }
 
-int SDLCALLCC Mix_OPNMIDI_getEmulator(void)
+int MIXCALLCC Mix_OPNMIDI_getEmulator(void)
 {
 #ifdef MUSIC_MID_OPNMIDI
     return _Mix_OPNMIDI_getEmulator();
@@ -3504,7 +3524,7 @@ int SDLCALLCC Mix_OPNMIDI_getEmulator(void)
 #endif
 }
 
-void SDLCALLCC Mix_OPNMIDI_setEmulator(int emu)
+void MIXCALLCC Mix_OPNMIDI_setEmulator(int emu)
 {
 #ifdef MUSIC_MID_OPNMIDI
     _Mix_OPNMIDI_setEmulator(emu);
@@ -3513,7 +3533,7 @@ void SDLCALLCC Mix_OPNMIDI_setEmulator(int emu)
 #endif
 }
 
-int SDLCALLCC Mix_OPNMIDI_getChipsCount(void)
+int MIXCALLCC Mix_OPNMIDI_getChipsCount(void)
 {
 #ifdef MUSIC_MID_OPNMIDI
     return _Mix_OPNMIDI_getChipsCount();
@@ -3522,7 +3542,7 @@ int SDLCALLCC Mix_OPNMIDI_getChipsCount(void)
 #endif
 }
 
-void SDLCALLCC Mix_OPNMIDI_setChipsCount(int chips)
+void MIXCALLCC Mix_OPNMIDI_setChipsCount(int chips)
 {
 #ifdef MUSIC_MID_OPNMIDI
     _Mix_OPNMIDI_setChipsCount(chips);
@@ -3531,14 +3551,14 @@ void SDLCALLCC Mix_OPNMIDI_setChipsCount(int chips)
 #endif
 }
 
-void SDLCALLCC Mix_OPNMIDI_setSetDefaults(void)
+void MIXCALLCC Mix_OPNMIDI_setSetDefaults(void)
 {
 #ifdef MUSIC_MID_OPNMIDI
     _Mix_OPNMIDI_setSetDefaults();
 #endif
 }
 
-void SDLCALLCC Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path)
+void MIXCALLCC Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path)
 {
 #ifdef MUSIC_MID_OPNMIDI
     _Mix_OPNMIDI_setCustomBankFile(bank_wonp_path);
