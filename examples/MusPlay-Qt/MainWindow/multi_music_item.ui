@@ -128,7 +128,7 @@
     </spacer>
    </item>
    <item row="0" column="10">
-    <widget class="QPushButton" name="closeSfx">
+    <widget class="QPushButton" name="closeMusic">
      <property name="enabled">
       <bool>true</bool>
      </property>
