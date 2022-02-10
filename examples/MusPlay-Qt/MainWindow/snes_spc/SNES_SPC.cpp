@@ -400,7 +400,7 @@ void SNES_SPC::cpu_write_high( int data, int i, rel_time_t time )
 		if ( m.rom_enabled )
 			RAM [i + rom_addr] = m.rom [i]; // restore overwritten ROM
 	}
-	else
+	else if (i + rom_addr < 0x10000)
 	{
 		assert( RAM [i + rom_addr] == (uint8_t) data );
 		RAM [i + rom_addr] = cpu_pad_fill; // restore overwritten padding
