@@ -3361,7 +3361,7 @@ void MIXCALLCC Mix_ADLMIDI_setAutoArpeggio(int aa_en)
 #ifdef MUSIC_MID_ADLMIDI
     _Mix_ADLMIDI_setAutoArpeggio(aa_en);
 #else
-    (void)frb;
+    (void)aa_en;
 #endif
 }
 
