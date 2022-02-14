@@ -3563,4 +3563,36 @@ void MIXCALLCC Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path)
 #endif
 }
 
+void MIXCALLCC Mix_GME_SetSpcEchoDisabled(Mix_Music *music, int disabled)
+{
+#ifdef MUSIC_GME
+    Mix_LockAudio();
+    if (music->interface->type == MUS_GME && music->context) {
+        _Mix_GME_SetSpcEchoDisabled(music->context, disabled);
+    }
+    Mix_UnlockAudio();
+#else
+    (void)music;
+    (void)disabled;
+#endif
+}
+
+int MIXCALLCC Mix_GME_GetSpcEchoDisabled(Mix_Music *music)
+{
+#ifdef MUSIC_GME
+    int ret = -1;
+
+    Mix_LockAudio();
+    if (music->interface->type == MUS_GME && music->context) {
+        ret = _Mix_GME_GetSpcEchoDisabled(music->context);
+    }
+    Mix_UnlockAudio();
+
+    return ret;
+#else
+    (void)music;
+    return -1;
+#endif
+}
+
 /* vi: set ts=4 sw=4 expandtab: */

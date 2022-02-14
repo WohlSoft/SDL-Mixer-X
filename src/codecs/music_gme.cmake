@@ -26,6 +26,15 @@ if(USE_GME AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE AND NOT SDL_MIXER_CLEAR_FOR_
                 OUTPUT_VARIABLE GME_TEST_RESULT
             )
             message("gme_set_autoload_playback_limit() compile test result: ${GME_HAS_SET_AUTOLOAD_PLAYBACK_LIMIT}")
+
+            try_compile(GME_HAS_DISABLE_ECHO
+                ${CMAKE_BINARY_DIR}/compile_tests
+                ${SDLMixerX_SOURCE_DIR}/cmake/tests/gme_has_gme_disable_echo.c
+                LINK_LIBRARIES ${GME_LIBRARIES} ${STDCPP_LIBRARY} ${M_LIBRARY}
+                CMAKE_FLAGS "-DINCLUDE_DIRECTORIES=${GME_INCLUDE_DIRS}"
+                OUTPUT_VARIABLE GME_TEST_RESULT
+            )
+            message("gme_disable_echo() compile test result: ${GME_HAS_DISABLE_ECHO}")
         endif()
 
     else()
@@ -44,6 +53,7 @@ if(USE_GME AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE AND NOT SDL_MIXER_CLEAR_FOR_
         set(STDCPP_NEEDED 1) # Statically linking GME which is C++ library
         set(LIBMATH_NEEDED 1)
         set(GME_HAS_SET_AUTOLOAD_PLAYBACK_LIMIT TRUE)
+        set(GME_HAS_DISABLE_ECHO TRUE)
         set(GME_INCLUDE_DIRS
             ${AUDIO_CODECS_INSTALL_PATH}/include/gme
             ${AUDIO_CODECS_INSTALL_PATH}/include
@@ -68,6 +78,9 @@ if(USE_GME AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE AND NOT SDL_MIXER_CLEAR_FOR_
             ${CMAKE_CURRENT_LIST_DIR}/music_gme.c)
         if(GME_HAS_SET_AUTOLOAD_PLAYBACK_LIMIT)
             list(APPEND SDL_MIXER_DEFINITIONS -DGME_HAS_SET_AUTOLOAD_PLAYBACK_LIMIT)
+        endif()
+        if(GME_HAS_DISABLE_ECHO)
+            list(APPEND SDL_MIXER_DEFINITIONS -DGME_HAS_DISABLE_ECHO)
         endif()
     else()
         message("-- skipping GME --")

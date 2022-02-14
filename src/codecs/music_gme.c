@@ -44,6 +44,7 @@ typedef struct {
     void (*gme_set_fade)(Music_Emu*, int start_msec);
 #endif
     void (*gme_set_autoload_playback_limit)(Music_Emu*, int do_autoload_limit);
+    void (*gme_disable_echo)(Music_Emu*, int disable);
     gme_err_t (*gme_track_info)(Music_Emu const*, gme_info_t** out, int track);
     void (*gme_free_info)(gme_info_t*);
     gme_err_t (*gme_seek)(Music_Emu*, int msec);
@@ -104,6 +105,14 @@ static int GME_Load(void)
 #else
         gme.gme_set_autoload_playback_limit = NULL;
 #endif
+
+#if defined(GME_DYNAMIC)
+        gme.gme_disable_echo = (void (*)(Music_Emu*,int)) SDL_LoadFunction(gme.handle, "gme_disable_echo");
+#elif defined(GME_HAS_DISABLE_ECHO)
+        gme.gme_disable_echo = gme_disable_echo;
+#else
+        gme.gme_disable_echo = NULL;
+#endif
     }
     ++gme.loaded;
 
@@ -126,17 +135,19 @@ static void GME_Unload(void)
 /* Global flags which are applying on initializing of GME player with a file */
 typedef struct {
     int track_number;
+    int echo_disable;
     double tempo;
     double gain;
 } Gme_Setup;
 
 static Gme_Setup gme_setup = {
-    0, 1.0, 1.0
+    0, 0, 1.0, 1.0
 };
 
 static void GME_SetDefault(Gme_Setup *setup)
 {
     setup->track_number = 0;
+    setup->echo_disable = 0;
     setup->tempo = 1.0;
     setup->gain = 1.0;
 }
@@ -148,6 +159,7 @@ typedef struct
     int play_count;
     Music_Emu* game_emu;
     SDL_bool has_track_length;
+    int echo_disabled;
     int track_length;
     int intro_length;
     int loop_length;
@@ -159,6 +171,28 @@ typedef struct
     size_t buffer_size;
     Mix_MusicMetaTags tags;
 } GME_Music;
+
+void _Mix_GME_SetSpcEchoDisabled(void *music_p, int disabled)
+{
+    GME_Music *music = (GME_Music*)music_p;
+
+    if (music && gme.gme_disable_echo) {
+        gme.gme_disable_echo(music->game_emu, disabled);
+        music->echo_disabled = disabled;
+    }
+}
+
+int  _Mix_GME_GetSpcEchoDisabled(void *music_p)
+{
+    int ret = -1;
+    GME_Music *music = (GME_Music*)music_p;
+
+    if (music && gme.gme_disable_echo) {
+        ret = music->echo_disabled;
+    }
+
+    return ret;
+}
 
 static void GME_delete(void *context);
 
@@ -210,6 +244,9 @@ static void process_args(const char *args, Gme_Setup *setup)
                 {
                 case '-':
                     setup->track_number = value;
+                    break;
+                case 'e':
+                    setup->echo_disable = value;
                     break;
                 case 't':
                     if (arg[0] == '=') {
@@ -307,6 +344,12 @@ GME_Music *GME_LoadSongRW(SDL_RWops *src, const char *args)
     /* Set this flag BEFORE calling the gme_start_track() to fix an inability to loop forever */
     if (gme.gme_set_autoload_playback_limit) {
         gme.gme_set_autoload_playback_limit(music->game_emu, 0);
+    }
+
+    music->echo_disabled = -1;
+    if (gme.gme_disable_echo) {
+        gme.gme_disable_echo(music->game_emu, setup.echo_disable);
+        music->echo_disabled = setup.echo_disable;
     }
 
     err = gme.gme_start_track(music->game_emu, setup.track_number);

@@ -1197,6 +1197,10 @@ extern DECLSPEC void MIXCALL Mix_OPNMIDI_setChipsCount(int chips);
 /* Sets WOPN bank file for OPNMIDI playing device, affects on MIDI file reopen */
 extern DECLSPEC void MIXCALL Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path);
 
+/* Disables/enables built-in echo effect for playing SPC files */
+extern DECLSPEC void MIXCALL Mix_GME_SetSpcEchoDisabled(Mix_Music *music, int disabled);
+extern DECLSPEC int MIXCALL Mix_GME_GetSpcEchoDisabled(Mix_Music *music);
+
 /* Get type of MIDI player library currently in use */
 extern DECLSPEC int  MIXCALL Mix_GetMidiPlayer(void);
 

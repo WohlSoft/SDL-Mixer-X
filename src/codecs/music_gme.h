@@ -24,3 +24,10 @@
 #include "music.h"
 
 extern Mix_MusicInterface Mix_MusicInterface_GME;
+
+#ifdef MUSIC_GME
+
+extern void _Mix_GME_SetSpcEchoDisabled(void *music, int disabled);
+extern int  _Mix_GME_GetSpcEchoDisabled(void *music);
+
+#endif
