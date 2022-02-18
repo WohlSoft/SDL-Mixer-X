@@ -490,7 +490,7 @@ void SetupMidi::on_fluidSynthSF2PathsBrowse_clicked()
     QString path = QFileDialog::getOpenFileName(this,
                    tr("Select SoundFont bank for FluidSynth"),
                    ui->fluidSynthSF2Paths->text(),
-                   "SoundFont files (*.sf2);;"
+                   "SoundFont files (*.sf2, *.sf3);;"
                    "All Files (*.*)", nullptr,
                    c_fileDialogOptions);
     if(!path.isEmpty())
