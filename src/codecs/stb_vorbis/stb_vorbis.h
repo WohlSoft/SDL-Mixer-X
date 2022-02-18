@@ -169,6 +169,12 @@ extern void stb_vorbis_close(stb_vorbis *f);
 /*  NOT WORKING YET after a seek with PULLDATA API */
 extern Sint64 stb_vorbis_get_sample_offset(stb_vorbis *f);
 
+/*  this function returns the count of returned samples from the beginning of the */
+/*  file. Functions "stb_vorbis_get_samples_*", "stb_vorbis_seek_*()" will
+ *  affect the returned value. Use this call to get the accurate sample position
+ *  during playback. */
+extern Sint64 stb_vorbis_get_playback_sample_offset(stb_vorbis *f);
+
 /*  returns the current seek point within the file, or offset from the beginning */
 /*  of the memory buffer. In pushdata mode it returns 0. */
 extern unsigned int stb_vorbis_get_file_offset(stb_vorbis *f);
@@ -864,6 +870,9 @@ struct stb_vorbis
 
    Uint32 current_loc; /*  sample location of next frame to decode */
    int    current_loc_valid;
+
+   Sint64 current_playback_loc; /*  sample location of played samples*/
+   int    current_playback_loc_valid;
 
   /*  per-blocksize precomputed data */
 
@@ -3566,6 +3575,8 @@ static int vorbis_pump_first_frame(stb_vorbis *f)
    res = vorbis_decode_packet(f, &len, &left, &right);
    if (res)
       vorbis_finish_frame(f, len, left, right);
+   f->current_playback_loc = 0;
+   f->current_playback_loc_valid = SDL_TRUE;
    return res;
 }
 
@@ -4358,6 +4369,14 @@ Sint64 stb_vorbis_get_sample_offset(stb_vorbis *f)
       return -1;
 }
 
+Sint64 stb_vorbis_get_playback_sample_offset(stb_vorbis *f)
+{
+   if (f->current_playback_loc_valid)
+      return f->current_playback_loc;
+   else
+      return -1;
+}
+
 stb_vorbis_info stb_vorbis_get_info(stb_vorbis *f)
 {
    stb_vorbis_info d;
@@ -4970,6 +4989,7 @@ int stb_vorbis_seek_frame(stb_vorbis *f, unsigned int sample_number)
    }
    /*  the next frame should start with the sample */
    if (f->current_loc != sample_number) return error(f, VORBIS_seek_failed);
+   f->current_playback_loc = sample_number;
    return 1;
 }
 
@@ -4977,8 +4997,10 @@ int stb_vorbis_seek(stb_vorbis *f, Sint64 sn)
 {
    Uint32 sample_number = sn >= 0 ? (Uint32)sn : 0;
 
-   if (!stb_vorbis_seek_frame(f, (Uint32)sample_number))
+   if (!stb_vorbis_seek_frame(f, (Uint32)sample_number)) {
+      f->current_playback_loc_valid = SDL_FALSE;
       return 0;
+   }
 
    if (sample_number != f->current_loc) {
       int n;
@@ -4988,6 +5010,9 @@ int stb_vorbis_seek(stb_vorbis *f, Sint64 sn)
       SDL_assert(f->channel_buffer_start + (int) (sample_number-frame_start) <= f->channel_buffer_end);
       f->channel_buffer_start += (sample_number - frame_start);
    }
+
+   f->current_playback_loc_valid = SDL_TRUE;
+   f->current_playback_loc = sample_number;
 
    return 1;
 }
@@ -5414,6 +5439,7 @@ int stb_vorbis_get_samples_short_interleaved(stb_vorbis *f, int channels, short 
       if (n == len) break;
       if (!stb_vorbis_get_frame_float(f, NULL, &outputs)) break;
    }
+   f->current_playback_loc += n;
    return n;
 }
 
@@ -5431,6 +5457,7 @@ int stb_vorbis_get_samples_short(stb_vorbis *f, int channels, short **buffer, in
       if (n == len) break;
       if (!stb_vorbis_get_frame_float(f, NULL, &outputs)) break;
    }
+   f->current_playback_loc += n;
    return n;
 }
 
@@ -5539,6 +5566,7 @@ int stb_vorbis_get_samples_float_interleaved(stb_vorbis *f, int channels, float 
       if (!stb_vorbis_get_frame_float(f, NULL, &outputs))
          break;
    }
+   f->current_playback_loc += n;
    return n;
 }
 
@@ -5565,6 +5593,7 @@ int stb_vorbis_get_samples_float(stb_vorbis *f, int channels, float **buffer, in
       if (!stb_vorbis_get_frame_float(f, NULL, &outputs))
          break;
    }
+   f->current_playback_loc += n;
    return n;
 }
 #endif /*  STB_VORBIS_NO_PULLDATA_API */
