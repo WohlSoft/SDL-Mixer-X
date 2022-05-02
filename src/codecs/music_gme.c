@@ -197,7 +197,7 @@ int  _Mix_GME_GetSpcEchoDisabled(void *music_p)
 static void GME_delete(void *context);
 
 /* Set the volume for a GME stream */
-void GME_setvolume(void *music_p, int volume)
+static void GME_setvolume(void *music_p, int volume)
 {
     GME_Music *music = (GME_Music*)music_p;
     double v = SDL_floor(((double)(volume) * music->gain) + 0.5);
@@ -205,7 +205,7 @@ void GME_setvolume(void *music_p, int volume)
 }
 
 /* Get the volume for a GME stream */
-int GME_getvolume(void *music_p)
+static int GME_getvolume(void *music_p)
 {
     GME_Music *music = (GME_Music*)music_p;
     double v = SDL_floor(((double)(music->volume) / music->gain) + 0.5);
@@ -284,7 +284,7 @@ static void process_args(const char *args, Gme_Setup *setup)
 #undef ARG_BUFFER_SIZE
 }
 
-GME_Music *GME_LoadSongRW(SDL_RWops *src, const char *args)
+static GME_Music *GME_LoadSongRW(SDL_RWops *src, const char *args)
 {
     void *mem = 0;
     size_t size;
