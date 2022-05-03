@@ -398,30 +398,21 @@ static double XMP_Duration(void *context)
 
 static int XMP_SetTempo(void *context, double tempo)
 {
-#ifdef XMP_HAS_TEMPO
     XMP_Music *music = (XMP_Music *)context;
     if (libxmp.xmp_set_tempo_factor && music && (tempo > 0.0)) {
         libxmp.xmp_set_tempo_factor(music->ctx, (1.0 / tempo));
         music->tempo = tempo;
         return 0;
     }
-#else
-    (void)context;
-    (void)tempo;
-#endif
     return -1;
 }
 
 static double XMP_GetTempo(void *context)
 {
-#ifdef XMP_HAS_TEMPO
     XMP_Music *music = (XMP_Music *)context;
-    if (music) {
+    if (libxmp.xmp_set_tempo_factor && music) {
         return music->tempo;
     }
-#else
-    (void)context;
-#endif
     return -1.0;
 }
 

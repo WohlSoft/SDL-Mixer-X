@@ -25,17 +25,6 @@ if(USE_XMP AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE)
             endif()
         endif()
 
-        if(XMP_FOUND)
-            try_compile(XMP_HAS_TEMPO
-                ${CMAKE_BINARY_DIR}/compile_tests
-                ${SDLMixerX_SOURCE_DIR}/cmake/tests/xmp_tempo.c
-                LINK_LIBRARIES ${XMP_LIBRARIES} ${M_LIBRARY}
-                CMAKE_FLAGS "-DINCLUDE_DIRECTORIES=${XMP_INCLUDE_DIRS}"
-                OUTPUT_VARIABLE XMP_TEMPO_TEST_RESULT
-            )
-            message("xmp_set_tempo_factor() compile test result: ${XMP_HAS_TEMPO}")
-        endif()
-
     else()
         if(WIN32)
             list(APPEND SDL_MIXER_DEFINITIONS -DBUILDING_STATIC)
@@ -60,7 +49,6 @@ if(USE_XMP AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE)
                          HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
         endif()
         set(XMP_FOUND 1)
-        set(XMP_HAS_TEMPO TRUE)
         set(XMP_INCLUDE_DIRS
             ${AUDIO_CODECS_PATH}/libxmp/include
             ${AUDIO_CODECS_INSTALL_PATH}/include/xmp
@@ -81,9 +69,6 @@ if(USE_XMP AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE)
         list(APPEND SDL_MIXER_INCLUDE_PATHS ${XMP_INCLUDE_DIRS})
         if(NOT USE_SYSTEM_AUDIO_LIBRARIES OR NOT USE_XMP_DYNAMIC)
             list(APPEND SDLMixerX_LINK_LIBS ${XMP_LIBRARIES})
-        endif()
-        if(XMP_HAS_TEMPO)
-            list(APPEND SDL_MIXER_DEFINITIONS -DXMP_HAS_TEMPO)
         endif()
         list(APPEND SDLMixerX_SOURCES ${CMAKE_CURRENT_LIST_DIR}/music_xmp.c)
     else()
