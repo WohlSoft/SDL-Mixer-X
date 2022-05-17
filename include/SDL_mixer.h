@@ -934,6 +934,12 @@ extern DECLSPEC int MIXCALL Mix_GetVolumeMusicStream(Mix_Music *music);
 extern DECLSPEC void MIXCALL Mix_VolumeMusicGeneral(int volume);
 extern DECLSPEC int MIXCALL Mix_GetVolumeMusicGeneral(void);
 
+/* Set the master volume.
+   This did not affect the member variables of music, channel or chunck volume.
+   If the specified volume is -1, just return the current master volume.
+*/
+extern DECLSPEC int SDLCALL Mix_MasterVolume(int volume);
+
 /* Halt playing of a particular channel */
 extern DECLSPEC int MIXCALL Mix_HaltChannel(int channel);
 extern DECLSPEC int MIXCALL Mix_HaltGroup(int tag);

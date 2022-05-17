@@ -544,6 +544,13 @@ void MusPlayer_Qt::on_tempo_valueChanged(int tempo)
 #endif
 }
 
+void MusPlayer_Qt::on_volumeGeneral_valueChanged(int volume)
+{
+    Mix_MasterVolume(volume);
+    qDebug() << "Changed general volume: " << volume;
+    QToolTip::showText(QCursor::pos(), QString("%1").arg(volume), this);
+}
+
 void MusPlayer_Qt::on_recordWav_clicked(bool checked)
 {
     if(checked)
