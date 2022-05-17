@@ -823,7 +823,7 @@ static SDL_INLINE int music_mix_stream(Mix_Music *music, void *udata, Uint8 *str
 
 void SDLCALL multi_music_mixer(void *udata, Uint8 *stream, int len)
 {
-    int i;
+    int i, master_vol = Mix_MasterVolume(-1);
     Mix_Music *m;
 
     if (!mix_streams) {
@@ -837,7 +837,7 @@ void SDLCALL multi_music_mixer(void *udata, Uint8 *stream, int len)
             SDL_memset(mix_streams_buffer, music_spec.silence, (size_t)len);
             music_mix_stream(m, udata, mix_streams_buffer, len);
             Mix_Music_DoEffects(m, mix_streams_buffer, len);
-            SDL_MixAudioFormat(stream, mix_streams_buffer, music_spec.format, len, (music_general_volume * Mix_MasterVolume(-1)));
+            SDL_MixAudioFormat(stream, mix_streams_buffer, music_spec.format, len, (music_general_volume * master_vol) / MIX_MAX_VOLUME);
         }
     }
 
