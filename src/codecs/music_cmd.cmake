@@ -8,6 +8,8 @@ if(UNIX) # CMD Music is not supported on Windows
             list(APPEND SDL_MIXER_DEFINITIONS -DHAVE_FORK)
         endif()
         list(APPEND SDLMixerX_SOURCES
-            ${CMAKE_CURRENT_LIST_DIR}/music_cmd.c)
+            ${CMAKE_CURRENT_LIST_DIR}/music_cmd.c
+            ${CMAKE_CURRENT_LIST_DIR}/music_cmd.h
+        )
     endif()
 endif()

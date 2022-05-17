@@ -18,15 +18,15 @@ if(USE_MIDI_TIMIDITY)
         set(TIMIDITYSDL_LIBRARIES)
         list(APPEND SDL_MIXER_DEFINITIONS -DHAVE_CONFIG_H=0)
         list(APPEND SDLMixerX_SOURCES
-            ${CMAKE_CURRENT_LIST_DIR}/timidity/common.c
-            ${CMAKE_CURRENT_LIST_DIR}/timidity/instrum.c
-            ${CMAKE_CURRENT_LIST_DIR}/timidity/mix.c
-            ${CMAKE_CURRENT_LIST_DIR}/timidity/output.c
-            ${CMAKE_CURRENT_LIST_DIR}/timidity/playmidi.c
-            ${CMAKE_CURRENT_LIST_DIR}/timidity/readmidi.c
-            ${CMAKE_CURRENT_LIST_DIR}/timidity/resample.c
-            ${CMAKE_CURRENT_LIST_DIR}/timidity/tables.c
-            ${CMAKE_CURRENT_LIST_DIR}/timidity/timidity.c
+            ${CMAKE_CURRENT_LIST_DIR}/timidity/common.c     ${CMAKE_CURRENT_LIST_DIR}/timidity/common.h
+            ${CMAKE_CURRENT_LIST_DIR}/timidity/instrum.c    ${CMAKE_CURRENT_LIST_DIR}/timidity/instrum.h
+            ${CMAKE_CURRENT_LIST_DIR}/timidity/mix.c        ${CMAKE_CURRENT_LIST_DIR}/timidity/mix.h
+            ${CMAKE_CURRENT_LIST_DIR}/timidity/output.c     ${CMAKE_CURRENT_LIST_DIR}/timidity/output.h
+            ${CMAKE_CURRENT_LIST_DIR}/timidity/playmidi.c   ${CMAKE_CURRENT_LIST_DIR}/timidity/playmidi.h
+            ${CMAKE_CURRENT_LIST_DIR}/timidity/readmidi.c   ${CMAKE_CURRENT_LIST_DIR}/timidity/readmidi.h
+            ${CMAKE_CURRENT_LIST_DIR}/timidity/resample.c   ${CMAKE_CURRENT_LIST_DIR}/timidity/resample.h
+            ${CMAKE_CURRENT_LIST_DIR}/timidity/tables.c     ${CMAKE_CURRENT_LIST_DIR}/timidity/tables.h
+            ${CMAKE_CURRENT_LIST_DIR}/timidity/timidity.c   ${CMAKE_CURRENT_LIST_DIR}/timidity/timidity.h
         )
         list(APPEND SDL_MIXER_INCLUDE_PATHS ${CMAKE_CURRENT_LIST_DIR}/timidity)
         set(TIMIDITYSDL_FOUND True)
@@ -38,6 +38,9 @@ if(USE_MIDI_TIMIDITY)
             list(APPEND SDL_MIXER_INCLUDE_PATHS ${AUDIO_CODECS_PATH}/libtimidity/include)
         endif()
         list(APPEND SDLMixerX_LINK_LIBS ${TIMIDITYSDL_LIBRARIES})
-        list(APPEND SDLMixerX_SOURCES ${CMAKE_CURRENT_LIST_DIR}/music_timidity.c)
+        list(APPEND SDLMixerX_SOURCES
+            ${CMAKE_CURRENT_LIST_DIR}/music_timidity.c
+            ${CMAKE_CURRENT_LIST_DIR}/music_timidity.h
+        )
     endif()
 endif()

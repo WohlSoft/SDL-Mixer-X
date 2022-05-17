@@ -99,10 +99,14 @@ if(USE_OGG_VORBIS)
 
     if(Vorbis_FOUND OR Tremor_FOUND)
         list(APPEND SDLMixerX_SOURCES
-            ${CMAKE_CURRENT_LIST_DIR}/music_ogg.c)
+            ${CMAKE_CURRENT_LIST_DIR}/music_ogg.c
+            ${CMAKE_CURRENT_LIST_DIR}/music_ogg.h
+        )
     else(USE_OGG_VORBIS_STB)
         list(APPEND SDLMixerX_SOURCES
-            ${CMAKE_CURRENT_LIST_DIR}/music_ogg_stb.c)
+            ${CMAKE_CURRENT_LIST_DIR}/music_ogg_stb.c
+            ${CMAKE_CURRENT_LIST_DIR}/music_ogg.h
+        )
     endif()
 
 endif()

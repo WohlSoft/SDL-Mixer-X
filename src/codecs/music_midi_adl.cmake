@@ -42,7 +42,9 @@ if(USE_MIDI_ADLMIDI AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE AND NOT SDL_MIXER_C
             list(APPEND SDLMixerX_LINK_LIBS ${ADLMIDI_LIBRARIES})
         endif()
         list(APPEND SDLMixerX_SOURCES
-            ${CMAKE_CURRENT_LIST_DIR}/music_midi_adl.c)
+            ${CMAKE_CURRENT_LIST_DIR}/music_midi_adl.c
+            ${CMAKE_CURRENT_LIST_DIR}/music_midi_adl.h
+        )
     else()
         message("-- skipping ADLMIDI --")
     endif()

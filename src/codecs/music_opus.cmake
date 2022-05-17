@@ -39,7 +39,9 @@ if(USE_OPUS)
         endif()
         list(APPEND SDL_MIXER_INCLUDE_PATHS ${Opus_INCLUDE_DIRS})
         list(APPEND SDLMixerX_SOURCES
-            ${CMAKE_CURRENT_LIST_DIR}/music_opus.c)
+            ${CMAKE_CURRENT_LIST_DIR}/music_opus.c
+            ${CMAKE_CURRENT_LIST_DIR}/music_opus.h
+        )
     else()
         message("-- skipping Opus --")
     endif()

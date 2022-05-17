@@ -35,7 +35,10 @@ if(USE_MP3_MPG123 AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE)
         if(NOT USE_SYSTEM_AUDIO_LIBRARIES OR NOT USE_MP3_MPG123_DYNAMIC)
             list(APPEND SDLMixerX_LINK_LIBS ${MPG123_LIBRARIES})
         endif()
-        list(APPEND SDLMixerX_SOURCES ${CMAKE_CURRENT_LIST_DIR}/music_mpg123.c)
+        list(APPEND SDLMixerX_SOURCES
+            ${CMAKE_CURRENT_LIST_DIR}/music_mpg123.c
+            ${CMAKE_CURRENT_LIST_DIR}/music_mpg123.h
+        )
     else()
         message("-- skipping MPG123 --")
     endif()

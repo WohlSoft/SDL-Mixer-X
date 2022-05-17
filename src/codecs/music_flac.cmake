@@ -35,7 +35,9 @@ if(USE_FLAC)
         endif()
         list(APPEND SDL_MIXER_INCLUDE_PATHS ${FLAC_INCLUDE_DIRS})
         list(APPEND SDLMixerX_SOURCES
-            ${CMAKE_CURRENT_LIST_DIR}/music_flac.c)
+            ${CMAKE_CURRENT_LIST_DIR}/music_flac.c
+            ${CMAKE_CURRENT_LIST_DIR}/music_flac.h
+        )
     else()
         message("-- skipping FLAC --")
     endif()

@@ -43,7 +43,9 @@ if(USE_MIDI_EDMIDI)
             list(APPEND SDLMixerX_LINK_LIBS ${EDMIDI_LIBRARIES})
         endif()
         list(APPEND SDLMixerX_SOURCES
-            ${CMAKE_CURRENT_LIST_DIR}/music_midi_edmidi.c)
+            ${CMAKE_CURRENT_LIST_DIR}/music_midi_edmidi.c
+            ${CMAKE_CURRENT_LIST_DIR}/music_midi_edmidi.h
+        )
     else()
         message("-- skipping EDMIDI --")
     endif()

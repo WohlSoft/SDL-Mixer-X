@@ -31,7 +31,9 @@ if(USE_MIKMOD AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE)
         endif()
         list(APPEND SDL_MIXER_INCLUDE_PATHS ${MikMod_INCLUDE_DIRS})
         list(APPEND SDLMixerX_SOURCES
-            ${CMAKE_CURRENT_LIST_DIR}/music_mikmod.c)
+            ${CMAKE_CURRENT_LIST_DIR}/music_mikmod.c
+            ${CMAKE_CURRENT_LIST_DIR}/music_mikmod.h
+        )
     else()
         message("-- skipping MikMod --")
     endif()

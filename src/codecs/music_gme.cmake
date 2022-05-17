@@ -75,7 +75,9 @@ if(USE_GME AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE AND NOT SDL_MIXER_CLEAR_FOR_
             list(APPEND SDLMixerX_LINK_LIBS ${GME_LIBRARIES})
         endif()
         list(APPEND SDLMixerX_SOURCES
-            ${CMAKE_CURRENT_LIST_DIR}/music_gme.c)
+            ${CMAKE_CURRENT_LIST_DIR}/music_gme.c
+            ${CMAKE_CURRENT_LIST_DIR}/music_gme.h
+        )
         if(GME_HAS_SET_AUTOLOAD_PLAYBACK_LIMIT)
             list(APPEND SDL_MIXER_DEFINITIONS -DGME_HAS_SET_AUTOLOAD_PLAYBACK_LIMIT)
         endif()

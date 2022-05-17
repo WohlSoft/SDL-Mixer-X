@@ -329,13 +329,14 @@ if(STDCPP_NEEDED AND NOT MSVC)
 endif()
 
 list(APPEND SDLMixerX_SOURCES
+    ${SDLMixerX_SOURCE_DIR}/include/SDL_mixer.h
     ${SDLMixerX_SOURCE_DIR}/src/effect_position.c
-    ${SDLMixerX_SOURCE_DIR}/src/effects_internal.c
+    ${SDLMixerX_SOURCE_DIR}/src/effects_internal.c ${SDLMixerX_SOURCE_DIR}/src/effects_internal.h
     ${SDLMixerX_SOURCE_DIR}/src/effect_stereoreverse.c
-    ${SDLMixerX_SOURCE_DIR}/src/mixer.c
-    ${SDLMixerX_SOURCE_DIR}/src/music.c
+    ${SDLMixerX_SOURCE_DIR}/src/mixer.c ${SDLMixerX_SOURCE_DIR}/src/mixer.h
+    ${SDLMixerX_SOURCE_DIR}/src/music.c ${SDLMixerX_SOURCE_DIR}/src/music.h
     ${SDLMixerX_SOURCE_DIR}/src/mixer_x_deprecated.c
-    ${SDLMixerX_SOURCE_DIR}/src/utils.c
+    ${SDLMixerX_SOURCE_DIR}/src/utils.c ${SDLMixerX_SOURCE_DIR}/src/utils.h
 )
 
 #file(GLOB SDLMixerX_SOURCES ${SDLMixerX_SOURCES})

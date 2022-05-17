@@ -1,7 +1,16 @@
 # C++-coded alternative MIDI-sequencer
 if(CPP_MIDI_SEQUENCER_NEEDED)
     list(APPEND SDLMixerX_SOURCES
-        ${CMAKE_CURRENT_LIST_DIR}/midi_seq/mix_midi_seq.cpp)
+        ${CMAKE_CURRENT_LIST_DIR}/midi_seq/mix_midi_seq.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/midi_seq/mix_midi_seq.h
+        ${CMAKE_CURRENT_LIST_DIR}/midi_seq/midi_sequencer.h
+        ${CMAKE_CURRENT_LIST_DIR}/midi_seq/midi_sequencer.hpp
+        ${CMAKE_CURRENT_LIST_DIR}/midi_seq/midi_sequencer_impl.hpp
+        ${CMAKE_CURRENT_LIST_DIR}/midi_seq/fraction.hpp
+        ${CMAKE_CURRENT_LIST_DIR}/midi_seq/file_reader.hpp
+        ${CMAKE_CURRENT_LIST_DIR}/midi_seq/cvt_xmi2mid.hpp
+        ${CMAKE_CURRENT_LIST_DIR}/midi_seq/cvt_mus2mid.hpp
+    )
     set(STDCPP_NEEDED TRUE)
     if(SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE)
         # Disable MUS and XMI formats as they LGPL-licensed

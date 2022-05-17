@@ -70,7 +70,10 @@ if(USE_XMP AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE)
         if(NOT USE_SYSTEM_AUDIO_LIBRARIES OR NOT USE_XMP_DYNAMIC)
             list(APPEND SDLMixerX_LINK_LIBS ${XMP_LIBRARIES})
         endif()
-        list(APPEND SDLMixerX_SOURCES ${CMAKE_CURRENT_LIST_DIR}/music_xmp.c)
+        list(APPEND SDLMixerX_SOURCES
+            ${CMAKE_CURRENT_LIST_DIR}/music_xmp.c
+            ${CMAKE_CURRENT_LIST_DIR}/music_xmp.h
+        )
     else()
         message("-- skipping XMP --")
     endif()

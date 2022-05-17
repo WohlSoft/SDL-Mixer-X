@@ -10,7 +10,9 @@ if(USE_MIDI_NATIVE AND NOT USE_MIDI_NATIVE_ALT)
     list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_MID_NATIVE)
     list(APPEND SDLMixerX_SOURCES
         ${CMAKE_CURRENT_LIST_DIR}/music_nativemidi.c
-        ${CMAKE_CURRENT_LIST_DIR}/native_midi/native_midi_common.c)
+        ${CMAKE_CURRENT_LIST_DIR}/native_midi/native_midi_common.c
+        ${CMAKE_CURRENT_LIST_DIR}/music_nativemidi.h
+    )
     if(WIN32)
         list(APPEND SDLMixerX_SOURCES
             ${CMAKE_CURRENT_LIST_DIR}/native_midi/native_midi_win32.c)

@@ -42,7 +42,9 @@ if(USE_MIDI_OPNMIDI AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE AND NOT SDL_MIXER_C
             list(APPEND SDLMixerX_LINK_LIBS ${OPNMIDI_LIBRARIES})
         endif()
         list(APPEND SDLMixerX_SOURCES
-            ${CMAKE_CURRENT_LIST_DIR}/music_midi_opn.c)
+            ${CMAKE_CURRENT_LIST_DIR}/music_midi_opn.c
+            ${CMAKE_CURRENT_LIST_DIR}/music_midi_opn.h
+        )
     else()
         message("-- skipping OPNMIDI --")
     endif()

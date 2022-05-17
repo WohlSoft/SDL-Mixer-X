@@ -54,7 +54,9 @@ if(USE_MODPLUG)
         endif()
         list(APPEND SDL_MIXER_INCLUDE_PATHS ${ModPlug_INCLUDE_DIRS})
         list(APPEND SDLMixerX_SOURCES
-            ${SDLMixerX_SOURCE_DIR}/src/codecs/music_modplug.c)
+            ${SDLMixerX_SOURCE_DIR}/src/codecs/music_modplug.c
+            ${SDLMixerX_SOURCE_DIR}/src/codecs/music_modplug.h
+        )
         if(MODPLUG_HAS_TELL)
             list(APPEND SDL_MIXER_DEFINITIONS -DMODPLUG_HAS_TELL)
         endif()
