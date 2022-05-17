@@ -62,6 +62,7 @@ static SDL_bool music_active = SDL_TRUE;
 static int music_volume = MIX_MAX_VOLUME;
 static Mix_Music * volatile music_playing = NULL;
 SDL_AudioSpec music_spec;
+static Uint8 *mix_music_buffer = NULL;
 
 /* ========== Multi-Music ========== */
 static int            num_streams = 0;
@@ -861,6 +862,7 @@ void SDLCALL music_mixer(void *udata, Uint8 *stream, int len)
     Mix_Music *music;
     Uint8 *src_stream = stream;
     int src_len = len;
+    int master_vol = Mix_MasterVolume(-1);
 
     (void)udata;
 
@@ -868,14 +870,14 @@ void SDLCALL music_mixer(void *udata, Uint8 *stream, int len)
         /* Handle fading */
         if (music_playing->fading != MIX_NO_FADING) {
             if (music_playing->fade_step++ < music_playing->fade_steps) {
-                int volume = Mix_MasterVolume(-1);
+                int volume;
                 int fade_step = music_playing->fade_step;
                 int fade_steps = music_playing->fade_steps;
 
                 if (music_playing->fading == MIX_FADING_OUT) {
-                    volume = (volume * (music_volume * (fade_steps-fade_step))) / (fade_steps * MIX_MAX_VOLUME);
+                    volume = (music_volume * (fade_steps-fade_step)) / fade_steps;
                 } else { /* Fading in */
-                    volume = (volume * (music_volume * fade_step)) / (fade_steps * MIX_MAX_VOLUME);
+                    volume = (music_volume * fade_step) / fade_steps;
                 }
                 music_internal_volume(music_playing, volume);
             } else {
@@ -895,7 +897,14 @@ void SDLCALL music_mixer(void *udata, Uint8 *stream, int len)
         }
 
         if (music_playing->interface->GetAudio) {
-            int left = music_playing->interface->GetAudio(music_playing->context, stream, len);
+            int left;
+            if (master_vol >= MIX_MAX_VOLUME || !mix_music_buffer) {
+                left = music_playing->interface->GetAudio(music_playing->context, stream, len);
+            } else {
+                SDL_memset(mix_music_buffer, music_spec.silence, (size_t)len);
+                left = music_playing->interface->GetAudio(music_playing->context, mix_music_buffer, len);
+                SDL_MixAudioFormat(stream, mix_music_buffer, music_spec.format, len, master_vol);
+            }
             if (left != 0) {
                 /* Either an error or finished playing with data left */
                 music_playing->playing = SDL_FALSE;
@@ -2037,6 +2046,9 @@ static int music_internal_play(Mix_Music *music, int play_count, double position
     if (music_playing) {
         music_internal_halt(music_playing);
     }
+    if (!mix_music_buffer) {
+        mix_music_buffer = SDL_calloc(1, music_spec.size);
+    }
     music_playing = music;
     music_playing->playing = SDL_TRUE;
 
@@ -3043,6 +3055,11 @@ void unload_music(void)
     size_t i;
 
     _Mix_MultiMusic_CloseAndFree();
+
+    if (mix_music_buffer) {
+        SDL_free(mix_music_buffer);
+        mix_music_buffer = NULL;
+    }
 
     for (i = 0; i < SDL_arraysize(s_music_interfaces); ++i) {
         Mix_MusicInterface *interface = s_music_interfaces[i];
