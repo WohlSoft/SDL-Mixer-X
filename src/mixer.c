@@ -112,7 +112,7 @@ static void *music_data = NULL;
 static const char **chunk_decoders = NULL;
 static int num_decoders = 0;
 
-static SDL_atomic_t master_volume;
+static SDL_atomic_t master_volume = { MIX_MAX_VOLUME };
 
 int MIXCALLCC Mix_GetNumChunkDecoders(void)
 {
@@ -169,8 +169,6 @@ const SDL_version * MIXCALLCC Mix_Linked_Version(void)
 int MIXCALLCC Mix_Init(int flags)
 {
     int result = 0;
-
-    SDL_AtomicSet(&master_volume, MIX_MAX_VOLUME);
 
     if (flags & MIX_INIT_FLAC) {
         if (load_music_type(MUS_FLAC)) {
@@ -282,7 +280,7 @@ static void SDLCALL
 mix_channels(void *udata, Uint8 *stream, int len)
 {
     Uint8 *mix_input;
-    int i, mixable, volume = Mix_MasterVolume(-1);
+    int i, mixable, volume, master_vol;
     Uint32 sdl_ticks;
 
     (void)udata;
@@ -297,6 +295,9 @@ mix_channels(void *udata, Uint8 *stream, int len)
     if (mix_multi_music) {
         mix_multi_music(music_data, stream, len);
     }
+
+    volume = Mix_MasterVolume(-1);
+    master_vol = volume;
 
     /* Mix any playing channels... */
     sdl_ticks = SDL_GetTicks();
@@ -334,7 +335,7 @@ mix_channels(void *udata, Uint8 *stream, int len)
                 int remaining = len;
                 while (mix_channel[i].playing > 0 && index < len) {
                     remaining = len - index;
-                    volume = (Mix_MasterVolume(-1) * (mix_channel[i].volume * mix_channel[i].chunk->volume)) / (MIX_MAX_VOLUME * MIX_MAX_VOLUME);
+                    volume = (master_vol * (mix_channel[i].volume * mix_channel[i].chunk->volume)) / (MIX_MAX_VOLUME * MIX_MAX_VOLUME);
                     mixable = mix_channel[i].playing;
                     if (mixable > remaining) {
                         mixable = remaining;
@@ -1755,7 +1756,6 @@ void Mix_UnlockAudio(void)
 int Mix_MasterVolume(int volume)
 {
     int prev_volume = SDL_AtomicGet(&master_volume);
-
     if (volume < 0) {
         return prev_volume;
     }
@@ -1763,7 +1763,6 @@ int Mix_MasterVolume(int volume)
         volume = SDL_MIX_MAXVOLUME;
     }
     SDL_AtomicSet(&master_volume, volume);
-
     return(prev_volume);
 }
 
