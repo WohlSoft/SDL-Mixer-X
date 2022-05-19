@@ -61,8 +61,8 @@ char *music_cmd = NULL;
 static SDL_bool music_active = SDL_TRUE;
 static int music_volume = MIX_MAX_VOLUME;
 static Mix_Music * volatile music_playing = NULL;
-SDL_AudioSpec music_spec;
 static Uint8 *mix_music_buffer = NULL;
+SDL_AudioSpec music_spec;
 
 /* ========== Multi-Music ========== */
 static int            num_streams = 0;
