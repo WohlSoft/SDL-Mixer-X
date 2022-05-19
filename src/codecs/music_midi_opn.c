@@ -75,7 +75,8 @@ static opnmidi_loader OPNMIDI;
     if (OPNMIDI.FUNC == NULL) { SDL_UnloadObject(OPNMIDI.handle); return -1; }
 #else
 #define FUNCTION_LOADER(FUNC, SIG) \
-    OPNMIDI.FUNC = FUNC;
+    OPNMIDI.FUNC = FUNC; \
+    if (OPNMIDI.FUNC == NULL) { Mix_SetError("Missing OPNMIDI.framework"); return -1; }
 #endif
 
 static int OPNMIDI_Load(void)
@@ -84,13 +85,6 @@ static int OPNMIDI_Load(void)
 #ifdef OPNMIDI_DYNAMIC
         OPNMIDI.handle = SDL_LoadObject(OPNMIDI_DYNAMIC);
         if (OPNMIDI.handle == NULL) {
-            return -1;
-        }
-#elif defined(__MACOSX__)
-        extern struct OPN2_MIDIPlayer *opn2_init(long) __attribute__((weak_import));
-        if (opn2_init == NULL) {
-            /* Missing weakly linked framework */
-            Mix_SetError("Missing OPNMIDI.framework");
             return -1;
         }
 #endif

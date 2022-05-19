@@ -66,7 +66,8 @@ static edmidi_loader EDMIDI;
     if (EDMIDI.FUNC == NULL) { SDL_UnloadObject(EDMIDI.handle); return -1; }
 #else
 #define FUNCTION_LOADER(FUNC, SIG) \
-    EDMIDI.FUNC = FUNC;
+    EDMIDI.FUNC = FUNC; \
+    if (EDMIDI.FUNC == NULL) { Mix_SetError("Missing EDMIDI.framework"); return -1; }
 #endif
 
 static int EDMIDI_Load(void)
@@ -75,13 +76,6 @@ static int EDMIDI_Load(void)
 #ifdef EDMIDI_DYNAMIC
         EDMIDI.handle = SDL_LoadObject(EDMIDI_DYNAMIC);
         if (EDMIDI.handle == NULL) {
-            return -1;
-        }
-#elif defined(__MACOSX__)
-        extern struct EDMIDIPlayer *edmidi_init(long) __attribute__((weak_import));
-        if (edmidi_init == NULL) {
-            /* Missing weakly linked framework */
-            Mix_SetError("Missing EDMIDI.framework");
             return -1;
         }
 #endif

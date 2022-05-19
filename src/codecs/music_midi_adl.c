@@ -79,7 +79,8 @@ static adlmidi_loader ADLMIDI;
     if (ADLMIDI.FUNC == NULL) { SDL_UnloadObject(ADLMIDI.handle); return -1; }
 #else
 #define FUNCTION_LOADER(FUNC, SIG) \
-    ADLMIDI.FUNC = FUNC;
+    ADLMIDI.FUNC = FUNC; \
+    if (ADLMIDI.FUNC == NULL) { Mix_SetError("Missing ADLMIDI.framework"); return -1; }
 #endif
 
 static int ADLMIDI_Load(void)
@@ -88,13 +89,6 @@ static int ADLMIDI_Load(void)
 #ifdef ADLMIDI_DYNAMIC
         ADLMIDI.handle = SDL_LoadObject(ADLMIDI_DYNAMIC);
         if (ADLMIDI.handle == NULL) {
-            return -1;
-        }
-#elif defined(__MACOSX__)
-        extern struct ADL_MIDIPlayer *adl_init(long) __attribute__((weak_import));
-        if (adl_init == NULL) {
-            /* Missing weakly linked framework */
-            Mix_SetError("Missing ADLMIDI.framework");
             return -1;
         }
 #endif

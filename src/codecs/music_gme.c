@@ -61,7 +61,8 @@ static gme_loader gme;
     if (gme.FUNC == NULL) { SDL_UnloadObject(gme.handle); return -1; }
 #else
 #define FUNCTION_LOADER(FUNC, SIG) \
-    gme.FUNC = FUNC;
+    gme.FUNC = FUNC; \
+    if (gme.FUNC == NULL) { Mix_SetError("Missing GME.framework"); return -1; }
 #endif
 
 static int GME_Load(void)
@@ -70,13 +71,6 @@ static int GME_Load(void)
 #ifdef GME_DYNAMIC
         gme.handle = SDL_LoadObject(GME_DYNAMIC);
         if (gme.handle == NULL) {
-            return -1;
-        }
-#elif defined(__MACOSX__)
-        extern gme_err_t gme_open_data(void const*,long,Music_Emu**,int) __attribute__((weak_import));
-        if (gme_open_data == NULL) {
-            /* Missing weakly linked framework */
-            Mix_SetError("Missing GME.framework");
             return -1;
         }
 #endif

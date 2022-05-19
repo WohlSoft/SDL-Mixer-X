@@ -71,7 +71,8 @@ static fluidsynth_loader fluidsynth;
     if (fluidsynth.FUNC == NULL) { SDL_UnloadObject(fluidsynth.handle); return -1; }
 #else
 #define FUNCTION_LOADER(FUNC, SIG) \
-    fluidsynth.FUNC = FUNC;
+    fluidsynth.FUNC = FUNC; \
+    if (fluidsynth.FUNC == NULL) { Mix_SetError("Missing fluidlite.framework"); return -1; }
 #endif
 
 static int FLUIDSYNTH_Load()
@@ -83,7 +84,6 @@ static int FLUIDSYNTH_Load()
             return -1;
         }
 #endif
-
         FUNCTION_LOADER(delete_fluid_synth, int (*)(fluid_synth_t*))
         FUNCTION_LOADER(delete_fluid_settings, void (*)(fluid_settings_t*))
         FUNCTION_LOADER(fluid_settings_setnum, int (*)(fluid_settings_t*, const char*, double))
