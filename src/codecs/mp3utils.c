@@ -1,6 +1,6 @@
 /*
   SDL_mixer:  An audio mixer library based on the SDL library
-  Copyright (C) 1997-2021 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -50,6 +50,7 @@ int MP3_RWinit(struct mp3file_t *fil, SDL_RWops *src) {
     SDL_RWseek(src, fil->start, RW_SEEK_SET);
     return 0;
 }
+
 size_t MP3_RWread(struct mp3file_t *fil, void *ptr, size_t size, size_t maxnum) {
     size_t remaining = (size_t)(fil->length - fil->pos);
     size_t ret;

@@ -1,6 +1,6 @@
 /*
   SDL_mixer:  An audio mixer library based on the SDL library
-  Copyright (C) 1997-2021 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -308,7 +308,7 @@ static int voc_get_block(SDL_RWops *src, vs_t *v, SDL_AudioSpec *spec)
             default:  /* text block or other krapola. */
                 for(i = 0; i < sblen; i++)
                 {
-                    if (SDL_RWread(src, &trash, sizeof (Uint8), 1) != 1)
+                    if (SDL_RWread(src, trash, sizeof (Uint8), 1) != 1)
                         return 0;
                 }
 

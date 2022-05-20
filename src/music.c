@@ -1,6 +1,6 @@
 /*
   SDL_mixer:  An audio mixer library based on the SDL library
-  Copyright (C) 1997-2021 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -36,9 +36,9 @@
 #include "music_timidity.h"
 #include "music_ogg.h"
 #include "music_opus.h"
+#include "music_minimp3.h"
 #include "music_mpg123.h"
 #include "music_mad.h"
-#include "music_minimp3.h"
 #include "music_flac.h"
 #include "native_midi/native_midi.h"
 #include "music_gme.h"
@@ -563,6 +563,7 @@ static SDL_INLINE const char *get_last_dirsep (const char *p) {
 }
 #endif
 
+
 /* Interfaces for the various music interfaces, ordered by priority */
 static Mix_MusicInterface *s_music_interfaces[] =
 {
@@ -581,9 +582,6 @@ static Mix_MusicInterface *s_music_interfaces[] =
 #ifdef MUSIC_OPUS
     &Mix_MusicInterface_Opus,
 #endif
-#ifdef MUSIC_MP3_MPG123
-    &Mix_MusicInterface_MPG123,
-#endif
 #ifdef MUSIC_GME
     &Mix_MusicInterface_GME,
 #endif
@@ -597,6 +595,9 @@ static Mix_MusicInterface *s_music_interfaces[] =
 #endif
 #ifdef MUSIC_MP3_MINIMP3
     &Mix_MusicInterface_MINIMP3,
+#endif
+#ifdef MUSIC_MP3_MPG123
+    &Mix_MusicInterface_MPG123,
 #endif
 #ifdef MUSIC_MP3_MAD
     &Mix_MusicInterface_MAD,

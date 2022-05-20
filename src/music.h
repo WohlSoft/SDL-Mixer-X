@@ -1,6 +1,6 @@
 /*
   SDL_mixer:  An audio mixer library based on the SDL library
-  Copyright (C) 1997-2021 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -35,6 +35,7 @@ typedef enum
     MIX_MUSIC_TIMIDITY,
     MIX_MUSIC_NATIVEMIDI,
     MIX_MUSIC_OGG,
+    MIX_MUSIC_MINIMP3,
     MIX_MUSIC_MPG123,
     MIX_MUSIC_MAD,
     MIX_MUSIC_FLAC,
@@ -43,7 +44,6 @@ typedef enum
     MIX_MUSIC_GME,/*MIXER-X*/
     MIX_MUSIC_ADLMIDI,/*MIXER-X*/
     MIX_MUSIC_OPNMIDI,/*MIXER-X*/
-    MIX_MUSIC_MINIMP3,/*MIXER-X*/
     MIX_MUSIC_EDMIDI,/*MIXER-X*/
     MIX_MUSIC_LAST
 } Mix_MusicAPI;
@@ -181,6 +181,7 @@ typedef struct
     void (*Unload)(void);
 
 } Mix_MusicInterface;
+
 
 extern int get_num_music_interfaces(void);
 extern Mix_MusicInterface *get_music_interface(int index);

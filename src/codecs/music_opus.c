@@ -1,6 +1,6 @@
 /*
   SDL_mixer:  An audio mixer library based on the SDL library
-  Copyright (C) 1997-2021 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -28,7 +28,7 @@
 #include "music_opus.h"
 #include "utils.h"
 
-#if defined(OPUSFILE_HEADER)
+#ifdef OPUSFILE_HEADER
 #include OPUSFILE_HEADER
 #else
 #include <opus/opusfile.h>
