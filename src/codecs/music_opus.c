@@ -28,8 +28,8 @@
 #include "music_opus.h"
 #include "utils.h"
 
-#if defined(OPUS_HEADER)
-#include OPUS_HEADER
+#if defined(OPUSFILE_HEADER)
+#include OPUSFILE_HEADER
 #else
 #include <opus/opusfile.h>
 #endif
