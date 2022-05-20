@@ -2121,7 +2121,7 @@ int MIXCALLCC Mix_FadeInMusicPos(Mix_Music *music, int loops, int ms, double pos
         music->fade_steps = fade_steps;
     } else { /* Normal fade-in from the ground up */
         music->fade_step = 0;
-        music->fade_steps = ms/ms_per_step;
+        music->fade_steps = (ms + ms_per_step - 1) / ms_per_step;
     }
 
     /* Play the puppy */
@@ -2251,7 +2251,7 @@ int MIXCALLCC Mix_FadeInMusicStreamPos(Mix_Music *music, int loops, int ms, doub
         music->fade_steps = fade_steps;
     } else { /* Normal fade-in from the ground up */
         music->fade_step = 0;
-        music->fade_steps = ms/ms_per_step;
+        music->fade_steps = (ms + ms_per_step - 1) / ms_per_step;
     }
 
     music->is_multimusic = 1;
