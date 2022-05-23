@@ -104,19 +104,17 @@ typedef unsigned short uint16;
 typedef   signed short  int16;
 typedef unsigned int   uint32;
 typedef   signed int    int32;
-# if defined(__x86_64) || defined(__x86_64__) || defined(__amd64) || defined(_M_X64) \
-    || defined(__ARM_ARCH_8__) || defined(__ARM_ARCH_8A) || defined(__ARM_ARCH_8A__) || defined(__ARM_ARCH_8R__) || defined(__ARM_ARCH_8M__) \
-    || (defined(__TARGET_ARCH_ARM) && __TARGET_ARCH_ARM >= 8) \
-    || (defined(__ARM_ARCH) && __ARM_ARCH >= 8) \
-    || defined(_M_ARM64) || defined(__aarch64__) \
-    || defined(__ppc64__) || defined(__powerpc64__) || defined(__64BIT__) /* On 64-bit architectures */
+#if defined(_LP64) || defined(__LP64__) /* On 64-bit architectures */
 typedef unsigned long  uint64;
 typedef   signed long   int64;
-# else /* On 32-bit architectures */
+#elif defined(_WIN32)
+typedef unsigned __int64    uint64;
+typedef   signed __int64     int64;
+#else /* On 32-bit architectures */
 typedef unsigned long long  uint64;
 typedef   signed long long   int64;
-# endif
 #endif
+#endif /* STB_VORBIS_SDL */
 
 /*/////////   THREAD SAFETY */
 
@@ -807,7 +805,7 @@ typedef struct
    int     bytes_left;  /* bytes left in packet */
    uint32  crc_so_far;  /* running crc */
    int     bytes_done;  /* bytes processed in _current_ chunk */
-   uint32  sample_loc;  /* granule pos encoded in page */
+   int64   sample_loc;  /* granule pos encoded in page */
 } CRCscan;
 
 typedef struct
@@ -1593,7 +1591,7 @@ static int start_page_no_capturepattern(vorb *f)
       return error(f, VORBIS_unexpected_eof);
    /* assume we _don't_ know any the sample position of any segments */
    f->end_seg_with_known_loc = -2;
-   if (loc != ~(uint64)0U) {
+   if (loc != ~(uint64)0) {
       int i;
       /* determine which packet is the last one that will complete */
       for (i=f->segment_count-1; i >= 0; --i)
@@ -4563,9 +4561,9 @@ static int vorbis_search_for_page_pushdata(vorb *f, uint8 *data, int data_len)
                /* if the last frame on a page is continued to the next, then */
                /* we can't recover the sample_loc immediately */
                if (data[i+27+data[i+26]-1] == 255)
-                  f->scan[n].sample_loc = ~0;
+                  f->scan[n].sample_loc = -1;
                else
-                  f->scan[n].sample_loc = data[i+6] + (data[i+7] << 8) + (data[i+ 8]<<16) + (data[i+ 9]<<24);
+                  f->scan[n].sample_loc = (int64) get64raw(data + i + 6);
                f->scan[n].bytes_done = i+j;
                if (f->page_crc_tests == STB_VORBIS_PUSHDATA_CRC_COUNT)
                   break;
@@ -4597,7 +4595,7 @@ static int vorbis_search_for_page_pushdata(vorb *f, uint8 *data, int data_len)
             f->next_seg = -1;       /* start a new page */
             f->current_loc = f->scan[i].sample_loc; /* set the current sample location */
                                     /* to the amount we'd have decoded had we decoded this page */
-            f->current_loc_valid = f->current_loc != ~(int64)0U;
+            f->current_loc_valid = f->current_loc != (int64)(-1);
             return data_len;
          }
          /* delete entry */
@@ -5181,7 +5179,7 @@ int64 stb_vorbis_stream_length_in_samples(stb_vorbis *f)
       getn(f, (unsigned char *)header, 6);
       /* extract the absolute granule position */
       total = get64(f);
-      if (total == 0xffffffffffffffff) {
+      if (total == ~((uint64)0)) {
          f->error = VORBIS_cant_find_last_page;
          f->total_samples = SAMPLE_unknown;
          goto done;
