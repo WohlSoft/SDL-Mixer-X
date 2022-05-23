@@ -33,7 +33,7 @@ There are libraries that keeps MixerX library under ZLib:
 the `-DSDL_MIXER_CLEAR_FOR_ZLIB_LICENSE=ON` flag):
 
 ### Static linking
-(BSD, ZLib, and "Artistic" licenses are allows usage in closed-source projects)
+(BSD, ZLib, "Artistic", MIT, and "public domain" licenses are allows usage in closed-source projects)
 * libFLAC
 * libModPlug
 * libOGG
@@ -43,7 +43,8 @@ the `-DSDL_MIXER_CLEAR_FOR_ZLIB_LICENSE=ON` flag):
 * libTimidity-SDL
 * libVorbis
 * libZlib
-* minimp3
+* dr_mp3
+* dr_flac
 * stb-vorbis
 
 ### LGPL-license libraries
