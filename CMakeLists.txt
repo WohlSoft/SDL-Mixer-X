@@ -265,6 +265,7 @@ include(music_wav)
 include(music_ogg_vorbis)
 include(music_opus)
 include(music_flac)
+include(music_drflac)
 
 include(music_mad)
 include(music_mpg123)
