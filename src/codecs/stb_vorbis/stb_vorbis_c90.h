@@ -1420,8 +1420,8 @@ static uint32 get32(vorb *f)
 {
    uint32 x;
    x = get8(f);
-   x += get8(f) << 8;
-   x += get8(f) << 16;
+   x += (uint32) get8(f) << 8;
+   x += (uint32) get8(f) << 16;
    x += (uint32) get8(f) << 24;
    return x;
 }
@@ -1430,8 +1430,8 @@ static uint64 get64(vorb *f)
 {
    uint64 x;
    x = get8(f);
-   x += get8(f) << 8;
-   x += get8(f) << 16;
+   x += (uint64) get8(f) << 8;
+   x += (uint64) get8(f) << 16;
    x += (uint64) get8(f) << 24;
    x += (uint64) get8(f) << 32;
    x += (uint64) get8(f) << 40;
@@ -1539,8 +1539,8 @@ STB_FORCEINLINE uint64 get64raw(uint8 *f)
 {
    uint64 x;
    x = f[0];
-   x += f[1] << 8;
-   x += f[2] << 16;
+   x += (uint64) f[1] << 8;
+   x += (uint64) f[2] << 16;
    x += (uint64) f[3] << 24;
    x += (uint64) f[4] << 32;
    x += (uint64) f[5] << 40;
