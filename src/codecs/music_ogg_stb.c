@@ -334,7 +334,7 @@ static int OGG_GetSome(void *context, void *data, int bytes, SDL_bool *done)
     pcmPos = stb_vorbis_get_playback_sample_offset(music->vf);
     if (music->loop && (music->play_count != 1) && (pcmPos >= music->loop_end)) {
         amount -= (int)((pcmPos - music->loop_end) * music->vi.channels) * (int)sizeof(float);
-        result = stb_vorbis_seek(music->vf, (Uint32)music->loop_start);
+        result = stb_vorbis_seek(music->vf, music->loop_start);
         if (!result) {
             set_ov_error("stb_vorbis_seek", stb_vorbis_get_error(music->vf));
             return -1;
@@ -380,7 +380,7 @@ static int OGG_Seek(void *context, double time)
     OGG_music *music = (OGG_music *)context;
     int result;
 
-    result = stb_vorbis_seek(music->vf, (unsigned int)(time * music->vi.sample_rate));
+    result = stb_vorbis_seek(music->vf, (time * music->vi.sample_rate));
     if (!result) {
         set_ov_error("stb_vorbis_seek", stb_vorbis_get_error(music->vf));
         return -1;
