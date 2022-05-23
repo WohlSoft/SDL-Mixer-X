@@ -1,4 +1,4 @@
-option(USE_FLAC            "Build with FLAC codec" ON)
+option(USE_FLAC            "Build with FLAC codec using libFLAC" ON)
 if(USE_FLAC)
     option(USE_FLAC_DYNAMIC "Use dynamical loading of FLAC" OFF)
 
@@ -27,7 +27,7 @@ if(USE_FLAC)
 
     if(FLAC_FOUND)
         message("== using FLAC (BSD 3-clause) ==")
-        list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_FLAC -DFLAC__NO_DLL)
+        list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_FLAC_LIBFLAC -DFLAC__NO_DLL)
         if(NOT USE_SYSTEM_AUDIO_LIBRARIES OR NOT USE_FLAC_DYNAMIC)
             set(LIBOGG_NEEDED ON)
             set(LIBMATH_NEEDED ON)
@@ -41,4 +41,14 @@ if(USE_FLAC)
     else()
         message("-- skipping FLAC --")
     endif()
+endif()
+
+option(USE_DRFLAC            "Build with FLAC codec using drflac" ON)
+if(USE_DRFLAC)
+    message("== using FLAC (BSD 3-clause) ==")
+    list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_FLAC_DRFLAC)
+    list(APPEND SDLMixerX_SOURCES
+        ${CMAKE_CURRENT_LIST_DIR}/music_drflac.c
+        ${CMAKE_CURRENT_LIST_DIR}/music_drflac.h
+    )
 endif()

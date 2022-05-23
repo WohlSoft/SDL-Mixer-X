@@ -22,7 +22,7 @@
     ~ Austen Dicken (admin@cvpcs.org)
 */
 
-#ifdef MUSIC_FLAC
+#ifdef MUSIC_FLAC_LIBFLAC
 
 #include "SDL_loadso.h"
 #include "SDL_assert.h"

@@ -19,8 +19,10 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+/* This file supports playing FLAC files with dr_flac */
+
 #include "music.h"
 
-extern Mix_MusicInterface Mix_MusicInterface_FLAC;
+extern Mix_MusicInterface Mix_MusicInterface_DRFLAC;
 
 /* vi: set ts=4 sw=4 expandtab: */
