@@ -306,10 +306,10 @@ QLabel
       <item>
        <widget class="QLabel" name="label_2">
         <property name="toolTip">
-         <string>Change the general volume (affecting all playing music and SFX at one time)</string>
+         <string>Change the SFX volume (affecting all playing SFX at one time, doesn't affects a music)</string>
         </property>
         <property name="text">
-         <string>General volume:</string>
+         <string>SFX volume:</string>
         </property>
        </widget>
       </item>
