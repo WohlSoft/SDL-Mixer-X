@@ -948,7 +948,7 @@ extern DECLSPEC int MIXCALL Mix_GetVolumeMusicGeneral(void);
    This did not affect the member variables of music, channel or chunck volume.
    If the specified volume is -1, just return the current master volume.
 */
-extern DECLSPEC int SDLCALL Mix_MasterVolume(int volume);
+extern DECLSPEC int MIXCALL Mix_MasterVolume(int volume);
 
 /* Halt playing of a particular channel */
 extern DECLSPEC int MIXCALL Mix_HaltChannel(int channel);
