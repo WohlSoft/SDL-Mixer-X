@@ -1,5 +1,5 @@
 
-option(USE_MP3_MPG123     "Build with MP3 codec using MPG123" ON)
+option(USE_MP3_MPG123     "Build with MP3 codec using MPG123" OFF)
 if(USE_MP3_MPG123 AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE)
     option(USE_MP3_MPG123_DYNAMIC "Use dynamical loading of MPG123" OFF)
 

@@ -2,7 +2,7 @@ option(USE_OGG_VORBIS      "Build with OGG Vorbis codec" ON)
 if(USE_OGG_VORBIS)
     option(USE_OGG_VORBIS_DYNAMIC "Use dynamical loading of OGG Vorbis" OFF)
     option(USE_OGG_VORBIS_TREMOR "Use the Tremor - an integer-only OGG Vorbis implementation" OFF)
-    option(USE_OGG_VORBIS_STB    "Use the stb_vorbis - the portable minimalistic OGG Vorbis implementation" OFF)
+    option(USE_OGG_VORBIS_STB    "Use the stb_vorbis - the portable minimalistic OGG Vorbis implementation" ON)
 
     if(NOT USE_OGG_VORBIS_STB)
         if(USE_SYSTEM_AUDIO_LIBRARIES)

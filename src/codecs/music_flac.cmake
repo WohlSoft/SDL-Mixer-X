@@ -1,4 +1,4 @@
-option(USE_FLAC            "Build with FLAC codec using libFLAC" ON)
+option(USE_FLAC            "Build with FLAC codec using libFLAC" OFF)
 if(USE_FLAC)
     option(USE_FLAC_DYNAMIC "Use dynamical loading of FLAC" OFF)
 
