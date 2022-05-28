@@ -21,5 +21,5 @@ created for SDL_mixer 1.2. Some functions would be marked by @b{[Mixer X]} label
 which means those functions are not available in SDL_mixer 1.x, but available in
 SDL_mixer 2.0 and SDL Mixer X fork.
 
-@b{IMPORTANT}: The license for libADLMIDI, libOPNMIDI, libMAD is GPL which means
-that in order to use it your application must also be GPL!
+@b{IMPORTANT}: The license for libADLMIDI, libOPNMIDI, libGME with MAME YM2612 emulator
+is GPL which means that in order to use it your application must also be GPL!

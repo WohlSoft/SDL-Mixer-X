@@ -266,7 +266,7 @@ typedef enum {
     OPNMIDI_OPN2_EMU_MIME = 0 /*!!!TYPO!!!*/
 } Mix_OPNMIDI_Emulator;
 
-/* The internal format for a music chunk interpreted via mikmod */
+/* The internal format for a music chunk interpreted via codecs */
 typedef struct _Mix_Music Mix_Music;
 
 /* Open the mixer with a certain audio format */
@@ -1095,7 +1095,7 @@ extern DECLSPEC int MIXCALL Mix_PlayingMusic(void);
 /* Stop music and set external music playback command */
 extern DECLSPEC int MIXCALL Mix_SetMusicCMD(const char *command);
 
-/* Synchro value is set by MikMod from modules while playing */
+/* Synchro value is set from modules while playing */
 extern DECLSPEC int MIXCALL Mix_SetSynchroValue(int value);
 extern DECLSPEC int MIXCALL Mix_GetSynchroValue(void);
 

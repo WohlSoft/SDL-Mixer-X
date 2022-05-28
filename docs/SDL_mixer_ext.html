@@ -127,7 +127,7 @@ to use them with SDL_mixer.
 </p>
 <p>Due to popular demand, here is a simple multi-channel audio mixer.
 It supports 8 or more channels of 16 bit or more stereo audio, plus a single or
-multiple channels of music, mixed by the popular LibXMP/ModPlug/MikMod MOD, Timidity/FluidSynth MIDI
+multiple channels of music, mixed by the popular LibXMP/ModPlug MOD, Timidity/FluidSynth MIDI
 (also, libADLMIDI and libOPNMIDI), OGG Vorbis, FLAC, Opus, and MPG123 MP3 libraries.
 </p>
 <p>See the header file SDL_mixer_ext.h and the examples playwave.c and playmus.c
@@ -135,7 +135,7 @@ for documentation on this mixer library.
 </p>
 <p>The mixer can currently load Microsoft WAVE files and Creative Labs VOC
 files as audio samples, and can load MIDI files via Timidity/FluidSynth/libADLMIDI/libOPNMIDI and the
-following music formats via XMP, ModPlug, or MikMod: .MOD .S3M .IT .XM. etc.
+following music formats via libXMP or ModPlug: .MOD .S3M .IT .XM. etc.
 It can load Ogg Vorbis / Opus / FLAC streams as music if built with related libraries,
 can play chiptunes via GME library if built with it,
 and finally it can load MP3 music using the DRMP3 or MPG123 library.
@@ -205,8 +205,8 @@ created for SDL_mixer 1.2. Some functions would be marked by <b>[Mixer X]</b> la
 which means those functions are not available in SDL_mixer 1.x, but available in
 SDL_mixer 2.0 and SDL Mixer X fork.
 </p>
-<p><b>IMPORTANT</b>: The license for libADLMIDI, libOPNMIDI, libMAD is GPL which means
-that in order to use it your application must also be GPL!
+<p><b>IMPORTANT</b>: The license for libADLMIDI, libOPNMIDI, libGME with MAME YM2612 emulator
+is GPL which means that in order to use it your application must also be GPL!
 
 </p><hr size="6">
 <a name="Getting-Started"></a>
@@ -247,13 +247,13 @@ make
 - WAVE/RIFF (.wav)<br>
 - AIFF (.aiff)<br>
 - VOC (.voc)<br>
-- MOD (.mod .xm .s3m .669 .it .med and more) requiring libmikmod or libmodplug <b>[Mixer 2.0]</b> built in package<br>
-- MIDI (.mid) using timidity, FluidSynth <b>[Mixer 2.0]</b>, libADLMIDI <b>[Mixer X]</b>, libOPNMIDI <b>[Mixer X]</b> or native midi hardware<br>
-- OggVorbis (.ogg) requiring ogg/vorbis libraries built in package<br>
-- MP3 (.mp3) requiring DRMP3 or MPG123 libraries built in package<br>
-- FLAC (.flac) requiring the FLAC library built in package<br>
+- MOD (.mod .xm .s3m .669 .it .med and more) requiring libxmp or libmodplug <b>[Mixer 2.0]</b> built in package<br>
+- MIDI (.mid) using timidity, FluidSynth <b>[Mixer 2.0]</b>, libADLMIDI <b>[Mixer X]</b>, libOPNMIDI <b>[Mixer X]</b>, libEDMIDI <b>[Mixer X]</b> or native midi hardware<br>
+- OggVorbis (.ogg) requiring ogg/vorbis libraries built in package, or stb_vorbis enabled isntead<br>
+- MP3 (.mp3) requiring MPG123 library built in package, or DRMP3 enabled instead<br>
+- FLAC (.flac) requiring the FLAC library built in package, or DRFLAC enabled instead<br>
 - Opus (.opus) requiring the Opus/OpusFile library built in package<br>
-- GME (.spc .nsf .hes .vgm and more) emulated chiptunes from various console games <b>[Mixer X]</b> <br>
+- GME (.spc .nsf .hes .vgm and more) requiring the libGME library built in package <b>[Mixer X]</b><br>
 - also any command-line player, which is not mixed by SDL Mixer X...<br>
 </p>
 <p>You may also want to look at some demonstration code which may be downloaded from:<br>
@@ -3760,9 +3760,9 @@ There are two different music sub-systems provided:<br>
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fSetMusicCMD">5.5.42 Mix_SetMusicCMD</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                 Use external program for music playback
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fGetSynchroValue">5.5.43 Mix_GetSynchroValue</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">             <b>makes no effect yet.</b> Get the MikMod synchro value <b>[Mixer 2.0]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fGetSynchroValue">5.5.43 Mix_GetSynchroValue</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">             <b>makes no effect yet.</b> Get the module music synchro value <b>[Mixer 2.0]</b>
 </td></tr>
-<tr><td align="left" valign="top"><a href="#Mix_005fSetSynchroValue">5.5.44 Mix_SetSynchroValue</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">             <b>makes no effect yet.</b> Set the synchro value for MikMod <b>[Mixer 2.0]</b>
+<tr><td align="left" valign="top"><a href="#Mix_005fSetSynchroValue">5.5.44 Mix_SetSynchroValue</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">             <b>makes no effect yet.</b> Set the synchro value for module music <b>[Mixer 2.0]</b>
 </td></tr>
 <tr><td align="left" valign="top"><a href="#Mix_005fSetMusicFileName">5.5.45 Mix_SetMusicFileName</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">            Change the reporting filename tag of a music <b>[Mixer X]</b>
 </td></tr>
@@ -4605,10 +4605,10 @@ The previous music will continue play or fade concurrently.
 You can use this function to play multiple parallel music files
 (or long atmosphere sound effects).<br>
 <br>
-<b>CAUTION:</b> You can&rsquo;t use this function with modules played through <b>MikMod</b> and
-MIDI played through <b>Native MIDI</b> interface: these libraries don&rsquo;t support parallel
-playing of multiple music files. Please use the <a href="#Mix_005fPlayMusic">Mix_PlayMusic</a> function to play MikMod
-and NativeMidi as a single-stream music.
+<b>CAUTION:</b> You can&rsquo;t use this function with MIDI played through <b>Native MIDI</b>
+interface: this interface doesn&rsquo;t support parallel playing of multiple music files.
+Please use the <a href="#Mix_005fPlayMusic">Mix_PlayMusic</a> function to playNativeMidi as a single-stream
+music.
 </p>
 <p><b>Returns</b>: 0 on success, or -1 on errors.
 </p>
@@ -4674,10 +4674,10 @@ You can use this function to play multiple parallel music files
 (or long atmosphere sound effects).<br>
 This function is the same as <code>Mix_FadeInMusicStreamPos(<var>music</var>, <var>loops</var>, <var>ms</var>, 0)</code>.<br>
 <br>
-<b>CAUTION:</b> You can&rsquo;t use this function with modules played through <b>MikMod</b> and
-MIDI played through <b>Native MIDI</b> interface: these libraries don&rsquo;t support parallel
-playing of multiple music files. Please use the <a href="#Mix_005fFadeInMusic">Mix_FadeInMusic</a> function to play MikMod
-and NativeMidi as a single-stream music.
+<b>CAUTION:</b> You can&rsquo;t use this function with MIDI played through <b>Native MIDI</b>
+interface: this interface doesn&rsquo;t support parallel playing of multiple music files.
+Please use the <a href="#Mix_005fFadeInMusic">Mix_FadeInMusic</a> function to play NativeMidi as a single-stream
+music.
 </p>
 <p><b>Returns</b>: 0 on success, or -1 on errors.
 </p>
@@ -4746,10 +4746,10 @@ Any previous music will continue play or fade concurrently.
 You can use this function to play multiple parallel music files
 (or long atmosphere sound effects).<br>
 <br>
-<b>CAUTION:</b> You can&rsquo;t use this function with modules played through <b>MikMod</b> and
-MIDI played through <b>Native MIDI</b> interface: these libraries don&rsquo;t support parallel
-playing of multiple music files. Please use the <a href="#Mix_005fFadeInMusicPos">Mix_FadeInMusicPos</a> function tp play MikMod
-and NativeMidi as a single-stream music.<br>
+<b>CAUTION:</b> You can&rsquo;t use this function with MIDI played through <b>Native MIDI</b>
+interface: this interface doesn&rsquo;t support parallel playing of multiple music files.
+Please use the <a href="#Mix_005fFadeInMusicPos">Mix_FadeInMusicPos</a> function to play NativeMidi as a single-stream
+music.<br>
 </p>
 <p><b>Returns</b>: 0 on success, or -1 on errors.
 </p>
@@ -4824,9 +4824,8 @@ The fade in effect only applies to the first loop.<br>
 Any previous music will continue play or fade concurrently.<br>
 This function is the same as <code>Mix_CrossFadeMusicStreamPos(<var>old_music</var>, <var>new_music</var>, <var>loops</var>, <var>ms</var>, 0, 0)</code>.<br>
 <br>
-<b>CAUTION:</b> You can&rsquo;t use this function with modules played through <b>MikMod</b> and
-MIDI played through <b>Native MIDI</b> interface: these libraries don&rsquo;t support parallel
-playing of multiple music files.
+<b>CAUTION:</b> You can&rsquo;t use this function with MIDI played through <b>Native MIDI</b>
+interface: this interface doesn&rsquo;t support parallel playing of multiple music files.
 </p>
 <p><b>Returns</b>: 0 on success, or -1 on errors.
 </p>
@@ -4901,9 +4900,8 @@ The fade in effect only applies to the first loop.<br>
 The first time the music is played, it position will be set to <var>position</var>, which means different things for different types of music files, see <code>Mix_SetMusicPosition</code> for more info on that.<br>
 Any previous music will continue play or fade concurrently.<br>
 <br>
-<b>CAUTION:</b> You can&rsquo;t use this function with modules played through <b>MikMod</b> and
-MIDI played through <b>Native MIDI</b> interface: these libraries don&rsquo;t support parallel
-playing of multiple music files.<br>
+<b>CAUTION:</b> You can&rsquo;t use this function with MIDI played through <b>Native MIDI</b>
+interface: this interface doesn&rsquo;t support parallel playing of multiple music files.<br>
 </p>
 <p><b>Returns</b>: 0 on success, or -1 on errors.
 </p>
@@ -5671,8 +5669,7 @@ It only works on the music sources listed below.
 <dd><p>Jumps to <var>position</var> seconds from the beginning of the song.
 </p></dd>
 <dt> <b>MOD</b></dt>
-<dd><p><b>ModPlug or XMP</b>: Jumps to <var>position</var> seconds from the beginning of the song.
-<b>Mikmod</b>: The double is cast to Uint16 and used for a pattern number in the module.<br>
+<dd><p><b>ModPlug or XMP</b>: Jumps to <var>position</var> seconds from the beginning of the song.<br>
 Passing zero is similar to rewinding the song.
 </p></dd>
 <dt> <b>OGG</b></dt>
@@ -6500,8 +6497,7 @@ Mix_RewindMusic();
 <dd><p>Jumps to <var>position</var> seconds from the beginning of the song.
 </p></dd>
 <dt> <b>MOD</b></dt>
-<dd><p><b>ModPlug or XMP</b>: Jumps to <var>position</var> seconds from the beginning of the song.
-<b>Mikmod</b>: The double is cast to Uint16 and used for a pattern number in the module.<br>
+<dd><p><b>ModPlug or XMP</b>: Jumps to <var>position</var> seconds from the beginning of the song.<br>
 Passing zero is similar to rewinding the song.
 </p></dd>
 <dt> <b>OGG</b></dt>
@@ -7210,7 +7206,7 @@ switch(Mix_GetMusicType(NULL))
         printf(&quot;WAVE/RIFF music is playing.\n&quot;);
         break;
     MUS_MOD:
-        printf(&quot;MOD (XMP/ModPlug/MikMod) music is playing.\n&quot;);
+        printf(&quot;MOD (XMP/ModPlug) music is playing.\n&quot;);
         break;
     MUS_MID:
         printf(&quot;MIDI music is playing.\n&quot;);
@@ -10880,6 +10876,7 @@ Who knows why it isn&rsquo;t a pointer in this typedef...
     MUS_ADLMIDI = 200,
     MUS_OPNMIDI,
     MUS_FLUIDLITE,
+    MUS_EDMIDI,
     MUS_NATIVEMIDI
 } Mix_MusicType;
 </pre></td></tr></table>

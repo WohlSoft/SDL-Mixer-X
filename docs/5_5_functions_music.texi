@@ -63,8 +63,8 @@ There are two different music sub-systems provided:@*
 * Mix_GetMusicTracks::              Get the number of tracks (or channels) at the MIDI/Tracker/Chiptune music @b{[Mixer X]}
 * Mix_SetMusicTrackMute::           Mute or unmute the given track (or channel) at the MIDI/Tracker/Chiptune music @b{[Mixer X]}
 * Mix_SetMusicCMD::                 Use external program for music playback
-* Mix_GetSynchroValue::             @b{makes no effect yet.} Get the MikMod synchro value @b{[Mixer 2.0]}
-* Mix_SetSynchroValue::             @b{makes no effect yet.} Set the synchro value for MikMod @b{[Mixer 2.0]}
+* Mix_GetSynchroValue::             @b{makes no effect yet.} Get the module music synchro value @b{[Mixer 2.0]}
+* Mix_SetSynchroValue::             @b{makes no effect yet.} Set the synchro value for module music @b{[Mixer 2.0]}
 * Mix_SetMusicFileName::            Change the reporting filename tag of a music @b{[Mixer X]}
 @c Mix_SetSynchroValue::          seems useless! (return -1;)
 
@@ -660,10 +660,10 @@ The previous music will continue play or fade concurrently.
 You can use this function to play multiple parallel music files
 (or long atmosphere sound effects).@*
 @*
-@b{CAUTION:} You can't use this function with modules played through @b{MikMod} and
-MIDI played through @b{Native MIDI} interface: these libraries don't support parallel
-playing of multiple music files. Please use the @ref{Mix_PlayMusic} function to play MikMod
-and NativeMidi as a single-stream music.
+@b{CAUTION:} You can't use this function with MIDI played through @b{Native MIDI}
+interface: this interface doesn't support parallel playing of multiple music files.
+Please use the @ref{Mix_PlayMusic} function to playNativeMidi as a single-stream
+music.
 
 @noindent
 @b{Returns}: 0 on success, or -1 on errors.
@@ -714,10 +714,10 @@ You can use this function to play multiple parallel music files
 (or long atmosphere sound effects).@*
 This function is the same as @code{Mix_FadeInMusicStreamPos(@var{music}, @var{loops}, @var{ms}, 0)}.@*
 @*
-@b{CAUTION:} You can't use this function with modules played through @b{MikMod} and
-MIDI played through @b{Native MIDI} interface: these libraries don't support parallel
-playing of multiple music files. Please use the @ref{Mix_FadeInMusic} function to play MikMod
-and NativeMidi as a single-stream music.
+@b{CAUTION:} You can't use this function with MIDI played through @b{Native MIDI}
+interface: this interface doesn't support parallel playing of multiple music files.
+Please use the @ref{Mix_FadeInMusic} function to play NativeMidi as a single-stream
+music.
 
 @noindent
 @b{Returns}: 0 on success, or -1 on errors.
@@ -770,10 +770,10 @@ Any previous music will continue play or fade concurrently.
 You can use this function to play multiple parallel music files
 (or long atmosphere sound effects).@*
 @*
-@b{CAUTION:} You can't use this function with modules played through @b{MikMod} and
-MIDI played through @b{Native MIDI} interface: these libraries don't support parallel
-playing of multiple music files. Please use the @ref{Mix_FadeInMusicPos} function tp play MikMod
-and NativeMidi as a single-stream music.@*
+@b{CAUTION:} You can't use this function with MIDI played through @b{Native MIDI}
+interface: this interface doesn't support parallel playing of multiple music files.
+Please use the @ref{Mix_FadeInMusicPos} function to play NativeMidi as a single-stream
+music.@*
 
 @noindent
 @b{Returns}: 0 on success, or -1 on errors.
@@ -831,9 +831,8 @@ The fade in effect only applies to the first loop.@*
 Any previous music will continue play or fade concurrently.@*
 This function is the same as @code{Mix_CrossFadeMusicStreamPos(@var{old_music}, @var{new_music}, @var{loops}, @var{ms}, 0, 0)}.@*
 @*
-@b{CAUTION:} You can't use this function with modules played through @b{MikMod} and
-MIDI played through @b{Native MIDI} interface: these libraries don't support parallel
-playing of multiple music files.
+@b{CAUTION:} You can't use this function with MIDI played through @b{Native MIDI}
+interface: this interface doesn't support parallel playing of multiple music files.
 
 @noindent
 @b{Returns}: 0 on success, or -1 on errors.
@@ -890,9 +889,8 @@ The fade in effect only applies to the first loop.@*
 The first time the music is played, it position will be set to @var{position}, which means different things for different types of music files, see @code{Mix_SetMusicPosition} for more info on that.@*
 Any previous music will continue play or fade concurrently.@*
 @*
-@b{CAUTION:} You can't use this function with modules played through @b{MikMod} and
-MIDI played through @b{Native MIDI} interface: these libraries don't support parallel
-playing of multiple music files.@*
+@b{CAUTION:} You can't use this function with MIDI played through @b{Native MIDI}
+interface: this interface doesn't support parallel playing of multiple music files.@*
 
 @noindent
 @b{Returns}: 0 on success, or -1 on errors.
@@ -1448,8 +1446,7 @@ It only works on the music sources listed below.
 @item WAV
 Jumps to @var{position} seconds from the beginning of the song.
 @item MOD
-@b{ModPlug or XMP}: Jumps to @var{position} seconds from the beginning of the song.
-@b{Mikmod}: The double is cast to Uint16 and used for a pattern number in the module.@*
+@b{ModPlug or XMP}: Jumps to @var{position} seconds from the beginning of the song.@*
 Passing zero is similar to rewinding the song.
 @item OGG
 Jumps to @var{position} seconds from the beginning of the song.
@@ -2001,8 +1998,7 @@ Set the position of the currently playing music.  The @var{position} takes diffe
 @item WAV
 Jumps to @var{position} seconds from the beginning of the song.
 @item MOD
-@b{ModPlug or XMP}: Jumps to @var{position} seconds from the beginning of the song.
-@b{Mikmod}: The double is cast to Uint16 and used for a pattern number in the module.@*
+@b{ModPlug or XMP}: Jumps to @var{position} seconds from the beginning of the song.@*
 Passing zero is similar to rewinding the song.
 @item OGG
 Jumps to @var{position} seconds from the beginning of the song.
@@ -2532,7 +2528,7 @@ switch(Mix_GetMusicType(NULL))
         printf("WAVE/RIFF music is playing.\n");
         break;
     MUS_MOD:
-        printf("MOD (XMP/ModPlug/MikMod) music is playing.\n");
+        printf("MOD (XMP/ModPlug) music is playing.\n");
         break;
     MUS_MID:
         printf("MIDI music is playing.\n");

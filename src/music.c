@@ -28,7 +28,6 @@
 
 #include "music_cmd.h"
 #include "music_wav.h"
-#include "music_mikmod.h"
 #include "music_modplug.h"
 #include "music_xmp.h"
 #include "music_nativemidi.h"
@@ -607,9 +606,6 @@ static Mix_MusicInterface *s_music_interfaces[] =
 #endif
 #ifdef MUSIC_MOD_MODPLUG
     &Mix_MusicInterface_MODPLUG,
-#endif
-#ifdef MUSIC_MOD_MIKMOD
-    &Mix_MusicInterface_MIKMOD,
 #endif
 #ifdef MUSIC_MID_FLUIDSYNTH
     &Mix_MusicInterface_FLUIDSYNTH,
@@ -1608,8 +1604,8 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
     /* Assume MOD format.
      *
      * Apparently there is no way to check if the file is really a MOD,
-     * or there are too many formats supported by MikMod/ModPlug, or
-     * MikMod/ModPlug does this check by itself. */
+     * or there are too many formats supported by libmodplug or libxmp.
+     * The mod library does this check by itself. */
     return MUS_MOD;
 }
 
@@ -2197,13 +2193,6 @@ int MIXCALLCC Mix_FadeInMusicStreamPos(Mix_Music *music, int loops, int ms, doub
 #if defined(MUSIC_MID_NATIVE)
     if (music->interface->api == MIX_MUSIC_NATIVEMIDI) {
         Mix_SetError("Native MIDI can't be used with Multi-Music API");
-        return(-1);
-    }
-#endif
-
-#if defined(MUSIC_MOD_MIKMOD)
-    if (music->interface->api == MIX_MUSIC_MIKMOD) {
-        Mix_SetError("MikMod can't be used with Multi-Music API");
         return(-1);
     }
 #endif

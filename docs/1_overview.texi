@@ -39,7 +39,7 @@ The latest version of this library is available from:@*
 
 Due to popular demand, here is a simple multi-channel audio mixer.
 It supports 8 or more channels of 16 bit or more stereo audio, plus a single or
-multiple channels of music, mixed by the popular LibXMP/ModPlug/MikMod MOD, Timidity/FluidSynth MIDI
+multiple channels of music, mixed by the popular LibXMP/ModPlug MOD, Timidity/FluidSynth MIDI
 (also, libADLMIDI and libOPNMIDI), OGG Vorbis, FLAC, Opus, and MPG123 MP3 libraries.
 
 See the header file SDL_mixer_ext.h and the examples playwave.c and playmus.c
@@ -47,7 +47,7 @@ for documentation on this mixer library.
 
 The mixer can currently load Microsoft WAVE files and Creative Labs VOC
 files as audio samples, and can load MIDI files via Timidity/FluidSynth/libADLMIDI/libOPNMIDI and the
-following music formats via XMP, ModPlug, or MikMod: .MOD .S3M .IT .XM. etc.
+following music formats via libXMP or ModPlug: .MOD .S3M .IT .XM. etc.
 It can load Ogg Vorbis / Opus / FLAC streams as music if built with related libraries,
 can play chiptunes via GME library if built with it,
 and finally it can load MP3 music using the DRMP3 or MPG123 library.

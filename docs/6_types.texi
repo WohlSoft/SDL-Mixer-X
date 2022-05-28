@@ -115,6 +115,7 @@ typedef enum @{
     MUS_ADLMIDI = 200,
     MUS_OPNMIDI,
     MUS_FLUIDLITE,
+    MUS_EDMIDI,
     MUS_NATIVEMIDI
 @} Mix_MusicType;
 @end example

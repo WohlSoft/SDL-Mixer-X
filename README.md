@@ -6,7 +6,7 @@ An audio mixer library, a fork of [SDL_mixer](http://www.libsdl.org/projects/SDL
 SDL_Mixer is a sample multi-channel audio mixer library.
 It supports any number of simultaneously playing channels of 16 bit stereo audio,
 plus a single channel of music, mixed by the popular FLAC, OPUS, XMP, ModPlug,
-MikMod MOD, Timidity MIDI, FluidSynth, Ogg Vorbis, FLAC, libMAD, and MPG123 MP3 libraries.
+Timidity MIDI, FluidSynth, Ogg Vorbis, FLAC, and MPG123 MP3 libraries.
 
 SDL Mixer X - is an extended fork made by Vitaly Novichkov "Wohlstand" in
 13 January 2015. SDL_mixer is a quick and stable high-quality audio library,
@@ -51,8 +51,7 @@ the `-DSDL_MIXER_CLEAR_FOR_ZLIB_LICENSE=ON` flag):
 LGPL allows usage in closed-source projects when LGPL-licensed components are linked dynamically.
 Note, once you link those libraries statically, the MixerX library gets LGPLv2.1+ license.
 * libFluidLite
-* libGME
-* libMikMod
+* libGME when Nuked OPN2 or GEMS emulator is used
 * libMPG123
 * libXMP
 
@@ -61,6 +60,6 @@ There are libraries making the MixerX being licensed as GPLv2+ or GPLv3+ with no
 how you will link them. You can avoid linking them by using of the `-DSDL_MIXER_CLEAR_FOR_LGPL_LICENSE=ON`
 CMake flag to get LGPL license, or use the `-DSDL_MIXER_CLEAR_FOR_ZLIB_LICENSE=ON` flag
 to get the ZLib license.
-* libMAD
 * libADLMIDI
 * libOPNMIDI
+* libGME when MAME YM2612 emulator is used
