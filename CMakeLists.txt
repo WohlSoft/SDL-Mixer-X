@@ -111,12 +111,12 @@ else()
     set(SDL_MIXER_X_SHARED OFF)
 endif()
 
-option(DOWNLOAD_AUDIO_CODECS_DEPENDENCY "Downloads and compiles AudioCodecs dependencies pack directly" OFF)
-option(AUDIO_CODECS_BUILD_LOCAL_SDL2 "Build SDL2 from local AudioCodecs' copy" OFF)
-set(AUDIO_CODECS_REPO_PATH "" CACHE PATH "Path to the AudioCodecs dependencies pack")
-set(AUDIO_CODECS_INSTALL_PATH "" CACHE PATH "Path to installed AudioCodecs prefix")
+option(DOWNLOAD_AUDIO_CODECS_DEPENDENCY "Downloads and compiles AudioCodecs dependencies from git repository and build it" OFF)
+option(AUDIO_CODECS_BUILD_LOCAL_SDL2 "Build SDL2 from local copy of 'AudioCodecs' repository" OFF)
+set(AUDIO_CODECS_REPO_PATH "" CACHE PATH "Path to the AudioCodecs repository with sources of dependencies (if not specified, system libraries will be used)")
+set(AUDIO_CODECS_INSTALL_PATH "" CACHE PATH "Path to installed AudioCodecs prefix (if not specified, system libraries will be used)")
 
-option(SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE   "Disable all GPL/LGPL dependencies to make binary being licensed with ZLib license" OFF)
+option(SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE   "Disable all GPL and LGPL dependencies to make binary being licensed with ZLib license" OFF)
 option(SDL_MIXER_CLEAR_FOR_LGPL_LICENSE   "Disable all GPL dependencies to make binary being licensed with LGPL license" OFF)
 
 if(SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE AND SDL_MIXER_CLEAR_FOR_LGPL_LICENSE)

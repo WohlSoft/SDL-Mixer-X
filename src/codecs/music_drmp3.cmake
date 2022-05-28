@@ -1,5 +1,5 @@
 option(USE_MP3_DRMP3  "Build with MP3 codec using dr_mp3" ON)
-option(USE_MP3_MINIMP3  "Build with MP3 codec using dr_mp3 [compatibility fallback]" OFF)
+option(USE_MP3_MINIMP3  "[compatibility fallback] Build with MP3 codec using dr_mp3" OFF)
 
 mark_as_advanced(USE_MP3_MINIMP3)
 
