@@ -26,6 +26,10 @@
 #include "music_ogg.h"
 #include "utils.h"
 #include "SDL_assert.h"
+#include "SDL_version.h"
+#if !SDL_VERSION_ATLEAST(2, 0, 9)
+#include <math.h> /* for missing exp() */
+#endif
 
 #define STB_VORBIS_SDL 1 /* for SDL_mixer-specific stuff. */
 #define STB_VORBIS_NO_STDIO 1
@@ -63,7 +67,9 @@
 #define cos(x) SDL_cos(x)
 #define sin(x) SDL_sin(x)
 #define log(x) SDL_log(x)
-#define exp(x) SDL_exp(x)
+#if SDL_VERSION_ATLEAST(2, 0, 9)
+#define exp(x) SDL_exp(x) /* Available since SDL 2.0.9 */
+#endif
 
 #include "stb_vorbis/stb_vorbis_c90.h"
 
