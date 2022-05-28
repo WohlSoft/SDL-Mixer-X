@@ -1799,7 +1799,7 @@ void Mix_UnlockAudio(void)
     SDL_UnlockAudioDevice(audio_device);
 }
 
-int Mix_MasterVolume(int volume)
+int MIXCALLCC Mix_MasterVolume(int volume)
 {
     int prev_volume = SDL_AtomicGet(&master_volume);
     if (volume < 0) {
