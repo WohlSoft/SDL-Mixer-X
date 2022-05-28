@@ -32,6 +32,7 @@ Makefile.*
 *.directory
 
 /build/*
+/build17/*
 /OBJ/*
 
 # System junk
