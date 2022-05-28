@@ -27,7 +27,7 @@ SDL Mixer X supports playing music and sound samples from the following formats:
 - MOD (.mod .xm .s3m .669 .it .med and more) requiring libmikmod or libmodplug @b{[Mixer 2.0]} built in package@*
 - MIDI (.mid) using timidity, FluidSynth @b{[Mixer 2.0]}, libADLMIDI @b{[Mixer X]}, libOPNMIDI @b{[Mixer X]} or native midi hardware@*
 - OggVorbis (.ogg) requiring ogg/vorbis libraries built in package@*
-- MP3 (.mp3) requiring MPG123 or MAD libraries built in package@*
+- MP3 (.mp3) requiring DRMP3 or MPG123 libraries built in package@*
 - FLAC (.flac) requiring the FLAC library built in package@*
 - Opus (.opus) requiring the Opus/OpusFile library built in package@*
 - GME (.spc .nsf .hes .vgm and more) emulated chiptunes from various console games @b{[Mixer X]} @*

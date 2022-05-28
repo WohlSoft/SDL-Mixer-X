@@ -1011,11 +1011,12 @@ extern DECLSPEC int MIXCALL Mix_PausedMusic(void);
  */
 extern DECLSPEC int MIXCALL Mix_ModMusicJumpToOrder(int order);
 extern DECLSPEC int MIXCALL Mix_ModMusicStreamJumpToOrder(Mix_Music *music, int order);
-/* Set the current position in the music stream.
-   This returns 0 if successful, or -1 if it failed or isn't implemented.
+
+/* Set the current position in the music stream (in seconds).
+   This returns 0 if successful, or -1 if it failed or not implemented.
    This function is only implemented for MOD music formats (set pattern
-   order number) and for WAV, OGG, FLAC, MP3_MAD, MP3_MPG, and MODPLUG music
-   (set position in seconds), at the moment.
+   order number) and for WAV, OGG, FLAC, MP3, and MODPLUG music at the
+   moment.
 */
 extern DECLSPEC int MIXCALL Mix_SetMusicPositionStream(Mix_Music *music, double position);
 

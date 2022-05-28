@@ -50,7 +50,7 @@ files as audio samples, and can load MIDI files via Timidity/FluidSynth/libADLMI
 following music formats via XMP, ModPlug, or MikMod: .MOD .S3M .IT .XM. etc.
 It can load Ogg Vorbis / Opus / FLAC streams as music if built with related libraries,
 can play chiptunes via GME library if built with it,
-and finally it can load MP3 music using the MPG123 or libMAD library.
+and finally it can load MP3 music using the DRMP3 or MPG123 library.
 
 The process of mixing MIDI files to wave output in dependence on a synthesizer
 is very CPU intensive, so if playing regular WAVE files sound great, but

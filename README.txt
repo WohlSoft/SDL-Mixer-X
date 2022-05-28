@@ -3,7 +3,7 @@ by Vitaly Novichkov <Wohlstand>,
 forked from SDL Mixer 2.0 by Sam Lantinga <slouken@libsdl.org>
 
 vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-WARNING: The licenses for libmad, ADLMIDI, OPNMIDI, and GME is GPL,
+WARNING: The licenses for libADLMIDI, libOPNMIDI, and GME is GPL,
          which means that in order to use it your application must
          also be GPL!
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -23,7 +23,7 @@ at the docs/SDL_mixer_ext.html
 Due to popular demand, here is a simple multi-channel audio mixer.
 It supports 8 channels of 16 bit stereo audio, plus a single channel
 of music, mixed by the libXMP, Modplug MOD, Timidity MIDI, libADLMIDI,
-libOPNMIDI, FluidSynth, FluidLite, GME, and LibMAD MP3 libraries.
+libOPNMIDI, FluidSynth, FluidLite, GME, and drmp3 MP3 libraries.
 
 See the header file SDL_mixer_ext.h for documentation on this mixer library.
 
@@ -33,7 +33,7 @@ libOPNMIDI, or by FluidSynth, and the following music formats via libXMP,
 libModPlug, or MikMod:  .MOD .S3M .IT .XM, and many other formats. It can load
 Ogg Vorbis streams as music if built with Ogg Vorbis, Tremor, or stb-vrobis
 libraries, load Opus, FLAC, and finally it can load MP3 music
-using the minimp3, libmad, or libmpg123 libraries.
+using the drmp3 or libmpg123 libraries.
 
 Tremor decoding is disabled by default; you can enable it by passing
 	-DUSE_OGG_VORBIS=ON -DUSE_OGG_VORBIS_TREMOR=ON
@@ -46,7 +46,7 @@ All other flags and codecs you can find using the CMake configure tools like the
 cmake-gui or ccmake.
 
 vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-WARNING: The license for libmad, libADLMIDI, and libOPNMIDI is GPL,
+WARNING: The license for libADLMIDI, and libOPNMIDI is GPL,
          which means that in order to use them your application must
          also be GPL!
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
