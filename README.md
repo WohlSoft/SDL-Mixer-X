@@ -27,6 +27,10 @@ depends on which libraries you'll use and how (statically or dynamically).
 
 The license of the library itself is ZLib as the mainstream SDL_mixer.
 
+# Building
+See the [docs/index.md](docs/index.md#How%20to%20build) file for details.
+
+
 ## List of libraries
 There are libraries that keeps MixerX library under ZLib:
 (Optionally, you can automatically filter any zlib-incompatible libraries by using

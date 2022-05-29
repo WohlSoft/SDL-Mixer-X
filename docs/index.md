@@ -5,7 +5,8 @@ A fork of [SDL_mixer](http://www.libsdl.org/projects/SDL_mixer/) library
 SDL_Mixer is a sample multi-channel audio mixer library.
 It supports any number of simultaneously playing channels of 16 bit stereo audio,
 plus a single channel of music, mixed by the popular FLAC, OPUS, XMP, ModPlug,
-MikMod MOD, Timidity MIDI, FluidSynth, Ogg Vorbis, FLAC, libMAD, and MPG123 MP3 libraries.
+MikMod MOD, Timidity MIDI, FluidSynth, libADLMIDI, libOPNMIDI, Ogg Vorbis,
+stb_vorbis, FLAC, DRFLAC, DRMP3 and MPG123 MP3 libraries.
 
 SDL Mixer X (or shorty MixerX) - It’s an extended fork of the SDL_mixer library
 made by Vitaly Novichkov "Wohlstand" in 13 January 2015. SDL_mixer is a quick and
@@ -47,52 +48,218 @@ providing support for more supported audio formats.
 ### Features introduced at MixerX later removed because of unnecessarity
 * Own re-sampling implementation which a workaround to glitches caused with inaccurate re-sampler implementation from SDL2. Recent versions of SDL2 now has much better resampler than was before.
 
-## Requirements
-* Fresh [SDL2 library](https://hg.libsdl.org/SDL/)
-* Optionally, complete set of audio codecs from [this repository](https://github.com/WohlSoft/AudioCodecs) can be built in one run with a small effort.
-  * OGG Vorbis or Tremor:
-    * [libogg, libvorbis, libvorbisfile (or libvorbisidec)](https://www.xiph.org/downloads/)
-  * OPUS
-    * [liboups, libopusfle](http://opus-codec.org/downloads/)
-  * [FLAC](https://www.xiph.org/flac/)
-  * one of these MP3 libraries on your choice:
-    * [libmpg123](https://www.mpg123.de/)
-    * libmad (working build with using of CMake is [here](https://github.com/WohlSoft/AudioCodecs/tree/master/libmad), original automake build is too old broken and unmodified since 2004'th year)
-  * Tracker music modules
-    * [XMP](https://github.com/libxmp/libxmp)
-    * [ModPlug](https://github.com/WohlSoft/AudioCodecs/tree/master/libmodplug)
-    * [MikMod](https://github.com/WohlSoft/AudioCodecs/tree/master/libmikmod)
-  * MIDI on your choice
-    * modified [Timidity-SDL library](https://github.com/WohlSoft/AudioCodecs/tree/master/libtimidity-sdl) (in original SDL Mixer it's source code is an embedded part)
-    * FluidSynth (supported both 1.x and 2.x, will be identified on a compile time, dynamically will not work)
-    * [libADLMIDI](https://github.com/Wohlstand/libADLMIDI)
-    * [libOPNMIDI](https://github.com/Wohlstand/libOPNMIDI)
 
-* [CMake >= 2.8](https://cmake.org/download/) building system
+# How to build
+
+## Requirements
+
+### Minimal
+To build library, the next conditions are required:
+- CMake 2.8.12 and higher (when using AudioCodecs mode, 3.2 and higher)
+- SDL2 version 2.0.8 or newer
+- git if you want to build the library with the AudioCodecs pack
 * Compiler, compatible with C90 (C99 is required when building with OPUS library) or higher and C++98 (to build C++-written parts and libraries) or higher. Build tested and works on next compilers:
   * GCC 4.8 and higher
   * CLang 3.x and higher
   * MSVC 2013, 2015, 2017
 
-# How to build
+### More file formats support
+Without installing any codec libraries and without AudioCodecs pack use, these
+formats will be supported by the library by default:
+- WAV
+- AIFF
+- VOC (As Mix_Chunk only)
+- MP3 via embedded DRMP3
+- OGG Vorbis via embedded stb_vorbis
+- FLAC via embedded DRFLAC
+- MIDI via embedded Timidity or via system-wide MIDI output
 
-## With CMake
-With this way all dependencies will be automatically downloaded and compiled
+If you want to enable support for more file formats, you will need to install
+optional libraries (listed below) into the system. You aren't required to
+install every library into the system to build the library: any enabled
+component will be automatically disabled when the required library is missing
+from the system.
+
+#### BSD/MIT/PD/LGPL-licensed libraries
+- [libogg](https://github.com/xiph/ogg) - is required when is need to support Vorbis, FLAC, or Opus.
+- [libvorbis](https://github.com/xiph/vorbis) or [Tremor](https://gitlab.xiph.org/xiph/tremor) - to enable the OGG Vorbis support, otherwise the embedded stb_vorbis can be used.
+- [libopus](https://github.com/xiph/opus) and [libopusfile](https://github.com/xiph/opusfile) - to enable the Opus support.
+- [libFLAC](https://github.com/xiph/flac) - to enable the FLAC support, otherwise the embedded [DRFLAC](https://github.com/mackron/dr_libs) codec can be used.
+- [libmpg123](https://www.mpg123.de/) - to enable the MP3 support, otherwise the embedded [DRMP3](https://github.com/mackron/dr_libs) codec can be used.
+- [libxmp](https://github.com/libxmp/libxmp/) - to enable the support for various tracker music formats such as MOD, IT, XM, S3M, etc.
+- [libmodplug](https://github.com/Konstanty/libmodplug) - another library for the tracker music formats support.
+- [libgme](https://bitbucket.org/mpyne/game-music-emu) - to enable support for chiptune formats such as NSF, VGM, SPC, HES, etc.
+- [libfluidsynth](https://github.com/FluidSynth/fluidsynth) or [libfluidlite](https://github.com/divideconcept/FluidLite) - the wavetable MIDI synthesizer library based on SoundFont 2 specifications
+- [libEDMIDI](https://github.com/Wohlstand/libEDMIDI) - the MIDI synthesizer library based on OPLL/PSG/SCC synthesis
+
+#### GPL-licensed libraries
+There are libraries that currently has GPL license, and if you will take use of them, the license of MixerX will be GPLv3.
+- [libADLMIDI](https://github.com/Wohlstand/libADLMIDI) - the MIDI synthesizer library based on OPL3 synthesis
+- [libOPNMIDI](https://github.com/Wohlstand/libOPNMIDI) - the MIDI synthesizer library based on OPN2/OPNA synthesis
+
+
+## Build the project
+
+### License of library
+The MixerX library has 3 different license modes (Zlib, LGPLv2.1+, and GPLv3+)
+depending on enabled components: you may get the LGPL license if you statically
+link LGPL components into the MixerX shared library, or GPL license when you
+link any GPL components to the library. To enforce library build under specific
+license, you may use the next CMake options:
+
+* `-DSDL_MIXER_CLEAR_FOR_ZLIB_LICENSE=ON` - Disable all GPL and LGPL components to ensure ZLib license.
+* `-DSDL_MIXER_CLEAR_FOR_LGPL_LICENSE=ON` - Disable all GPL components to ensure LGPLv2.1 license.
+
+If you want to build the library with full functionality and use GPL license,
+disable these options.
+
+
+### Build with default configuration
+Once all necessary dependencies installed, run the next code in your terminal at the clonned repository directory:
 ```bash
+# Prepare the build directory
 mkdir build
 cd build
-cmake -DCMAKE_INSTALL_PREFIX=/usr/local/ -DDOWNLOAD_AUDIO_CODECS_DEPENDENCY=ON -DDOWNLOAD_SDL2_DEPENDENCY=ON ..
+
+# Configure the project
+cmake  -DCMAKE_BUILD_TYPE=Release -DSDL_MIXER_CLEAR_FOR_ZLIB_LICENSE=ON ..
+
+# Run the build
 make -j 4 #where 4 - set number of CPU cores you have
+
+# Install the built library and headers into the system
 make install
 ```
+It will enable these components which was detected at the system during CMake step.
+
+The built library will have ZLib license that you can statically link with any
+application including commercial.
+
+This build will have next components always disabled:
+- FluidSynth (LGPLv2.1+)
+- GME (LGPLv2.1+ or GPLv2+ with MAME YM2612 enabled)
+- MPG123 (LGPLv2.1)
+- libADLMIDI (GPLv3+)
+- libOPNMIDI (GPLv3+)
+
+
+### Build with default configuration with LGPL mode
+If you want to enable support for FluidSynth, GME, and MPG123, you will need
+to use the LGPL mode, run the configure step with the next line:
+```
+# Configure the project
+cmake  -DCMAKE_BUILD_TYPE=Release -DSDL_MIXER_X_SHARED=ON -DSDL_MIXER_X_STATIC=OFF -DSDL_MIXER_CLEAR_FOR_LGPL_LICENSE=ON ..
+```
+The resulted build will have LGPLv2.1 license that you can dynamically link with any
+application including commercial.
+
+This build will have next components always disabled:
+- GME (LGPLv2.1+ or GPLv2+ with MAME YM2612 enabled)
+- libADLMIDI (GPLv3+)
+- libOPNMIDI (GPLv3+)
+
+
+### Build with default configuration and GPL license
+If you want to enable support for libADLMIDI and libOPNMIDI, you will need
+to use the GPL mode, run the configure step with the next line:
+```
+# Configure the project
+cmake -DCMAKE_BUILD_TYPE=Release ..
+```
+All supported components will be enabled in condition they are installed at the
+system. This version you can link with GPL-only applications. The final license
+of the library will be printed out after running CMake command.
+
+
+### Build with AudioCodecs
+If you don't want to build the library with the complete functionality, you can enable use of the
+[AudioCodecs](https://github.com/WohlSoft/AudioCodecs) repository which is a collection of audio
+codec libraries bundled into single portable build project. This way is very useful
+on platforms such as Windows, mobile platforms such as Android where is required
+to build all dependencies from the source separately, or homebrew console toolchains with
+the similar case. You aren't required to build and install separately, you can enable two
+CMake options to let CMake do all hard work instead of you.
+
+#### General build on UNIX-like platform and install into the system
+The library will be built and installed into system in usual way
+```bash
+# Prepare the build directory
+mkdir build
+cd build
+
+# Configure the project
+cmake -DCMAKE_BUILD_TYPE=Release -DDOWNLOAD_AUDIO_CODECS_DEPENDENCY=ON -DAUDIO_CODECS_BUILD_LOCAL_SDL2=ON ..
+
+# Run the build
+make -j 4 #where 4 - set number of CPU cores you have
+
+# Install the built library and headers into the system
+make install
+```
+
+#### Build with installing into custom location
+If you don't want install the library into system, you may specify the different path for the
+library installation and then, copy it into another location or refer it directly at the project:
+
+```bash
+# Prepare the build directory
+mkdir build
+cd build
+
+# Configure the project
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=output -DDOWNLOAD_AUDIO_CODECS_DEPENDENCY=ON -DAUDIO_CODECS_BUILD_LOCAL_SDL2=ON ..
+
+# Run the build
+cmake --build . --config Release -- j 4 #where 4 - set number of CPU cores you have
+
+# Install the built library and headers into the system
+make install
+```
+After run, the library, all dependencies, and headers will appear at the "output"
+sub-directory at the "build" directory inside the repository. You can refer
+use its content in your project directly.
+
+
+#### Use standalone copy of AudioCodecs repository
+You may totally avoid any network access during build if you make the full copy of the
+[AudioCodecs](https://github.com/WohlSoft/AudioCodecs) repository and when you build it separately.
+```bash
+# Clonning both repositories (and in the next time, pack them into archive and take them at any time you want to use them)
+git clone https://github.com/WohlSoft/AudioCodecs.git
+git clone https://github.com/WohlSoft/SDL-Mixer-X.git
+
+# Building AudioCodecs
+cd AudioCodecs
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release -DUSE_LOCAL_SDL2=ON -DCMAKE_INSTALL_PREFIX=../../mixerx-install ..
+make -j 5
+make install
+cd ../..
+
+# Building MixerX and re-use libraries built at AudioCodecs
+cd SDL-Mixer-X
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../../mixerx-install -DAUDIO_CODECS_INSTALL_PATH=../../mixerx-install -DAUDIO_CODECS_REPO_PATH=../../AudioCodecs ..
+make -j 5
+make install
+```
+
+So, the complete build will appear at the "mixerx-install" directory among both AudioCodecs and SDL_Mixer_X repositories.
+
 
 # How to use library
 
 ## Include
-The API is fully compatible with original SDL Mixer and can be used as a drop-in replacement of original SDL Mixer with exception of a different header name
+The API is backward-compatible with original SDL2_mixer and can be used as a drop-in replacement of original SDL2_mixer with exception of a different header name
 ```cpp
 #include <SDL2/SDL_mixer_ext.h>
 ```
+and different linked library name `SDL2_mixer_ext`.
+
+In addition, there are new API calls which can be used to take full ability of the MixerX fork.
+
 
 ## Linking (Linux)
 
@@ -102,11 +269,11 @@ gcc playmus.c -o playmus -I/usr/local/include -L/usr/local/lib -lSDL2_mixer_ext 
 ```
 
 ### Statically
-To get it linked you must also link dependencies of SDL Mixer X library itself and also dependencies of SDL2 too
+To get it linked you should also link all dependencies of MixerX library itself and also dependencies of SDL2 too
 ```
-gcc playmus.c -o playmus -I/usr/local/include -L/usr/local/lib -Wl,-Bstatic -lSDL2_mixer_ext -lFLAC -lopusfile -lopus -lvorbisfile -lvorbis -logg -lmad -lid3tag -lmodplug -lADLMIDI -lOPNMIDI -ltimidity -lgme -lzlib -lSDL2 -Wl,-Bdynamic -lpthread -lm -ldl -static-libgcc -lstdc++
+gcc playmus.c -o playmus -I/usr/local/include -L/usr/local/lib -Wl,-Bstatic -lSDL2_mixer_ext -lFLAC -lopusfile -lopus -lvorbisfile -lvorbis -logg -lmodplug -lADLMIDI -lOPNMIDI -lEDMIDI -lgme -lzlib -lSDL2 -Wl,-Bdynamic -lpthread -lm -ldl -static-libgcc -lstdc++
 ```
 
 # Documentation
-* [Full documentation](https://wohlsoft.github.io/SDL-Mixer-X/SDL_mixer_ext.html)
-* [PGE-Wiki description page](http://wohlsoft.ru/pgewiki/SDL_Mixer_X)
+* [Full API documentation](https://wohlsoft.github.io/SDL-Mixer-X/SDL_mixer_ext.html)
+* [Moondust-Wiki description page](https://wohlsoft.ru/pgewiki/SDL_Mixer_X)
