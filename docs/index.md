@@ -172,7 +172,8 @@ of the library will be printed out after running CMake command.
 
 
 ### Build with AudioCodecs
-If you don't want to build the library with the complete functionality, you can enable use of the
+If you want to build the library with the complete functionality and you don't
+want or can't install any libraries into system, you can enable use of the
 [AudioCodecs](https://github.com/WohlSoft/AudioCodecs) repository which is a collection of audio
 codec libraries bundled into single portable build project. This way is very useful
 on platforms such as Windows, mobile platforms such as Android where is required
