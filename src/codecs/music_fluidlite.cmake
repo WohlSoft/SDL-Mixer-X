@@ -1,5 +1,5 @@
-option(USE_MIDI_FLUIDLITE "Build with an FluidLite wave table MIDI sequencer support (a light-weight of the FluidSynth)" ON)
-if(USE_MIDI_FLUIDLITE AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE)
+option(USE_MIDI_FLUIDLITE "Build with an FluidLite wave table MIDI sequencer support (a light-weight of the FluidSynth) (LGPL)" ON)
+if(USE_MIDI_FLUIDLITE AND MIXERX_LGPL)
     option(USE_MIDI_FLUIDLITE_DYNAMIC "Use dynamical loading of FluidLite" OFF)
     option(USE_MIDI_FLUIDLITE_OGG_STB "Don't require the vorbis linking (set this flag if FluidLite build has std_vorbis used)" OFF)
 

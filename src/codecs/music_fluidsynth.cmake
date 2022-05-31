@@ -1,5 +1,5 @@
-option(USE_MIDI_FLUIDSYNTH "Build with FluidSynth wave table MIDI sequencer support" OFF)
-if(USE_MIDI_FLUIDSYNTH AND NOT USE_MIDI_FLUIDLITE AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE)
+option(USE_MIDI_FLUIDSYNTH "Build with FluidSynth wave table MIDI sequencer support (LGPL)" OFF)
+if(USE_MIDI_FLUIDSYNTH AND NOT USE_MIDI_FLUIDLITE AND MIXERX_LGPL)
     option(USE_MIDI_FLUIDSYNTH_DYNAMIC "Use dynamical loading of FluidSynth" OFF)
 
     if(NOT USE_SYSTEM_AUDIO_LIBRARIES)

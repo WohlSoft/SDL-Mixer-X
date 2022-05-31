@@ -1,9 +1,11 @@
-option(USE_XMP         "Build with XMP library" ON)
-if(USE_XMP AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE)
+option(USE_XMP         "Build with XMP library (LGPL)" ON)
+if(USE_XMP)
     option(USE_XMP_DYNAMIC "Use dynamical loading of XMP library" OFF)
     option(USE_XMP_LITE "Use the lite version of XMP library" OFF)
 
-    set(USE_XMP_LITE_ENFORCE ${SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE})
+    if(NOT MIXERX_LGPL AND NOT MIXERX_GPL)
+        set(USE_XMP_LITE_ENFORCE TRUE)
+    endif()
 
     if(USE_SYSTEM_AUDIO_LIBRARIES)
         if(USE_XMP_LITE OR USE_XMP_LITE_ENFORCE)

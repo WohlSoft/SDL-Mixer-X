@@ -1,5 +1,5 @@
-option(USE_MIDI_OPNMIDI    "Build with libOPNMIDI OPN2 Emulator based MIDI sequencer support" ON)
-if(USE_MIDI_OPNMIDI AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE AND NOT SDL_MIXER_CLEAR_FOR_LGPL_LICENSE)
+option(USE_MIDI_OPNMIDI    "Build with libOPNMIDI OPN2 Emulator based MIDI sequencer support (GPL)" ON)
+if(USE_MIDI_OPNMIDI AND MIXERX_GPL)
     option(USE_MIDI_OPNMIDI_DYNAMIC "Use dynamical loading of libOPNMIDI library" OFF)
 
     if(USE_SYSTEM_AUDIO_LIBRARIES)

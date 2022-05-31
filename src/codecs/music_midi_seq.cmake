@@ -12,7 +12,7 @@ if(CPP_MIDI_SEQUENCER_NEEDED)
         ${CMAKE_CURRENT_LIST_DIR}/midi_seq/cvt_mus2mid.hpp
     )
     set(STDCPP_NEEDED TRUE)
-    if(SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE)
+    if(NOT MIXERX_LGPL)
         # Disable MUS and XMI formats as they LGPL-licensed
         message("-- !!! MIDI Sequencer will don't support MUS and XMI formats !!!")
         list(APPEND SDL_MIXER_DEFINITIONS -DBWMIDI_DISABLE_MUS_SUPPORT -DBWMIDI_DISABLE_XMI_SUPPORT)

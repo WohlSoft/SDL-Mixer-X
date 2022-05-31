@@ -75,25 +75,36 @@ formats will be supported by the library by default:
 - MIDI via embedded Timidity or via system-wide MIDI output
 
 If you want to enable support for more file formats, you will need to install
-optional libraries (listed below) into the system. You aren't required to
-install every library into the system to build the library: any enabled
-component will be automatically disabled when the required library is missing
-from the system.
+optional libraries (listed below) into the system and, if needed, their use.
+You aren't required to install every library into the system to build the
+library: any enabled component will be automatically disabled when the required
+library is missing from the system.
 
-#### BSD/MIT/PD/LGPL-licensed libraries
+#### BSD/MIT/PD-licensed libraries
+There are libraries licensed under any of permissive license. These libraries
+can be linked to any project (including closed-source proprietary projects).
+They are always used when detected to be installed in the system.
 - [libogg](https://github.com/xiph/ogg) - is required when is need to support Vorbis, FLAC, or Opus.
 - [libvorbis](https://github.com/xiph/vorbis) or [Tremor](https://gitlab.xiph.org/xiph/tremor) - to enable the OGG Vorbis support, otherwise the embedded stb_vorbis can be used.
 - [libopus](https://github.com/xiph/opus) and [libopusfile](https://github.com/xiph/opusfile) - to enable the Opus support.
 - [libFLAC](https://github.com/xiph/flac) - to enable the FLAC support, otherwise the embedded [DRFLAC](https://github.com/mackron/dr_libs) codec can be used.
-- [libmpg123](https://www.mpg123.de/) - to enable the MP3 support, otherwise the embedded [DRMP3](https://github.com/mackron/dr_libs) codec can be used.
-- [libxmp](https://github.com/libxmp/libxmp/) - to enable the support for various tracker music formats such as MOD, IT, XM, S3M, etc.
 - [libmodplug](https://github.com/Konstanty/libmodplug) - another library for the tracker music formats support.
-- [libgme](https://bitbucket.org/mpyne/game-music-emu) - to enable support for chiptune formats such as NSF, VGM, SPC, HES, etc.
 - [libfluidsynth](https://github.com/FluidSynth/fluidsynth) or [libfluidlite](https://github.com/divideconcept/FluidLite) - the wavetable MIDI synthesizer library based on SoundFont 2 specifications
 - [libEDMIDI](https://github.com/Wohlstand/libEDMIDI) - the MIDI synthesizer library based on OPLL/PSG/SCC synthesis
 
+#### LGPL-licensed libraries
+There are libraries that has LGPL license, and you will need to link them
+dynamically when your project is not compatible to GPL license. These libraries
+will not be used without `-DMIXERX_ENABLE_LGPL=ON` (or `-DMIXERX_ENABLE_GPL=ON`)
+CMake argument.
+- [libmpg123](https://www.mpg123.de/) - to enable the MP3 support, otherwise the embedded [DRMP3](https://github.com/mackron/dr_libs) codec can be used.
+- [libxmp](https://github.com/libxmp/libxmp/) - to enable the support for various tracker music formats such as MOD, IT, XM, S3M, etc.
+- [libgme](https://bitbucket.org/mpyne/game-music-emu) - to enable support for chiptune formats such as NSF, VGM, SPC, HES, etc.
+
 #### GPL-licensed libraries
-There are libraries that currently has GPL license, and if you will take use of them, the license of MixerX will be GPLv3.
+There are libraries that currently has GPL license, and if you will take use of
+them, the license of MixerX will be GPLv3. These libraries will not ne used
+without `-DMIXERX_ENABLE_GPL=ON` CMake argument.
 - [libADLMIDI](https://github.com/Wohlstand/libADLMIDI) - the MIDI synthesizer library based on OPL3 synthesis
 - [libOPNMIDI](https://github.com/Wohlstand/libOPNMIDI) - the MIDI synthesizer library based on OPN2/OPNA synthesis
 
@@ -101,28 +112,36 @@ There are libraries that currently has GPL license, and if you will take use of 
 ## Build the project
 
 ### License of library
-The MixerX library has 3 different license modes (Zlib, LGPLv2.1+, and GPLv3+)
-depending on enabled components: you may get the LGPL license if you statically
-link LGPL components into the MixerX shared library, or GPL license when you
-link any GPL components to the library. To enforce library build under specific
-license, you may use the next CMake options:
+The MixerX library has 3 different license modes (Zlib (default), LGPLv2.1+,
+and GPLv3+) depending on enabled components: you may get the LGPL license if
+you statically link LGPL components into the MixerX shared library, or GPL
+license when you link any GPL components to the library. By default, LGPL and
+GPL licensed modules are disabled. You may use the next CMake options to enable
+these modules:
 
-* `-DSDL_MIXER_CLEAR_FOR_ZLIB_LICENSE=ON` - Disable all GPL and LGPL components to ensure ZLib license.
-* `-DSDL_MIXER_CLEAR_FOR_LGPL_LICENSE=ON` - Disable all GPL components to ensure LGPLv2.1 license.
+* `-DMIXERX_ENABLE_LGPL=ON` - Enable components with LGPL license. This will
+enable part of extra functionality and if you link them statically into MixerX,
+build it will be licensed under LGPL, or you can link the MixerX itself statically,
+but link other components dynamically, they will stay LGPL while MixerX by itself
+will be LGPL.
+* `-DMIXERX_ENABLE_GPL=ON` - Enable components with GPL license. This
+will enable complete functionality of the MixerX, and its build will be licensed
+under GPL. This argument also enables LGPL-licensed libraries.
 
-If you want to build the library with full functionality and use GPL license,
-disable these options.
+If you want to statically link the library into GPL-incompatible software,
+don't enable these options.
 
 
 ### Build with default configuration
-Once all necessary dependencies installed, run the next code in your terminal at the clonned repository directory:
+Once all necessary dependencies installed, run the next code in your terminal
+at the clonned repository directory:
 ```bash
 # Prepare the build directory
 mkdir build
 cd build
 
 # Configure the project
-cmake  -DCMAKE_BUILD_TYPE=Release -DSDL_MIXER_CLEAR_FOR_ZLIB_LICENSE=ON ..
+cmake -DCMAKE_BUILD_TYPE=Release ..
 
 # Run the build
 make -j 4 #where 4 - set number of CPU cores you have
@@ -133,7 +152,7 @@ make install
 It will enable these components which was detected at the system during CMake step.
 
 The built library will have ZLib license that you can statically link with any
-application including commercial.
+application including closed-source proprietary.
 
 This build will have next components always disabled:
 - FluidSynth (LGPLv2.1+)
@@ -145,10 +164,11 @@ This build will have next components always disabled:
 
 ### Build with default configuration with LGPL mode
 If you want to enable support for FluidSynth, GME, and MPG123, you will need
-to use the LGPL mode, run the configure step with the next line:
+to use the LGPL mode (adding the `-DMIXERX_ENABLE_LGPL=ON` argument), run the
+configure step with the next line:
 ```
 # Configure the project
-cmake  -DCMAKE_BUILD_TYPE=Release -DSDL_MIXER_X_SHARED=ON -DSDL_MIXER_X_STATIC=OFF -DSDL_MIXER_CLEAR_FOR_LGPL_LICENSE=ON ..
+cmake -DCMAKE_BUILD_TYPE=Release -DMIXERX_ENABLE_LGPL=ON -DSDL_MIXER_X_SHARED=ON -DSDL_MIXER_X_STATIC=OFF ..
 ```
 The resulted build will have LGPLv2.1 license that you can dynamically link with any
 application including commercial.
@@ -161,10 +181,11 @@ This build will have next components always disabled:
 
 ### Build with default configuration and GPL license
 If you want to enable support for libADLMIDI and libOPNMIDI, you will need
-to use the GPL mode, run the configure step with the next line:
+to use the GPL mode (adding the `-DMIXERX_ENABLE_GPL=ON` argument), run the
+configure step with the next line:
 ```
 # Configure the project
-cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake -DCMAKE_BUILD_TYPE=Release -DMIXERX_ENABLE_GPL=ON ..
 ```
 All supported components will be enabled in condition they are installed at the
 system. This version you can link with GPL-only applications. The final license
@@ -174,12 +195,18 @@ of the library will be printed out after running CMake command.
 ### Build with AudioCodecs
 If you want to build the library with the complete functionality and you don't
 want or can't install any libraries into system, you can enable use of the
-[AudioCodecs](https://github.com/WohlSoft/AudioCodecs) repository which is a collection of audio
-codec libraries bundled into single portable build project. This way is very useful
-on platforms such as Windows, mobile platforms such as Android where is required
-to build all dependencies from the source separately, or homebrew console toolchains with
-the similar case. You aren't required to build and install separately, you can enable two
-CMake options to let CMake do all hard work instead of you.
+[AudioCodecs](https://github.com/WohlSoft/AudioCodecs) repository which is
+a collection of audio codec libraries bundled into single portable build project.
+This way is very useful on platforms such as Windows, mobile platforms such as
+Android where is required to build all dependencies from the source separately,
+or homebrew console toolchains with the similar case. You aren't required to
+build and install separately, you can enable two CMake options to let CMake do
+all hard work instead of you. You will need to add `-DDOWNLOAD_AUDIO_CODECS_DEPENDENCY=ON`
+and `-DAUDIO_CODECS_BUILD_LOCAL_SDL2=ON` options into your CMake command line
+to enable use of AudioCodecs external package. This will allow you to build
+the library even SDL2 (the required dependency) is not installed at your system
+at all, or there is an older version than required minimum.
+
 
 #### General build on UNIX-like platform and install into the system
 The library will be built and installed into system in usual way
@@ -272,7 +299,7 @@ gcc playmus.c -o playmus -I/usr/local/include -L/usr/local/lib -lSDL2_mixer_ext 
 ### Statically
 To get it linked you should also link all dependencies of MixerX library itself and also dependencies of SDL2 too
 ```
-gcc playmus.c -o playmus -I/usr/local/include -L/usr/local/lib -Wl,-Bstatic -lSDL2_mixer_ext -lFLAC -lopusfile -lopus -lvorbisfile -lvorbis -logg -lmodplug -lADLMIDI -lOPNMIDI -lEDMIDI -lgme -lzlib -lSDL2 -Wl,-Bdynamic -lpthread -lm -ldl -static-libgcc -lstdc++
+gcc playmus.c -o playmus -I/usr/local/include -L/usr/local/lib -Wl,-Bstatic -lSDL2_mixer_ext -lopusfile -lopus -logg -lxmp -lmodplug -lADLMIDI -lOPNMIDI -lEDMIDI -lgme -lzlib -lSDL2 -Wl,-Bdynamic -lpthread -lm -ldl -static-libgcc -lstdc++
 ```
 
 # Documentation
