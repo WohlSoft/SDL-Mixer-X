@@ -74,6 +74,14 @@ if(USE_XMP AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE)
             ${CMAKE_CURRENT_LIST_DIR}/music_xmp.c
             ${CMAKE_CURRENT_LIST_DIR}/music_xmp.h
         )
+        if(USE_XMP_LITE OR USE_XMP_LITE_ENFORCE)
+            appendTrackerFormats("MOD;XM;S3M;IT")
+        else()
+            appendTrackerFormats("MOD;M15;FLX;WOW;S3M;DBM;DIGI;EMOD;MED;MTN;OKT;SFX;DTM;MGT;
+                                  669;FAR;FNK;IMF(Imago Orpheus);IT;LIQ;MDL;MTM;PTM;RTM;S3M;STM;ULT;XM;
+                                  AMF;GDM;STX;
+                                  ABK;AMF;PSM;J2B;MFP;SMP;MMDC;STIM;UMX")
+        endif()
     else()
         message("-- skipping XMP --")
     endif()

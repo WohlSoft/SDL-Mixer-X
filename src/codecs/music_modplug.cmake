@@ -60,6 +60,8 @@ if(USE_MODPLUG)
         if(MODPLUG_HAS_TELL)
             list(APPEND SDL_MIXER_DEFINITIONS -DMODPLUG_HAS_TELL)
         endif()
+        appendTrackerFormats("MOD;S3M;XM;IT;669;AMF;AMS;DBM;DMF;DSM;FAR;
+                              MDL;MED;MTM;OKT;PTM;STM;ULT;UMX;MT2;PSM")
     else()
         message("-- skipping libModPlug --")
     endif()

@@ -42,5 +42,6 @@ if(USE_MIDI_TIMIDITY)
             ${CMAKE_CURRENT_LIST_DIR}/music_timidity.c
             ${CMAKE_CURRENT_LIST_DIR}/music_timidity.h
         )
+        appendMidiFormats("MIDI;RIFF MIDI")
     endif()
 endif()

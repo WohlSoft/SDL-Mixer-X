@@ -11,4 +11,5 @@ if(USE_MP3_DRMP3 OR USE_MP3_MINIMP3)
         ${CMAKE_CURRENT_LIST_DIR}/music_drmp3.c
         ${CMAKE_CURRENT_LIST_DIR}/music_drmp3.h
     )
+    appendPcmFormats("MP3")
 endif()

@@ -46,6 +46,7 @@ if(USE_MIDI_EDMIDI)
             ${CMAKE_CURRENT_LIST_DIR}/music_midi_edmidi.c
             ${CMAKE_CURRENT_LIST_DIR}/music_midi_edmidi.h
         )
+        appendMidiFormats("MIDI;RIFF MIDI;XMI;MUS")
     else()
         message("-- skipping EDMIDI --")
     endif()

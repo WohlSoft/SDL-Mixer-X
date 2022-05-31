@@ -45,6 +45,8 @@ if(USE_MIDI_ADLMIDI AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE AND NOT SDL_MIXER_C
             ${CMAKE_CURRENT_LIST_DIR}/music_midi_adl.c
             ${CMAKE_CURRENT_LIST_DIR}/music_midi_adl.h
         )
+        appendMidiFormats("MIDI;RIFF MIDI;XMI;MUS")
+        appendChiptuneFormats("IMF(OPL2);CMF")
     else()
         message("-- skipping ADLMIDI --")
     endif()

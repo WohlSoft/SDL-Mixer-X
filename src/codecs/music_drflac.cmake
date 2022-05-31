@@ -6,4 +6,5 @@ if(USE_DRFLAC)
         ${CMAKE_CURRENT_LIST_DIR}/music_drflac.c
         ${CMAKE_CURRENT_LIST_DIR}/music_drflac.h
     )
+    appendPcmFormats("FLAC")
 endif()

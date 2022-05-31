@@ -64,6 +64,7 @@ set(CMAKE_MODULE_PATH "${SDLMixerX_SOURCE_DIR}/cmake;${SDLMixerX_SOURCE_DIR}/cma
 
 include(CppNeedCheck)
 include(WhichLicense)
+include(FormatsSupported)
 
 if(NOT CMAKE_VERSION VERSION_LESS 2.8.12)
     set(CMAKE_MACOSX_RPATH 0)
@@ -604,4 +605,7 @@ print_sumary("libEDMIDI" USE_MIDI_EDMIDI EDMIDI_FOUND EDMIDI_LIBRARIES)
 print_sumary("FluidSynth" USE_MIDI_FLUIDSYNTH FluidSynth_FOUND FluidSynth_LIBRARIES)
 print_sumary("FluidLite" USE_MIDI_FLUIDLITE FluidLite_FOUND FluidLite_LIBRARIES)
 print_sumary("Timidity-SDL" USE_MIDI_TIMIDITY TIMIDITYSDL_FOUND TIMIDITYSDL_LIBRARIES)
+
+printFormats()
+
 printLicense()

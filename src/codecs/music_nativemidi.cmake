@@ -22,4 +22,5 @@ if(USE_MIDI_NATIVE AND NOT USE_MIDI_NATIVE_ALT)
         list(APPEND SDLMixerX_SOURCES
             ${CMAKE_CURRENT_LIST_DIR}/native_midi/native_midi_macosx.c)
     endif()
+    appendMidiFormats("MIDI;RIFF MIDI")
 endif()

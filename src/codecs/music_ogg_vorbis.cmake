@@ -102,11 +102,13 @@ if(USE_OGG_VORBIS)
             ${CMAKE_CURRENT_LIST_DIR}/music_ogg.c
             ${CMAKE_CURRENT_LIST_DIR}/music_ogg.h
         )
+        appendPcmFormats("OGG Vorbis")
     else(USE_OGG_VORBIS_STB)
         list(APPEND SDLMixerX_SOURCES
             ${CMAKE_CURRENT_LIST_DIR}/music_ogg_stb.c
             ${CMAKE_CURRENT_LIST_DIR}/music_ogg.h
         )
+        appendPcmFormats("OGG Voribs")
     endif()
 
 endif()

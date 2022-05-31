@@ -27,6 +27,7 @@ if(USE_MIDI_FLUIDSYNTH AND NOT USE_MIDI_FLUIDLITE AND NOT SDL_MIXER_CLEAR_FOR_ZL
             ${CMAKE_CURRENT_LIST_DIR}/music_fluidsynth.c
             ${CMAKE_CURRENT_LIST_DIR}/music_fluidsynth.h
         )
+        appendMidiFormats("MIDI;RIFF MIDI")
     else()
         message("-- skipping FluidSynth --")
     endif()

@@ -5,6 +5,7 @@ if(USE_WAV)
         ${CMAKE_CURRENT_LIST_DIR}/music_wav.c
         ${CMAKE_CURRENT_LIST_DIR}/music_wav.h
     )
+    appendPcmFormats("WAV(Music);AIFF(Music)")
 endif()
 
 list(APPEND SDLMixerX_SOURCES

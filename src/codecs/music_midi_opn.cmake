@@ -45,6 +45,7 @@ if(USE_MIDI_OPNMIDI AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE AND NOT SDL_MIXER_C
             ${CMAKE_CURRENT_LIST_DIR}/music_midi_opn.c
             ${CMAKE_CURRENT_LIST_DIR}/music_midi_opn.h
         )
+        appendMidiFormats("MIDI;RIFF MIDI;XMI;MUS")
     else()
         message("-- skipping OPNMIDI --")
     endif()

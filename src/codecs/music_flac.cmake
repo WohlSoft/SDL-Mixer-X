@@ -38,6 +38,7 @@ if(USE_FLAC)
             ${CMAKE_CURRENT_LIST_DIR}/music_flac.c
             ${CMAKE_CURRENT_LIST_DIR}/music_flac.h
         )
+        appendPcmFormats("FLAC")
     else()
         message("-- skipping FLAC --")
     endif()

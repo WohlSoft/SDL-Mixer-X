@@ -11,5 +11,6 @@ if(UNIX) # CMD Music is not supported on Windows
             ${CMAKE_CURRENT_LIST_DIR}/music_cmd.c
             ${CMAKE_CURRENT_LIST_DIR}/music_cmd.h
         )
+        appendOtherFormats("CMD Music")
     endif()
 endif()

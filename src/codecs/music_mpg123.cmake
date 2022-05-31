@@ -39,6 +39,7 @@ if(USE_MP3_MPG123 AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE)
             ${CMAKE_CURRENT_LIST_DIR}/music_mpg123.c
             ${CMAKE_CURRENT_LIST_DIR}/music_mpg123.h
         )
+        appendPcmFormats("MP3")
     else()
         message("-- skipping MPG123 --")
     endif()

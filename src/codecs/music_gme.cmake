@@ -84,6 +84,7 @@ if(USE_GME AND NOT SDL_MIXER_CLEAR_FOR_ZLIB_LICENSE AND NOT SDL_MIXER_CLEAR_FOR_
         if(GME_HAS_DISABLE_ECHO)
             list(APPEND SDL_MIXER_DEFINITIONS -DGME_HAS_DISABLE_ECHO)
         endif()
+        appendChiptuneFormats("AY;GBS;GYM;HES;KSS;NSF;NSFE;SAP;SPC;VGM;VGZ")
     else()
         message("-- skipping GME --")
     endif()

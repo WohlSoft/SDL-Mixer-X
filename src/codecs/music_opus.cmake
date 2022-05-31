@@ -42,6 +42,7 @@ if(USE_OPUS)
             ${CMAKE_CURRENT_LIST_DIR}/music_opus.c
             ${CMAKE_CURRENT_LIST_DIR}/music_opus.h
         )
+        appendPcmFormats("Opus")
     else()
         message("-- skipping Opus --")
     endif()
