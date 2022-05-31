@@ -275,6 +275,12 @@ if(USE_MP3_MPG123 OR USE_WAV)
         ${SDLMixerX_SOURCE_DIR}/src/codecs/mp3utils.c)
 endif()
 
+# Differences between ModPlug and libXMP:
+# - ModPlug-exclusive formats: AMS, DMF, DSM, MT2
+# - XMP-exclusive formats: ABK, DIGI, DTM, EMOD, FLX, FNK, GDM, IMF, J2B, LIQ,
+#                          M15, MFP, MGT, MMDC, MTN, RTM, SFX, SPM, STIM, STX,
+#                          WOW
+# - Other formats supported by both ModPlug and libXMP
 include(music_modplug)
 include(music_xmp)
 include(music_gme)
