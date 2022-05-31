@@ -33,8 +33,6 @@ See the [docs/index.md](docs/index.md#How%20to%20build) file for details.
 
 ## List of libraries
 There are libraries that keeps MixerX library under ZLib:
-(Optionally, you can automatically filter any zlib-incompatible libraries by using
-the `-DSDL_MIXER_CLEAR_FOR_ZLIB_LICENSE=ON` flag):
 
 ### Static linking
 (BSD, ZLib, "Artistic", MIT, and "public domain" licenses are allows usage in closed-source projects)
@@ -54,6 +52,7 @@ the `-DSDL_MIXER_CLEAR_FOR_ZLIB_LICENSE=ON` flag):
 ### LGPL-license libraries
 LGPL allows usage in closed-source projects when LGPL-licensed components are linked dynamically.
 Note, once you link those libraries statically, the MixerX library gets LGPLv2.1+ license.
+They can be enabled if you set the `-DMIXER_ENABLE_LGPL=ON` CMake option.
 * libFluidLite
 * libGME when Nuked OPN2 or GEMS emulator is used
 * libMPG123
@@ -61,9 +60,7 @@ Note, once you link those libraries statically, the MixerX library gets LGPLv2.1
 
 ### GPL-license libraries
 There are libraries making the MixerX being licensed as GPLv2+ or GPLv3+ with no matter
-how you will link them. You can avoid linking them by using of the `-DSDL_MIXER_CLEAR_FOR_LGPL_LICENSE=ON`
-CMake flag to get LGPL license, or use the `-DSDL_MIXER_CLEAR_FOR_ZLIB_LICENSE=ON` flag
-to get the ZLib license.
+how you will link them. They can be enabled if you set the `-DMIXER_ENABLE_GPL=ON` CMake option.
 * libADLMIDI
 * libOPNMIDI
 * libGME when MAME YM2612 emulator is used
