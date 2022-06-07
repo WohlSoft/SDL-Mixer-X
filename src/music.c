@@ -1913,7 +1913,7 @@ void MIXCALLCC Mix_FreeMusic(Mix_Music *music)
 
         if (music == music_playing || music->is_multimusic) {
             /* Wait for any fade out to finish */
-            while (music->fading == MIX_FADING_OUT) {
+            while ((music_active || music->is_multimusic) && music->fading == MIX_FADING_OUT) {
                 Mix_UnlockAudio();
                 SDL_Delay(100);
                 Mix_LockAudio();
