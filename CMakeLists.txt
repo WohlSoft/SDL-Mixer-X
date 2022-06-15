@@ -55,6 +55,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DSDL_BUILD_MICRO_VERSION=${SDLMixerX_VERSIO
 include(GNUInstallDirs)
 include(FindPkgConfig)
 include(CheckIncludeFiles)
+include(CheckSymbolExists)
 include(CheckFunctionExists)
 include(CheckLibraryExists)
 include(CheckCCompilerFlag)
