@@ -21,14 +21,14 @@ if(UNIX) # CMD Music is not supported on Windows
             endif()
         endif()
 
-        if(NOT fork_found)
-            message(FATAL_ERROR "Neither fork() or vfork() or available on this platform. Reconfigure with -DUSE_CMD=OFF.")
+        if(fork_found)
+            list(APPEND SDLMixerX_SOURCES
+                ${CMAKE_CURRENT_LIST_DIR}/music_cmd.c
+                ${CMAKE_CURRENT_LIST_DIR}/music_cmd.h
+            )
+            appendOtherFormats("CMD Music")
+        else()
+            message(WARNING "Neither fork() or vfork() or available on this platform. CMD Music will be disabled.")
         endif()
-
-        list(APPEND SDLMixerX_SOURCES
-            ${CMAKE_CURRENT_LIST_DIR}/music_cmd.c
-            ${CMAKE_CURRENT_LIST_DIR}/music_cmd.h
-        )
-        appendOtherFormats("CMD Music")
     endif()
 endif()
