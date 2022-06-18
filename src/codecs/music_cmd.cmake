@@ -1,5 +1,7 @@
-if(UNIX) # CMD Music is not supported on Windows
-    option(USE_CMD             "Build with CMD music player support" ON)
+if(UNIX AND NOT ANDROID AND NOT EMSCRIPTEN AND NOT HAIKU AND NOT APPLE)
+    # CMD Music is not supported on Windows, Haiku, macOS, Android, and Emscripten
+
+    option(USE_CMD "Build with CMD music player support" ON)
     if(USE_CMD)
         message("== using CMD Music (ZLib) ==")
         list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_CMD -D_POSIX_C_SOURCE=1)
@@ -29,6 +31,7 @@ if(UNIX) # CMD Music is not supported on Windows
             appendOtherFormats("CMD Music")
         else()
             message(WARNING "Neither fork() or vfork() or available on this platform. CMD Music will be disabled.")
+            set(USE_CMD OFF)
         endif()
     endif()
 endif()
