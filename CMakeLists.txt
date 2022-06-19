@@ -433,7 +433,7 @@ if(SDL_MIXER_X_STATIC AND NOT BUILD_AS_VB6_BINDING)
         add_custom_command(
             TARGET SDL2_mixer_ext_Static POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy
-                    ${CMAKE_SOURCE_DIR}/include/SDL_mixer.h
+                    ${SDLMixerX_SOURCE_DIR}/include/SDL_mixer.h
                     ${AUDIO_CODECS_INSTALL_DIR}/include/SDL2/SDL_mixer_ext.h)
     endif()
     list(APPEND SDLMixerX_INSTALLS SDL2_mixer_ext_Static)
@@ -476,7 +476,7 @@ if(SDL_MIXER_X_SHARED AND NOT BUILD_AS_VB6_BINDING)
         add_custom_command(
             TARGET SDL2_mixer_ext POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy
-                    ${CMAKE_SOURCE_DIR}/include/SDL_mixer.h
+                    ${SDLMixerX_SOURCE_DIR}/include/SDL_mixer.h
                     ${AUDIO_CODECS_INSTALL_DIR}/include/SDL2/SDL_mixer_ext.h)
     endif()
     list(APPEND SDLMixerX_INSTALLS SDL2_mixer_ext)
