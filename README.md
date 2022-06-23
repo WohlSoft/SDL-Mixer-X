@@ -39,7 +39,6 @@ There are libraries that keeps MixerX library under ZLib:
 * libFLAC
 * libModPlug
 * libOGG
-* libOpenMPT
 * libOpus
 * libSDL2
 * libTimidity-SDL
