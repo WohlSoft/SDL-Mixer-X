@@ -257,7 +257,7 @@ int MIXCALLCC Mix_Init(int flags)
     }
     if (flags & MIX_INIT_MID) {
         if (load_music_type(MUS_MID)) {
-            open_music_type_ex(MUS_MID, mididevice_current);
+            open_music_type_ex(MUS_MID, midiplayer_current);
             result |= MIX_INIT_MID;
         } else {
             Mix_SetError("MIDI support not available");
@@ -667,7 +667,7 @@ static SDL_AudioSpec *Mix_LoadMusic_RW(SDL_RWops *src, int freesrc, SDL_AudioSpe
     int fragment_size;
 
     music_type = detect_music_type(src);
-    if (!load_music_type(music_type) || !open_music_type_ex(music_type, mididevice_current)) {
+    if (!load_music_type(music_type) || !open_music_type_ex(music_type, midiplayer_current)) {
         return NULL;
     }
 

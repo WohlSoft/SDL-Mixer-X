@@ -208,8 +208,12 @@ typedef enum {
     MIDI_Fluidsynth,
     MIDI_EDMIDI,
     MIDI_ANY,
-    MIDI_KnownDevices   /* Count of MIDI device types */
-} Mix_MIDI_Device;
+    MIDI_KnownPlayers, /* Count of MIDI player types */
+    MIDI_KnownDevices = MIDI_KnownPlayers /* Backward compatibility */
+} Mix_MIDI_Player;
+
+/* Backward compatibility fallback */
+typedef Mix_MIDI_Player Mix_MIDI_Device;
 
 /* The field with a typo, kept for backward compatibility  */
 #define MIDI_KnuwnDevices MIDI_KnownDevices
