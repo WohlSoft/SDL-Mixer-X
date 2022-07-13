@@ -290,6 +290,7 @@ endif()
 include(music_modplug)
 include(music_xmp)
 include(music_gme)
+include(music_ffmpeg)
 
 include(music_cmd)
 
