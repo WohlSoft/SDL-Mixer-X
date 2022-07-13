@@ -257,7 +257,7 @@ int MIXCALLCC Mix_Init(int flags)
     }
     if (flags & MIX_INIT_MID) {
         if (load_music_type(MUS_MID)) {
-            open_music_type_ex(MUS_MID, mididevice_current);
+            open_music_type_ex(MUS_MID, midiplayer_current);
             result |= MIX_INIT_MID;
         } else {
             Mix_SetError("MIDI support not available");
@@ -667,7 +667,7 @@ static SDL_AudioSpec *Mix_LoadMusic_RW(SDL_RWops *src, int freesrc, SDL_AudioSpe
     int fragment_size;
 
     music_type = detect_music_type(src);
-    if (!load_music_type(music_type) || !open_music_type_ex(music_type, mididevice_current)) {
+    if (!load_music_type(music_type) || !open_music_type_ex(music_type, midiplayer_current)) {
         return NULL;
     }
 
@@ -902,6 +902,11 @@ Mix_Chunk * MIXCALLCC Mix_LoadWAV_RW(SDL_RWops *src, int freesrc)
     return(chunk);
 }
 
+Mix_Chunk * MIXCALLCC Mix_LoadWAV(const char *file)
+{
+    return Mix_LoadWAV_RW(SDL_RWFromFile(file, "rb"), 1);
+}
+
 /* Load a wave file of the mixer format from a memory buffer */
 Mix_Chunk * MIXCALLCC Mix_QuickLoad_WAV(Uint8 *mem)
 {
@@ -964,6 +969,20 @@ Mix_Chunk * MIXCALLCC Mix_QuickLoad_RAW(Uint8 *mem, Uint32 len)
     return(chunk);
 }
 
+/* MAKE SURE you hold the audio lock (Mix_LockAudio()) before calling this! */
+static void  Mix_HaltChannel_locked(int which)
+{
+    if (Mix_Playing(which)) {
+        _Mix_channel_done_playing(which);
+        mix_channel[which].playing = 0;
+        mix_channel[which].looping = 0;
+    }
+    mix_channel[which].expire = 0;
+    if (mix_channel[which].fading != MIX_NO_FADING) /* Restore volume */
+        mix_channel[which].volume = mix_channel[which].fade_volume_reset;
+    mix_channel[which].fading = MIX_NO_FADING;
+}
+
 /* Free an audio chunk previously loaded */
 void MIXCALLCC Mix_FreeChunk(Mix_Chunk *chunk)
 {
@@ -976,8 +995,7 @@ void MIXCALLCC Mix_FreeChunk(Mix_Chunk *chunk)
         if (mix_channel) {
             for (i=0; i<num_channels; ++i) {
                 if (chunk == mix_channel[i].chunk) {
-                    mix_channel[i].playing = 0;
-                    mix_channel[i].looping = 0;
+                    Mix_HaltChannel_locked(i);
                 }
             }
         }
@@ -1281,23 +1299,15 @@ int MIXCALLCC Mix_HaltChannel(int which)
 {
     int i;
 
+    Mix_LockAudio();
     if (which == -1) {
         for (i=0; i<num_channels; ++i) {
-            Mix_HaltChannel(i);
+            Mix_HaltChannel_locked(i);
         }
     } else if (which < num_channels) {
-        Mix_LockAudio();
-        if (Mix_Playing(which)) {
-            _Mix_channel_done_playing(which);
-            mix_channel[which].playing = 0;
-            mix_channel[which].looping = 0;
-        }
-        mix_channel[which].expire = 0;
-        if (mix_channel[which].fading != MIX_NO_FADING) /* Restore volume */
-            mix_channel[which].volume = mix_channel[which].fade_volume_reset;
-        mix_channel[which].fading = MIX_NO_FADING;
-        Mix_UnlockAudio();
+        Mix_HaltChannel_locked(which);
     }
+    Mix_UnlockAudio();
     return(0);
 }
 
@@ -1554,6 +1564,11 @@ int MIXCALLCC Mix_GroupCount(int tag)
 {
     int count = 0;
     int i;
+
+    if (tag == -1) {
+        return num_channels;  /* minor optimization; no need to go through the loop. */
+    }
+
     for(i=0; i < num_channels; i ++) {
         if (mix_channel[i].tag==tag || tag==-1)
             ++ count;

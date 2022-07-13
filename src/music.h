@@ -188,7 +188,7 @@ extern Mix_MusicInterface *get_music_interface(int index);
 extern Mix_MusicType detect_music_type(SDL_RWops *src);
 extern SDL_bool load_music_type(Mix_MusicType type);
 extern SDL_bool open_music_type(Mix_MusicType type);
-extern SDL_bool open_music_type_ex(Mix_MusicType type, int midi_device);
+extern SDL_bool open_music_type_ex(Mix_MusicType type, int midi_player);
 extern SDL_bool has_music(Mix_MusicType type);
 extern void open_music(const SDL_AudioSpec *spec);
 extern int music_pcm_getaudio(void *context, void *data, int bytes, int volume,
@@ -201,7 +201,7 @@ extern void unload_music(void);
 
 extern char *music_cmd;
 extern SDL_AudioSpec music_spec;
-extern int mididevice_current;
+extern int midiplayer_current;
 
 #endif /* MUSIC_H_ */
 

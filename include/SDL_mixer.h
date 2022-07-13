@@ -208,8 +208,12 @@ typedef enum {
     MIDI_Fluidsynth,
     MIDI_EDMIDI,
     MIDI_ANY,
-    MIDI_KnownDevices   /* Count of MIDI device types */
-} Mix_MIDI_Device;
+    MIDI_KnownPlayers, /* Count of MIDI player types */
+    MIDI_KnownDevices = MIDI_KnownPlayers /* Backward compatibility */
+} Mix_MIDI_Player;
+
+/* Backward compatibility fallback */
+typedef Mix_MIDI_Player Mix_MIDI_Device;
 
 /* The field with a typo, kept for backward compatibility  */
 #define MIDI_KnuwnDevices MIDI_KnownDevices
@@ -298,7 +302,7 @@ extern DECLSPEC int MIXCALL Mix_QuerySpec(int *frequency,Uint16 *format,int *cha
                Examples: "file.nsf|12", "file.hes|2"
 */
 extern DECLSPEC Mix_Chunk * MIXCALL Mix_LoadWAV_RW(SDL_RWops *src, int freesrc);
-#define Mix_LoadWAV(file)   Mix_LoadWAV_RW(SDL_RWFromFile(file, "rb"), 1)
+extern DECLSPEC Mix_Chunk * MIXCALL Mix_LoadWAV(const char *file);
 extern DECLSPEC Mix_Music * MIXCALL Mix_LoadMUS(const char *file);
 
 /* Set the displayable filename used in cases of memory-read files */

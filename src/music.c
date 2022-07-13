@@ -484,10 +484,10 @@ static char* soundfont_paths = NULL;
 static char* timidity_cfg = NULL;
 
 /*  ======== MIDI toggler ======== */
-/* MIDI device currently in use */
-int mididevice_current = MIDI_ANY;
+/* MIDI player currently in use */
+int midiplayer_current = MIDI_ANY;
 /* Denies MIDI arguments */
-static int mididevice_args_lock = 0;
+static int midiplayer_args_lock = 0;
 /*  ======== MIDI toggler END ==== */
 
 
@@ -988,22 +988,22 @@ SDL_bool load_music_type(Mix_MusicType type)
     return (loaded > 0) ? SDL_TRUE : SDL_FALSE;
 }
 
-Mix_MusicAPI get_current_midi_api(int *device)
+Mix_MusicAPI get_current_midi_api(int *in_midi_player)
 {
     Mix_MusicAPI target_midi_api = MIX_MUSIC_NATIVEMIDI;
     SDL_bool use_native_midi = SDL_FALSE;
-    int midi_device = device ? *device : mididevice_current;
+    int midi_player = in_midi_player ? *in_midi_player : midiplayer_current;
 
 #ifdef MUSIC_MID_NATIVE
     if (SDL_GetHintBoolean("SDL_NATIVE_MUSIC", SDL_FALSE) && native_midi_detect()) {
         use_native_midi = SDL_TRUE;
         target_midi_api = MIX_MUSIC_NATIVEMIDI;
-        mididevice_current = MIDI_Native;
+        midiplayer_current = MIDI_Native;
     }
 #endif
 
     if (!use_native_midi) {
-        switch (midi_device) {
+        switch (midi_player) {
         #ifdef MUSIC_MID_ADLMIDI
         case MIDI_ADLMIDI:
             target_midi_api = MIX_MUSIC_ADLMIDI;
@@ -1035,10 +1035,10 @@ Mix_MusicAPI get_current_midi_api(int *device)
             break;
         #endif
         default:
-            if (device)
-                *device = MIDI_ANY;
+            if (in_midi_player)
+                *in_midi_player = MIDI_ANY;
             else
-                mididevice_current = MIDI_ANY;
+                midiplayer_current = MIDI_ANY;
             break;
         }
     }
@@ -1053,13 +1053,13 @@ int parse_midi_args(const char *args)
     size_t maxlen = 0;
     size_t i, j = 0;
     int value_opened = 0;
-    int selected_midi_device = -1;
+    int selected_midi_player = -1;
 
     if (args == NULL) {
         return -1;
     }
 
-    if (mididevice_args_lock) {
+    if (midiplayer_args_lock) {
         return -1; /* Do nothing as generic MIDI arguments are been locked */
     }
 
@@ -1074,8 +1074,8 @@ int parse_midi_args(const char *args)
                 switch(type) {
                 case 's':
                     value = SDL_atoi(arg);
-                    if ((value >= 0) && value < MIDI_KnownDevices)
-                        selected_midi_device = value;
+                    if ((value >= 0) && value < MIDI_KnownPlayers)
+                        selected_midi_player = value;
                     break;
                 case '\0':
                 default:
@@ -1086,14 +1086,14 @@ int parse_midi_args(const char *args)
             arg[j++] = c;
         } else {
             if (c == '\0') {
-                return selected_midi_device;
+                return selected_midi_player;
             }
             type = c;
             value_opened = 1;
             j = 0;
         }
     }
-    return selected_midi_device;
+    return selected_midi_player;
 }
 
 /* Open the music interfaces for a given music type */
@@ -1103,7 +1103,7 @@ SDL_bool open_music_type(Mix_MusicType type)
 }
 
 /* Open the music interfaces for a given music type, also select a MIDI library */
-SDL_bool open_music_type_ex(Mix_MusicType type, int midi_device)
+SDL_bool open_music_type_ex(Mix_MusicType type, int midi_player)
 {
     size_t i;
     int opened = 0;
@@ -1116,8 +1116,8 @@ SDL_bool open_music_type_ex(Mix_MusicType type, int midi_device)
     }
 
     if (type == MUS_MID) {
-        target_midi_api = get_current_midi_api(&midi_device);
-        if (midi_device == MIDI_ANY) {
+        target_midi_api = get_current_midi_api(&midi_player);
+        if (midi_player == MIDI_ANY) {
             use_any_midi = SDL_TRUE;
         }
     }
@@ -1228,31 +1228,31 @@ static Mix_MusicType xmi_compatible_midi_player()
     int is_compatible = 0;
 
 #if defined(MUSIC_MID_NATIVE_ALT)
-    if (mididevice_current == MIDI_Native) {
+    if (midiplayer_current == MIDI_Native) {
         is_compatible |= 1;
     }
 #endif
 
 #if defined(MUSIC_MID_ADLMIDI)
-    if (mididevice_current == MIDI_ADLMIDI) {
+    if (midiplayer_current == MIDI_ADLMIDI) {
         is_compatible |= 1;
     }
 #endif
 
 #if defined(MUSIC_MID_OPNMIDI)
-    if (mididevice_current == MIDI_OPNMIDI) {
+    if (midiplayer_current == MIDI_OPNMIDI) {
         is_compatible |= 1;
     }
 #endif
 
 #if defined(MUSIC_MID_FLUIDLITE)
-    if (mididevice_current == MIDI_Fluidsynth) {
+    if (midiplayer_current == MIDI_Fluidsynth) {
         is_compatible |= 1;
     }
 #endif
 
 #if defined(MUSIC_MID_EDMIDI)
-    if (mididevice_current == MIDI_EDMIDI) {
+    if (midiplayer_current == MIDI_EDMIDI) {
         is_compatible |= 1;
     }
 #endif
@@ -1695,13 +1695,13 @@ Mix_Music * MIXCALLCC Mix_LoadMUS(const char *file)
         if (interface->type == MUS_MID) {
             Mix_MusicAPI target_midi_api = 0;
             SDL_bool use_any_midi = SDL_FALSE;
-            int midi_device = parse_midi_args(music_args);
-            if (midi_device < 0) {
+            int midi_player = parse_midi_args(music_args);
+            if (midi_player < 0) {
                 music_args[0] = '\0';
-                midi_device = mididevice_current;
+                midi_player = midiplayer_current;
             }
-            target_midi_api = get_current_midi_api(&midi_device);
-            if (midi_device == MIDI_ANY) {
+            target_midi_api = get_current_midi_api(&midi_player);
+            if (midi_player == MIDI_ANY) {
                 use_any_midi = SDL_TRUE;
             }
             if (!use_any_midi && interface->api != target_midi_api) {
@@ -1818,7 +1818,7 @@ Mix_Music * MIXCALLCC Mix_LoadMUSType_RW_ARG(SDL_RWops *src, Mix_MusicType type,
     size_t i;
     void *context;
     Sint64 start;
-    int midi_device = mididevice_current;
+    int midi_player = midiplayer_current;
 
     if (!src) {
         Mix_SetError("RWops pointer is NULL");
@@ -1839,19 +1839,19 @@ Mix_Music * MIXCALLCC Mix_LoadMUSType_RW_ARG(SDL_RWops *src, Mix_MusicType type,
     }
 
     if (type == MUS_MID) {
-        midi_device = parse_midi_args(args);
-        if (midi_device < 0) {
+        midi_player = parse_midi_args(args);
+        if (midi_player < 0) {
             args = NULL;
-            midi_device = mididevice_current;
+            midi_player = midiplayer_current;
         }
     }
 
     Mix_ClearError();
 
-    if (load_music_type(type) && open_music_type_ex(type, midi_device)) {
-        Mix_MusicAPI target_midi_api = get_current_midi_api(&midi_device);
+    if (load_music_type(type) && open_music_type_ex(type, midi_player)) {
+        Mix_MusicAPI target_midi_api = get_current_midi_api(&midi_player);
         SDL_bool use_any_midi = SDL_FALSE;
-        if (midi_device == MIDI_ANY) {
+        if (midi_player == MIDI_ANY) {
             use_any_midi = SDL_TRUE;
         }
         for (i = 0; i < SDL_arraysize(s_music_interfaces); ++i) {
@@ -3166,12 +3166,12 @@ int MIXCALLCC Mix_EachSoundFontEx(const char* cpaths, int (SDLCALL *function)(co
 
 int MIXCALLCC Mix_GetMidiPlayer()
 {
-    return mididevice_current;
+    return midiplayer_current;
 }
 
 int MIXCALLCC Mix_GetNextMidiPlayer()
 {
-    return mididevice_current;
+    return midiplayer_current;
 }
 
 int MIXCALLCC Mix_SetMidiPlayer(int player)
@@ -3196,10 +3196,10 @@ int MIXCALLCC Mix_SetMidiPlayer(int player)
 #   ifdef MUSIC_MID_EDMIDI
     case MIDI_EDMIDI:
 #   endif
-        mididevice_current = player;
+        midiplayer_current = player;
         return 0;
     default:
-        Mix_SetError("Unknown MIDI Device");
+        Mix_SetError("Unknown MIDI Player");
         return -1;
     }
 #else
@@ -3211,7 +3211,7 @@ int MIXCALLCC Mix_SetMidiPlayer(int player)
 
 void MIXCALLCC Mix_SetLockMIDIArgs(int lock_midiargs)
 {
-    mididevice_args_lock = lock_midiargs;
+    midiplayer_args_lock = lock_midiargs;
 }
 
 

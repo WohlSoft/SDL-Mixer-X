@@ -197,7 +197,7 @@ void *XMP_CreateFromRW(SDL_RWops *src, int freesrc)
 {
     XMP_Music *music;
     struct xmp_callbacks file_callbacks = {
-        xmp_fread, xmp_fseek, xmp_ftell, NULL
+           xmp_fread, xmp_fseek, xmp_ftell, NULL
     };
     int err = 0;
 
