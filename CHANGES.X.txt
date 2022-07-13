@@ -2,7 +2,7 @@ Changelog of MixerX-exclusive changes
 -------
 It is an additional changelog file. It extends the CHANGES.txt that lists changes done at the mainstream SDL2_mixer library.
 
-2.5.1: [dev]
+2.6.0: [dev]
  * Added new calls: Mix_ADLMIDI_getAutoArpeggio(), Mix_ADLMIDI_setAutoArpeggio(), Mix_OPNMIDI_getAutoArpeggio(), Mix_OPNMIDI_setAutoArpeggio()
  * Fixed memory damages and crashes while playing XMI files
  * Added support for the experimental libEDMIDI synthesizer
