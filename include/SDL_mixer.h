@@ -22,6 +22,13 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+/**
+ *  \file SDL_mixer.h
+ *
+ *  Header file for SDL_mixer library
+ *
+ * A simple library to play and mix sounds and musics
+ */
 #ifndef SDL_MIXER_H_
 #define SDL_MIXER_H_
 
@@ -77,13 +84,15 @@
 extern "C" {
 #endif
 
-/* Printable format: "%d.%d.%d", MAJOR, MINOR, PATCHLEVEL
-*/
+/**
+ * Printable format: "%d.%d.%d", MAJOR, MINOR, PATCHLEVEL
+ */
 #define SDL_MIXER_MAJOR_VERSION 2
 #define SDL_MIXER_MINOR_VERSION 5
 #define SDL_MIXER_PATCHLEVEL    1
 
-/* This macro can be used to fill a version structure with the compile-time
+/**
+ * This macro can be used to fill a version structure with the compile-time
  * version of the SDL_mixer library.
  */
 #define SDL_MIXER_VERSION(X)                        \
