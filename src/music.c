@@ -943,7 +943,7 @@ void SDLCALL music_mixer(void *udata, Uint8 *stream, int len)
 
 void pause_async_music(int pause_on)
 {
-    if (!music_playing || !music_playing->interface) {
+    if (!music_active || !music_playing || !music_playing->interface) {
         return;
     }
 
