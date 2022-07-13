@@ -2285,7 +2285,7 @@ extern DECLSPEC int MIXCALL Mix_GroupNewer(int tag);
  * \since This function is available since SDL_mixer 2.6.0 (and as a macro
  *        since 2.0.0).
  */
-#define Mix_PlayChannel(channel,chunk,loops) Mix_PlayChannelTimed(channel,chunk,loops,-1)
+extern DECLSPEC int MIXCALL Mix_PlayChannel(int channel, Mix_Chunk *chunk, int loops);
 
 /**
  * Play an audio chunk on a specific channel for a maximum time.
@@ -2489,7 +2489,7 @@ extern DECLSPEC int MIXCALL Mix_FadeInMusicPos(Mix_Music *music, int loops, int 
  * \since This function is available since SDL_mixer 2.6.0 (and as a macro
  *        since 2.0.0).
  */
-#define Mix_FadeInChannel(channel,chunk,loops,ms) Mix_FadeInChannelTimed(channel,chunk,loops,ms,-1)
+extern DECLSPEC int MIXCALL Mix_FadeInChannel(int channel, Mix_Chunk *chunk, int loops, int ms);
 
 /**
  * Play an audio chunk on a specific channel, fading in the audio, for a
@@ -2536,10 +2536,39 @@ extern DECLSPEC int MIXCALL Mix_FadeInMusicPos(Mix_Music *music, int loops, int 
 extern DECLSPEC int MIXCALL Mix_FadeInChannelTimed(int channel, Mix_Chunk *chunk, int loops, int ms, int ticks);
 
 /**
- * TODO: Describe this
- * This is the MixerX fork exclusive function.
+ * Play an audio chunk on a specific channel, fading in the audio, and set
+ * the channel volume.
+ *
+ * This will start the new sound playing, much like Mix_PlayChannel() will,
+ * but will start the sound playing at silence and fade in to its normal
+ * volume over the specified number of milliseconds.
+ *
+ * If the specified channel is -1, play on the first free channel (and return
+ * -1 without playing anything new if no free channel was available).
+ *
+ * If a specific channel was requested, and there is a chunk already playing
+ * there, that chunk will be halted and the new chunk will take its place.
+ *
+ * If `loops` is greater than zero, loop the sound that many times. If `loops`
+ * is -1, loop "infinitely" (~65000 times).
+ *
+ * `volume` speccifies the initial channel volume level. If `volume` is -1,
+ * the volume will be re-used from the selected channel.
+ *
+ * \param channel the channel on which to play the new chunk, or -1 to find
+ *                any available.
+ * \param chunk the new chunk to play.
+ * \param loop the number of times the chunk should loop, -1 to loop (not
+ *             actually) infinitely.
+ * \param ms the number of milliseconds to spend fading in.
+ * \param volume the initial channel volume, -1 to re-use the current volume
+ *               level of the channel
+ * \returns which channel was used to play the sound, or -1 if sound could not
+ *          be played.
+ *
+ * \since This function is available since SDL_mixer 2.7.0.
  */
-#define Mix_FadeInChannelVolume(channel,chunk,loops,ms,vol) Mix_FadeInChannelTimedVolume(channel,chunk,loops,ms,-1,vol)/*MIXER-X*/
+extern DECLSPEC int MIXCALL Mix_FadeInChannelVolume(int channel, Mix_Chunk *chunk,int loops, int ms, int volume);/*MIXER-X*/
 
 /**
  * TODO: Describe this

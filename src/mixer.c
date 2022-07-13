@@ -588,7 +588,6 @@ void MIXCALLCC Mix_PauseAudio(int pause_on)
     Mix_UnlockAudio();
 }
 
-
 /* Dynamically change the number of channels managed by the mixer.
    If decreasing the number of channels, the upper channels are
    stopped.
@@ -1157,12 +1156,11 @@ int MIXCALLCC Mix_PlayChannelTimedVolume(int which, Mix_Chunk *chunk, int loops,
     return(which);
 }
 
-/* Play an audio chunk on a specific channel.
-   If the specified channel is -1, play on the first free channel.
-   'ticks' is the number of milliseconds at most to play the sample, or -1
-   if there is no limit.
-   Returns which channel was used to play the sound.
-*/
+int Mix_PlayChannel(int channel, Mix_Chunk *chunk, int loops)
+{
+    return Mix_PlayChannelTimedVolume(channel, chunk, loops, -1, -1);
+}
+
 int MIXCALLCC Mix_PlayChannelTimed(int which, Mix_Chunk *chunk, int loops, int ticks)
 {
     return Mix_PlayChannelTimedVolume(which, chunk, loops, ticks, -1);
@@ -1252,6 +1250,16 @@ int MIXCALLCC Mix_FadeInChannelTimedVolume(int which, Mix_Chunk *chunk, int loop
 int MIXCALLCC Mix_FadeInChannelTimed(int which, Mix_Chunk *chunk, int loops, int ms, int ticks)
 {
     return Mix_FadeInChannelTimedVolume(which, chunk, loops, ms, ticks, -1);
+}
+
+int MIXCALLCC Mix_FadeInChannelVolume(int which, Mix_Chunk *chunk, int loops, int ms, int volume)
+{
+    return Mix_FadeInChannelTimedVolume(which, chunk, loops, ms, -1, volume);
+}
+
+int Mix_FadeInChannel(int channel, Mix_Chunk *chunk, int loops, int ms)
+{
+    return Mix_FadeInChannelTimedVolume(channel, chunk, loops, ms, -1, -1);
 }
 
 /* Set volume of a particular channel */
