@@ -70,8 +70,7 @@ static fluidsynth_loader fluidsynth;
     if (fluidsynth.FUNC == NULL) { SDL_UnloadObject(fluidsynth.handle); return -1; }
 #else
 #define FUNCTION_LOADER(FUNC, SIG) \
-    fluidsynth.FUNC = FUNC; \
-    if (fluidsynth.FUNC == NULL) { Mix_SetError("Missing fluidsynth.framework"); return -1; }
+    fluidsynth.FUNC = FUNC;
 #endif
 
 static int FLUIDSYNTH_Load()
