@@ -192,6 +192,7 @@ typedef enum {
     MUS_OPUS,
     /* MixerX specific codecs starts with 100 */
     MUS_GME = 100,
+    MUS_FFMPEG,
     /* Special cases to play formats IMF, MUS, or XMI are can't be played without specific MIDI libraries */
     MUS_ADLMIDI = 200,
     MUS_OPNMIDI,
