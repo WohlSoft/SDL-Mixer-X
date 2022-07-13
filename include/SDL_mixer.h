@@ -581,11 +581,9 @@ extern DECLSPEC int MIXCALL Mix_OpenAudioDevice(int frequency, Uint16 format, in
 /**
  * Suspend or resume the whole audio output.
  *
- * This is the MixerX fork exclusive function.
+ * \since This function is available since SDL_mixer 2.8.0 and MixerX 2.6.0.
  *
- * \since This function is available since MixerX 2.6.0.
- *
- * @param pause_on Set audio output to pause
+ * @param pause_on Set audio output to pause, 1 (to pause) or 0 (to resume)
  */
 extern DECLSPEC void MIXCALL Mix_PauseAudio(int pause_on);
 
