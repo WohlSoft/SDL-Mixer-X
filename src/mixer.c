@@ -969,6 +969,20 @@ Mix_Chunk * MIXCALLCC Mix_QuickLoad_RAW(Uint8 *mem, Uint32 len)
     return(chunk);
 }
 
+/* MAKE SURE you hold the audio lock (Mix_LockAudio()) before calling this! */
+static void  Mix_HaltChannel_locked(int which)
+{
+    if (Mix_Playing(which)) {
+        _Mix_channel_done_playing(which);
+        mix_channel[which].playing = 0;
+        mix_channel[which].looping = 0;
+    }
+    mix_channel[which].expire = 0;
+    if (mix_channel[which].fading != MIX_NO_FADING) /* Restore volume */
+        mix_channel[which].volume = mix_channel[which].fade_volume_reset;
+    mix_channel[which].fading = MIX_NO_FADING;
+}
+
 /* Free an audio chunk previously loaded */
 void MIXCALLCC Mix_FreeChunk(Mix_Chunk *chunk)
 {
@@ -981,8 +995,7 @@ void MIXCALLCC Mix_FreeChunk(Mix_Chunk *chunk)
         if (mix_channel) {
             for (i=0; i<num_channels; ++i) {
                 if (chunk == mix_channel[i].chunk) {
-                    mix_channel[i].playing = 0;
-                    mix_channel[i].looping = 0;
+                    Mix_HaltChannel_locked(i);
                 }
             }
         }
@@ -1286,23 +1299,15 @@ int MIXCALLCC Mix_HaltChannel(int which)
 {
     int i;
 
+    Mix_LockAudio();
     if (which == -1) {
         for (i=0; i<num_channels; ++i) {
-            Mix_HaltChannel(i);
+            Mix_HaltChannel_locked(i);
         }
     } else if (which < num_channels) {
-        Mix_LockAudio();
-        if (Mix_Playing(which)) {
-            _Mix_channel_done_playing(which);
-            mix_channel[which].playing = 0;
-            mix_channel[which].looping = 0;
-        }
-        mix_channel[which].expire = 0;
-        if (mix_channel[which].fading != MIX_NO_FADING) /* Restore volume */
-            mix_channel[which].volume = mix_channel[which].fade_volume_reset;
-        mix_channel[which].fading = MIX_NO_FADING;
-        Mix_UnlockAudio();
+        Mix_HaltChannel_locked(which);
     }
+    Mix_UnlockAudio();
     return(0);
 }
 
