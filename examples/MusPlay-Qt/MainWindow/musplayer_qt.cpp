@@ -434,7 +434,7 @@ void MusPlayer_Qt::on_play_clicked()
 
     if(playSuccess)
     {
-        double total = Mix_GetMusicTotalTime(PGE_MusicPlayer::s_playMus);
+        double total = Mix_MusicDuration(PGE_MusicPlayer::s_playMus);
         double curPos = Mix_GetMusicPosition(PGE_MusicPlayer::s_playMus);
 
         double loopStart = Mix_GetMusicLoopStartTime(PGE_MusicPlayer::s_playMus);
