@@ -718,6 +718,10 @@ Mix_MusicInterface Mix_MusicInterface_NATIVEXMI =
     NATIVEMIDI_Duration,   /* Duration */
     NATIVEMIDI_SetTempo,   /* [MIXER-X] */
     NATIVEMIDI_GetTempo,   /*[MIXER-X] */
+    NULL,   /* SetSpeed [MIXER-X] */
+    NULL,   /* GetSpeed [MIXER-X] */
+    NULL,   /* SetPitch [MIXER-X] */
+    NULL,   /* GetPitch [MIXER-X] */
     NATIVEMIDI_GetTracksCount,   /* [MIXER-X] */
     NATIVEMIDI_SetTrackMuted,   /* [MIXER-X] */
     NATIVEMIDI_LoopStart,   /* LoopStart [MIXER-X]*/

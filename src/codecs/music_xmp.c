@@ -480,6 +480,10 @@ Mix_MusicInterface Mix_MusicInterface_XMP =
     XMP_Duration,
     XMP_SetTempo,   /* [MIXER-X] */
     XMP_GetTempo,   /* [MIXER-X] */
+    NULL,   /* SetSpeed [MIXER-X] */
+    NULL,   /* GetSpeed [MIXER-X] */
+    NULL,   /* SetPitch [MIXER-X] */
+    NULL,   /* GetPitch [MIXER-X] */
     XMP_GetTracksCount,   /* GetTracksCount [MIXER-X] */
     XMP_SetTrackMute,   /* SetTrackMute [MIXER-X] */
     NULL,   /* LoopStart */

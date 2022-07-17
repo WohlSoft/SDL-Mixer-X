@@ -3292,6 +3292,30 @@ extern DECLSPEC double MIXCALL Mix_GetMusicTempo(Mix_Music *music);/*MixerX*/
  * TODO: Describe this
  * This is the MixerX fork exclusive function.
  */
+extern DECLSPEC int MIXCALL Mix_SetMusicSpeed(Mix_Music *music, double speed);/*MixerX*/
+
+/**
+ * TODO: Describe this
+ * This is the MixerX fork exclusive function.
+ */
+extern DECLSPEC double MIXCALL Mix_GetMusicSpeed(Mix_Music *music);/*MixerX*/
+
+/**
+ * TODO: Describe this
+ * This is the MixerX fork exclusive function.
+ */
+extern DECLSPEC int MIXCALL Mix_SetMusicPitch(Mix_Music *music, double pitch);/*MixerX*/
+
+/**
+ * TODO: Describe this
+ * This is the MixerX fork exclusive function.
+ */
+extern DECLSPEC double MIXCALL Mix_GetMusicPitch(Mix_Music *music);/*MixerX*/
+
+/**
+ * TODO: Describe this
+ * This is the MixerX fork exclusive function.
+ */
 extern DECLSPEC int MIXCALL Mix_GetMusicTracks(Mix_Music *music);/*MixerX*/
 
 /*

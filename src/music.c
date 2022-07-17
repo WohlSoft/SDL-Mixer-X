@@ -2460,6 +2460,122 @@ double MIXCALLCC Mix_GetMusicTempo(Mix_Music *music)
     return(retval);
 }
 
+/* Set the playing music playback speed */
+int music_internal_set_speed(Mix_Music *music, double speed)
+{
+    if (music->interface->SetSpeed) {
+        return music->interface->SetSpeed(music->context, speed);
+    }
+    return -1;
+}
+int MIXCALLCC Mix_SetMusicSpeed(Mix_Music *music, double speed)
+{
+    int retval;
+
+    Mix_LockAudio();
+    if (music) {
+        retval = music_internal_set_speed(music, speed);
+        if (retval < 0) {
+            Mix_SetError("Playback speed not implemented for music type");
+        }
+    } else if (music_playing) {
+        retval = music_internal_set_speed(music_playing, speed);
+        if (retval < 0) {
+            Mix_SetError("Playback speed not implemented for music type");
+        }
+    } else {
+        Mix_SetError("Music isn't playing");
+        retval = -1;
+    }
+    Mix_UnlockAudio();
+
+    return(retval);
+}
+
+/* Get total playing music playback speed */
+static double music_internal_speed(Mix_Music *music)
+{
+    if (music->interface->GetSpeed) {
+        return music->interface->GetSpeed(music->context);
+    }
+    return -1.0;
+}
+double MIXCALLCC Mix_GetMusicSpeed(Mix_Music *music)
+{
+    double retval;
+
+    Mix_LockAudio();
+    if (music) {
+        retval = music_internal_speed(music);
+    } else if (music_playing) {
+        retval = music_internal_speed(music_playing);
+    } else {
+        Mix_SetError("Music isn't playing");
+        retval = -1.0;
+    }
+    Mix_UnlockAudio();
+
+    return(retval);
+}
+
+/* Set the playing music pitch factor */
+int music_internal_set_pitch(Mix_Music *music, double pitch)
+{
+    if (music->interface->SetPitch) {
+        return music->interface->SetPitch(music->context, pitch);
+    }
+    return -1;
+}
+int MIXCALLCC Mix_SetMusicPitch(Mix_Music *music, double pitch)
+{
+    int retval;
+
+    Mix_LockAudio();
+    if (music) {
+        retval = music_internal_set_pitch(music, pitch);
+        if (retval < 0) {
+            Mix_SetError("Pitch not implemented for music type");
+        }
+    } else if (music_playing) {
+        retval = music_internal_set_pitch(music_playing, pitch);
+        if (retval < 0) {
+            Mix_SetError("Pitch not implemented for music type");
+        }
+    } else {
+        Mix_SetError("Music isn't playing");
+        retval = -1;
+    }
+    Mix_UnlockAudio();
+
+    return(retval);
+}
+
+/* Get total playing music pitch factor */
+static double music_internal_pitch(Mix_Music *music)
+{
+    if (music->interface->GetPitch) {
+        return music->interface->GetPitch(music->context);
+    }
+    return -1.0;
+}
+double MIXCALLCC Mix_GetMusicPitch(Mix_Music *music)
+{
+    double retval;
+
+    Mix_LockAudio();
+    if (music) {
+        retval = music_internal_pitch(music);
+    } else if (music_playing) {
+        retval = music_internal_pitch(music_playing);
+    } else {
+        Mix_SetError("Music isn't playing");
+        retval = -1.0;
+    }
+    Mix_UnlockAudio();
+
+    return(retval);
+}
+
 /* Get the count of tracks in the song */
 static int music_internal_tracks(Mix_Music *music)
 {

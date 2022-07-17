@@ -866,6 +866,10 @@ Mix_MusicInterface Mix_MusicInterface_ADLMIDI =
     ADLMIDI_Duration,
     ADLMIDI_SetTempo,   /* [MIXER-X] */
     ADLMIDI_GetTempo,   /* [MIXER-X] */
+    NULL,   /* SetSpeed [MIXER-X] */
+    NULL,   /* GetSpeed [MIXER-X] */
+    NULL,   /* SetPitch [MIXER-X] */
+    NULL,   /* GetPitch [MIXER-X] */
     ADLMIDI_GetTracksCount,   /* [MIXER-X] */
     ADLMIDI_SetTrackMute,   /* [MIXER-X] */
     ADLMIDI_LoopStart,   /* LoopStart [MIXER-X]*/
@@ -906,6 +910,10 @@ Mix_MusicInterface Mix_MusicInterface_ADLIMF =
     ADLMIDI_Duration,
     ADLMIDI_SetTempo,   /* [MIXER-X] */
     ADLMIDI_GetTempo,   /* [MIXER-X] */
+    NULL,   /* SetSpeed [MIXER-X] */
+    NULL,   /* GetSpeed [MIXER-X] */
+    NULL,   /* SetPitch [MIXER-X] */
+    NULL,   /* GetPitch [MIXER-X] */
     NULL,   /* GetTracksCount [MIXER-X] */
     NULL,   /* SetTrackMute [MIXER-X] */
     ADLMIDI_LoopStart,   /* LoopStart [MIXER-X]*/

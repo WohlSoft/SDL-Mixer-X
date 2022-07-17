@@ -624,6 +624,10 @@ Mix_MusicInterface Mix_MusicInterface_EDMIDI =
     EDMIDI_Duration,
     EDMIDI_SetTempo,   /* [MIXER-X] */
     EDMIDI_GetTempo,   /* [MIXER-X] */
+    NULL,   /* SetSpeed [MIXER-X] */
+    NULL,   /* GetSpeed [MIXER-X] */
+    NULL,   /* SetPitch [MIXER-X] */
+    NULL,   /* GetPitch [MIXER-X] */
     EDMIDI_GetTracksCount,   /* [MIXER-X] */
     EDMIDI_SetTrackMute,   /* [MIXER-X] */
     EDMIDI_LoopStart,   /* LoopStart [MIXER-X]*/
@@ -663,6 +667,10 @@ Mix_MusicInterface Mix_MusicInterface_EDXMI =
     EDMIDI_Duration,
     EDMIDI_SetTempo,   /* [MIXER-X] */
     EDMIDI_GetTempo,   /* [MIXER-X] */
+    NULL,   /* SetSpeed [MIXER-X] */
+    NULL,   /* GetSpeed [MIXER-X] */
+    NULL,   /* SetPitch [MIXER-X] */
+    NULL,   /* GetPitch [MIXER-X] */
     EDMIDI_GetTracksCount,   /* [MIXER-X] */
     EDMIDI_SetTrackMute,   /* [MIXER-X] */
     EDMIDI_LoopStart,   /* LoopStart [MIXER-X]*/

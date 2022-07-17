@@ -753,6 +753,10 @@ Mix_MusicInterface Mix_MusicInterface_OPNMIDI =
     OPNMIDI_Duration,
     OPNMIDI_SetTempo,   /* [MIXER-X] */
     OPNMIDI_GetTempo,   /* [MIXER-X] */
+    NULL,   /* SetSpeed [MIXER-X] */
+    NULL,   /* GetSpeed [MIXER-X] */
+    NULL,   /* SetPitch [MIXER-X] */
+    NULL,   /* GetPitch [MIXER-X] */
     OPNMIDI_GetTracksCount,   /* [MIXER-X] */
     OPNMIDI_SetTrackMute,   /* [MIXER-X] */
     OPNMIDI_LoopStart,   /* LoopStart [MIXER-X]*/
@@ -793,6 +797,10 @@ Mix_MusicInterface Mix_MusicInterface_OPNXMI =
     OPNMIDI_Duration,
     OPNMIDI_SetTempo,   /* [MIXER-X] */
     OPNMIDI_GetTempo,   /* [MIXER-X] */
+    NULL,   /* SetSpeed [MIXER-X] */
+    NULL,   /* GetSpeed [MIXER-X] */
+    NULL,   /* SetPitch [MIXER-X] */
+    NULL,   /* GetPitch [MIXER-X] */
     OPNMIDI_GetTracksCount,   /* [MIXER-X] */
     OPNMIDI_SetTrackMute,   /* [MIXER-X] */
     OPNMIDI_LoopStart,   /* LoopStart [MIXER-X]*/
