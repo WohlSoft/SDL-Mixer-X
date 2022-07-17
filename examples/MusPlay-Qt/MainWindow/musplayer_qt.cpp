@@ -243,6 +243,8 @@ void MusPlayer_Qt::contextMenu(const QPoint &pos)
     QAction *resetSpeed   = x.addAction("Reset speed");
     QAction *resetPitch   = x.addAction("Reset pitch");
     resetTempo->setEnabled(ui->tempoFrame->isEnabled());
+    resetSpeed->setEnabled(ui->speedFrame->isEnabled());
+    resetPitch->setEnabled(ui->pitchFrame->isEnabled());
     reverb->setCheckable(true);
     reverb->setChecked(PGE_MusicPlayer::reverbEnabled);
     reverbTuner->setEnabled(PGE_MusicPlayer::reverbEnabled);
