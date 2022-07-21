@@ -379,6 +379,14 @@ typedef enum {
     OPNMIDI_OPN2_EMU_MIME = 0 /*!!!TYPO!!!*/
 } Mix_OPNMIDI_Emulator;
 
+/* Channel allocation mode in the ADLMIDI and OPNMIDI */
+typedef enum {
+    MIX_CHIP_CHANALLOC_AUTO = -1,
+    MIX_CHIP_CHANALLOC_OffDelay = 0,
+    MIX_CHIP_CHANALLOC_SameInst,
+    MIX_CHIP_CHANALLOC_AnyFree,
+} Mix_ChipChanAllocMode;
+
 /**
  * The internal format for a music chunk interpreted via codecs
  */
@@ -3726,6 +3734,10 @@ extern DECLSPEC void MIXCALL Mix_ADLMIDI_setFullRangeBrightness(int frb);/*Mixer
 extern DECLSPEC int  MIXCALL Mix_ADLMIDI_getAutoArpeggio();/*MixerX*/
 /* Set the automatic arpeggio enabled or disabled */
 extern DECLSPEC void MIXCALL Mix_ADLMIDI_setAutoArpeggio(int aa_en);/*MixerX*/
+/* Get channel allocation mode */
+extern DECLSPEC int  MIXCALL Mix_ADLMIDI_getChannelAllocMode(void);/*MixerX*/
+/* Set channel allocation mode */
+extern DECLSPEC void MIXCALL Mix_ADLMIDI_setChannelAllocMode(int ch_alloc);/*MixerX*/
 /* Get full panning stereo mode */
 extern DECLSPEC int  MIXCALL Mix_ADLMIDI_getFullPanStereo(void);/*MixerX*/
 /* Set full panning stereo mode */
@@ -3758,6 +3770,10 @@ extern DECLSPEC void MIXCALL Mix_OPNMIDI_setFullRangeBrightness(int frb);/*Mixer
 extern DECLSPEC int  MIXCALL Mix_OPNMIDI_getAutoArpeggio();/*MixerX*/
 /* Set the automatic arpeggio enabled or disabled */
 extern DECLSPEC void MIXCALL Mix_OPNMIDI_setAutoArpeggio(int aa_en);/*MixerX*/
+/* Get channel allocation mode */
+extern DECLSPEC int  MIXCALL Mix_OPNMIDI_getChannelAllocMode(void);/*MixerX*/
+/* Set channel allocation mode */
+extern DECLSPEC void MIXCALL Mix_OPNMIDI_setChannelAllocMode(int ch_alloc);/*MixerX*/
 /* Get full panning stereo mode */
 extern DECLSPEC int  MIXCALL Mix_OPNMIDI_getFullPanStereo(void);/*MixerX*/
 /* Set full panning stereo mode */

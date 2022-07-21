@@ -3477,6 +3477,24 @@ void MIXCALLCC Mix_ADLMIDI_setAutoArpeggio(int aa_en)
 #endif
 }
 
+int MIXCALLCC Mix_ADLMIDI_getChannelAllocMode(void)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    return _Mix_ADLMIDI_getChannelAllocMode();
+#else
+    return -1;
+#endif
+}
+
+void MIXCALLCC Mix_ADLMIDI_setChannelAllocMode(int ch_alloc)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    _Mix_ADLMIDI_setChannelAllocMode(ch_alloc);
+#else
+    (void)ch_alloc;
+#endif
+}
+
 int MIXCALLCC Mix_ADLMIDI_getFullPanStereo(void)
 {
 #ifdef MUSIC_MID_ADLMIDI
@@ -3602,6 +3620,24 @@ void MIXCALLCC Mix_OPNMIDI_setAutoArpeggio(int aa_en)
     _Mix_OPNMIDI_setAutoArpeggio(aa_en);
 #else
     (void)aa_en;
+#endif
+}
+
+int MIXCALLCC Mix_OPNMIDI_getChannelAllocMode(void)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    return _Mix_OPNMIDI_getChannelAllocMode();
+#else
+    return -1;
+#endif
+}
+
+void MIXCALLCC Mix_OPNMIDI_setChannelAllocMode(int ch_alloc)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    _Mix_OPNMIDI_setChannelAllocMode(ch_alloc);
+#else
+    (void)ch_alloc;
 #endif
 }
 
