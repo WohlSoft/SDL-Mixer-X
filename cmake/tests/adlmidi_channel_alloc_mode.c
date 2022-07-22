@@ -2,6 +2,6 @@
 
 int main()
 {
-    adl_setChannelAllocMode(0, 0)
+    adl_setChannelAllocMode(0, 0);
     return 0;
 }
