@@ -12,7 +12,7 @@
 #include <QToolTip>
 #include <cmath>
 
-#include "ui_mainwindow.h"
+#include "ui_player_main.h"
 #include "musplayer_qt.h"
 #include "multi_music_test.h"
 #include "multi_sfx_test.h"
@@ -35,7 +35,7 @@
 
 MusPlayer_Qt::MusPlayer_Qt(QWidget *parent) : QMainWindow(parent),
     MusPlayerBase(),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MusPlayerQt)
 {
     ui->setupUi(this);
     PGE_MusicPlayer::setMainWindow(this);
