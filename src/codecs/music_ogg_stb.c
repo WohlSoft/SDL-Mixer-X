@@ -71,6 +71,39 @@
 #define exp(x) SDL_exp(x) /* Available since SDL 2.0.9 */
 #endif
 
+/* Workaround to don't conflict with another statically-linked stb-vorbis */
+#define stb_vorbis_get_info _mix_stb_vorbis_get_info
+#define stb_vorbis_get_comment _mix_stb_vorbis_get_comment
+#define stb_vorbis_get_error _mix_stb_vorbis_get_error
+#define stb_vorbis_close _mix_stb_vorbis_close
+#define stb_vorbis_get_sample_offset _mix_stb_vorbis_get_sample_offset
+#define stb_vorbis_get_playback_sample_offset _mix_stb_vorbis_get_playback_sample_offset
+#define stb_vorbis_get_file_offset _mix_stb_vorbis_get_file_offset
+#define stb_vorbis_open_pushdata _mix_stb_vorbis_open_pushdata
+#define stb_vorbis_decode_frame_pushdata _mix_stb_vorbis_decode_frame_pushdata
+#define stb_vorbis_flush_pushdata _mix_stb_vorbis_flush_pushdata
+#define stb_vorbis_decode_filename _mix_stb_vorbis_decode_filename
+#define stb_vorbis_decode_memory _mix_stb_vorbis_decode_memory
+#define stb_vorbis_open_memory _mix_stb_vorbis_open_memory
+#define stb_vorbis_open_filename _mix_stb_vorbis_open_filename
+#define stb_vorbis_open_file _mix_stb_vorbis_open_file
+#define stb_vorbis_open_file_section _mix_stb_vorbis_open_file_section
+#define stb_vorbis_open_rwops_section _mix_stb_vorbis_open_rwops_section
+#define stb_vorbis_open_rwops _mix_stb_vorbis_open_rwops
+#define stb_vorbis_seek_frame _mix_stb_vorbis_seek_frame
+#define stb_vorbis_seek _mix_stb_vorbis_seek
+#define stb_vorbis_seek_start _mix_stb_vorbis_seek_start
+#define stb_vorbis_stream_length_in_samples _mix_stb_vorbis_stream_length_in_samples
+#define stb_vorbis_stream_length_in_seconds _mix_stb_vorbis_stream_length_in_seconds
+#define stb_vorbis_get_frame_float _mix_stb_vorbis_get_frame_float
+#define stb_vorbis_get_frame_short_interleaved _mix_stb_vorbis_get_frame_short_interleaved
+#define stb_vorbis_get_frame_short _mix_stb_vorbis_get_frame_short
+#define stb_vorbis_get_samples_float_interleaved _mix_stb_vorbis_get_samples_float_interleaved
+#define stb_vorbis_get_samples_float _mix_stb_vorbis_get_samples_float
+#define stb_vorbis_get_samples_short_interleaved _mix_stb_vorbis_get_samples_short_interleaved
+#define stb_vorbis_get_samples_short _mix_stb_vorbis_get_samples_short
+/* Workaround to don't conflict with another statically-linked stb-vorbis: END */
+
 #include "stb_vorbis/stb_vorbis_c90.h"
 
 typedef struct {
