@@ -44,6 +44,7 @@
 #include "music_midi_adl.h"
 #include "music_midi_opn.h"
 #include "music_midi_edmidi.h"
+#include "music_ffmpeg.h"
 
 #include "utils.h"
 
@@ -600,6 +601,9 @@ static Mix_MusicInterface *s_music_interfaces[] =
 #endif
 #ifdef MUSIC_MP3_MPG123
     &Mix_MusicInterface_MPG123,
+#endif
+#ifdef MUSIC_FFMPEG
+    &Mix_MusicInterface_FFMPEG,
 #endif
 #ifdef MUSIC_MOD_XMP
     &Mix_MusicInterface_XMP,
@@ -1579,6 +1583,19 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
         return MUS_MOD;
     if (SDL_memcmp(magic, "if", 2) == 0)
         return MUS_MOD;
+
+#if defined(MUSIC_FFMPEG)
+    if (SDL_memcmp(magic, "\x1A\x45\xDF\xA3", 4) == 0)
+        return MUS_FFMPEG;
+    if (SDL_memcmp(magic, "\x30\x26\xB2\x75\x8E\x66\xCF\x11\xA6\xD9\x00\xAA\x00\x62\xCE\x6C", 16) == 0) /* WMA */
+        return MUS_FFMPEG;
+    if (SDL_memcmp(magic + 4, "\x66\x74\x79\x70\x69\x73\x6F\x6D", 8) == 0) /* AAC */
+        return MUS_FFMPEG;
+    if (SDL_memcmp(magic + 4, "\x66\x74\x79\x70\x6D\x70\x34\x32", 8) == 0) /* AAC */
+        return MUS_FFMPEG;
+    if (SDL_memcmp(magic + 4, "ftypM4A ", 8) == 0) /* AAC */
+        return MUS_FFMPEG;
+#endif
 
 #if defined(MUSIC_MP3_MPG123) || defined(MUSIC_MP3_DRMP3)
     /* Detect MP3 format [needs scanning of bigger part of the file] */
