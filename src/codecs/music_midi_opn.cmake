@@ -17,6 +17,15 @@ if(USE_MIDI_OPNMIDI AND MIXERX_GPL)
                 "${OPNMIDI_LIBRARIES};${M_LIBRARY}"
                 STDCPP_NEEDED
             )
+
+            try_compile(OPNMIDI_HAS_CHANNEL_ALLOC_MODE
+                ${CMAKE_BINARY_DIR}/compile_tests
+                ${SDLMixerX_SOURCE_DIR}/cmake/tests/opnmidi_channel_alloc_mode.c
+                LINK_LIBRARIES ${OPNMIDI_LIBRARIES} ${STDCPP_LIBRARY} ${M_LIBRARY}
+                CMAKE_FLAGS "-DINCLUDE_DIRECTORIES=${OPNMIDI_INCLUDE_DIRS}"
+                OUTPUT_VARIABLE OPNMIDI_HAS_CHANNEL_ALLOC_MODE_RESULT
+            )
+            message("OPNMIDI_HAS_CHANNEL_ALLOC_MODE compile test result: ${OPNMIDI_HAS_CHANNEL_ALLOC_MODE}")
         endif()
 
     else()
@@ -27,6 +36,7 @@ if(USE_MIDI_OPNMIDI AND MIXERX_GPL)
         endif()
         if(OPNMIDI_LIBRARIES)
             set(OPNMIDI_FOUND 1)
+            set(OPNMIDI_HAS_CHANNEL_ALLOC_MODE TRUE)
             set(STDCPP_NEEDED 1) # Statically linking OPNMIDI which is C++ library
         endif()
         set(OPNMIDI_INCLUDE_DIRS "${AUDIO_CODECS_PATH}/libOPNMIDI/include")
@@ -40,6 +50,9 @@ if(USE_MIDI_OPNMIDI AND MIXERX_GPL)
         list(APPEND SDL_MIXER_INCLUDE_PATHS ${OPNMIDI_INCLUDE_DIRS})
         if(NOT USE_SYSTEM_AUDIO_LIBRARIES OR NOT USE_MIDI_OPNMIDI_DYNAMIC)
             list(APPEND SDLMixerX_LINK_LIBS ${OPNMIDI_LIBRARIES})
+        endif()
+        if(OPNMIDI_HAS_CHANNEL_ALLOC_MODE)
+            list(APPEND SDL_MIXER_DEFINITIONS -DOPNMIDI_HAS_CHANNEL_ALLOC_MODE)
         endif()
         list(APPEND SDLMixerX_SOURCES
             ${CMAKE_CURRENT_LIST_DIR}/music_midi_opn.c

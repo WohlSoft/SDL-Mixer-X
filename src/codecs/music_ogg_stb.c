@@ -71,6 +71,39 @@
 #define exp(x) SDL_exp(x) /* Available since SDL 2.0.9 */
 #endif
 
+/* Workaround to don't conflict with another statically-linked stb-vorbis */
+#define stb_vorbis_get_info _mix_stb_vorbis_get_info
+#define stb_vorbis_get_comment _mix_stb_vorbis_get_comment
+#define stb_vorbis_get_error _mix_stb_vorbis_get_error
+#define stb_vorbis_close _mix_stb_vorbis_close
+#define stb_vorbis_get_sample_offset _mix_stb_vorbis_get_sample_offset
+#define stb_vorbis_get_playback_sample_offset _mix_stb_vorbis_get_playback_sample_offset
+#define stb_vorbis_get_file_offset _mix_stb_vorbis_get_file_offset
+#define stb_vorbis_open_pushdata _mix_stb_vorbis_open_pushdata
+#define stb_vorbis_decode_frame_pushdata _mix_stb_vorbis_decode_frame_pushdata
+#define stb_vorbis_flush_pushdata _mix_stb_vorbis_flush_pushdata
+#define stb_vorbis_decode_filename _mix_stb_vorbis_decode_filename
+#define stb_vorbis_decode_memory _mix_stb_vorbis_decode_memory
+#define stb_vorbis_open_memory _mix_stb_vorbis_open_memory
+#define stb_vorbis_open_filename _mix_stb_vorbis_open_filename
+#define stb_vorbis_open_file _mix_stb_vorbis_open_file
+#define stb_vorbis_open_file_section _mix_stb_vorbis_open_file_section
+#define stb_vorbis_open_rwops_section _mix_stb_vorbis_open_rwops_section
+#define stb_vorbis_open_rwops _mix_stb_vorbis_open_rwops
+#define stb_vorbis_seek_frame _mix_stb_vorbis_seek_frame
+#define stb_vorbis_seek _mix_stb_vorbis_seek
+#define stb_vorbis_seek_start _mix_stb_vorbis_seek_start
+#define stb_vorbis_stream_length_in_samples _mix_stb_vorbis_stream_length_in_samples
+#define stb_vorbis_stream_length_in_seconds _mix_stb_vorbis_stream_length_in_seconds
+#define stb_vorbis_get_frame_float _mix_stb_vorbis_get_frame_float
+#define stb_vorbis_get_frame_short_interleaved _mix_stb_vorbis_get_frame_short_interleaved
+#define stb_vorbis_get_frame_short _mix_stb_vorbis_get_frame_short
+#define stb_vorbis_get_samples_float_interleaved _mix_stb_vorbis_get_samples_float_interleaved
+#define stb_vorbis_get_samples_float _mix_stb_vorbis_get_samples_float
+#define stb_vorbis_get_samples_short_interleaved _mix_stb_vorbis_get_samples_short_interleaved
+#define stb_vorbis_get_samples_short _mix_stb_vorbis_get_samples_short
+/* Workaround to don't conflict with another statically-linked stb-vorbis: END */
+
 #include "stb_vorbis/stb_vorbis_c90.h"
 
 typedef struct {
@@ -89,6 +122,8 @@ typedef struct {
     Sint64 loop_end;
     Sint64 loop_len;
     Sint64 full_length;
+    int computed_src_rate;
+    double speed;
     Mix_MusicMetaTags tags;
 } OGG_music;
 
@@ -126,6 +161,35 @@ static int set_ov_error(const char *function, int error)
 static int OGG_Seek(void *context, double time);
 static void OGG_Delete(void *context);
 
+static int OGG_UpdateSpeed(OGG_music *music)
+{
+    if (music->computed_src_rate != -1) {
+        return 0;
+    }
+
+    if (music->stream) {
+        SDL_AudioStreamFlush(music->stream);
+        if (SDL_AudioStreamAvailable(music->stream) > 0) {
+            return -1;
+        }
+        SDL_FreeAudioStream(music->stream);
+        music->stream = NULL;
+    }
+
+    music->computed_src_rate = music->vi.sample_rate * music->speed;
+    if (music->computed_src_rate < 1000) {
+        music->computed_src_rate = 1000;
+    }
+
+    music->stream = SDL_NewAudioStream(AUDIO_F32SYS, (Uint8)music->vi.channels, music->computed_src_rate,
+                                       music_spec.format, music_spec.channels, music_spec.freq);
+    if (!music->stream) {
+        return -2;
+    }
+
+    return 0;
+}
+
 static int OGG_UpdateSection(OGG_music *music)
 {
     stb_vorbis_info vi;
@@ -137,6 +201,11 @@ static int OGG_UpdateSection(OGG_music *music)
     }
     SDL_memcpy(&music->vi, &vi, sizeof(vi));
 
+    music->computed_src_rate = music->vi.sample_rate * music->speed;
+    if (music->computed_src_rate < 1000) {
+        music->computed_src_rate = 1000;
+    }
+
     if (music->buffer) {
         SDL_free(music->buffer);
         music->buffer = NULL;
@@ -147,7 +216,7 @@ static int OGG_UpdateSection(OGG_music *music)
         music->stream = NULL;
     }
 
-    music->stream = SDL_NewAudioStream(AUDIO_F32SYS, (Uint8)vi.channels, (int)vi.sample_rate,
+    music->stream = SDL_NewAudioStream(AUDIO_F32SYS, (Uint8)vi.channels, music->computed_src_rate,
                                        music_spec.format, music_spec.channels, music_spec.freq);
     if (!music->stream) {
         return -1;
@@ -181,6 +250,8 @@ static void *OGG_CreateFromRW(SDL_RWops *src, int freesrc)
     }
     music->src = src;
     music->volume = MIX_MAX_VOLUME;
+    music->speed = 1.0;
+    music->computed_src_rate = -1;
     music->section = -1;
 
     music->vf = stb_vorbis_open_rwops(src, 0, &error, NULL);
@@ -337,6 +408,15 @@ static int OGG_GetSome(void *context, void *data, int bytes, SDL_bool *done)
         }
     }
 
+    if (music->computed_src_rate < 0) {
+        result = OGG_UpdateSpeed(music);
+        if (result == -1) {
+            return 0; /* Has data to be flush */
+        } else if (result == -2) {
+            return -1; /* Error has occured */
+        }
+    }
+
     pcmPos = stb_vorbis_get_playback_sample_offset(music->vf);
     if (music->loop && (music->play_count != 1) && (pcmPos >= music->loop_end)) {
         amount -= (int)((pcmPos - music->loop_end) * music->vi.channels) * (int)sizeof(float);
@@ -406,6 +486,24 @@ static double OGG_Duration(void *context)
     OGG_music *music = (OGG_music *)context;
     return (double)music->full_length / music->vi.sample_rate;
 }
+
+static int OGG_SetSpeed(void *context, double speed)
+{
+    OGG_music *music = (OGG_music *)context;
+    if (speed <= 0.01) {
+        speed = 0.01;
+    }
+    music->speed = speed;
+    music->computed_src_rate = -1;
+    return 0;
+}
+
+static double OGG_GetSpeed(void *context)
+{
+    OGG_music *music = (OGG_music *)context;
+    return music->speed;
+}
+
 
 static double   OGG_LoopStart(void *music_p)
 {
@@ -478,6 +576,10 @@ Mix_MusicInterface Mix_MusicInterface_OGG =
     OGG_Duration,
     NULL,   /* SetTempo [MIXER-X] */
     NULL,   /* GetTempo [MIXER-X] */
+    OGG_SetSpeed,
+    OGG_GetSpeed,
+    NULL,   /* SetPitch [MIXER-X] */
+    NULL,   /* GetPitch [MIXER-X] */
     NULL,   /* GetTracksCount [MIXER-X] */
     NULL,   /* SetTrackMute [MIXER-X] */
     OGG_LoopStart,

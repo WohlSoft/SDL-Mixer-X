@@ -943,7 +943,7 @@ void SDLCALL music_mixer(void *udata, Uint8 *stream, int len)
 
 void pause_async_music(int pause_on)
 {
-    if (!music_playing || !music_playing->interface) {
+    if (!music_active || !music_playing || !music_playing->interface) {
         return;
     }
 
@@ -2460,6 +2460,122 @@ double MIXCALLCC Mix_GetMusicTempo(Mix_Music *music)
     return(retval);
 }
 
+/* Set the playing music playback speed */
+int music_internal_set_speed(Mix_Music *music, double speed)
+{
+    if (music->interface->SetSpeed) {
+        return music->interface->SetSpeed(music->context, speed);
+    }
+    return -1;
+}
+int MIXCALLCC Mix_SetMusicSpeed(Mix_Music *music, double speed)
+{
+    int retval;
+
+    Mix_LockAudio();
+    if (music) {
+        retval = music_internal_set_speed(music, speed);
+        if (retval < 0) {
+            Mix_SetError("Playback speed not implemented for music type");
+        }
+    } else if (music_playing) {
+        retval = music_internal_set_speed(music_playing, speed);
+        if (retval < 0) {
+            Mix_SetError("Playback speed not implemented for music type");
+        }
+    } else {
+        Mix_SetError("Music isn't playing");
+        retval = -1;
+    }
+    Mix_UnlockAudio();
+
+    return(retval);
+}
+
+/* Get total playing music playback speed */
+static double music_internal_speed(Mix_Music *music)
+{
+    if (music->interface->GetSpeed) {
+        return music->interface->GetSpeed(music->context);
+    }
+    return -1.0;
+}
+double MIXCALLCC Mix_GetMusicSpeed(Mix_Music *music)
+{
+    double retval;
+
+    Mix_LockAudio();
+    if (music) {
+        retval = music_internal_speed(music);
+    } else if (music_playing) {
+        retval = music_internal_speed(music_playing);
+    } else {
+        Mix_SetError("Music isn't playing");
+        retval = -1.0;
+    }
+    Mix_UnlockAudio();
+
+    return(retval);
+}
+
+/* Set the playing music pitch factor */
+int music_internal_set_pitch(Mix_Music *music, double pitch)
+{
+    if (music->interface->SetPitch) {
+        return music->interface->SetPitch(music->context, pitch);
+    }
+    return -1;
+}
+int MIXCALLCC Mix_SetMusicPitch(Mix_Music *music, double pitch)
+{
+    int retval;
+
+    Mix_LockAudio();
+    if (music) {
+        retval = music_internal_set_pitch(music, pitch);
+        if (retval < 0) {
+            Mix_SetError("Pitch not implemented for music type");
+        }
+    } else if (music_playing) {
+        retval = music_internal_set_pitch(music_playing, pitch);
+        if (retval < 0) {
+            Mix_SetError("Pitch not implemented for music type");
+        }
+    } else {
+        Mix_SetError("Music isn't playing");
+        retval = -1;
+    }
+    Mix_UnlockAudio();
+
+    return(retval);
+}
+
+/* Get total playing music pitch factor */
+static double music_internal_pitch(Mix_Music *music)
+{
+    if (music->interface->GetPitch) {
+        return music->interface->GetPitch(music->context);
+    }
+    return -1.0;
+}
+double MIXCALLCC Mix_GetMusicPitch(Mix_Music *music)
+{
+    double retval;
+
+    Mix_LockAudio();
+    if (music) {
+        retval = music_internal_pitch(music);
+    } else if (music_playing) {
+        retval = music_internal_pitch(music_playing);
+    } else {
+        Mix_SetError("Music isn't playing");
+        retval = -1.0;
+    }
+    Mix_UnlockAudio();
+
+    return(retval);
+}
+
 /* Get the count of tracks in the song */
 static int music_internal_tracks(Mix_Music *music)
 {
@@ -3361,6 +3477,24 @@ void MIXCALLCC Mix_ADLMIDI_setAutoArpeggio(int aa_en)
 #endif
 }
 
+int MIXCALLCC Mix_ADLMIDI_getChannelAllocMode(void)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    return _Mix_ADLMIDI_getChannelAllocMode();
+#else
+    return -1;
+#endif
+}
+
+void MIXCALLCC Mix_ADLMIDI_setChannelAllocMode(int ch_alloc)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    _Mix_ADLMIDI_setChannelAllocMode(ch_alloc);
+#else
+    (void)ch_alloc;
+#endif
+}
+
 int MIXCALLCC Mix_ADLMIDI_getFullPanStereo(void)
 {
 #ifdef MUSIC_MID_ADLMIDI
@@ -3486,6 +3620,24 @@ void MIXCALLCC Mix_OPNMIDI_setAutoArpeggio(int aa_en)
     _Mix_OPNMIDI_setAutoArpeggio(aa_en);
 #else
     (void)aa_en;
+#endif
+}
+
+int MIXCALLCC Mix_OPNMIDI_getChannelAllocMode(void)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    return _Mix_OPNMIDI_getChannelAllocMode();
+#else
+    return -1;
+#endif
+}
+
+void MIXCALLCC Mix_OPNMIDI_setChannelAllocMode(int ch_alloc)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    _Mix_OPNMIDI_setChannelAllocMode(ch_alloc);
+#else
+    (void)ch_alloc;
 #endif
 }
 

@@ -144,6 +144,18 @@ typedef struct
     /* MIXER-X: Get a current tempo multiplier */
     double (*GetTempo)(void *music);
 
+    /* MIXER-X: Set a playback speed multiplier */
+    int (*SetSpeed)(void *music, double tempo);
+
+    /* MIXER-X: Get a current playback speed multiplier */
+    double (*GetSpeed)(void *music);
+
+    /* MIXER-X: Set a pitch multiplier */
+    int (*SetPitch)(void *music, double tempo);
+
+    /* MIXER-X: Get a current pitch multiplier */
+    double (*GetPitch)(void *music);
+
     /* MIXER-X: Get a count of concurrent tracks (MIDI / Tracker / etc.) */
     int (*GetTracksCount)(void *music);
 

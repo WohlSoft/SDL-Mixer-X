@@ -46,6 +46,7 @@ typedef struct {
     int (*adl_switchEmulator)(struct ADL_MIDIPlayer *device, int emulator);
     void (*adl_setScaleModulators)(struct ADL_MIDIPlayer *device, int smod);
     void (*adl_setVolumeRangeModel)(struct ADL_MIDIPlayer *device, int volumeModel);
+    void (*adl_setChannelAllocMode)(struct ADL_MIDIPlayer *device, int chanalloc);
     void (*adl_setFullRangeBrightness)(struct ADL_MIDIPlayer *device, int fr_brightness);
     void (*adl_setAutoArpeggio)(struct ADL_MIDIPlayer *device, int aaEn);
     void (*adl_setSoftPanEnabled)(struct ADL_MIDIPlayer *device, int softPanEn);
@@ -77,10 +78,14 @@ static adlmidi_loader ADLMIDI;
 #define FUNCTION_LOADER(FUNC, SIG) \
     ADLMIDI.FUNC = (SIG) SDL_LoadFunction(ADLMIDI.handle, #FUNC); \
     if (ADLMIDI.FUNC == NULL) { SDL_UnloadObject(ADLMIDI.handle); return -1; }
+#define FUNCTION_LOADER_OPTIONAL(FUNC, SIG) \
+    ADLMIDI.FUNC = (SIG) SDL_LoadFunction(ADLMIDI.handle, #FUNC);
 #else
 #define FUNCTION_LOADER(FUNC, SIG) \
     ADLMIDI.FUNC = FUNC; \
     if (ADLMIDI.FUNC == NULL) { Mix_SetError("Missing ADLMIDI.framework"); return -1; }
+#define FUNCTION_LOADER_OPTIONAL(FUNC, SIG) \
+    ADLMIDI.FUNC = FUNC;
 #endif
 
 static int ADLMIDI_Load(void)
@@ -104,6 +109,11 @@ static int ADLMIDI_Load(void)
         FUNCTION_LOADER(adl_switchEmulator, int(*)(struct ADL_MIDIPlayer*,int))
         FUNCTION_LOADER(adl_setScaleModulators, void(*)(struct ADL_MIDIPlayer*,int))
         FUNCTION_LOADER(adl_setVolumeRangeModel, void(*)(struct ADL_MIDIPlayer*,int))
+#if defined(ADLMIDI_HAS_CHANNEL_ALLOC_MODE)
+        FUNCTION_LOADER_OPTIONAL(adl_setChannelAllocMode, void(*)(struct ADL_MIDIPlayer*,int))
+#else
+        ADLMIDI.adl_setChannelAllocMode = NULL;
+#endif
         FUNCTION_LOADER(adl_setFullRangeBrightness, void(*)(struct ADL_MIDIPlayer*,int))
         FUNCTION_LOADER(adl_setAutoArpeggio, void(*)(struct ADL_MIDIPlayer*,int))
         FUNCTION_LOADER(adl_setSoftPanEnabled, void(*)(struct ADL_MIDIPlayer*,int))
@@ -153,6 +163,7 @@ typedef struct {
     int vibrato;
     int scalemod;
     int volume_model;
+    int alloc_mode;
     int chips_count;
     int four_op_channels;
     int full_brightness_range;
@@ -167,7 +178,14 @@ typedef struct {
 #define ADLMIDI_DEFAULT_CHIPS_COUNT     4
 
 static AdlMidi_Setup adlmidi_setup = {
-    58, -1, -1, -1, 0, -1, -1, 0, 1, 1, ADLMIDI_EMU_DOSBOX, "", 1.0, 2.0
+    58,
+    -1, -1, -1,
+    ADLMIDI_VolumeModel_AUTO,
+    ADLMIDI_ChanAlloc_AUTO,
+    -1, -1,
+    0, 0, 1,
+    ADLMIDI_EMU_DOSBOX, "",
+    1.0, 2.0
 };
 
 static void ADLMIDI_SetDefault(AdlMidi_Setup *setup)
@@ -176,11 +194,12 @@ static void ADLMIDI_SetDefault(AdlMidi_Setup *setup)
     setup->tremolo     = -1;
     setup->vibrato     = -1;
     setup->scalemod    = -1;
-    setup->volume_model = 0;
+    setup->volume_model = ADLMIDI_VolumeModel_AUTO;
+    setup->alloc_mode = ADLMIDI_ChanAlloc_AUTO;
     setup->chips_count = -1;
     setup->four_op_channels = -1;
     setup->full_brightness_range = 0;
-    setup->auto_arpeggio = 1;
+    setup->auto_arpeggio = 0;
     setup->soft_pan = 1;
     setup->emulator = -1;
     setup->custom_bank_path[0] = '\0';
@@ -285,6 +304,16 @@ int _Mix_ADLMIDI_getAutoArpeggio()
 void _Mix_ADLMIDI_setAutoArpeggio(int aa_en)
 {
     adlmidi_setup.auto_arpeggio = aa_en;
+}
+
+int _Mix_ADLMIDI_getChannelAllocMode()
+{
+    return adlmidi_setup.alloc_mode;
+}
+
+void _Mix_ADLMIDI_setChannelAllocMode(int ch_alloc)
+{
+    adlmidi_setup.alloc_mode = ch_alloc;
 }
 
 int _Mix_ADLMIDI_getFullPanStereo()
@@ -428,6 +457,9 @@ static void process_args(const char *args, AdlMidi_Setup *setup)
                     break;
                 case 'j':
                     setup->auto_arpeggio = value;
+                    break;
+                case 'o':
+                    setup->alloc_mode = value;
                     break;
                 case 'm':
                     setup->scalemod = value;
@@ -610,6 +642,9 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
     ADLMIDI.adl_setFullRangeBrightness(music->adlmidi, setup.full_brightness_range);
     ADLMIDI.adl_setSoftPanEnabled(music->adlmidi, setup.soft_pan);
     ADLMIDI.adl_setAutoArpeggio(music->adlmidi, setup.auto_arpeggio);
+    if (ADLMIDI.adl_setChannelAllocMode) {
+        ADLMIDI.adl_setChannelAllocMode(music->adlmidi, setup.alloc_mode);
+    }
     ADLMIDI.adl_setNumChips(music->adlmidi, (setup.chips_count >= 0) ? setup.chips_count : ADLMIDI_DEFAULT_CHIPS_COUNT);
     if (setup.four_op_channels >= 0) {
         ADLMIDI.adl_setNumFourOpsChn(music->adlmidi, setup.four_op_channels);
@@ -866,6 +901,10 @@ Mix_MusicInterface Mix_MusicInterface_ADLMIDI =
     ADLMIDI_Duration,
     ADLMIDI_SetTempo,   /* [MIXER-X] */
     ADLMIDI_GetTempo,   /* [MIXER-X] */
+    NULL,   /* SetSpeed [MIXER-X] */
+    NULL,   /* GetSpeed [MIXER-X] */
+    NULL,   /* SetPitch [MIXER-X] */
+    NULL,   /* GetPitch [MIXER-X] */
     ADLMIDI_GetTracksCount,   /* [MIXER-X] */
     ADLMIDI_SetTrackMute,   /* [MIXER-X] */
     ADLMIDI_LoopStart,   /* LoopStart [MIXER-X]*/
@@ -906,6 +945,10 @@ Mix_MusicInterface Mix_MusicInterface_ADLIMF =
     ADLMIDI_Duration,
     ADLMIDI_SetTempo,   /* [MIXER-X] */
     ADLMIDI_GetTempo,   /* [MIXER-X] */
+    NULL,   /* SetSpeed [MIXER-X] */
+    NULL,   /* GetSpeed [MIXER-X] */
+    NULL,   /* SetPitch [MIXER-X] */
+    NULL,   /* GetPitch [MIXER-X] */
     NULL,   /* GetTracksCount [MIXER-X] */
     NULL,   /* SetTrackMute [MIXER-X] */
     ADLMIDI_LoopStart,   /* LoopStart [MIXER-X]*/

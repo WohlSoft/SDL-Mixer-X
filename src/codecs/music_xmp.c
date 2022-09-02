@@ -135,7 +135,7 @@ typedef struct
 {
     int volume;
     double tempo;
-    int virt_channels;
+    int num_channels;
     int play_count;
     struct xmp_module_info mi;
     struct xmp_frame_info fi;
@@ -262,9 +262,7 @@ void *XMP_CreateFromRW(SDL_RWops *src, int freesrc)
     if (music->mi.comment) {
         meta_tags_set(&music->tags, MIX_META_COPYRIGHT, music->mi.comment);
     }
-
-    libxmp.xmp_get_frame_info(music->ctx, &music->fi);
-    music->virt_channels = music->fi.virt_channels;
+    music->num_channels = music->mi.mod->chn;
 
     if (freesrc) {
         SDL_RWclose(src);
@@ -414,7 +412,7 @@ static int XMP_GetTracksCount(void *context)
 {
     XMP_Music *music = (XMP_Music *)context;
     if (music) {
-        return music->virt_channels;
+        return music->num_channels;
     }
     return -1;
 }
@@ -480,6 +478,10 @@ Mix_MusicInterface Mix_MusicInterface_XMP =
     XMP_Duration,
     XMP_SetTempo,   /* [MIXER-X] */
     XMP_GetTempo,   /* [MIXER-X] */
+    NULL,   /* SetSpeed [MIXER-X] */
+    NULL,   /* GetSpeed [MIXER-X] */
+    NULL,   /* SetPitch [MIXER-X] */
+    NULL,   /* GetPitch [MIXER-X] */
     XMP_GetTracksCount,   /* GetTracksCount [MIXER-X] */
     XMP_SetTrackMute,   /* SetTrackMute [MIXER-X] */
     NULL,   /* LoopStart */

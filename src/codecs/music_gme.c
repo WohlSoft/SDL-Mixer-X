@@ -601,6 +601,10 @@ Mix_MusicInterface Mix_MusicInterface_GME =
     GME_Duration,
     GME_SetTempo,   /* [MIXER-X] */
     GME_GetTempo,   /* [MIXER-X] */
+    NULL,   /* SetSpeed [MIXER-X] */
+    NULL,   /* GetSpeed [MIXER-X] */
+    NULL,   /* SetPitch [MIXER-X] */
+    NULL,   /* GetPitch [MIXER-X] */
     GME_GetTracksCount,
     GME_SetTrackMute,
     NULL,   /* LoopStart [MIXER-X]*/

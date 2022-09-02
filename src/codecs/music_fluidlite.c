@@ -864,6 +864,10 @@ Mix_MusicInterface Mix_MusicInterface_FLUIDSYNTH =
     FLUIDSYNTH_Duration,
     FLUIDSYNTH_SetTempo,
     FLUIDSYNTH_GetTempo,
+    NULL,   /* SetSpeed [MIXER-X] */
+    NULL,   /* GetSpeed [MIXER-X] */
+    NULL,   /* SetPitch [MIXER-X] */
+    NULL,   /* GetPitch [MIXER-X] */
     FLUIDSYNTH_GetTracksCount, /* [MIXER-X] */
     FLUIDSYNTH_SetTrackMuted,  /* [MIXER-X] */
     FLUIDSYNTH_LoopStart,
@@ -904,6 +908,10 @@ Mix_MusicInterface Mix_MusicInterface_FLUIDXMI =
     FLUIDSYNTH_Duration,
     FLUIDSYNTH_SetTempo,
     FLUIDSYNTH_GetTempo,
+    NULL,   /* SetSpeed [MIXER-X] */
+    NULL,   /* GetSpeed [MIXER-X] */
+    NULL,   /* SetPitch [MIXER-X] */
+    NULL,   /* GetPitch [MIXER-X] */
     FLUIDSYNTH_GetTracksCount, /* [MIXER-X] */
     FLUIDSYNTH_SetTrackMuted,  /* [MIXER-X] */
     FLUIDSYNTH_LoopStart,

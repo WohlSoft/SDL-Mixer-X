@@ -53,6 +53,9 @@ extern void _Mix_ADLMIDI_setFullRangeBrightness(int frb);
 extern int _Mix_ADLMIDI_getAutoArpeggio(void);
 extern void _Mix_ADLMIDI_setAutoArpeggio(int aaEn);
 
+extern int _Mix_ADLMIDI_getChannelAllocMode();
+extern void _Mix_ADLMIDI_setChannelAllocMode(int ch_alloc);
+
 extern int _Mix_ADLMIDI_getFullPanStereo(void);
 extern void _Mix_ADLMIDI_setFullPanStereo(int fp);
 

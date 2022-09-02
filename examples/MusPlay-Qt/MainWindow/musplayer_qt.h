@@ -21,7 +21,7 @@ class MusicFX;
 class TrackMuter;
 
 namespace Ui {
-class MainWindow;
+class MusPlayerQt;
 }
 
 struct Mix_Chunk;
@@ -81,6 +81,8 @@ private slots:
     void on_disableSpcEcho_clicked(bool checked);
 
     void on_tempo_valueChanged(int tempo);
+    void on_speed_valueChanged(int speed);
+    void on_pitch_valueChanged(int pitch);
     void on_volumeGeneral_valueChanged(int position);
 
     void on_recordWav_clicked(bool checked);
@@ -123,7 +125,7 @@ private:
     QTimer m_positionWatcher;
     bool   m_positionWatcherLock = false;
     //! UI form class pointer
-    Ui::MainWindow *ui;
+    Ui::MusPlayerQt *ui = nullptr;
 
     QPoint    m_oldWindowPos;
 

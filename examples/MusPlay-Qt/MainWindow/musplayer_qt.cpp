@@ -12,7 +12,7 @@
 #include <QToolTip>
 #include <cmath>
 
-#include "ui_mainwindow.h"
+#include "ui_player_main.h"
 #include "musplayer_qt.h"
 #include "multi_music_test.h"
 #include "multi_sfx_test.h"
@@ -35,7 +35,7 @@
 
 MusPlayer_Qt::MusPlayer_Qt(QWidget *parent) : QMainWindow(parent),
     MusPlayerBase(),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MusPlayerQt)
 {
     ui->setupUi(this);
     PGE_MusicPlayer::setMainWindow(this);
@@ -128,6 +128,8 @@ MusPlayer_Qt::MusPlayer_Qt(QWidget *parent) : QMainWindow(parent),
     m_prevTrackID = ui->trackID->value();
     ui->gme_setup->setEnabled(false);
     ui->tempoFrame->setEnabled(false);
+    ui->speedFrame->setEnabled(false);
+    ui->pitchFrame->setEnabled(false);
 
     m_currentMusic = setup.value("RecentMusic", "").toString();
     restoreGeometry(setup.value("Window-Geometry").toByteArray());
@@ -238,7 +240,11 @@ void MusPlayer_Qt::contextMenu(const QPoint &pos)
     QAction *echoTuner    = x.addAction("Echo tuner...");
     QAction *musicFX      = x.addAction("Music FX...");
     QAction *resetTempo   = x.addAction("Reset tempo");
+    QAction *resetSpeed   = x.addAction("Reset speed");
+    QAction *resetPitch   = x.addAction("Reset pitch");
     resetTempo->setEnabled(ui->tempoFrame->isEnabled());
+    resetSpeed->setEnabled(ui->speedFrame->isEnabled());
+    resetPitch->setEnabled(ui->pitchFrame->isEnabled());
     reverb->setCheckable(true);
     reverb->setChecked(PGE_MusicPlayer::reverbEnabled);
     reverbTuner->setEnabled(PGE_MusicPlayer::reverbEnabled);
@@ -287,6 +293,10 @@ void MusPlayer_Qt::contextMenu(const QPoint &pos)
         on_actionMusicFX_triggered();
     else if(resetTempo == ret)
         ui->tempo->setValue(0);
+    else if(resetSpeed == ret)
+        ui->speed->setValue(0);
+    else if(resetPitch == ret)
+        ui->pitch->setValue(0);
     else if(assoc_files == ret)
         on_actionFileAssoc_triggered();
     else if(ret == sfx_testing_show)
@@ -419,6 +429,17 @@ void MusPlayer_Qt::on_play_clicked()
         ui->tempo->setValue(0);
         ui->tempo->blockSignals(false);
         ui->tempoFrame->setEnabled(Mix_GetMusicTempo(PGE_MusicPlayer::s_playMus) >= 0.0);
+
+        ui->speed->blockSignals(true);
+        ui->speed->setValue(0);
+        ui->speed->blockSignals(false);
+        ui->speedFrame->setEnabled(Mix_GetMusicSpeed(PGE_MusicPlayer::s_playMus) >= 0.0);
+
+        ui->pitch->blockSignals(true);
+        ui->pitch->setValue(0);
+        ui->pitch->blockSignals(false);
+        ui->pitchFrame->setEnabled(Mix_GetMusicPitch(PGE_MusicPlayer::s_playMus) >= 0.0);
+
         PGE_MusicPlayer::changeVolume(ui->volume->value());
         playSuccess = PGE_MusicPlayer::playMusic();
         ui->play->setToolTip(tr("Pause"));
@@ -434,7 +455,7 @@ void MusPlayer_Qt::on_play_clicked()
 
     if(playSuccess)
     {
-        double total = Mix_GetMusicTotalTime(PGE_MusicPlayer::s_playMus);
+        double total = Mix_MusicDuration(PGE_MusicPlayer::s_playMus);
         double curPos = Mix_GetMusicPosition(PGE_MusicPlayer::s_playMus);
 
         double loopStart = Mix_GetMusicLoopStartTime(PGE_MusicPlayer::s_playMus);
@@ -544,6 +565,36 @@ void MusPlayer_Qt::on_tempo_valueChanged(int tempo)
 #endif
 }
 
+void MusPlayer_Qt::on_speed_valueChanged(int speed)
+{
+#ifdef SDL_MIXER_X
+    if(Mix_PlayingMusicStream(PGE_MusicPlayer::s_playMus))
+    {
+        double speedFactor = 1.0 + 0.01 * double(speed);
+        Mix_SetMusicSpeed(PGE_MusicPlayer::s_playMus, speedFactor);
+        qDebug() << "Changed speed factor: " << speedFactor;
+        QToolTip::showText(QCursor::pos(), QString("%1").arg(speedFactor), this);
+    }
+#else
+    Q_UNUSED(speed);
+#endif
+}
+
+void MusPlayer_Qt::on_pitch_valueChanged(int pitch)
+{
+#ifdef SDL_MIXER_X
+    if(Mix_PlayingMusicStream(PGE_MusicPlayer::s_playMus))
+    {
+        double pitchFactor = 1.0 + 0.01 * double(pitch);
+        Mix_SetMusicPitch(PGE_MusicPlayer::s_playMus, pitchFactor);
+        qDebug() << "Changed pitch factor: " << pitchFactor;
+        QToolTip::showText(QCursor::pos(), QString("%1").arg(pitchFactor), this);
+    }
+#else
+    Q_UNUSED(speed);
+#endif
+}
+
 void MusPlayer_Qt::on_volumeGeneral_valueChanged(int volume)
 {
     Mix_MasterVolume(volume);
@@ -562,10 +613,92 @@ void MusPlayer_Qt::on_recordWav_clicked(bool checked)
         QFileInfo twav(m_currentMusic);
         PGE_MusicPlayer::stopWavRecording();
         QString wavPathBase = twav.absoluteDir().absolutePath() + "/" + twav.baseName();
-        QString wavPath = wavPathBase + ".wav";
+        QString fileSuffix = twav.suffix();
+
+        switch(PGE_MusicPlayer::musicTypeI())
+        {
+        case MUS_GME:
+            fileSuffix += QString("-t%1").arg(ui->trackID->value());
+            break;
+
+        case MUS_MID:
+            {
+                int synth = Mix_GetMidiPlayer();
+                fileSuffix += QString("-s%1").arg(synth);
+
+                if(synth == MIDI_ADLMIDI)
+                {
+                    int t = Mix_ADLMIDI_getTremolo();
+                    int v = Mix_ADLMIDI_getVibrato();
+                    int m = Mix_ADLMIDI_getScaleMod();
+                    int l = Mix_ADLMIDI_getVolumeModel();
+                    int e = Mix_ADLMIDI_getEmulator();
+                    int c = Mix_ADLMIDI_getChipsCount();
+                    int o = Mix_ADLMIDI_getChannelAllocMode();
+                    fileSuffix += QString("-b%1").arg(Mix_ADLMIDI_getBankID());
+
+                    if(t >= 0)
+                        fileSuffix += QString("-t%1").arg(t);
+
+                    if(v >= 0)
+                        fileSuffix += QString("-v%1").arg(v);
+
+                    if(m >= 0)
+                        fileSuffix += QString("-m%1").arg(m);
+
+                    if(l > 0)
+                        fileSuffix += QString("-l%1").arg(l);
+
+                    if(o > 0)
+                        fileSuffix += QString("-o%1").arg(o);
+
+                    fileSuffix += QString("-e%1").arg(e);
+                    fileSuffix += QString("-c%1").arg(c);
+                }
+
+                if(synth == MIDI_OPNMIDI)
+                {
+                    int l = Mix_OPNMIDI_getVolumeModel();
+                    int e = Mix_OPNMIDI_getEmulator();
+                    int c = Mix_OPNMIDI_getChipsCount();
+                    int o = Mix_OPNMIDI_getChannelAllocMode();
+
+                    if(l > 0)
+                        fileSuffix += QString("-l%1").arg(l);
+
+                    if(o > 0)
+                        fileSuffix += QString("-o%1").arg(o);
+
+                    fileSuffix += QString("-e%1").arg(e);
+                    fileSuffix += QString("-c%1").arg(c);
+                }
+            }
+            break;
+
+        case MUS_ADLMIDI:
+            fileSuffix += "-s0";
+            break;
+        case MUS_OPNMIDI:
+            fileSuffix += "-s3";
+            break;
+        case MUS_EDMIDI:
+            fileSuffix += "-s5";
+            break;
+        case MUS_FLUIDLITE:
+            fileSuffix += "-s4";
+            break;
+        case MUS_NATIVEMIDI:
+            fileSuffix += "-s2";
+            break;
+        default:
+            break; // Do Nothing
+        }
+
+        QString wavPath = wavPathBase + "-" + fileSuffix + ".wav";
+
         int count = 1;
         while(QFile::exists(wavPath))
-            wavPath = wavPathBase + QString("-%1.wav").arg(count++);
+            wavPath = wavPathBase + "-" + fileSuffix + QString("-%1.wav").arg(count++);
         PGE_MusicPlayer::startWavRecording(wavPath);
         on_play_clicked();
         ui->open->setEnabled(false);
