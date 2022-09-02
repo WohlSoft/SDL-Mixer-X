@@ -49,7 +49,7 @@ typedef struct
     SDL_RWops *src;
     Sint64 src_start;
     int freesrc;
-    struct AVFormatContext *fmt_ctx;
+    AVFormatContext *fmt_ctx;
     AVIOContext     *avio_in;
     const AVCodec *codec;
     AVCodecContext *audio_dec_ctx;
@@ -60,7 +60,7 @@ typedef struct
     enum AVSampleFormat sfmt;
     SDL_bool planar;
     enum AVSampleFormat dst_sample_fmt;
-    struct SwrContext *swr_ctx;
+    SwrContext *swr_ctx;
     Uint8 *merge_buffer;
     size_t merge_buffer_size;
     int srate;
@@ -284,7 +284,7 @@ static void *FFMPEG_NewRW(struct SDL_RWops *src, int freesrc)
 
     music->fmt_ctx->pb = music->avio_in;
 
-    ret = avformat_open_input(&music->fmt_ctx, "/home/vitaly/Yandex.Disk/Музыка (Phone)/ff6-fanatics.mid.m4a", NULL, NULL);
+    ret = avformat_open_input(&music->fmt_ctx, NULL, NULL, NULL);
     if (ret < 0) {
         Mix_SetError("FFMPEG: Failed to open the input: %s", av_err2str(ret));
         FFMPEG_Delete(music);
@@ -307,12 +307,6 @@ static void *FFMPEG_NewRW(struct SDL_RWops *src, int freesrc)
 
     music->stream_index = ret;
     music->audio_stream = music->fmt_ctx->streams[music->stream_index];
-
-    av_dump_format(music->fmt_ctx, music->stream_index, "<SDL_RWops context 1>", 0);
-
-    if (music->audio_stream->duration != AV_NOPTS_VALUE) {
-        music->time_duration = music->fmt_ctx->duration / AV_TIME_BASE;
-    }
 
     if (!music->codec) {
         music->codec = avcodec_find_decoder(music->audio_stream->codecpar->codec_id);
@@ -368,6 +362,14 @@ static void *FFMPEG_NewRW(struct SDL_RWops *src, int freesrc)
         FFMPEG_Delete(music);
         return NULL;
     }
+
+    if (music->fmt_ctx->duration != AV_NOPTS_VALUE && music->fmt_ctx->duration != 0) {
+        music->time_duration = (double)music->fmt_ctx->duration / AV_TIME_BASE;
+    } else if (music->audio_stream->nb_frames > 0) {
+        music->time_duration = (double)music->audio_stream->nb_frames / music->audio_stream->codecpar->sample_rate;
+    }
+
+    av_dump_format(music->fmt_ctx, music->stream_index, "<SDL_RWops context 1>", 0);
 
     music->freesrc = freesrc;
 
@@ -578,6 +580,11 @@ static void FFMPEG_Delete(void *context)
         if (music->fmt_ctx) {
             avformat_close_input(&music->fmt_ctx);
         }
+/*
+        if (music->avio_in) {
+            avio_closep(&music->avio_in);
+        }
+*/
         if (music->pkt) {
             av_packet_free(&music->pkt);
         }
