@@ -80,6 +80,14 @@ typedef struct
 
 static int FFMPEG_Load(void)
 {
+    unsigned version = avcodec_version();
+
+    if (version == LIBAVCODEC_VERSION_INT) {
+        SDL_Log("Linked FFMPEG version %u", version);
+    } else {
+        SDL_Log("Linked FFMPEG version %u is NOT MATCHING to API version %u", version, LIBAVCODEC_VERSION_INT);
+    }
+
     return 0;
 }
 
