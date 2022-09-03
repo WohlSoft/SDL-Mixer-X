@@ -43,6 +43,11 @@
 
 #define AUDIO_INBUF_SIZE 4096
 
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(59, 24, 100)
+#define AVCODEC_NEW_CHANNEL_LAYOUT
+#endif
+
+
 /* This file supports Game Music Emulator music streams */
 typedef struct
 {
@@ -80,12 +85,33 @@ typedef struct
 
 static int FFMPEG_Load(void)
 {
-    unsigned version = avcodec_version();
+    unsigned ver_avcodec = avcodec_version();
+    unsigned ver_avformat = avformat_version();
+    unsigned ver_avutil = avutil_version();
+    unsigned ver_swresample = swresample_version();
 
-    if (version == LIBAVCODEC_VERSION_INT) {
-        SDL_Log("Linked FFMPEG version %u", version);
+    if (ver_avcodec == LIBAVCODEC_VERSION_INT) {
+        SDL_Log("Linked FFMPEG avcodec version %u", ver_avcodec);
     } else {
-        SDL_Log("Linked FFMPEG version %u is NOT MATCHING to API version %u", version, LIBAVCODEC_VERSION_INT);
+        SDL_Log("Linked FFMPEG avcodec version %u is NOT MATCHING to API version %u", ver_avcodec, LIBAVCODEC_VERSION_INT);
+    }
+
+    if (ver_avformat == LIBAVFORMAT_VERSION_INT) {
+        SDL_Log("Linked FFMPEG avformat version %u", ver_avformat);
+    } else {
+        SDL_Log("Linked FFMPEG avformat version %u is NOT MATCHING to API version %u", ver_avformat, LIBAVFORMAT_VERSION_INT);
+    }
+
+    if (ver_avutil == LIBAVUTIL_VERSION_INT) {
+        SDL_Log("Linked FFMPEG avutil version %u", ver_avutil);
+    } else {
+        SDL_Log("Linked FFMPEG avutil version %u is NOT MATCHING to API version %u", ver_avutil, LIBAVUTIL_VERSION_INT);
+    }
+
+    if (ver_swresample == LIBSWRESAMPLE_VERSION_INT) {
+        SDL_Log("Linked FFMPEG swresample version %u", ver_swresample);
+    } else {
+        SDL_Log("Linked FFMPEG swresample version %u is NOT MATCHING to API version %u", ver_swresample, LIBSWRESAMPLE_VERSION_INT);
     }
 
     return 0;
@@ -102,7 +128,11 @@ static int FFMPEG_UpdateStream(FFMPEG_Music *music)
     SDL_assert(music->audio_stream->codecpar);
     enum AVSampleFormat sfmt = music->audio_stream->codecpar->format;
     int srate = music->audio_stream->codecpar->sample_rate;
+#if defined(AVCODEC_NEW_CHANNEL_LAYOUT)
+    int channels = music->audio_stream->codecpar->ch_layout.nb_channels;
+#else
     int channels = music->audio_stream->codecpar->channels;
+#endif
     int fmt = 0;
     int layout;
 
@@ -174,7 +204,11 @@ static int FFMPEG_UpdateStream(FFMPEG_Music *music)
 
         if (music->planar) {
             music->swr_ctx = swr_alloc();
+#if defined(AVCODEC_NEW_CHANNEL_LAYOUT)
+            layout = music->audio_stream->codecpar->ch_layout.u.mask;
+#else
             layout = music->audio_stream->codecpar->channel_layout;
+#endif
             if (layout == 0) {
                 if(channels > 2) {
                     layout = AV_CH_LAYOUT_SURROUND;
