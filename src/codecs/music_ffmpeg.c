@@ -553,12 +553,19 @@ static int FFMPEG_Seek(void *music_p, double time)
 {
     FFMPEG_Music *music = (FFMPEG_Music*)music_p;
     AVRational timebase = music->audio_dec_ctx->time_base;
-    int64_t ts = av_rescale(time, timebase.den, timebase.num);
-    int err = avformat_seek_file(music->fmt_ctx, music->stream_index, 0, ts, ts, AVSEEK_FLAG_ANY);
-    music-> time_position = time;
+    int64_t ts;
+    int err;
 
-    if (err < 0) {
-         return -1;
+    ts = av_rescale(time * 1000, timebase.den, timebase.num);
+    ts /=1000;
+    err = avformat_seek_file(music->fmt_ctx, music->stream_index, 0, ts, ts, AVSEEK_FLAG_ANY);
+
+    if (err >= 0) {
+        music->time_position = time;
+        avcodec_flush_buffers(music->audio_dec_ctx);
+    } else {
+        SDL_Log("FFMPEG: Seek failed: %s", av_err2str(err));
+        return -1;
     }
 
     return 0;
