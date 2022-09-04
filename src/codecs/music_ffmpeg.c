@@ -49,76 +49,90 @@
 
 typedef struct ffmpeg_loader {
     int loaded;
-    void *handle_avcodec;
     void *handle_avformat;
+    void *handle_avcodec;
     void *handle_avutil;
     void *handle_swresample;
 
-
     unsigned (*avformat_version)(void);
     AVFormatContext *(*avformat_alloc_context)(void);
-    AVIOContext *(*avio_alloc_context)(
-                      unsigned char *buffer,
-                      int buffer_size,
-                      int write_flag,
-                      void *opaque,
-                      int (*read_packet)(void *opaque, uint8_t *buf, int buf_size),
-                      int (*write_packet)(void *opaque, uint8_t *buf, int buf_size),
-                      int64_t (*seek)(void *opaque, int64_t offset, int whence));
-    int (*avformat_open_input)(AVFormatContext **ps, const char *url,
-                               const AVInputFormat *fmt, AVDictionary **options);
-    int (*avformat_find_stream_info)(AVFormatContext *ic, AVDictionary **options);
-    int (*av_find_best_stream)(AVFormatContext *ic,
-                              enum AVMediaType type,
-                              int wanted_stream_nb,
-                              int related_stream,
-                              const AVCodec **decoder_ret,
-                              int flags);
-    void (*av_dump_format)(AVFormatContext *ic,
-                           int index,
-                           const char *url,
-                           int is_output);
-    int (*av_seek_frame)(AVFormatContext *s, int stream_index, int64_t timestamp, int flags);
-    int (*av_read_frame)(AVFormatContext *s, AVPacket *pkt);
-    int (*avformat_seek_file)(AVFormatContext *s, int stream_index, int64_t min_ts, int64_t ts, int64_t max_ts, int flags);
-    void (*avformat_close_input)(AVFormatContext **s);
+    AVIOContext *(*avio_alloc_context)(unsigned char *,int,int,void *,int (*)(void *,uint8_t *,int),int (*)(void *, uint8_t *, int),int64_t (*)(void *,int64_t,int));
+    int (*avformat_open_input)(AVFormatContext **, const char *,const AVInputFormat *,AVDictionary **);
+    int (*avformat_find_stream_info)(AVFormatContext *,AVDictionary **);
+    int (*av_find_best_stream)(AVFormatContext *,enum AVMediaType,int,int,const AVCodec **,int);
+    void (*av_dump_format)(AVFormatContext *,int,const char *,int);
+    int (*av_seek_frame)(AVFormatContext *,int,int64_t,int);
+    int (*av_read_frame)(AVFormatContext *,AVPacket *);
+    int (*avformat_seek_file)(AVFormatContext *,int,int64_t,int64_t,int64_t,int);
+    void (*avformat_close_input)(AVFormatContext **);
 
 
     unsigned (*avcodec_version)(void);
-    const AVCodec *(*avcodec_find_decoder)(enum AVCodecID id);
-    AVCodecContext *(*avcodec_alloc_context3)(const AVCodec *codec);
-    int (*avcodec_parameters_to_context)(AVCodecContext *codec, const AVCodecParameters *par);
-    int (*avcodec_open2)(AVCodecContext *avctx, const AVCodec *codec, AVDictionary **options);
+    const AVCodec *(*avcodec_find_decoder)(enum AVCodecID);
+    AVCodecContext *(*avcodec_alloc_context3)(const AVCodec *);
+    int (*avcodec_parameters_to_context)(AVCodecContext *, const AVCodecParameters *);
+    int (*avcodec_open2)(AVCodecContext *, const AVCodec *, AVDictionary **);
     AVPacket *(*av_packet_alloc)(void);
-    int (*avcodec_send_packet)(AVCodecContext *avctx, const AVPacket *avpkt);
-    int (*avcodec_receive_frame)(AVCodecContext *avctx, AVFrame *frame);
-    void (*av_packet_unref)(AVPacket *pkt);
-    void (*av_packet_free)(AVPacket **pkt);
-    void (*avcodec_flush_buffers)(AVCodecContext *avctx);
-    void (*avcodec_free_context)(AVCodecContext **avctx);
+    int (*avcodec_send_packet)(AVCodecContext *, const AVPacket *);
+    int (*avcodec_receive_frame)(AVCodecContext *, AVFrame *);
+    void (*av_packet_unref)(AVPacket *);
+    void (*av_packet_free)(AVPacket **);
+    void (*avcodec_flush_buffers)(AVCodecContext *);
+    void (*avcodec_free_context)(AVCodecContext **);
 
 
     unsigned (*avutil_version)(void);
-    int (*av_opt_set_int)(void *obj, const char *name, int64_t val, int search_flags);
-    int (*av_opt_set_sample_fmt)(void *obj, const char *name, enum AVSampleFormat fmt, int search_flags);
-    void *(*av_malloc)(size_t size);
-    int (*av_strerror)(int errnum, char *errbuf, size_t errbuf_size);
+    int (*av_opt_set_int)(void *, const char *, int64_t , int);
+    int (*av_opt_set_sample_fmt)(void *, const char *, enum AVSampleFormat, int);
+    void *(*av_malloc)(size_t);
+    int (*av_strerror)(int, char *, size_t);
     AVFrame *(*av_frame_alloc)(void);
-    int64_t (*av_rescale)(int64_t a, int64_t b, int64_t c);
-    void (*av_frame_free)(AVFrame **frame);
+    int64_t (*av_rescale)(int64_t, int64_t, int64_t);
+    void (*av_frame_free)(AVFrame **);
 
 
     unsigned (*swresample_version)(void);
     struct SwrContext *(*swr_alloc)(void);
     int (*swr_init)(struct SwrContext *s);
-    int (*av_get_bytes_per_sample)(enum AVSampleFormat sample_fmt);
-    int (*swr_convert)(struct SwrContext *s, uint8_t **out, int out_count,
-                                       const uint8_t **in , int in_count);
-    void (*swr_free)(struct SwrContext **s);
+    int (*av_get_bytes_per_sample)(enum AVSampleFormat);
+    int (*swr_convert)(struct SwrContext *, uint8_t **, int,const uint8_t ** , int);
+    void (*swr_free)(struct SwrContext **);
 
 } ffmpeg_loader;
 
 static ffmpeg_loader ffmpeg;
+
+#ifdef FFMPEG_DYNAMIC
+static void FFMPEG_UnloadAllHandlers()
+{
+    if (ffmpeg.handle_avformat) {
+        SDL_UnloadObject(ffmpeg.handle_avformat);
+        ffmpeg.handle_avformat = NULL;
+    }
+    if (ffmpeg.handle_avcodec) {
+        SDL_UnloadObject(ffmpeg.handle_avcodec);
+        ffmpeg.handle_avcodec = NULL;
+    }
+    if (ffmpeg.handle_avutil) {
+        SDL_UnloadObject(ffmpeg.handle_avutil);
+        ffmpeg.handle_avutil = NULL;
+    }
+    if (ffmpeg.handle_swresample) {
+        SDL_UnloadObject(ffmpeg.handle_swresample);
+        ffmpeg.handle_swresample = NULL;
+    }
+}
+#endif
+
+#ifdef FFMPEG_DYNAMIC
+#define FUNCTION_LOADER(HANDLER, FUNC, SIG) \
+    ffmpeg.FUNC = (SIG) SDL_LoadFunction(ffmpeg.HANDLER, #FUNC); \
+    if (ffmpeg.FUNC == NULL) { FFMPEG_UnloadAllHandlers(); return -1; }
+#else
+#define FUNCTION_LOADER(HANDLER, FUNC, SIG) \
+    ffmpeg.FUNC = FUNC; \
+    if (ffmpeg.FUNC == NULL) { Mix_SetError("Missing ffmpeg.framework"); return -1; }
+#endif
 
 static inline char *mix_av_make_error_string(char *errbuf, size_t errbuf_size, int errnum)
 {
@@ -135,51 +149,72 @@ static int FFMPEG_Load(void)
     unsigned ver_avcodec, ver_avformat, ver_avutil, ver_swresample;
 
     if (ffmpeg.loaded == 0) {
-
+#ifdef FFMPEG_DYNAMIC
+        ffmpeg.handle_avformat = SDL_LoadObject(FFMPEG_DYNAMIC_AVFORMAT);
+        if (ffmpeg.handle_avformat == NULL) {
+            FFMPEG_UnloadAllHandlers();
+            return -1;
+        }
+        ffmpeg.handle_avcodec = SDL_LoadObject(FFMPEG_DYNAMIC_AVCODEC);
+        if (ffmpeg.handle_avcodec == NULL) {
+            FFMPEG_UnloadAllHandlers();
+            return -1;
+        }
+        ffmpeg.handle_avutil = SDL_LoadObject(FFMPEG_DYNAMIC_AVUTIL);
+        if (ffmpeg.handle_avutil == NULL) {
+            FFMPEG_UnloadAllHandlers();
+            return -1;
+        }
+        ffmpeg.handle_swresample = SDL_LoadObject(FFMPEG_DYNAMIC_SWRESAMPLE);
+        if (ffmpeg.handle_swresample == NULL) {
+            FFMPEG_UnloadAllHandlers();
+            return -1;
+        }
+#endif
         /* AVFormat */
-        ffmpeg.avformat_version = avformat_version;
-        ffmpeg.avformat_alloc_context = avformat_alloc_context;
-        ffmpeg.avio_alloc_context = avio_alloc_context;
-        ffmpeg.avformat_open_input = avformat_open_input;
-        ffmpeg.avformat_find_stream_info = avformat_find_stream_info;
-        ffmpeg.av_find_best_stream = av_find_best_stream;
-        ffmpeg.av_dump_format = av_dump_format;
-        ffmpeg.av_seek_frame = av_seek_frame;
-        ffmpeg.avformat_seek_file = avformat_seek_file;
-        ffmpeg.av_read_frame = av_read_frame;
-        ffmpeg.avformat_close_input = avformat_close_input;
+        FUNCTION_LOADER(handle_avformat, avformat_version, unsigned (*)(void))
+        FUNCTION_LOADER(handle_avformat, avformat_alloc_context, AVFormatContext *(*)(void))
+        FUNCTION_LOADER(handle_avformat, avio_alloc_context, AVIOContext *(*)(unsigned char *,int,int,void *,int (*)(void *,uint8_t *,int),int (*)(void *, uint8_t *, int),int64_t (*)(void *,int64_t,int)))
+        FUNCTION_LOADER(handle_avformat, avformat_open_input, int (*)(AVFormatContext **, const char *,const AVInputFormat *,AVDictionary **))
+        FUNCTION_LOADER(handle_avformat, avformat_find_stream_info, int (*)(AVFormatContext *,AVDictionary **))
+        FUNCTION_LOADER(handle_avformat, av_find_best_stream, int (*)(AVFormatContext *,enum AVMediaType,int,int,const AVCodec **,int))
+        FUNCTION_LOADER(handle_avformat, av_dump_format, void (*)(AVFormatContext *,int,const char *,int))
+        FUNCTION_LOADER(handle_avformat, av_seek_frame, int (*)(AVFormatContext *,int,int64_t,int))
+        FUNCTION_LOADER(handle_avformat, av_read_frame, int (*)(AVFormatContext *,AVPacket *))
+        FUNCTION_LOADER(handle_avformat, avformat_seek_file, int (*)(AVFormatContext *,int,int64_t,int64_t,int64_t,int))
+        FUNCTION_LOADER(handle_avformat, avformat_close_input, void (*)(AVFormatContext **))
 
         /* AVCodec */
-        ffmpeg.avcodec_version = avcodec_version;
-        ffmpeg.avcodec_find_decoder = avcodec_find_decoder;
-        ffmpeg.avcodec_alloc_context3 = avcodec_alloc_context3;
-        ffmpeg.avcodec_parameters_to_context = avcodec_parameters_to_context;
-        ffmpeg.avcodec_open2 = avcodec_open2;
-        ffmpeg.av_packet_alloc = av_packet_alloc;
-        ffmpeg.avcodec_send_packet = avcodec_send_packet;
-        ffmpeg.avcodec_receive_frame = avcodec_receive_frame;
-        ffmpeg.av_packet_unref = av_packet_unref;
-        ffmpeg.av_packet_free = av_packet_free;
-        ffmpeg.avcodec_flush_buffers = avcodec_flush_buffers;
-        ffmpeg.avcodec_free_context = avcodec_free_context;
+        FUNCTION_LOADER(handle_avcodec, avcodec_version,  unsigned (*)(void))
+        FUNCTION_LOADER(handle_avcodec, avcodec_find_decoder, const AVCodec *(*)(enum AVCodecID))
+        FUNCTION_LOADER(handle_avcodec, avcodec_alloc_context3,  AVCodecContext *(*)(const AVCodec *))
+        FUNCTION_LOADER(handle_avcodec, avcodec_parameters_to_context,  int (*)(AVCodecContext *, const AVCodecParameters *))
+        FUNCTION_LOADER(handle_avcodec, avcodec_open2,  int (*)(AVCodecContext *, const AVCodec *, AVDictionary **))
+        FUNCTION_LOADER(handle_avcodec, av_packet_alloc,  AVPacket *(*)(void))
+        FUNCTION_LOADER(handle_avcodec, avcodec_send_packet,  int (*)(AVCodecContext *, const AVPacket *))
+        FUNCTION_LOADER(handle_avcodec, avcodec_receive_frame,  int (*)(AVCodecContext *, AVFrame *))
+        FUNCTION_LOADER(handle_avcodec, av_packet_unref,  void (*)(AVPacket *))
+        FUNCTION_LOADER(handle_avcodec, av_packet_free,  void (*)(AVPacket **))
+        FUNCTION_LOADER(handle_avcodec, avcodec_flush_buffers,  void (*)(AVCodecContext *))
+        FUNCTION_LOADER(handle_avcodec, avcodec_free_context,  void (*)(AVCodecContext **))
 
         /* AVUtil */
-        ffmpeg.avutil_version = avutil_version;
-        ffmpeg.av_opt_set_int = av_opt_set_int;
-        ffmpeg.av_opt_set_sample_fmt = av_opt_set_sample_fmt;
-        ffmpeg.av_malloc = av_malloc;
-        ffmpeg.av_strerror = av_strerror;
-        ffmpeg.av_frame_alloc = av_frame_alloc;
-        ffmpeg.av_rescale = av_rescale;
-        ffmpeg.av_frame_free = av_frame_free;
+        FUNCTION_LOADER(handle_avutil, avutil_version,  unsigned (*)(void))
+        FUNCTION_LOADER(handle_avutil, av_opt_set_int,  int (*)(void *, const char *, int64_t , int))
+        FUNCTION_LOADER(handle_avutil, av_opt_set_sample_fmt,  int (*)(void *, const char *, enum AVSampleFormat, int))
+        FUNCTION_LOADER(handle_avutil, av_malloc,  void *(*)(size_t))
+        FUNCTION_LOADER(handle_avutil, av_strerror,  int (*)(int, char *, size_t))
+        FUNCTION_LOADER(handle_avutil, av_frame_alloc,  AVFrame *(*)(void))
+        FUNCTION_LOADER(handle_avutil, av_rescale,  int64_t (*)(int64_t, int64_t, int64_t))
+        FUNCTION_LOADER(handle_avutil, av_frame_free,  void (*)(AVFrame **))
 
         /* SWResample */
-        ffmpeg.swresample_version = swresample_version;
-        ffmpeg.swr_alloc = swr_alloc;
-        ffmpeg.swr_init = swr_init;
-        ffmpeg.av_get_bytes_per_sample = av_get_bytes_per_sample;
-        ffmpeg.swr_convert = swr_convert;
-        ffmpeg.swr_free = swr_free;
+        FUNCTION_LOADER(handle_swresample, swresample_version, unsigned (*)(void))
+        FUNCTION_LOADER(handle_swresample, swr_alloc, struct SwrContext *(*)(void))
+        FUNCTION_LOADER(handle_swresample, swr_init, int (*)(struct SwrContext *s))
+        FUNCTION_LOADER(handle_swresample, av_get_bytes_per_sample, int (*)(enum AVSampleFormat))
+        FUNCTION_LOADER(handle_swresample, swr_convert, int (*)(struct SwrContext *, uint8_t **, int,const uint8_t ** , int))
+        FUNCTION_LOADER(handle_swresample, swr_free, void (*)(struct SwrContext **))
 
         ver_avcodec = ffmpeg.avcodec_version();
         ver_avformat = ffmpeg.avformat_version();
@@ -187,25 +222,25 @@ static int FFMPEG_Load(void)
         ver_swresample = ffmpeg.swresample_version();
 
         if (AV_VERSION_MAJOR(ver_avcodec) != LIBAVCODEC_VERSION_MAJOR) {
-            Mix_SetError("Linked FFMPEG %s version %u is INCOMPATIBLE, the major version %u is required",
+            Mix_SetError("Linked FFMPEG's %s version %u has INCOMPATIBLE ABI, the major version %u is required",
                          "avcodec", AV_VERSION_MAJOR(ver_avcodec), LIBAVCODEC_VERSION_MAJOR);
             return -1;
         }
 
         if (AV_VERSION_MAJOR(ver_avformat) != LIBAVFORMAT_VERSION_MAJOR) {
-            Mix_SetError("Linked FFMPEG %s version %u is INCOMPATIBLE, the major version %u is required",
+            Mix_SetError("Linked FFMPEG's %s version %u has INCOMPATIBLE ABI, the major version %u is required",
                          "avformat", AV_VERSION_MAJOR(ver_avformat), LIBAVFORMAT_VERSION_MAJOR);
             return -1;
         }
 
         if (AV_VERSION_MAJOR(ver_avutil) != LIBAVUTIL_VERSION_MAJOR) {
-            Mix_SetError("Linked FFMPEG %s version %u is INCOMPATIBLE, the major version %u is required",
+            Mix_SetError("Linked FFMPEG's %s version %u has INCOMPATIBLE ABI, the major version %u is required",
                          "avutil", AV_VERSION_MAJOR(ver_avutil), LIBAVUTIL_VERSION_MAJOR);
             return -1;
         }
 
         if (AV_VERSION_MAJOR(ver_swresample) != LIBSWRESAMPLE_VERSION_MAJOR) {
-            Mix_SetError("Linked FFMPEG %s version %u is INCOMPATIBLE, the major version %u is required",
+            Mix_SetError("Linked FFMPEG's %s version %u has INCOMPATIBLE ABI, the major version %u is required",
                          "swresample", AV_VERSION_MAJOR(ver_swresample), LIBSWRESAMPLE_VERSION_MAJOR);
             return -1;
         }
@@ -246,10 +281,7 @@ static void FFMPEG_Unload(void)
     }
     if (ffmpeg.loaded == 1) {
 #ifdef FFMPEG_DYNAMIC
-        SDL_UnloadObject(ffmpeg.handle_avcodec);
-        SDL_UnloadObject(ffmpeg.handle_avformat);
-        SDL_UnloadObject(ffmpeg.handle_avutil);
-        SDL_UnloadObject(ffmpeg.handle_swresample);
+        FFMPEG_UnloadAllHandlers();
 #endif
     }
     --ffmpeg.loaded;
