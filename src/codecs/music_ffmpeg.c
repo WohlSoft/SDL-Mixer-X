@@ -47,6 +47,215 @@
 #define AVCODEC_NEW_CHANNEL_LAYOUT
 #endif
 
+typedef struct ffmpeg_loader {
+    int loaded;
+    void *handle_avcodec;
+    void *handle_avformat;
+    void *handle_avutil;
+    void *handle_swresample;
+
+
+    unsigned (*avformat_version)(void);
+    AVFormatContext *(*avformat_alloc_context)(void);
+    AVIOContext *(*avio_alloc_context)(
+                      unsigned char *buffer,
+                      int buffer_size,
+                      int write_flag,
+                      void *opaque,
+                      int (*read_packet)(void *opaque, uint8_t *buf, int buf_size),
+                      int (*write_packet)(void *opaque, uint8_t *buf, int buf_size),
+                      int64_t (*seek)(void *opaque, int64_t offset, int whence));
+    int (*avformat_open_input)(AVFormatContext **ps, const char *url,
+                               const AVInputFormat *fmt, AVDictionary **options);
+    int (*avformat_find_stream_info)(AVFormatContext *ic, AVDictionary **options);
+    int (*av_find_best_stream)(AVFormatContext *ic,
+                              enum AVMediaType type,
+                              int wanted_stream_nb,
+                              int related_stream,
+                              const AVCodec **decoder_ret,
+                              int flags);
+    void (*av_dump_format)(AVFormatContext *ic,
+                           int index,
+                           const char *url,
+                           int is_output);
+    int (*av_seek_frame)(AVFormatContext *s, int stream_index, int64_t timestamp, int flags);
+    int (*av_read_frame)(AVFormatContext *s, AVPacket *pkt);
+    int (*avformat_seek_file)(AVFormatContext *s, int stream_index, int64_t min_ts, int64_t ts, int64_t max_ts, int flags);
+    void (*avformat_close_input)(AVFormatContext **s);
+
+
+    unsigned (*avcodec_version)(void);
+    const AVCodec *(*avcodec_find_decoder)(enum AVCodecID id);
+    AVCodecContext *(*avcodec_alloc_context3)(const AVCodec *codec);
+    int (*avcodec_parameters_to_context)(AVCodecContext *codec, const AVCodecParameters *par);
+    int (*avcodec_open2)(AVCodecContext *avctx, const AVCodec *codec, AVDictionary **options);
+    AVPacket *(*av_packet_alloc)(void);
+    int (*avcodec_send_packet)(AVCodecContext *avctx, const AVPacket *avpkt);
+    int (*avcodec_receive_frame)(AVCodecContext *avctx, AVFrame *frame);
+    void (*av_packet_unref)(AVPacket *pkt);
+    void (*av_packet_free)(AVPacket **pkt);
+    void (*avcodec_flush_buffers)(AVCodecContext *avctx);
+    void (*avcodec_free_context)(AVCodecContext **avctx);
+
+
+    unsigned (*avutil_version)(void);
+    int (*av_opt_set_int)(void *obj, const char *name, int64_t val, int search_flags);
+    int (*av_opt_set_sample_fmt)(void *obj, const char *name, enum AVSampleFormat fmt, int search_flags);
+    void *(*av_malloc)(size_t size);
+    int (*av_strerror)(int errnum, char *errbuf, size_t errbuf_size);
+    AVFrame *(*av_frame_alloc)(void);
+    int64_t (*av_rescale)(int64_t a, int64_t b, int64_t c);
+    void (*av_frame_free)(AVFrame **frame);
+
+
+    unsigned (*swresample_version)(void);
+    struct SwrContext *(*swr_alloc)(void);
+    int (*swr_init)(struct SwrContext *s);
+    int (*av_get_bytes_per_sample)(enum AVSampleFormat sample_fmt);
+    int (*swr_convert)(struct SwrContext *s, uint8_t **out, int out_count,
+                                       const uint8_t **in , int in_count);
+    void (*swr_free)(struct SwrContext **s);
+
+} ffmpeg_loader;
+
+static ffmpeg_loader ffmpeg;
+
+static inline char *mix_av_make_error_string(char *errbuf, size_t errbuf_size, int errnum)
+{
+    ffmpeg.av_strerror(errnum, errbuf, errbuf_size);
+    return errbuf;
+}
+
+#define mix_av_err2str(errnum) \
+    mix_av_make_error_string((char[AV_ERROR_MAX_STRING_SIZE]){0}, AV_ERROR_MAX_STRING_SIZE, errnum)
+
+
+static int FFMPEG_Load(void)
+{
+    unsigned ver_avcodec, ver_avformat, ver_avutil, ver_swresample;
+
+    if (ffmpeg.loaded == 0) {
+
+        /* AVFormat */
+        ffmpeg.avformat_version = avformat_version;
+        ffmpeg.avformat_alloc_context = avformat_alloc_context;
+        ffmpeg.avio_alloc_context = avio_alloc_context;
+        ffmpeg.avformat_open_input = avformat_open_input;
+        ffmpeg.avformat_find_stream_info = avformat_find_stream_info;
+        ffmpeg.av_find_best_stream = av_find_best_stream;
+        ffmpeg.av_dump_format = av_dump_format;
+        ffmpeg.av_seek_frame = av_seek_frame;
+        ffmpeg.avformat_seek_file = avformat_seek_file;
+        ffmpeg.av_read_frame = av_read_frame;
+        ffmpeg.avformat_close_input = avformat_close_input;
+
+        /* AVCodec */
+        ffmpeg.avcodec_version = avcodec_version;
+        ffmpeg.avcodec_find_decoder = avcodec_find_decoder;
+        ffmpeg.avcodec_alloc_context3 = avcodec_alloc_context3;
+        ffmpeg.avcodec_parameters_to_context = avcodec_parameters_to_context;
+        ffmpeg.avcodec_open2 = avcodec_open2;
+        ffmpeg.av_packet_alloc = av_packet_alloc;
+        ffmpeg.avcodec_send_packet = avcodec_send_packet;
+        ffmpeg.avcodec_receive_frame = avcodec_receive_frame;
+        ffmpeg.av_packet_unref = av_packet_unref;
+        ffmpeg.av_packet_free = av_packet_free;
+        ffmpeg.avcodec_flush_buffers = avcodec_flush_buffers;
+        ffmpeg.avcodec_free_context = avcodec_free_context;
+
+        /* AVUtil */
+        ffmpeg.avutil_version = avutil_version;
+        ffmpeg.av_opt_set_int = av_opt_set_int;
+        ffmpeg.av_opt_set_sample_fmt = av_opt_set_sample_fmt;
+        ffmpeg.av_malloc = av_malloc;
+        ffmpeg.av_strerror = av_strerror;
+        ffmpeg.av_frame_alloc = av_frame_alloc;
+        ffmpeg.av_rescale = av_rescale;
+        ffmpeg.av_frame_free = av_frame_free;
+
+        /* SWResample */
+        ffmpeg.swresample_version = swresample_version;
+        ffmpeg.swr_alloc = swr_alloc;
+        ffmpeg.swr_init = swr_init;
+        ffmpeg.av_get_bytes_per_sample = av_get_bytes_per_sample;
+        ffmpeg.swr_convert = swr_convert;
+        ffmpeg.swr_free = swr_free;
+
+        ver_avcodec = ffmpeg.avcodec_version();
+        ver_avformat = ffmpeg.avformat_version();
+        ver_avutil = ffmpeg.avutil_version();
+        ver_swresample = ffmpeg.swresample_version();
+
+        if (AV_VERSION_MAJOR(ver_avcodec) != LIBAVCODEC_VERSION_MAJOR) {
+            Mix_SetError("Linked FFMPEG %s version %u is INCOMPATIBLE, the major version %u is required",
+                         "avcodec", AV_VERSION_MAJOR(ver_avcodec), LIBAVCODEC_VERSION_MAJOR);
+            return -1;
+        }
+
+        if (AV_VERSION_MAJOR(ver_avformat) != LIBAVFORMAT_VERSION_MAJOR) {
+            Mix_SetError("Linked FFMPEG %s version %u is INCOMPATIBLE, the major version %u is required",
+                         "avformat", AV_VERSION_MAJOR(ver_avformat), LIBAVFORMAT_VERSION_MAJOR);
+            return -1;
+        }
+
+        if (AV_VERSION_MAJOR(ver_avutil) != LIBAVUTIL_VERSION_MAJOR) {
+            Mix_SetError("Linked FFMPEG %s version %u is INCOMPATIBLE, the major version %u is required",
+                         "avutil", AV_VERSION_MAJOR(ver_avutil), LIBAVUTIL_VERSION_MAJOR);
+            return -1;
+        }
+
+        if (AV_VERSION_MAJOR(ver_swresample) != LIBSWRESAMPLE_VERSION_MAJOR) {
+            Mix_SetError("Linked FFMPEG %s version %u is INCOMPATIBLE, the major version %u is required",
+                         "swresample", AV_VERSION_MAJOR(ver_swresample), LIBSWRESAMPLE_VERSION_MAJOR);
+            return -1;
+        }
+
+        if (ver_avcodec == LIBAVCODEC_VERSION_INT) {
+            SDL_Log("Linked FFMPEG avcodec version %u", ver_avcodec);
+        } else {
+            SDL_Log("Linked FFMPEG avcodec version %u is NOT MATCHING to API version %u", ver_avcodec, LIBAVCODEC_VERSION_INT);
+        }
+
+        if (ver_avformat == LIBAVFORMAT_VERSION_INT) {
+            SDL_Log("Linked FFMPEG avformat version %u", ver_avformat);
+        } else {
+            SDL_Log("Linked FFMPEG avformat version %u is NOT MATCHING to API version %u", ver_avformat, LIBAVFORMAT_VERSION_INT);
+        }
+
+        if (ver_avutil == LIBAVUTIL_VERSION_INT) {
+            SDL_Log("Linked FFMPEG avutil version %u", ver_avutil);
+        } else {
+            SDL_Log("Linked FFMPEG avutil version %u is NOT MATCHING to API version %u", ver_avutil, LIBAVUTIL_VERSION_INT);
+        }
+
+        if (ver_swresample == LIBSWRESAMPLE_VERSION_INT) {
+            SDL_Log("Linked FFMPEG swresample version %u", ver_swresample);
+        } else {
+            SDL_Log("Linked FFMPEG swresample version %u is NOT MATCHING to API version %u", ver_swresample, LIBSWRESAMPLE_VERSION_INT);
+        }
+    }
+    ++ffmpeg.loaded;
+
+    return 0;
+}
+
+static void FFMPEG_Unload(void)
+{
+    if (ffmpeg.loaded == 0) {
+        return;
+    }
+    if (ffmpeg.loaded == 1) {
+#ifdef FFMPEG_DYNAMIC
+        SDL_UnloadObject(ffmpeg.handle_avcodec);
+        SDL_UnloadObject(ffmpeg.handle_avformat);
+        SDL_UnloadObject(ffmpeg.handle_avutil);
+        SDL_UnloadObject(ffmpeg.handle_swresample);
+#endif
+    }
+    --ffmpeg.loaded;
+}
+
+
 
 /* This file supports Game Music Emulator music streams */
 typedef struct
@@ -81,70 +290,6 @@ typedef struct
     void *buffer;
     size_t buffer_size;
 } FFMPEG_Music;
-
-
-static int FFMPEG_Load(void)
-{
-    unsigned ver_avcodec = avcodec_version();
-    unsigned ver_avformat = avformat_version();
-    unsigned ver_avutil = avutil_version();
-    unsigned ver_swresample = swresample_version();
-
-    if (AV_VERSION_MAJOR(ver_avcodec) != LIBAVCODEC_VERSION_MAJOR) {
-        Mix_SetError("Linked FFMPEG %s version %u is INCOMPATIBLE, the major version %u is required",
-                     "avcodec", AV_VERSION_MAJOR(ver_avcodec), LIBAVCODEC_VERSION_MAJOR);
-        return -1;
-    }
-
-    if (AV_VERSION_MAJOR(ver_avformat) != LIBAVFORMAT_VERSION_MAJOR) {
-        Mix_SetError("Linked FFMPEG %s version %u is INCOMPATIBLE, the major version %u is required",
-                     "avformat", AV_VERSION_MAJOR(ver_avformat), LIBAVFORMAT_VERSION_MAJOR);
-        return -1;
-    }
-
-    if (AV_VERSION_MAJOR(ver_avutil) != LIBAVUTIL_VERSION_MAJOR) {
-        Mix_SetError("Linked FFMPEG %s version %u is INCOMPATIBLE, the major version %u is required",
-                     "avutil", AV_VERSION_MAJOR(ver_avutil), LIBAVUTIL_VERSION_MAJOR);
-        return -1;
-    }
-
-    if (AV_VERSION_MAJOR(ver_swresample) != LIBSWRESAMPLE_VERSION_MAJOR) {
-        Mix_SetError("Linked FFMPEG %s version %u is INCOMPATIBLE, the major version %u is required",
-                     "swresample", AV_VERSION_MAJOR(ver_swresample), LIBSWRESAMPLE_VERSION_MAJOR);
-        return -1;
-    }
-
-    if (ver_avcodec == LIBAVCODEC_VERSION_INT) {
-        SDL_Log("Linked FFMPEG avcodec version %u", ver_avcodec);
-    } else {
-        SDL_Log("Linked FFMPEG avcodec version %u is NOT MATCHING to API version %u", ver_avcodec, LIBAVCODEC_VERSION_INT);
-    }
-
-    if (ver_avformat == LIBAVFORMAT_VERSION_INT) {
-        SDL_Log("Linked FFMPEG avformat version %u", ver_avformat);
-    } else {
-        SDL_Log("Linked FFMPEG avformat version %u is NOT MATCHING to API version %u", ver_avformat, LIBAVFORMAT_VERSION_INT);
-    }
-
-    if (ver_avutil == LIBAVUTIL_VERSION_INT) {
-        SDL_Log("Linked FFMPEG avutil version %u", ver_avutil);
-    } else {
-        SDL_Log("Linked FFMPEG avutil version %u is NOT MATCHING to API version %u", ver_avutil, LIBAVUTIL_VERSION_INT);
-    }
-
-    if (ver_swresample == LIBSWRESAMPLE_VERSION_INT) {
-        SDL_Log("Linked FFMPEG swresample version %u", ver_swresample);
-    } else {
-        SDL_Log("Linked FFMPEG swresample version %u is NOT MATCHING to API version %u", ver_swresample, LIBSWRESAMPLE_VERSION_INT);
-    }
-
-    return 0;
-}
-
-static void FFMPEG_Unload(void)
-{
-
-}
 
 
 static int FFMPEG_UpdateStream(FFMPEG_Music *music)
@@ -227,7 +372,7 @@ static int FFMPEG_UpdateStream(FFMPEG_Music *music)
         }
 
         if (music->planar) {
-            music->swr_ctx = swr_alloc();
+            music->swr_ctx = ffmpeg.swr_alloc();
 #if defined(AVCODEC_NEW_CHANNEL_LAYOUT)
             layout = music->audio_stream->codecpar->ch_layout.u.mask;
 #else
@@ -242,15 +387,15 @@ static int FFMPEG_UpdateStream(FFMPEG_Music *music)
                     layout = AV_CH_LAYOUT_MONO;
                 }
             }
-            av_opt_set_int(music->swr_ctx, "in_channel_layout",  layout, 0);
-            av_opt_set_int(music->swr_ctx, "out_channel_layout", layout, 0);
-            av_opt_set_int(music->swr_ctx, "in_sample_rate",     srate, 0);
-            av_opt_set_int(music->swr_ctx, "out_sample_rate",    srate, 0);
-            av_opt_set_sample_fmt(music->swr_ctx, "in_sample_fmt",  sfmt, 0);
-            av_opt_set_sample_fmt(music->swr_ctx, "out_sample_fmt", music->dst_sample_fmt,  0);
-            swr_init(music->swr_ctx);
+            ffmpeg.av_opt_set_int(music->swr_ctx, "in_channel_layout",  layout, 0);
+            ffmpeg.av_opt_set_int(music->swr_ctx, "out_channel_layout", layout, 0);
+            ffmpeg.av_opt_set_int(music->swr_ctx, "in_sample_rate",     srate, 0);
+            ffmpeg.av_opt_set_int(music->swr_ctx, "out_sample_rate",    srate, 0);
+            ffmpeg.av_opt_set_sample_fmt(music->swr_ctx, "in_sample_fmt",  sfmt, 0);
+            ffmpeg.av_opt_set_sample_fmt(music->swr_ctx, "out_sample_fmt", music->dst_sample_fmt,  0);
+            ffmpeg.swr_init(music->swr_ctx);
 
-            music->merge_buffer_size = channels * av_get_bytes_per_sample(sfmt) * 4096;
+            music->merge_buffer_size = channels * ffmpeg.av_get_bytes_per_sample(sfmt) * 4096;
             music->merge_buffer = (Uint8*)SDL_calloc(1, music->merge_buffer_size);
             if (!music->merge_buffer) {
                 music->planar = SDL_FALSE;
@@ -316,7 +461,7 @@ static void *FFMPEG_NewRW(struct SDL_RWops *src, int freesrc)
         return NULL;
     }
 
-    music->in_buffer = (uint8_t *)av_malloc(AUDIO_INBUF_SIZE);
+    music->in_buffer = (uint8_t *)ffmpeg.av_malloc(AUDIO_INBUF_SIZE);
     music->in_buffer_size = AUDIO_INBUF_SIZE;
     if (!music->in_buffer) {
         SDL_OutOfMemory();
@@ -328,20 +473,20 @@ static void *FFMPEG_NewRW(struct SDL_RWops *src, int freesrc)
     music->src_start = SDL_RWtell(src);
     music->volume = MIX_MAX_VOLUME;
 
-    music->fmt_ctx = avformat_alloc_context();
+    music->fmt_ctx = ffmpeg.avformat_alloc_context();
     if (!music->fmt_ctx) {
         FFMPEG_Delete(music);
         Mix_SetError("FFMPEG: Failed to allocate format context");
         return NULL;
     }
 
-    music->avio_in = avio_alloc_context(music->in_buffer,
-                                        music->in_buffer_size,
-                                        0,
-                                        music,
-                                        _rw_read_buffer,
-                                        NULL,
-                                        _rw_seek);
+    music->avio_in = ffmpeg.avio_alloc_context(music->in_buffer,
+                                               music->in_buffer_size,
+                                               0,
+                                               music,
+                                               _rw_read_buffer,
+                                               NULL,
+                                               _rw_seek);
     if(!music->avio_in) {
         FFMPEG_Delete(music);
         Mix_SetError("FFMPEG: Unhandled file format");
@@ -350,23 +495,23 @@ static void *FFMPEG_NewRW(struct SDL_RWops *src, int freesrc)
 
     music->fmt_ctx->pb = music->avio_in;
 
-    ret = avformat_open_input(&music->fmt_ctx, NULL, NULL, NULL);
+    ret = ffmpeg.avformat_open_input(&music->fmt_ctx, NULL, NULL, NULL);
     if (ret < 0) {
-        Mix_SetError("FFMPEG: Failed to open the input: %s", av_err2str(ret));
+        Mix_SetError("FFMPEG: Failed to open the input: %s", mix_av_err2str(ret));
         FFMPEG_Delete(music);
         return NULL;
     }
 
-    ret = avformat_find_stream_info(music->fmt_ctx, NULL);
+    ret = ffmpeg.avformat_find_stream_info(music->fmt_ctx, NULL);
     if (ret < 0) {
-        Mix_SetError("FFMPEG: Could not find stream information: %s", av_err2str(ret));
+        Mix_SetError("FFMPEG: Could not find stream information: %s", mix_av_err2str(ret));
         FFMPEG_Delete(music);
         return NULL;
     }
 
-    ret = av_find_best_stream(music->fmt_ctx, AVMEDIA_TYPE_AUDIO, -1, -1, &music->codec, 0);
+    ret = ffmpeg.av_find_best_stream(music->fmt_ctx, AVMEDIA_TYPE_AUDIO, -1, -1, &music->codec, 0);
     if (ret < 0) {
-        Mix_SetError("FFMPEG: Could not find audio stream in input file: %s", av_err2str(ret));
+        Mix_SetError("FFMPEG: Could not find audio stream in input file: %s", mix_av_err2str(ret));
         FFMPEG_Delete(music);
         return NULL;
     }
@@ -375,7 +520,7 @@ static void *FFMPEG_NewRW(struct SDL_RWops *src, int freesrc)
     music->audio_stream = music->fmt_ctx->streams[music->stream_index];
 
     if (!music->codec) {
-        music->codec = avcodec_find_decoder(music->audio_stream->codecpar->codec_id);
+        music->codec = ffmpeg.avcodec_find_decoder(music->audio_stream->codecpar->codec_id);
         if (!music->codec) {
             Mix_SetError("FFMPEG: Failed to find audio codec");
             FFMPEG_Delete(music);
@@ -383,7 +528,7 @@ static void *FFMPEG_NewRW(struct SDL_RWops *src, int freesrc)
         }
     }
 
-    music->audio_dec_ctx = avcodec_alloc_context3(music->codec);
+    music->audio_dec_ctx = ffmpeg.avcodec_alloc_context3(music->codec);
     if (!music->audio_dec_ctx) {
         Mix_SetError("FFMPEG: Failed allocate the codec context");
         FFMPEG_Delete(music);
@@ -396,27 +541,27 @@ static void *FFMPEG_NewRW(struct SDL_RWops *src, int freesrc)
         return NULL;
     }
 
-    if (avcodec_parameters_to_context(music->audio_dec_ctx, music->audio_stream->codecpar) < 0) {
+    if (ffmpeg.avcodec_parameters_to_context(music->audio_dec_ctx, music->audio_stream->codecpar) < 0) {
         Mix_SetError("FFMPEG: Failed to copy codec parameters to context");
         FFMPEG_Delete(music);
         return NULL;
     }
 
-    ret = avcodec_open2(music->audio_dec_ctx, music->codec, NULL);
+    ret = ffmpeg.avcodec_open2(music->audio_dec_ctx, music->codec, NULL);
     if (ret < 0) {
-        Mix_SetError("FFMPEG: Failed to initialise the decoder: %s", av_err2str(ret));
+        Mix_SetError("FFMPEG: Failed to initialise the decoder: %s", mix_av_err2str(ret));
         FFMPEG_Delete(music);
         return NULL;
     }
 
-    music->decoded_frame = av_frame_alloc();
+    music->decoded_frame = ffmpeg.av_frame_alloc();
     if (!music->decoded_frame) {
         Mix_SetError("FFMPEG: Failed to allocate the frame");
         FFMPEG_Delete(music);
         return NULL;
     }
 
-    music->pkt = av_packet_alloc();
+    music->pkt = ffmpeg.av_packet_alloc();
     if (!music->pkt) {
         Mix_SetError("FFMPEG: Failed to allocate the packet");
         FFMPEG_Delete(music);
@@ -435,7 +580,7 @@ static void *FFMPEG_NewRW(struct SDL_RWops *src, int freesrc)
         music->time_duration = (double)music->audio_stream->nb_frames / music->audio_stream->codecpar->sample_rate;
     }
 
-    av_dump_format(music->fmt_ctx, music->stream_index, "<SDL_RWops context 1>", 0);
+    ffmpeg.av_dump_format(music->fmt_ctx, music->stream_index, "<SDL_RWops context 1>", 0);
 
     music->freesrc = freesrc;
 
@@ -462,7 +607,7 @@ static int FFMPEG_Play(void *music_p, int play_count)
     FFMPEG_Music *music = (FFMPEG_Music*)music_p;
     if (music) {
         SDL_AudioStreamClear(music->stream);
-        av_seek_frame(music->fmt_ctx, music->stream_index, 0, AVSEEK_FLAG_ANY);
+        ffmpeg.av_seek_frame(music->fmt_ctx, music->stream_index, 0, AVSEEK_FLAG_ANY);
         music-> time_position = 0.0;
         music->play_count = play_count;
     }
@@ -483,20 +628,20 @@ static int decode_packet(FFMPEG_Music *music, const AVPacket *pkt, SDL_bool *got
 
     *got_some = SDL_FALSE;
 
-    ret = avcodec_send_packet(music->audio_dec_ctx, pkt);
+    ret = ffmpeg.avcodec_send_packet(music->audio_dec_ctx, pkt);
     if (ret < 0) {
         if (ret == AVERROR_EOF) {
             return ret;
         }
 
-        Mix_SetError("ERROR: Error submitting a packet for decoding (%s)", av_err2str(ret));
+        Mix_SetError("ERROR: Error submitting a packet for decoding (%s)", mix_av_err2str(ret));
         SDL_Log("FFMPEG: %s", Mix_GetError());
         return ret;
     }
 
     /* get all the available frames from the decoder */
     while (ret >= 0) {
-        ret = avcodec_receive_frame(music->audio_dec_ctx, music->decoded_frame);
+        ret = ffmpeg.avcodec_receive_frame(music->audio_dec_ctx, music->decoded_frame);
         if (ret < 0) {
             /* those two return values are special and mean there is no output */
             /* frame available, but there were no errors during decoding */
@@ -504,23 +649,23 @@ static int decode_packet(FFMPEG_Music *music, const AVPacket *pkt, SDL_bool *got
                 return 0;
             }
 
-            Mix_SetError("FFMPEG: Error during decoding (%s)", av_err2str(ret));
+            Mix_SetError("FFMPEG: Error during decoding (%s)", mix_av_err2str(ret));
             return ret;
         }
 
         FFMPEG_UpdateStream(music);
 
         if (music->planar) {
-            sample_size = av_get_bytes_per_sample(music->decoded_frame->format);
+            sample_size = ffmpeg.av_get_bytes_per_sample(music->decoded_frame->format);
             unpadded_linesize = sample_size * music->decoded_frame->nb_samples * music->schannels;
 
             if (unpadded_linesize > music->merge_buffer_size) {
                 bump_merge_buffer(music, unpadded_linesize);
             }
 
-            swr_convert(music->swr_ctx,
-                        &music->merge_buffer, music->decoded_frame->nb_samples,
-                        (const Uint8**)music->decoded_frame->extended_data, music->decoded_frame->nb_samples);
+            ffmpeg.swr_convert(music->swr_ctx,
+                               &music->merge_buffer, music->decoded_frame->nb_samples,
+                               (const Uint8**)music->decoded_frame->extended_data, music->decoded_frame->nb_samples);
 
             music-> time_position += (double)music->decoded_frame->nb_samples / music->srate;
 
@@ -529,7 +674,7 @@ static int decode_packet(FFMPEG_Music *music, const AVPacket *pkt, SDL_bool *got
                 return -1;
             }
         } else {
-            unpadded_linesize = music->decoded_frame->nb_samples * av_get_bytes_per_sample(music->decoded_frame->format);
+            unpadded_linesize = music->decoded_frame->nb_samples * ffmpeg.av_get_bytes_per_sample(music->decoded_frame->format);
             if (SDL_AudioStreamPut(music->stream, music->decoded_frame->extended_data[0], unpadded_linesize) < 0) {
                 Mix_SetError("FFMPEG: Failed to put audio stream");
                 return -1;
@@ -568,13 +713,13 @@ static int FFMPEG_GetSome(void *context, void *data, int bytes, SDL_bool *done)
     got_some = SDL_FALSE;
 
     /* read frames from the file */
-    while (av_read_frame(music->fmt_ctx, music->pkt) >= 0) {
+    while (ffmpeg.av_read_frame(music->fmt_ctx, music->pkt) >= 0) {
         /* check if the packet belongs to a stream we are interested in, otherwise */
         /* skip it */
         if (music->pkt->stream_index == music->stream_index) {
             ret = decode_packet(music, music->pkt, &got_some);
         }
-        av_packet_unref(music->pkt);
+        ffmpeg.av_packet_unref(music->pkt);
 
         if (ret < 0 || got_some)
             break;
@@ -614,15 +759,15 @@ static int FFMPEG_Seek(void *music_p, double time)
     int64_t ts;
     int err;
 
-    ts = av_rescale(time * 1000, timebase.den, timebase.num);
+    ts = ffmpeg.av_rescale(time * 1000, timebase.den, timebase.num);
     ts /=1000;
-    err = avformat_seek_file(music->fmt_ctx, music->stream_index, 0, ts, ts, AVSEEK_FLAG_ANY);
+    err = ffmpeg.avformat_seek_file(music->fmt_ctx, music->stream_index, 0, ts, ts, AVSEEK_FLAG_ANY);
 
     if (err >= 0) {
         music->time_position = time;
-        avcodec_flush_buffers(music->audio_dec_ctx);
+        ffmpeg.avcodec_flush_buffers(music->audio_dec_ctx);
     } else {
-        SDL_Log("FFMPEG: Seek failed: %s", av_err2str(err));
+        SDL_Log("FFMPEG: Seek failed: %s", mix_av_err2str(err));
         return -1;
     }
 
@@ -648,10 +793,10 @@ static void FFMPEG_Delete(void *context)
     FFMPEG_Music *music = (FFMPEG_Music*)context;
     if (music) {
         if (music->audio_dec_ctx) {
-            avcodec_free_context(&music->audio_dec_ctx);
+            ffmpeg.avcodec_free_context(&music->audio_dec_ctx);
         }
         if (music->fmt_ctx) {
-            avformat_close_input(&music->fmt_ctx);
+            ffmpeg.avformat_close_input(&music->fmt_ctx);
         }
 /*
         if (music->avio_in) {
@@ -659,13 +804,13 @@ static void FFMPEG_Delete(void *context)
         }
 */
         if (music->pkt) {
-            av_packet_free(&music->pkt);
+            ffmpeg.av_packet_free(&music->pkt);
         }
         if (music->decoded_frame) {
-            av_frame_free(&music->decoded_frame);
+            ffmpeg.av_frame_free(&music->decoded_frame);
         }
         if (music->swr_ctx) {
-            swr_free(&music->swr_ctx);
+            ffmpeg.swr_free(&music->swr_ctx);
         }
 
         music->in_buffer = NULL; /* This buffer is already freed by FFMPEG side*/
