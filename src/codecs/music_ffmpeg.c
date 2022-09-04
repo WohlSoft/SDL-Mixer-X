@@ -610,7 +610,7 @@ static int FFMPEG_PlayAudio(void *music_p, void *data, int bytes)
 static int FFMPEG_Seek(void *music_p, double time)
 {
     FFMPEG_Music *music = (FFMPEG_Music*)music_p;
-    AVRational timebase = music->audio_dec_ctx->time_base;
+    AVRational timebase = music->audio_stream->time_base;
     int64_t ts;
     int err;
 
