@@ -577,7 +577,11 @@ static void *FFMPEG_NewRW(struct SDL_RWops *src, int freesrc)
     if (music->fmt_ctx->duration != AV_NOPTS_VALUE && music->fmt_ctx->duration != 0) {
         music->time_duration = (double)music->fmt_ctx->duration / AV_TIME_BASE;
     } else if (music->audio_stream->nb_frames > 0) {
+        /* NOTE: This method may compute an inaccurate time depending on a format. Used as fallback when "duration" is invalid */
         music->time_duration = (double)music->audio_stream->nb_frames / music->audio_stream->codecpar->sample_rate;
+    } else {
+        /* Unknown duration */
+        music->time_duration = -1.0;
     }
 
     ffmpeg.av_dump_format(music->fmt_ctx, music->stream_index, "<SDL_RWops context 1>", 0);
@@ -667,7 +671,11 @@ static int decode_packet(FFMPEG_Music *music, const AVPacket *pkt, SDL_bool *got
                                &music->merge_buffer, music->decoded_frame->nb_samples,
                                (const Uint8**)music->decoded_frame->extended_data, music->decoded_frame->nb_samples);
 
-            music-> time_position += (double)music->decoded_frame->nb_samples / music->srate;
+            if (pkt->pts != AV_NOPTS_VALUE) {
+                music-> time_position = (double)pkt->pts * av_q2d(music->audio_stream->time_base);
+            } else {
+                music-> time_position = -1.0;
+            }
 
             if (SDL_AudioStreamPut(music->stream, music->merge_buffer, unpadded_linesize) < 0) {
                 Mix_SetError("FFMPEG: Failed to put audio stream");
