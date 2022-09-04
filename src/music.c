@@ -1788,6 +1788,15 @@ Mix_Music * MIXCALLCC Mix_LoadMUS(const char *file)
             SDL_strcasecmp(ext, "XM") == 0) {
             type = MUS_MOD;
         }
+        else if (SDL_strcasecmp(ext, "MP4") == 0 ||
+                 SDL_strcasecmp(ext, "MKV") == 0 ||
+                 SDL_strcasecmp(ext, "WEBM") == 0 ||
+                 SDL_strcasecmp(ext, "M4A") == 0 ||
+                 SDL_strcasecmp(ext, "WMA") == 0 ||
+                 SDL_strcasecmp(ext, "MOV") == 0 ||
+                 SDL_strcasecmp(ext, "TS") == 0) {
+            type = MUS_FFMPEG;
+        }
     }
     ret = Mix_LoadMUSType_RW_ARG(src, type, SDL_TRUE, music_args);
     if (ret) {
