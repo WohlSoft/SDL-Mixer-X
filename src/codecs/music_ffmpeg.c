@@ -90,6 +90,30 @@ static int FFMPEG_Load(void)
     unsigned ver_avutil = avutil_version();
     unsigned ver_swresample = swresample_version();
 
+    if (AV_VERSION_MAJOR(ver_avcodec) != LIBAVCODEC_VERSION_MAJOR) {
+        Mix_SetError("Linked FFMPEG %s version %u is INCOMPATIBLE, the major version %u is required",
+                     "avcodec", AV_VERSION_MAJOR(ver_avcodec), LIBAVCODEC_VERSION_MAJOR);
+        return -1;
+    }
+
+    if (AV_VERSION_MAJOR(ver_avformat) != LIBAVFORMAT_VERSION_MAJOR) {
+        Mix_SetError("Linked FFMPEG %s version %u is INCOMPATIBLE, the major version %u is required",
+                     "avformat", AV_VERSION_MAJOR(ver_avformat), LIBAVFORMAT_VERSION_MAJOR);
+        return -1;
+    }
+
+    if (AV_VERSION_MAJOR(ver_avutil) != LIBAVUTIL_VERSION_MAJOR) {
+        Mix_SetError("Linked FFMPEG %s version %u is INCOMPATIBLE, the major version %u is required",
+                     "avutil", AV_VERSION_MAJOR(ver_avutil), LIBAVUTIL_VERSION_MAJOR);
+        return -1;
+    }
+
+    if (AV_VERSION_MAJOR(ver_swresample) != LIBSWRESAMPLE_VERSION_MAJOR) {
+        Mix_SetError("Linked FFMPEG %s version %u is INCOMPATIBLE, the major version %u is required",
+                     "swresample", AV_VERSION_MAJOR(ver_swresample), LIBSWRESAMPLE_VERSION_MAJOR);
+        return -1;
+    }
+
     if (ver_avcodec == LIBAVCODEC_VERSION_INT) {
         SDL_Log("Linked FFMPEG avcodec version %u", ver_avcodec);
     } else {
