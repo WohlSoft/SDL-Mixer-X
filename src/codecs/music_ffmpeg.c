@@ -47,6 +47,15 @@
 #define AVCODEC_NEW_CHANNEL_LAYOUT
 #endif
 
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(59, 0, 100)
+#define AVFORMAT_NEW_avcodec_find_decoder
+#endif
+
+#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(59, 0, 100)
+#define AVFORMAT_NEW_avformat_open_input
+#define AVFORMAT_NEW_av_find_best_stream
+#endif
+
 typedef struct ffmpeg_loader {
     int loaded;
     void *handle_avformat;
@@ -57,9 +66,17 @@ typedef struct ffmpeg_loader {
     unsigned (*avformat_version)(void);
     AVFormatContext *(*avformat_alloc_context)(void);
     AVIOContext *(*avio_alloc_context)(unsigned char *,int,int,void *,int (*)(void *,uint8_t *,int),int (*)(void *, uint8_t *, int),int64_t (*)(void *,int64_t,int));
+#if defined(AVFORMAT_NEW_avformat_open_input)
     int (*avformat_open_input)(AVFormatContext **, const char *,const AVInputFormat *,AVDictionary **);
+#else
+    int (*avformat_open_input)(AVFormatContext **, const char *,ff_const59 AVInputFormat *,AVDictionary **);
+#endif
     int (*avformat_find_stream_info)(AVFormatContext *,AVDictionary **);
+#ifdef AVFORMAT_NEW_av_find_best_stream
     int (*av_find_best_stream)(AVFormatContext *,enum AVMediaType,int,int,const AVCodec **,int);
+#else
+    int (*av_find_best_stream)(AVFormatContext *,enum AVMediaType,int,int,AVCodec **,int);
+#endif
     void (*av_dump_format)(AVFormatContext *,int,const char *,int);
     int (*av_seek_frame)(AVFormatContext *,int,int64_t,int);
     int (*av_read_frame)(AVFormatContext *,AVPacket *);
@@ -68,7 +85,11 @@ typedef struct ffmpeg_loader {
 
 
     unsigned (*avcodec_version)(void);
+#ifdef AVFORMAT_NEW_avcodec_find_decoder
     const AVCodec *(*avcodec_find_decoder)(enum AVCodecID);
+#else
+    AVCodec *(*avcodec_find_decoder)(enum AVCodecID);
+#endif
     AVCodecContext *(*avcodec_alloc_context3)(const AVCodec *);
     int (*avcodec_parameters_to_context)(AVCodecContext *, const AVCodecParameters *);
     int (*avcodec_open2)(AVCodecContext *, const AVCodec *, AVDictionary **);
@@ -175,9 +196,17 @@ static int FFMPEG_Load(void)
         FUNCTION_LOADER(handle_avformat, avformat_version, unsigned (*)(void))
         FUNCTION_LOADER(handle_avformat, avformat_alloc_context, AVFormatContext *(*)(void))
         FUNCTION_LOADER(handle_avformat, avio_alloc_context, AVIOContext *(*)(unsigned char *,int,int,void *,int (*)(void *,uint8_t *,int),int (*)(void *, uint8_t *, int),int64_t (*)(void *,int64_t,int)))
+#if defined(AVFORMAT_NEW_avformat_open_input)
         FUNCTION_LOADER(handle_avformat, avformat_open_input, int (*)(AVFormatContext **, const char *,const AVInputFormat *,AVDictionary **))
+#else
+        FUNCTION_LOADER(handle_avformat, avformat_open_input, int (*)(AVFormatContext **, const char *,ff_const59 AVInputFormat *,AVDictionary **))
+#endif
         FUNCTION_LOADER(handle_avformat, avformat_find_stream_info, int (*)(AVFormatContext *,AVDictionary **))
+#ifdef AVFORMAT_NEW_av_find_best_stream
         FUNCTION_LOADER(handle_avformat, av_find_best_stream, int (*)(AVFormatContext *,enum AVMediaType,int,int,const AVCodec **,int))
+#else
+        FUNCTION_LOADER(handle_avformat, av_find_best_stream, int (*)(AVFormatContext *,enum AVMediaType,int,int,AVCodec **,int))
+#endif
         FUNCTION_LOADER(handle_avformat, av_dump_format, void (*)(AVFormatContext *,int,const char *,int))
         FUNCTION_LOADER(handle_avformat, av_seek_frame, int (*)(AVFormatContext *,int,int64_t,int))
         FUNCTION_LOADER(handle_avformat, av_read_frame, int (*)(AVFormatContext *,AVPacket *))
@@ -186,7 +215,11 @@ static int FFMPEG_Load(void)
 
         /* AVCodec */
         FUNCTION_LOADER(handle_avcodec, avcodec_version,  unsigned (*)(void))
+#ifdef AVFORMAT_NEW_avcodec_find_decoder
         FUNCTION_LOADER(handle_avcodec, avcodec_find_decoder, const AVCodec *(*)(enum AVCodecID))
+#else
+        FUNCTION_LOADER(handle_avcodec, avcodec_find_decoder, AVCodec *(*)(enum AVCodecID))
+#endif
         FUNCTION_LOADER(handle_avcodec, avcodec_alloc_context3,  AVCodecContext *(*)(const AVCodec *))
         FUNCTION_LOADER(handle_avcodec, avcodec_parameters_to_context,  int (*)(AVCodecContext *, const AVCodecParameters *))
         FUNCTION_LOADER(handle_avcodec, avcodec_open2,  int (*)(AVCodecContext *, const AVCodec *, AVDictionary **))
@@ -246,25 +279,25 @@ static int FFMPEG_Load(void)
         }
 
         if (ver_avcodec == LIBAVCODEC_VERSION_INT) {
-            SDL_Log("Linked FFMPEG avcodec version %u", ver_avcodec);
+            SDL_Log("Linked FFMPEG avcodec version %u, major %u", ver_avcodec, LIBAVCODEC_VERSION_MAJOR);
         } else {
             SDL_Log("Linked FFMPEG avcodec version %u is NOT MATCHING to API version %u", ver_avcodec, LIBAVCODEC_VERSION_INT);
         }
 
         if (ver_avformat == LIBAVFORMAT_VERSION_INT) {
-            SDL_Log("Linked FFMPEG avformat version %u", ver_avformat);
+            SDL_Log("Linked FFMPEG avformat version %u, major %u", ver_avformat, LIBAVFORMAT_VERSION_MAJOR);
         } else {
             SDL_Log("Linked FFMPEG avformat version %u is NOT MATCHING to API version %u", ver_avformat, LIBAVFORMAT_VERSION_INT);
         }
 
         if (ver_avutil == LIBAVUTIL_VERSION_INT) {
-            SDL_Log("Linked FFMPEG avutil version %u", ver_avutil);
+            SDL_Log("Linked FFMPEG avutil version %u, major %u", ver_avutil, LIBAVUTIL_VERSION_MAJOR);
         } else {
             SDL_Log("Linked FFMPEG avutil version %u is NOT MATCHING to API version %u", ver_avutil, LIBAVUTIL_VERSION_INT);
         }
 
         if (ver_swresample == LIBSWRESAMPLE_VERSION_INT) {
-            SDL_Log("Linked FFMPEG swresample version %u", ver_swresample);
+            SDL_Log("Linked FFMPEG swresample version %u, major %u", ver_swresample, LIBSWRESAMPLE_VERSION_MAJOR);
         } else {
             SDL_Log("Linked FFMPEG swresample version %u is NOT MATCHING to API version %u", ver_swresample, LIBSWRESAMPLE_VERSION_INT);
         }
@@ -297,7 +330,11 @@ typedef struct
     int freesrc;
     AVFormatContext *fmt_ctx;
     AVIOContext     *avio_in;
+#ifdef AVFORMAT_NEW_avcodec_find_decoder
     const AVCodec *codec;
+#else
+    AVCodec *codec;
+#endif
     AVCodecContext *audio_dec_ctx;
     AVStream *audio_stream;
     AVCodecParserContext *parser;
