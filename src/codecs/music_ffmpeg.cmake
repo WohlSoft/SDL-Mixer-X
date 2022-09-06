@@ -23,11 +23,12 @@ if(USE_FFMPEG AND MIXERX_LGPL)
         )
     else()
         message(WARNING "FFMPEG libraries are not a part of AudioCodecs yet. Using any available from the system.")
-        set(FFMPEG_INCLUDE_DIRS "" CACHE PATH)
-        set(FFMPEG_swresample_LIBRARY swresample CACHE PATH)
-        set(FFMPEG_avformat_LIBRARY avformat CACHE PATH)
-        set(FFMPEG_avcodec_LIBRARY avcodec CACHE PATH)
-        set(FFMPEG_avutil_LIBRARY avutil CACHE PATH)
+        set(FFMPEG_INCLUDE_DIRS "" CACHE PATH "")
+        set(FFMPEG_swresample_LIBRARY swresample CACHE PATH "")
+        set(FFMPEG_avformat_LIBRARY avformat CACHE PATH "")
+        set(FFMPEG_avcodec_LIBRARY avcodec CACHE PATH "")
+        set(FFMPEG_avutil_LIBRARY avutil CACHE PATH "")
+        mark_as_advanced(FFMPEG_INCLUDE_DIRS FFMPEG_swresample_LIBRARY FFMPEG_avformat_LIBRARY FFMPEG_avcodec_LIBRARY FFMPEG_avutil_LIBRARY)
         set(FFMPEG_LINK_LIBRARIES
             ${FFMPEG_swresample_LIBRARY}
             ${FFMPEG_avformat_LIBRARY}
