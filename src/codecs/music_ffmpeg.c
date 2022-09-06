@@ -23,6 +23,7 @@
 #include "music_ffmpeg.h"
 
 #include "SDL_log.h"
+#include "SDL_loadso.h"
 #include "SDL_assert.h"
 
 #define inline SDL_INLINE
@@ -110,6 +111,7 @@ typedef struct ffmpeg_loader {
     AVFrame *(*av_frame_alloc)(void);
     int64_t (*av_rescale)(int64_t, int64_t, int64_t);
     void (*av_frame_free)(AVFrame **);
+    void (*av_frame_unref)(AVFrame *);
 
 
     unsigned (*swresample_version)(void);
@@ -171,8 +173,8 @@ static int FFMPEG_Load(void)
 
     if (ffmpeg.loaded == 0) {
 #ifdef FFMPEG_DYNAMIC
-        ffmpeg.handle_avformat = SDL_LoadObject(FFMPEG_DYNAMIC_AVFORMAT);
-        if (ffmpeg.handle_avformat == NULL) {
+        ffmpeg.handle_avutil = SDL_LoadObject(FFMPEG_DYNAMIC_AVUTIL);
+        if (ffmpeg.handle_avutil == NULL) {
             FFMPEG_UnloadAllHandlers();
             return -1;
         }
@@ -181,8 +183,8 @@ static int FFMPEG_Load(void)
             FFMPEG_UnloadAllHandlers();
             return -1;
         }
-        ffmpeg.handle_avutil = SDL_LoadObject(FFMPEG_DYNAMIC_AVUTIL);
-        if (ffmpeg.handle_avutil == NULL) {
+        ffmpeg.handle_avformat = SDL_LoadObject(FFMPEG_DYNAMIC_AVFORMAT);
+        if (ffmpeg.handle_avformat == NULL) {
             FFMPEG_UnloadAllHandlers();
             return -1;
         }
@@ -240,6 +242,7 @@ static int FFMPEG_Load(void)
         FUNCTION_LOADER(handle_avutil, av_frame_alloc,  AVFrame *(*)(void))
         FUNCTION_LOADER(handle_avutil, av_rescale,  int64_t (*)(int64_t, int64_t, int64_t))
         FUNCTION_LOADER(handle_avutil, av_frame_free,  void (*)(AVFrame **))
+        FUNCTION_LOADER(handle_avutil, av_frame_unref,  void (*)(AVFrame *))
 
         /* SWResample */
         FUNCTION_LOADER(handle_swresample, swresample_version, unsigned (*)(void))
@@ -255,51 +258,51 @@ static int FFMPEG_Load(void)
         ver_swresample = ffmpeg.swresample_version();
 
         if (AV_VERSION_MAJOR(ver_avcodec) != LIBAVCODEC_VERSION_MAJOR) {
-            Mix_SetError("Linked FFMPEG's %s version %u has INCOMPATIBLE ABI, the major version %u is required",
+            Mix_SetError("Loaded FFMPEG's %s version %u has INCOMPATIBLE ABI, the major version %u is required",
                          "avcodec", AV_VERSION_MAJOR(ver_avcodec), LIBAVCODEC_VERSION_MAJOR);
             return -1;
         }
 
         if (AV_VERSION_MAJOR(ver_avformat) != LIBAVFORMAT_VERSION_MAJOR) {
-            Mix_SetError("Linked FFMPEG's %s version %u has INCOMPATIBLE ABI, the major version %u is required",
+            Mix_SetError("Loaded FFMPEG's %s version %u has INCOMPATIBLE ABI, the major version %u is required",
                          "avformat", AV_VERSION_MAJOR(ver_avformat), LIBAVFORMAT_VERSION_MAJOR);
             return -1;
         }
 
         if (AV_VERSION_MAJOR(ver_avutil) != LIBAVUTIL_VERSION_MAJOR) {
-            Mix_SetError("Linked FFMPEG's %s version %u has INCOMPATIBLE ABI, the major version %u is required",
+            Mix_SetError("Loaded FFMPEG's %s version %u has INCOMPATIBLE ABI, the major version %u is required",
                          "avutil", AV_VERSION_MAJOR(ver_avutil), LIBAVUTIL_VERSION_MAJOR);
             return -1;
         }
 
         if (AV_VERSION_MAJOR(ver_swresample) != LIBSWRESAMPLE_VERSION_MAJOR) {
-            Mix_SetError("Linked FFMPEG's %s version %u has INCOMPATIBLE ABI, the major version %u is required",
+            Mix_SetError("Loaded FFMPEG's %s version %u has INCOMPATIBLE ABI, the major version %u is required",
                          "swresample", AV_VERSION_MAJOR(ver_swresample), LIBSWRESAMPLE_VERSION_MAJOR);
             return -1;
         }
 
         if (ver_avcodec == LIBAVCODEC_VERSION_INT) {
-            SDL_Log("Linked FFMPEG avcodec version %u, major %u", ver_avcodec, LIBAVCODEC_VERSION_MAJOR);
+            SDL_Log("Loaded FFMPEG avcodec version %u, major %u", ver_avcodec, LIBAVCODEC_VERSION_MAJOR);
         } else {
-            SDL_Log("Linked FFMPEG avcodec version %u is NOT MATCHING to API version %u", ver_avcodec, LIBAVCODEC_VERSION_INT);
+            SDL_Log("Loaded FFMPEG avcodec version %u is NOT MATCHING to API version %u", ver_avcodec, LIBAVCODEC_VERSION_INT);
         }
 
         if (ver_avformat == LIBAVFORMAT_VERSION_INT) {
-            SDL_Log("Linked FFMPEG avformat version %u, major %u", ver_avformat, LIBAVFORMAT_VERSION_MAJOR);
+            SDL_Log("Loaded FFMPEG avformat version %u, major %u", ver_avformat, LIBAVFORMAT_VERSION_MAJOR);
         } else {
-            SDL_Log("Linked FFMPEG avformat version %u is NOT MATCHING to API version %u", ver_avformat, LIBAVFORMAT_VERSION_INT);
+            SDL_Log("Loaded FFMPEG avformat version %u is NOT MATCHING to API version %u", ver_avformat, LIBAVFORMAT_VERSION_INT);
         }
 
         if (ver_avutil == LIBAVUTIL_VERSION_INT) {
-            SDL_Log("Linked FFMPEG avutil version %u, major %u", ver_avutil, LIBAVUTIL_VERSION_MAJOR);
+            SDL_Log("Loaded FFMPEG avutil version %u, major %u", ver_avutil, LIBAVUTIL_VERSION_MAJOR);
         } else {
-            SDL_Log("Linked FFMPEG avutil version %u is NOT MATCHING to API version %u", ver_avutil, LIBAVUTIL_VERSION_INT);
+            SDL_Log("Loaded FFMPEG avutil version %u is NOT MATCHING to API version %u", ver_avutil, LIBAVUTIL_VERSION_INT);
         }
 
         if (ver_swresample == LIBSWRESAMPLE_VERSION_INT) {
-            SDL_Log("Linked FFMPEG swresample version %u, major %u", ver_swresample, LIBSWRESAMPLE_VERSION_MAJOR);
+            SDL_Log("Loaded FFMPEG swresample version %u, major %u", ver_swresample, LIBSWRESAMPLE_VERSION_MAJOR);
         } else {
-            SDL_Log("Linked FFMPEG swresample version %u is NOT MATCHING to API version %u", ver_swresample, LIBSWRESAMPLE_VERSION_INT);
+            SDL_Log("Loaded FFMPEG swresample version %u is NOT MATCHING to API version %u", ver_swresample, LIBSWRESAMPLE_VERSION_INT);
         }
     }
     ++ffmpeg.loaded;
@@ -430,7 +433,7 @@ static int FFMPEG_UpdateStream(FFMPEG_Music *music)
             music->merge_buffer_size = 0;
         }
         if (music->swr_ctx) {
-            swr_free(&music->swr_ctx);
+            ffmpeg.swr_free(&music->swr_ctx);
             music->swr_ctx = NULL;
         }
 
@@ -758,7 +761,7 @@ static int decode_packet(FFMPEG_Music *music, const AVPacket *pkt, SDL_bool *got
             }
         }
 
-        av_frame_unref(music->decoded_frame);
+        ffmpeg.av_frame_unref(music->decoded_frame);
 
         *got_some = SDL_TRUE;
 
