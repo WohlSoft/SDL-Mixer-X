@@ -1363,16 +1363,16 @@ static int detect_ea_rsxx(SDL_RWops *in, Sint64 start, Uint8 magic_byte)
 #if defined(MUSIC_MP3_MPG123) || defined(MUSIC_MP3_DRMP3)
 static int detect_mp3(Uint8 *magic, SDL_RWops *src, Sint64 start)
 {
-    Uint32 null = 0;
-    Uint8  magic2[9];
-    unsigned char byte = 0;
-    Sint64 endPos = 0;
-    Sint64 notNullPos = 0;
+    const Uint32 null = 0;
+    Uint8 mp3_magic[9];
+    Uint8 byte = 0;
+    Sint64 end_file_pos = 0;
+    Sint64 first_frame_pos = 0;
     const int max_search = 10240;
 
-    SDL_memcpy(magic2, magic, 9);
+    SDL_memcpy(mp3_magic, magic, 9);
 
-    if (SDL_strncmp((char *)magic2, "ID3", 3) == 0 ||
+    if (SDL_strncmp((char *)mp3_magic, "ID3", 3) == 0 ||
     /* see: https://bugzilla.libsdl.org/show_bug.cgi?id=5322 */
        (magic[0] == 0xFF && (magic[1] & 0xE6) == 0xE2)) {
         SDL_RWseek(src, start, RW_SEEK_SET);
@@ -1380,11 +1380,11 @@ static int detect_mp3(Uint8 *magic, SDL_RWops *src, Sint64 start)
     }
 
     SDL_RWseek(src, 0, RW_SEEK_END);
-    endPos = SDL_RWtell(src);
+    end_file_pos = SDL_RWtell(src);
     SDL_RWseek(src, start, RW_SEEK_SET);
 
-    /* If first bytes are zero */
-    if (SDL_memcmp(magic2, &null, 4) != 0) {
+    /* If first 4 bytes are not zero */
+    if (SDL_memcmp(mp3_magic, &null, 4) != 0) {
         goto readHeader;
     }
 
@@ -1394,12 +1394,12 @@ digMoreBytes:
         while ((SDL_RWread(src, &byte, 1, 1) == 1) &&
                (byte != 0xFF) &&
                (SDL_RWtell(src) < (start + max_search)) &&
-               (SDL_RWtell(src) < (endPos - 1)) )
+               (SDL_RWtell(src) < (end_file_pos - 1)) )
         {}
 
         /* with offset -1 byte */
-        notNullPos = SDL_RWtell(src) - 1;
-        SDL_RWseek(src, notNullPos, RW_SEEK_SET);
+        first_frame_pos = SDL_RWtell(src) - 1;
+        SDL_RWseek(src, first_frame_pos, RW_SEEK_SET);
 
         /* If no sync bits found at all at the search zone */
         if (byte != 0xFF) {
@@ -1409,7 +1409,7 @@ digMoreBytes:
             return 0;*/
         }
 
-        if (SDL_RWread(src, magic2, 1, 4) != 4) {
+        if (SDL_RWread(src, mp3_magic, 1, 4) != 4) {
             /* printf("MAGIC WRONG\n"); */
             SDL_RWseek(src, start, RW_SEEK_SET);
             return 0;
@@ -1422,7 +1422,7 @@ digMoreBytes:
         }
 
         /* got end of file, however, found nothing */
-        if (SDL_RWtell(src) >= (endPos - 1)) {
+        if (SDL_RWtell(src) >= (end_file_pos - 1)) {
             SDL_RWseek(src, start, RW_SEEK_SET);
             return 0;
         }
@@ -1430,11 +1430,11 @@ digMoreBytes:
 
 readHeader:
     if (
-        ((magic2[0] & 0xff) != 0xff) || ((magic2[1] & 0xf0) != 0xf0) || /*  No sync bits */
-        ((magic2[2] & 0xf0) == 0x00) || /*  Bitrate is 0 */
-        ((magic2[2] & 0xf0) == 0xf0) || /*  Bitrate is 15 */
-        ((magic2[2] & 0x0c) == 0x0c) || /*  Frequency is 3 */
-        ((magic2[1] & 0x06) == 0x00)   /*  Layer is 4 */
+        ((mp3_magic[0] & 0xff) != 0xff) || ((mp3_magic[1] & 0xf0) != 0xf0) || /*  No sync bits */
+        ((mp3_magic[2] & 0xf0) == 0x00) || /*  Bitrate is 0 */
+        ((mp3_magic[2] & 0xf0) == 0xf0) || /*  Bitrate is 15 */
+        ((mp3_magic[2] & 0x0c) == 0x0c) || /*  Frequency is 3 */
+        ((mp3_magic[1] & 0x06) == 0x00)   /*  Layer is 4 */
     ) {
         /* printf("WRONG BITS\n"); */
         goto digMoreBytes;
