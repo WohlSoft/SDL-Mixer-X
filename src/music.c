@@ -1642,7 +1642,7 @@ static int split_path_and_params(const char *path, char **file, char **args)
     SDL_memset(music_file, 0, buffer_len);
     SDL_memset(music_args, 0, buffer_len);
     SDL_strlcpy(music_file, path, buffer_len);
-    #ifdef _WIN32
+#ifdef _WIN32
     if (music_file) {
         size_t i = 0;
         for (i = 0; music_file[i] != '\0'; i++) {
@@ -1651,7 +1651,7 @@ static int split_path_and_params(const char *path, char **file, char **args)
             }
         }
     }
-    #endif
+#endif
     *file = music_file;
     *args = music_args;
 
