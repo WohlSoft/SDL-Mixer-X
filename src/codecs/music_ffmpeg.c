@@ -39,6 +39,7 @@
 #include <libavutil/error.h>
 #include <libavutil/samplefmt.h>
 #include <libavutil/opt.h>
+#include <libavutil/dict.h>
 #include <libswresample/swresample.h>
 
 
@@ -112,6 +113,7 @@ typedef struct ffmpeg_loader {
     int64_t (*av_rescale)(int64_t, int64_t, int64_t);
     void (*av_frame_free)(AVFrame **);
     void (*av_frame_unref)(AVFrame *);
+    AVDictionaryEntry *(*av_dict_get)(const AVDictionary *, const char *, const AVDictionaryEntry *, int);
 
 
     unsigned (*swresample_version)(void);
@@ -243,6 +245,7 @@ static int FFMPEG_Load(void)
         FUNCTION_LOADER(handle_avutil, av_rescale,  int64_t (*)(int64_t, int64_t, int64_t))
         FUNCTION_LOADER(handle_avutil, av_frame_free,  void (*)(AVFrame **))
         FUNCTION_LOADER(handle_avutil, av_frame_unref,  void (*)(AVFrame *))
+        FUNCTION_LOADER(handle_avutil, av_dict_get,  AVDictionaryEntry *(*)(const AVDictionary *, const char *, const AVDictionaryEntry *, int))
 
         /* SWResample */
         FUNCTION_LOADER(handle_swresample, swresample_version, unsigned (*)(void))
@@ -349,18 +352,23 @@ typedef struct
     SwrContext *swr_ctx;
     Uint8 *merge_buffer;
     size_t merge_buffer_size;
+
     int srate;
     int schannels;
     int stream_index;
     int play_count;
     int volume;
+
     double time_position;
     double time_duration;
+
     SDL_AudioStream *stream;
     Uint8 *in_buffer;
     size_t in_buffer_size;
     void *buffer;
     size_t buffer_size;
+
+    Mix_MusicMetaTags tags;
 } FFMPEG_Music;
 
 
@@ -525,6 +533,7 @@ static void FFMPEG_Delete(void *context);
 static void *FFMPEG_NewRW(struct SDL_RWops *src, int freesrc)
 {
     FFMPEG_Music *music = NULL;
+    const AVDictionaryEntry *tag = NULL;
     int ret;
 
     music = (FFMPEG_Music *)SDL_calloc(1, sizeof *music);
@@ -658,9 +667,45 @@ static void *FFMPEG_NewRW(struct SDL_RWops *src, int freesrc)
 
     ffmpeg.av_dump_format(music->fmt_ctx, music->stream_index, "<SDL_RWops context 1>", 0);
 
+    /* Attempt to load metadata */
+
     music->freesrc = freesrc;
 
+    if (music->fmt_ctx->metadata) {
+        tag = ffmpeg.av_dict_get(music->fmt_ctx->metadata, "title", tag, AV_DICT_MATCH_CASE);
+        if (tag) {
+            meta_tags_set(&music->tags, MIX_META_TITLE, tag->value);
+        }
+
+        tag = ffmpeg.av_dict_get(music->fmt_ctx->metadata, "artist", tag, AV_DICT_MATCH_CASE);
+        if (tag) {
+            meta_tags_set(&music->tags, MIX_META_ARTIST, tag->value);
+        } else {
+            /* Try to seaarch for "author" instead */
+            tag = ffmpeg.av_dict_get(music->fmt_ctx->metadata, "author", tag, AV_DICT_MATCH_CASE);
+            if (tag) {
+                meta_tags_set(&music->tags, MIX_META_ARTIST, tag->value);
+            }
+        }
+
+        tag = ffmpeg.av_dict_get(music->fmt_ctx->metadata, "album", tag, AV_DICT_MATCH_CASE);
+        if (tag) {
+            meta_tags_set(&music->tags, MIX_META_ALBUM, tag->value);
+        }
+
+        tag = ffmpeg.av_dict_get(music->fmt_ctx->metadata, "copyright", tag, AV_DICT_MATCH_CASE);
+        if (tag) {
+            meta_tags_set(&music->tags, MIX_META_COPYRIGHT, tag->value);
+        }
+    }
+
     return music;
+}
+
+static const char* FFMPEG_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
+{
+    FFMPEG_Music *music = (FFMPEG_Music *)context;
+    return meta_tags_get(&music->tags, tag_type);
 }
 
 /* Set the volume for a GME stream */
@@ -872,6 +917,8 @@ static void FFMPEG_Delete(void *context)
 {
     FFMPEG_Music *music = (FFMPEG_Music*)context;
     if (music) {
+        meta_tags_clear(&music->tags);
+
         if (music->audio_dec_ctx) {
             ffmpeg.avcodec_free_context(&music->audio_dec_ctx);
         }
@@ -948,7 +995,7 @@ Mix_MusicInterface Mix_MusicInterface_FFMPEG =
     NULL,   /* LoopStart [MIXER-X]*/
     NULL,   /* LoopEnd [MIXER-X]*/
     NULL,   /* LoopLength [MIXER-X]*/
-    NULL,   /* GetMetaTag [MIXER-X]*/
+    FFMPEG_GetMetaTag,
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */
