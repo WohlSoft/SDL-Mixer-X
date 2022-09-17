@@ -1368,6 +1368,7 @@ static int detect_mp3(Uint8 *magic, SDL_RWops *src, Sint64 start)
     unsigned char byte = 0;
     Sint64 endPos = 0;
     Sint64 notNullPos = 0;
+    const int max_search = 10240;
 
     SDL_memcpy(magic2, magic, 9);
 
@@ -1389,11 +1390,10 @@ static int detect_mp3(Uint8 *magic, SDL_RWops *src, Sint64 start)
 
 digMoreBytes:
     {
-        /* Find nearest non zero */
-        /* Look for FF byte */
+        /* Find the nearest 0xFF byte */
         while ((SDL_RWread(src, &byte, 1, 1) == 1) &&
-               (byte == 0x00) &&
-               (SDL_RWtell(src) < (start + 10240)) &&
+               (byte != 0xFF) &&
+               (SDL_RWtell(src) < (start + max_search)) &&
                (SDL_RWtell(src) < (endPos - 1)) )
         {}
 
@@ -1401,12 +1401,14 @@ digMoreBytes:
         notNullPos = SDL_RWtell(src) - 1;
         SDL_RWseek(src, notNullPos, RW_SEEK_SET);
 
-        /* If file contains only null bytes */
+        /* If no sync bits found at all at the search zone */
         if (byte != 0xFF) {
             /* printf("WRONG BYTE\n"); */
-            SDL_RWseek(src, start, RW_SEEK_SET);
-            return 0;
+            goto digMoreBytes;
+            /*SDL_RWseek(src, start, RW_SEEK_SET);
+            return 0;*/
         }
+
         if (SDL_RWread(src, magic2, 1, 4) != 4) {
             /* printf("MAGIC WRONG\n"); */
             SDL_RWseek(src, start, RW_SEEK_SET);
@@ -1414,7 +1416,7 @@ digMoreBytes:
         }
 
         /* got end of search zone, however, found nothing */
-        if (SDL_RWtell(src) >= (start + 10240)) {
+        if (SDL_RWtell(src) >= (start + max_search)) {
             SDL_RWseek(src, start, RW_SEEK_SET);
             return 0;
         }
