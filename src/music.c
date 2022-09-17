@@ -1397,31 +1397,28 @@ digMoreBytes:
                (SDL_RWtell(src) < (end_file_pos - 1)) )
         {}
 
-        /* with offset -1 byte */
+        /* With offset -1 byte */
         first_frame_pos = SDL_RWtell(src) - 1;
         SDL_RWseek(src, first_frame_pos, RW_SEEK_SET);
 
         /* If no sync bits found at all at the search zone */
         if (byte != 0xFF) {
-            /* printf("WRONG BYTE\n"); */
             goto digMoreBytes;
-            /*SDL_RWseek(src, start, RW_SEEK_SET);
-            return 0;*/
         }
 
+        /* Can't read the frame header */
         if (SDL_RWread(src, mp3_magic, 1, 4) != 4) {
-            /* printf("MAGIC WRONG\n"); */
             SDL_RWseek(src, start, RW_SEEK_SET);
             return 0;
         }
 
-        /* got end of search zone, however, found nothing */
+        /* Got the end of search zone, however, found nothing */
         if (SDL_RWtell(src) >= (start + max_search)) {
             SDL_RWseek(src, start, RW_SEEK_SET);
             return 0;
         }
 
-        /* got end of file, however, found nothing */
+        /* Got the end of file, however, found nothing */
         if (SDL_RWtell(src) >= (end_file_pos - 1)) {
             SDL_RWseek(src, start, RW_SEEK_SET);
             return 0;
@@ -1434,7 +1431,7 @@ readHeader:
         ((mp3_magic[2] & 0xf0) == 0x00) || /*  Bitrate is 0 */
         ((mp3_magic[2] & 0xf0) == 0xf0) || /*  Bitrate is 15 */
         ((mp3_magic[2] & 0x0c) == 0x0c) || /*  Frequency is 3 */
-        ((mp3_magic[1] & 0x06) == 0x00)   /*  Layer is 4 */
+        ((mp3_magic[1] & 0x06) == 0x00)    /*  Layer is 4 */
     ) {
         /* printf("WRONG BITS\n"); */
         goto digMoreBytes;
