@@ -620,10 +620,37 @@ extern DECLSPEC void MIXCALL Mix_PauseAudio(int pause_on);
  *
  * \since This function is available since SDL_mixer 2.0.0.
  *
+ * \sa Mix_QuerySpecEx
  * \sa Mix_OpenAudio
  * \sa Mix_OpenAudioDevice
  */
 extern DECLSPEC int MIXCALL Mix_QuerySpec(int *frequency, Uint16 *format, int *channels);
+
+/**
+ * Find out what the actual audio device parameters are.
+ *
+ * If Mix_OpenAudioDevice() was called with `allowed_changes` set to anything
+ * but zero, or Mix_OpenAudio() was used, some audio device settings may be
+ * different from the application's request. This function will report what
+ * the device is actually running at.
+ *
+ * Note this is only important if the app intends to touch the audio buffers
+ * being sent to the hardware directly. If an app just wants to play audio
+ * files and let SDL_mixer handle the low-level details, this function can
+ * probably be ignored.
+ *
+ * If the audio device is not opened, this function will return 0.
+ *
+ * \param out_spec On return, will be filled with the audio device's spec data
+ * \returns 1 if the audio device has been opened, 0 otherwise.
+ *
+ * \since This function is available since MixerX 2.6.0.
+ *
+ * \sa Mix_QuerySpec
+ * \sa Mix_OpenAudio
+ * \sa Mix_OpenAudioDevice
+ */
+extern DECLSPEC int MIXCALL Mix_QuerySpecEx(SDL_AudioSpec *out_spec);
 
 /**
  * Dynamically change the number of channels managed by the mixer.

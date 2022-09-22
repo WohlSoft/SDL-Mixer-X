@@ -646,6 +646,16 @@ int MIXCALLCC Mix_QuerySpec(int *frequency, Uint16 *format, int *channels)
     return(audio_opened);
 }
 
+int MIXCALLCC Mix_QuerySpecEx(SDL_AudioSpec *out_spec)
+{
+    if (audio_opened) {
+        if (out_spec) {
+            *out_spec = mixer;
+        }
+    }
+    return(audio_opened);
+}
+
 typedef struct _MusicFragment
 {
     Uint8 *data;
