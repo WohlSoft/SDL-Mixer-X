@@ -107,7 +107,9 @@ option(SSE3                "Use SSE3 assembly routines" ${OPT_DEF_SSEMATH})
 
 if(NOT EMSCRIPTEN
    AND NOT VITA
-   AND NOT 3DS)
+   AND NOT NINTENDO_3DS
+   AND NOT NINTENDO_WII
+   AND NOT NINTENDO_WIIU)
     option(SDL_MIXER_X_STATIC   "Build static library of SDL Mixer X" ON)
     option(SDL_MIXER_X_SHARED   "Build shared library of SDL Mixer X" ON)
 else()
