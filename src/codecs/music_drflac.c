@@ -419,6 +419,8 @@ Mix_MusicInterface Mix_MusicInterface_DRFLAC =
     DRFLAC_LoopEnd,
     DRFLAC_LoopLength,
     DRFLAC_GetMetaTag,
+    NULL,   /* GetNumTracks */
+    NULL,   /* StartTrack */
     NULL,   /* Pause */
     NULL,   /* Resume */
     DRFLAC_Stop,

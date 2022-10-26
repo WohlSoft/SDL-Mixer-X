@@ -174,6 +174,12 @@ typedef struct
     /* Get a meta-tag string if available */
     const char* (*GetMetaTag)(void *music, Mix_MusicMetaTag tag_type);
 
+    /* Get number of tracks. Returns -1 if not applicable */
+    int (*GetNumTracks)(void *music);
+
+    /* Start a specific track */
+    int (*StartTrack)(void *music, int track);
+
     /* Pause playing music */
     void (*Pause)(void *music);
 

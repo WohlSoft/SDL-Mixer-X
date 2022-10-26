@@ -634,6 +634,8 @@ Mix_MusicInterface Mix_MusicInterface_EDMIDI =
     EDMIDI_LoopEnd,   /* LoopEnd [MIXER-X]*/
     EDMIDI_LoopLength,   /* LoopLength [MIXER-X]*/
     EDMIDI_GetMetaTag,   /* GetMetaTag [MIXER-X]*/
+    NULL,   /* GetNumTracks */
+    NULL,   /* StartTrack */
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */
@@ -677,6 +679,8 @@ Mix_MusicInterface Mix_MusicInterface_EDXMI =
     EDMIDI_LoopEnd,   /* LoopEnd [MIXER-X]*/
     EDMIDI_LoopLength,   /* LoopLength [MIXER-X]*/
     EDMIDI_GetMetaTag,   /* GetMetaTag [MIXER-X]*/
+    NULL,   /* GetNumTracks */
+    NULL,   /* StartTrack */
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */

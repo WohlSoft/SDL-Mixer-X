@@ -1264,6 +1264,8 @@ Mix_MusicInterface Mix_MusicInterface_WAV =
     NULL,   /* LoopEnd */
     NULL,   /* LoopLength */
     WAV_GetMetaTag,   /* GetMetaTag */
+    NULL,   /* GetNumTracks */
+    NULL,   /* StartTrack */
     NULL,   /* Pause */
     NULL,   /* Resume */
     WAV_Stop, /* Stop */

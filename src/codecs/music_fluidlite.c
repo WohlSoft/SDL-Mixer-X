@@ -874,6 +874,8 @@ Mix_MusicInterface Mix_MusicInterface_FLUIDSYNTH =
     FLUIDSYNTH_LoopEnd,
     FLUIDSYNTH_LoopLength,
     FLUIDSYNTH_GetMetaTag,
+    NULL,   /* GetNumTracks */
+    NULL,   /* StartTrack */
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */
@@ -918,6 +920,8 @@ Mix_MusicInterface Mix_MusicInterface_FLUIDXMI =
     FLUIDSYNTH_LoopEnd,
     FLUIDSYNTH_LoopLength,
     FLUIDSYNTH_GetMetaTag,
+    NULL,   /* GetNumTracks */
+    NULL,   /* StartTrack */
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */

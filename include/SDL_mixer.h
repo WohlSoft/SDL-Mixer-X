@@ -3234,6 +3234,10 @@ extern DECLSPEC int MIXCALL Mix_ModMusicJumpToOrder(int order);
  */
 extern DECLSPEC int MIXCALL Mix_ModMusicStreamJumpToOrder(Mix_Music *music, int order);/*MixerX*/
 
+/* Tracks */
+extern DECLSPEC int SDLCALL Mix_StartTrack(Mix_Music *music, int track);
+extern DECLSPEC int SDLCALL Mix_GetNumTracks(Mix_Music *music);
+
 /**
  * Set the current position in the music object (if playing), in seconds.
  *

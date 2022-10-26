@@ -3066,6 +3066,38 @@ int MIXCALLCC Mix_PausedMusic(void)
     return (music_active == SDL_FALSE);
 }
 
+int Mix_StartTrack(Mix_Music *music, int track)
+{
+    int result;
+
+    Mix_LockAudio();
+    if (music && music->interface->StartTrack) {
+        if (music->interface->Pause) {
+            music->interface->Pause(music->context);
+        }
+        result = music->interface->StartTrack(music->context, track);
+    } else {
+        result = Mix_SetError("That operation is not supported");
+    }
+    Mix_UnlockAudio();
+
+    return result;
+}
+
+int Mix_GetNumTracks(Mix_Music *music)
+{
+    int result;
+
+    Mix_LockAudio();
+    if (music && music->interface->GetNumTracks) {
+        result = music->interface->GetNumTracks(music->context);
+    } else {
+        result = Mix_SetError("That operation is not supported");
+    }
+    Mix_UnlockAudio();
+    return result;
+}
+
 /* Check the status of the music */
 static SDL_bool music_internal_playing(Mix_Music *music)
 {

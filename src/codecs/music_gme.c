@@ -611,6 +611,8 @@ Mix_MusicInterface Mix_MusicInterface_GME =
     NULL,   /* LoopEnd [MIXER-X]*/
     NULL,   /* LoopLength [MIXER-X]*/
     GME_GetMetaTag,/* GetMetaTag [MIXER-X]*/
+    NULL,   /* GetNumTracks */
+    NULL,   /* StartTrack */
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */

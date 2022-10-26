@@ -728,6 +728,8 @@ Mix_MusicInterface Mix_MusicInterface_NATIVEXMI =
     NATIVEMIDI_LoopEnd,   /* LoopEnd [MIXER-X]*/
     NATIVEMIDI_LoopLength,   /* LoopLength [MIXER-X]*/
     NATIVEMIDI_GetMetaTag,   /* GetMetaTag [MIXER-X]*/
+    NULL,   /* GetNumTracks */
+    NULL,   /* StartTrack */
     NATIVEMIDI_Pause,
     NATIVEMIDI_Resume,
     NATIVEMIDI_Stop,

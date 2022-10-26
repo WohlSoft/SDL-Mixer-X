@@ -996,6 +996,8 @@ Mix_MusicInterface Mix_MusicInterface_FFMPEG =
     NULL,   /* LoopEnd [MIXER-X]*/
     NULL,   /* LoopLength [MIXER-X]*/
     FFMPEG_GetMetaTag,
+    NULL,   /* GetNumTracks */
+    NULL,   /* StartTrack */
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */

@@ -488,6 +488,8 @@ Mix_MusicInterface Mix_MusicInterface_XMP =
     NULL,   /* LoopEnd */
     NULL,   /* LoopLength */
     XMP_GetMetaTag,
+    NULL,   /* GetNumTracks */
+    NULL,   /* StartTrack */
     NULL,   /* Pause */
     NULL,   /* Resume */
     XMP_Stop,
