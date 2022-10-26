@@ -387,6 +387,12 @@ private:
     //! Set the number of loops limit. Lesser than 0 - loop infinite
     int     m_loopCount;
 
+    //! The number of track of multi-track file (for exmaple, XMI) to load
+    int     m_loadTrackNumber;
+
+    //! The XMI-specific list of raw songs, converted into SMF format
+    std::vector<std::vector<uint8_t > > m_rawSongsData;
+
     /**
      * @brief Loop stack entry
      */
@@ -610,6 +616,18 @@ public:
      * @param track Identifier of solo track, or max to disable
      */
     void setSoloTrack(size_t track);
+
+    /**
+     * @brief Set the song number of a multi-song file (such as XMI)
+     * @param trackNumber Identifier of the song to load (or -1 to mix all songs as one song)
+     */
+    void setSongNum(int track);
+
+    /**
+     * @brief Retrive the number of songs in a currently opened file
+     * @return Number of songs in the file. If 1 or less, means, the file has only one song inside.
+     */
+    int getSongsCount();
 
     /**
      * @brief Defines a handler for callback trigger events
