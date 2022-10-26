@@ -43,6 +43,8 @@ typedef struct {
     int (*edmidi_setTrackEnabled)(struct EDMIDIPlayer *device, size_t trackNumber, int enabled);
     int (*edmidi_setChannelEnabled)(struct EDMIDIPlayer *device, size_t channelNumber, int enabled);
     int (*edmidi_openData)(struct EDMIDIPlayer *device, const void *mem, unsigned long size);
+    void (*edmidi_selectSongNum)(struct EDMIDIPlayer *device, int songNumber);
+    int (*edmidi_getSongsCount)(struct EDMIDIPlayer *device);
     const char *(*edmidi_metaMusicTitle)(struct EDMIDIPlayer *device);
     const char *(*edmidi_metaMusicCopyright)(struct EDMIDIPlayer *device);
     void (*edmidi_positionRewind)(struct EDMIDIPlayer *device);
@@ -88,6 +90,8 @@ static int EDMIDI_Load(void)
         FUNCTION_LOADER(edmidi_setTrackEnabled, int(*)(struct EDMIDIPlayer *, size_t, int))
         FUNCTION_LOADER(edmidi_setChannelEnabled, int(*)(struct EDMIDIPlayer *, size_t, int))
         FUNCTION_LOADER(edmidi_openData, int(*)(struct EDMIDIPlayer *, const void *, unsigned long))
+        FUNCTION_LOADER(edmidi_selectSongNum, void(*)(struct EDMIDIPlayer *, int))
+        FUNCTION_LOADER(edmidi_getSongsCount, int(*)(struct EDMIDIPlayer *))
         FUNCTION_LOADER(edmidi_metaMusicTitle, const char*(*)(struct EDMIDIPlayer*))
         FUNCTION_LOADER(edmidi_metaMusicCopyright, const char*(*)(struct EDMIDIPlayer*))
         FUNCTION_LOADER(edmidi_positionRewind, void (*)(struct EDMIDIPlayer*))
@@ -525,6 +529,26 @@ static double EDMIDI_Duration(void *music_p)
     return -1;
 }
 
+static int EDMIDI_StartTrack(void *music_p, int track)
+{
+    EDMIDI_Music *music = (EDMIDI_Music *)music_p;
+    if (music && EDMIDI.edmidi_selectSongNum) {
+        EDMIDI.edmidi_selectSongNum(music->edmidi, track);
+        return 0;
+    }
+    return -1;
+}
+
+static int EDMIDI_GetNumTracks(void *music_p)
+{
+    EDMIDI_Music *music = (EDMIDI_Music *)music_p;
+    if (EDMIDI.edmidi_getSongsCount) {
+        return EDMIDI.edmidi_getSongsCount(music->edmidi);
+    } else {
+        return -1;
+    }
+}
+
 static int EDMIDI_SetTempo(void *music_p, double tempo)
 {
     EDMIDI_Music *music = (EDMIDI_Music *)music_p;
@@ -634,8 +658,8 @@ Mix_MusicInterface Mix_MusicInterface_EDMIDI =
     EDMIDI_LoopEnd,   /* LoopEnd [MIXER-X]*/
     EDMIDI_LoopLength,   /* LoopLength [MIXER-X]*/
     EDMIDI_GetMetaTag,   /* GetMetaTag [MIXER-X]*/
-    NULL,   /* GetNumTracks */
-    NULL,   /* StartTrack */
+    EDMIDI_GetNumTracks,
+    EDMIDI_StartTrack,
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */
@@ -679,8 +703,8 @@ Mix_MusicInterface Mix_MusicInterface_EDXMI =
     EDMIDI_LoopEnd,   /* LoopEnd [MIXER-X]*/
     EDMIDI_LoopLength,   /* LoopLength [MIXER-X]*/
     EDMIDI_GetMetaTag,   /* GetMetaTag [MIXER-X]*/
-    NULL,   /* GetNumTracks */
-    NULL,   /* StartTrack */
+    EDMIDI_GetNumTracks,
+    EDMIDI_StartTrack,
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */

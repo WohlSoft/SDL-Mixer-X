@@ -569,6 +569,25 @@ static double NATIVEMIDI_Duration(void *context)
     return -1;
 }
 
+static int NATIVEMIDI_StartTrack(void *music_p, int track)
+{
+    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)music_p;
+    SDL_LockMutex(music->lock);
+    midi_switch_song_number(music->song, track);
+    SDL_UnlockMutex(music->lock);
+    return -1;
+}
+
+static int NATIVEMIDI_GetNumTracks(void *music_p)
+{
+    int ret;
+    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)music_p;
+    SDL_LockMutex(music->lock);
+    ret = midi_get_songs_count(music->song);
+    SDL_UnlockMutex(music->lock);
+    return ret;
+}
+
 static int NATIVEMIDI_SetTempo(void *context, double tempo)
 {
     NativeMidiSong *music = (NativeMidiSong *)context;
@@ -684,6 +703,8 @@ Mix_MusicInterface Mix_MusicInterface_NATIVEMIDI =
     NATIVEMIDI_LoopEnd,   /* LoopEnd [MIXER-X]*/
     NATIVEMIDI_LoopLength,   /* LoopLength [MIXER-X]*/
     NATIVEMIDI_GetMetaTag,   /* GetMetaTag [MIXER-X]*/
+    NATIVEMIDI_GetNumTracks,
+    NATIVEMIDI_StartTrack,
     NATIVEMIDI_Pause,
     NATIVEMIDI_Resume,
     NATIVEMIDI_Stop,
@@ -728,8 +749,8 @@ Mix_MusicInterface Mix_MusicInterface_NATIVEXMI =
     NATIVEMIDI_LoopEnd,   /* LoopEnd [MIXER-X]*/
     NATIVEMIDI_LoopLength,   /* LoopLength [MIXER-X]*/
     NATIVEMIDI_GetMetaTag,   /* GetMetaTag [MIXER-X]*/
-    NULL,   /* GetNumTracks */
-    NULL,   /* StartTrack */
+    NATIVEMIDI_GetNumTracks,
+    NATIVEMIDI_StartTrack,
     NATIVEMIDI_Pause,
     NATIVEMIDI_Resume,
     NATIVEMIDI_Stop,

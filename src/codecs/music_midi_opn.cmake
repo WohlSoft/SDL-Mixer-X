@@ -26,6 +26,22 @@ if(USE_MIDI_OPNMIDI AND MIXERX_GPL)
                 OUTPUT_VARIABLE OPNMIDI_HAS_CHANNEL_ALLOC_MODE_RESULT
             )
             message("OPNMIDI_HAS_CHANNEL_ALLOC_MODE compile test result: ${OPNMIDI_HAS_CHANNEL_ALLOC_MODE}")
+
+            try_compile(OPNMIDI_HAS_GET_SONGS_COUNT
+                ${CMAKE_BINARY_DIR}/compile_tests
+                ${SDLMixerX_SOURCE_DIR}/cmake/tests/opnmidi_get_songs_count.c
+                LINK_LIBRARIES ${OPNMIDI_LIBRARIES} ${STDCPP_LIBRARY} ${M_LIBRARY}
+                CMAKE_FLAGS "-DINCLUDE_DIRECTORIES=${OPNMIDI_INCLUDE_DIRS}"
+                OUTPUT_VARIABLE OPNMIDI_HAS_GET_SONGS_COUNT_RESULT
+            )
+
+            try_compile(OPNMIDI_HAS_SELECT_SONG_NUM
+                ${CMAKE_BINARY_DIR}/compile_tests
+                ${SDLMixerX_SOURCE_DIR}/cmake/tests/opnmidi_get_songs_count.c
+                LINK_LIBRARIES ${OPNMIDI_LIBRARIES} ${STDCPP_LIBRARY} ${M_LIBRARY}
+                CMAKE_FLAGS "-DINCLUDE_DIRECTORIES=${OPNMIDI_INCLUDE_DIRS}"
+                OUTPUT_VARIABLE OPNMIDI_HAS_SELECT_SONG_NUM_RESULT
+            )
         endif()
 
     else()
@@ -37,6 +53,8 @@ if(USE_MIDI_OPNMIDI AND MIXERX_GPL)
         if(OPNMIDI_LIBRARIES)
             set(OPNMIDI_FOUND 1)
             set(OPNMIDI_HAS_CHANNEL_ALLOC_MODE TRUE)
+            set(OPNMIDI_HAS_GET_SONGS_COUNT TRUE)
+            set(OPNMIDI_HAS_SELECT_SONG_NUM TRUE)
             set(STDCPP_NEEDED 1) # Statically linking OPNMIDI which is C++ library
         endif()
         set(OPNMIDI_INCLUDE_DIRS "${AUDIO_CODECS_PATH}/libOPNMIDI/include")
@@ -53,6 +71,12 @@ if(USE_MIDI_OPNMIDI AND MIXERX_GPL)
         endif()
         if(OPNMIDI_HAS_CHANNEL_ALLOC_MODE)
             list(APPEND SDL_MIXER_DEFINITIONS -DOPNMIDI_HAS_CHANNEL_ALLOC_MODE)
+        endif()
+        if(OPNMIDI_HAS_GET_SONGS_COUNT)
+            list(APPEND SDL_MIXER_DEFINITIONS -DOPNMIDI_HAS_GET_SONGS_COUNT)
+        endif()
+        if(OPNMIDI_HAS_SELECT_SONG_NUM)
+            list(APPEND SDL_MIXER_DEFINITIONS -DOPNMIDI_HAS_SELECT_SONG_NUM)
         endif()
         list(APPEND SDLMixerX_SOURCES
             ${CMAKE_CURRENT_LIST_DIR}/music_midi_opn.c

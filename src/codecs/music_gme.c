@@ -536,6 +536,36 @@ static double GME_Duration(void *music_p)
     }
 }
 
+static int GME_StartTrack(void *music_p, int track)
+{
+    GME_Music *music = (GME_Music *)music_p;
+    const char *err;
+
+    if ((track < 0) || (track >= gme.gme_track_count(music->game_emu))) {
+        track = gme.gme_track_count(music->game_emu) - 1;
+    }
+
+    err = gme.gme_start_track(music->game_emu, track);
+    if (err != 0) {
+        Mix_SetError("GME: %s", err);
+        return -1;
+    }
+
+    GME_Play(music, music->play_count);
+
+    if (initialize_from_track_info(music, track) == -1) {
+        return -1;
+    }
+
+    return 0;
+}
+
+static int GME_GetNumTracks(void *music_p)
+{
+    GME_Music *music = (GME_Music *)music_p;
+    return gme.gme_track_count(music->game_emu);
+}
+
 static int GME_SetTempo(void *music_p, double tempo)
 {
     GME_Music *music = (GME_Music *)music_p;
@@ -611,8 +641,8 @@ Mix_MusicInterface Mix_MusicInterface_GME =
     NULL,   /* LoopEnd [MIXER-X]*/
     NULL,   /* LoopLength [MIXER-X]*/
     GME_GetMetaTag,/* GetMetaTag [MIXER-X]*/
-    NULL,   /* GetNumTracks */
-    NULL,   /* StartTrack */
+    GME_GetNumTracks,
+    GME_StartTrack,
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */

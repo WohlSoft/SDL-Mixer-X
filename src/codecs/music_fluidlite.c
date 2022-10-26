@@ -688,6 +688,19 @@ static double FLUIDSYNTH_Duration(void *context)
     return midi_seq_length(music->player);
 }
 
+static int FLUIDSYNTH_StartTrack(void *music_p, int track)
+{
+    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)music_p;
+    midi_switch_song_number(music->player, track);
+    return -1;
+}
+
+static int FLUIDSYNTH_GetNumTracks(void *music_p)
+{
+    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)music_p;
+    return midi_get_songs_count(music->player);
+}
+
 static int FLUIDSYNTH_SetTempo(void *context, double tempo)
 {
     FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
@@ -874,8 +887,8 @@ Mix_MusicInterface Mix_MusicInterface_FLUIDSYNTH =
     FLUIDSYNTH_LoopEnd,
     FLUIDSYNTH_LoopLength,
     FLUIDSYNTH_GetMetaTag,
-    NULL,   /* GetNumTracks */
-    NULL,   /* StartTrack */
+    FLUIDSYNTH_GetNumTracks,
+    FLUIDSYNTH_StartTrack,
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */
@@ -920,8 +933,8 @@ Mix_MusicInterface Mix_MusicInterface_FLUIDXMI =
     FLUIDSYNTH_LoopEnd,
     FLUIDSYNTH_LoopLength,
     FLUIDSYNTH_GetMetaTag,
-    NULL,   /* GetNumTracks */
-    NULL,   /* StartTrack */
+    FLUIDSYNTH_GetNumTracks,
+    FLUIDSYNTH_StartTrack,
     NULL,   /* Pause */
     NULL,   /* Resume */
     NULL,   /* Stop */

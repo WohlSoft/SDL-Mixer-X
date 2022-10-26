@@ -61,6 +61,9 @@ extern int midi_get_tracks_number(void *seq);
 extern int midi_set_track_enabled(void *seq, int track, int enabled);
 extern int midi_set_channel_enabled(void *seq, int channel, int enabled);
 
+extern int midi_get_songs_count(void *seq);
+extern void midi_switch_song_number(void *seq, int song);
+
 #ifdef __cplusplus
 }
 #endif

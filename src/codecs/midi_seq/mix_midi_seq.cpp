@@ -205,3 +205,15 @@ int midi_set_channel_enabled(void *seq, int channel, int enabled)
     MixerSeqInternal *seqi = reinterpret_cast<MixerSeqInternal*>(seq);
     return (int)seqi->seq.setChannelEnabled(channel, enabled);
 }
+
+int midi_get_songs_count(void *seq)
+{
+    MixerSeqInternal *seqi = reinterpret_cast<MixerSeqInternal*>(seq);
+    return (int)seqi->seq.getSongsCount();
+}
+
+void midi_switch_song_number(void *seq, int song)
+{
+    MixerSeqInternal *seqi = reinterpret_cast<MixerSeqInternal*>(seq);
+    seqi->seq.setSongNum(song);
+}
