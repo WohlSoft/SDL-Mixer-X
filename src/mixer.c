@@ -1166,7 +1166,7 @@ int MIXCALLCC Mix_PlayChannelTimedVolume(int which, Mix_Chunk *chunk, int loops,
     return(which);
 }
 
-int Mix_PlayChannel(int channel, Mix_Chunk *chunk, int loops)
+int MIXCALLCC Mix_PlayChannel(int channel, Mix_Chunk *chunk, int loops)
 {
     return Mix_PlayChannelTimedVolume(channel, chunk, loops, -1, -1);
 }
@@ -1267,7 +1267,7 @@ int MIXCALLCC Mix_FadeInChannelVolume(int which, Mix_Chunk *chunk, int loops, in
     return Mix_FadeInChannelTimedVolume(which, chunk, loops, ms, -1, volume);
 }
 
-int Mix_FadeInChannel(int channel, Mix_Chunk *chunk, int loops, int ms)
+int MIXCALLCC Mix_FadeInChannel(int channel, Mix_Chunk *chunk, int loops, int ms)
 {
     return Mix_FadeInChannelTimedVolume(channel, chunk, loops, ms, -1, -1);
 }
