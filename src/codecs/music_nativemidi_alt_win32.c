@@ -310,8 +310,8 @@ static int NativeMidiThread(void *context)
         SDL_UnlockMutex(music->lock);
         end = SDL_GetTicks();
 
-        if (t > 0.01) {
-            t = 0.01;
+        if (t < 0.0001) {
+            t = 0.0001;
         }
 
         w = (double)(end - start) / 1000;
@@ -576,6 +576,7 @@ static int NATIVEMIDI_StartTrack(void *context, int track)
         SDL_LockMutex(music->lock);
         midi_switch_song_number(music->song, track);
         SDL_UnlockMutex(music->lock);
+        NATIVEMIDI_Resume(context);
         return 0;
     }
     return -1;
