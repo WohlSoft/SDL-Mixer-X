@@ -48,6 +48,7 @@ typedef struct _NativeMidiSong
     double tempo;
     int loops;
     int volume;
+    Uint32 doResetControls;
 
     BW_MidiRtInterface seq_if;
     HMIDIOUT out;
@@ -93,11 +94,19 @@ static void all_notes_off(NativeMidiSong *seq)
             msg |= (0 << 16) & 0xFF0000;
             msg |= (note << 8) & 0x00FF00;
             msg |= makeEvt(0x09, channel);
-            midiOutShortMsg(seq->out, msg);
+            while(midiOutShortMsg(seq->out, msg) == MIDIERR_NOTREADY) {
+                SDL_Delay(1);
+            }
         }
     }
 }
 
+static void reset_midi_device(NativeMidiSong *seq)
+{
+    while(midiOutReset(seq->out) == MIDIERR_NOTREADY){
+        SDL_Delay(1);
+    }
+}
 
 
 /****************************************************
@@ -156,7 +165,9 @@ static void rtControllerChange(void *userdata, uint8_t channel, uint8_t type, ui
     msg |= (value << 16) & 0xFF0000;
     msg |= (type << 8) & 0x00FF00;
     msg |= makeEvt(0x0B, channel);
-    midiOutShortMsg(seqi->out, msg);
+    while(midiOutShortMsg(seqi->out, msg) == MIDIERR_NOTREADY) {
+        SDL_Delay(1);
+    }
 }
 
 static void rtPatchChange(void *userdata, uint8_t channel, uint8_t patch)
@@ -275,12 +286,25 @@ int native_midi_detect(void)
     return 1;
 }
 
+static Uint64 GetTicksUS()
+{
+    FILETIME ft;
+    GetSystemTimeAsFileTime(&ft);
+    Uint64 tt = ft.dwHighDateTime;
+    tt <<=32;
+    tt |= ft.dwLowDateTime;
+    tt /=10;
+    tt -= 11644473600000000ULL;
+    return tt;
+}
+
 static int NativeMidiThread(void *context)
 {
     NativeMidiSong *music = (NativeMidiSong *)context;
     LARGE_INTEGER liDueTime;
-    int start, end;
-    double t = 0.0001, w, wait = -1.0;
+    Uint64 start, end;
+    Uint8 i;
+    double t = 0.000001, w, wait = -1.0;
 
     liDueTime.QuadPart = -10000000LL;
 
@@ -300,21 +324,34 @@ static int NativeMidiThread(void *context)
     SDL_AtomicSet(&music->running, 1);
 
     while (SDL_AtomicGet(&music->running)) {
-        start = SDL_GetTicks();
+        start = GetTicksUS();
+
         SDL_LockMutex(music->lock);
+        if(music->doResetControls) /* Workaround for some synths to don't miss notes */
+        {
+            SDL_Delay(100);
+            for (i = 0; i < 16; ++i) { /* Reset pedal controllers */
+                rtControllerChange(music->song, i, 121, 0);
+                rtControllerChange(music->song, i, 64, 0);
+                rtControllerChange(music->song, i, 66, 0);
+            }
+            start = GetTicksUS();
+            music->doResetControls = 0;
+            t = 0.000001;
+        }
         if (midi_seq_at_end(music->song)) {
             SDL_UnlockMutex(music->lock);
             break;
         }
         t = midi_seq_tick(music->song, t, 0.0001);
         SDL_UnlockMutex(music->lock);
-        end = SDL_GetTicks();
+        end = GetTicksUS();
 
-        if (t < 0.0001) {
-            t = 0.0001;
+        if (t < 0.000001) {
+            t = 0.000001;
         }
 
-        w = (double)(end - start) / 1000;
+        w = (double)(end - start) / 1000000;
         wait = t - w;
 
         if (wait > 0.0) {
@@ -575,8 +612,10 @@ static int NATIVEMIDI_StartTrack(void *context, int track)
     if (music) {
         SDL_LockMutex(music->lock);
         midi_switch_song_number(music->song, track);
-        SDL_UnlockMutex(music->lock);
+        reset_midi_device(music->song);
+        music->doResetControls = 1;
         NATIVEMIDI_Resume(context);
+        SDL_UnlockMutex(music->lock);
         return 0;
     }
     return -1;
