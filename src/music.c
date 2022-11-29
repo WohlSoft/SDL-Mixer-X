@@ -1340,11 +1340,16 @@ static int detect_ea_rsxx(SDL_RWops *in, Sint64 start, Uint8 magic_byte)
 {
     int res = SDL_FALSE;
     Uint8 sub_magic[6];
+    size_t file_size;
 
-    if (magic_byte != 0x7D)
+    SDL_RWseek(in, 0, RW_SEEK_END);
+    file_size = (size_t)SDL_RWtell(in);
+    SDL_RWseek(in, start, RW_SEEK_SET);
+
+    if (magic_byte < 0x5D || file_size <= magic_byte)
         return res;
 
-    SDL_RWseek(in, start + 0x6D, RW_SEEK_SET);
+    SDL_RWseek(in, start + (magic_byte - 0x10), RW_SEEK_SET);
 
     if (SDL_RWread(in, &sub_magic, 1, 6) != 6) {
         SDL_RWseek(in, start, RW_SEEK_SET);
@@ -1603,7 +1608,11 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
     }
     /* Detect EA MUS (RSXX) format */
     if (detect_ea_rsxx(src, start, magic[0])) {
-        return MUS_ADLMIDI;
+        if (midiplayer_current != MIDI_Timidity) {
+            return MUS_MID;
+        } else {
+            return MUS_ADLMIDI;
+        }
     }
 #endif
 
