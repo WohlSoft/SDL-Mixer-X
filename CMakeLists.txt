@@ -539,8 +539,10 @@ install(TARGETS ${SDLMixerX_INSTALLS}
 )
 
 if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
-    install(DIRECTORY ${AUDIO_CODECS_INSTALL_DIR}/bin
-            DESTINATION .)
+    if(EXISTS ${AUDIO_CODECS_INSTALL_DIR}/bin)
+        install(DIRECTORY ${AUDIO_CODECS_INSTALL_DIR}/bin
+                DESTINATION .)
+    endif()
     install(DIRECTORY ${AUDIO_CODECS_INSTALL_DIR}/lib
             DESTINATION .)
     install(DIRECTORY ${AUDIO_CODECS_INSTALL_DIR}/include
