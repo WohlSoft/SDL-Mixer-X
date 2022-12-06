@@ -22,6 +22,7 @@ AssocFiles::AssocFiles(QWidget *parent) :
     formats << tentry("voc",  "VOC - Creative Labs Audio File");
     formats << tentry("mp3",  "MP3 - MPEG-1/2/2.5 Layer 3, Lossy data compressed audio");
     formats << tentry("ogg",  "OGG - OGG Vorbis, Lossy data compressed audio");
+    formats << tentry("opus",  "OPUS - OGG Opus, Lossy data compressed audio");
     formats << tentry("flac", "FLAC - Free Lossless Audio Codec, Loss-less compressed");
     formats << tentry("mid",  "mid - Music Instrument Digital Interface, commands list");
     formats << tentry("midi", "midi - Music Instrument Digital Interface, commands list");
