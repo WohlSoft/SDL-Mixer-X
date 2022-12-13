@@ -200,23 +200,28 @@ static AdlMidi_Setup adlmidi_setup = {
     1.0, 2.0
 };
 
-static void ADLMIDI_SetDefault(AdlMidi_Setup *setup)
+static void ADLMIDI_SetDefaultMin(AdlMidi_Setup *setup)
 {
-    setup->bank        = 58;
     setup->tremolo     = -1;
     setup->vibrato     = -1;
     setup->scalemod    = -1;
     setup->volume_model = ADLMIDI_VolumeModel_AUTO;
     setup->alloc_mode = ADLMIDI_ChanAlloc_AUTO;
-    setup->chips_count = -1;
     setup->four_op_channels = -1;
     setup->full_brightness_range = 0;
     setup->auto_arpeggio = 0;
     setup->soft_pan = 1;
-    setup->emulator = -1;
-    setup->custom_bank_path[0] = '\0';
     setup->tempo = 1.0;
     setup->gain = 2.0;
+}
+
+static void ADLMIDI_SetDefault(AdlMidi_Setup *setup)
+{
+    ADLMIDI_SetDefaultMin(setup);
+    setup->bank        = 58;
+    setup->custom_bank_path[0] = '\0';
+    setup->chips_count = -1;
+    setup->emulator = -1;
 }
 
 int _Mix_ADLMIDI_getTotalBanks(void)
@@ -421,7 +426,7 @@ static void process_args(const char *args, AdlMidi_Setup *setup)
     }
 
     maxlen += 1;
-    ADLMIDI_SetDefault(setup);
+    ADLMIDI_SetDefaultMin(setup);
 
     for (i = 0; i < maxlen; i++) {
         char c = args[i];

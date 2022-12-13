@@ -180,18 +180,23 @@ static OpnMidi_Setup opnmidi_setup = {
     -1, 0, 1, 1, -1, "", 1.0, 2.0
 };
 
-static void OPNMIDI_SetDefault(OpnMidi_Setup *setup)
+static void OPNMIDI_SetDefaultMin(OpnMidi_Setup *setup)
 {
     setup->volume_model = OPNMIDI_VolumeModel_AUTO;
     setup->alloc_mode = OPNMIDI_ChanAlloc_AUTO;
-    setup->chips_count = -1;
     setup->full_brightness_range = 0;
     setup->auto_arpeggio = 1;
     setup->soft_pan = 1;
-    setup->emulator = -1;
-    setup->custom_bank_path[0] = '\0';
     setup->tempo = 1.0;
     setup->gain = 2.0;
+}
+
+static void OPNMIDI_SetDefault(OpnMidi_Setup *setup)
+{
+    OPNMIDI_SetDefaultMin(setup);
+    setup->chips_count = -1;
+    setup->emulator = -1;
+    setup->custom_bank_path[0] = '\0';
 }
 
 int _Mix_OPNMIDI_getVolumeModel(void)
@@ -334,7 +339,7 @@ static void process_args(const char *args, OpnMidi_Setup *setup)
     }
 
     maxlen += 1;
-    OPNMIDI_SetDefault(setup);
+    OPNMIDI_SetDefaultMin(setup);
 
     for (i = 0; i < maxlen; i++) {
         char c = args[i];
