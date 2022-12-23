@@ -229,7 +229,6 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusic(void *data)
 
     ret = fluidsynth.fluid_player_add_mem(music->player, rw_mem, rw_size);
     SDL_free(rw_mem);
-
     if (ret != FLUID_OK) {
         Mix_SetError("FluidSynth failed to load in-memory song");
         goto fail;
@@ -241,7 +240,6 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusic(void *data)
     }
 
     return music;
-
 fail:
     FLUIDSYNTH_Delete(music);
     return NULL;

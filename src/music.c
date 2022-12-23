@@ -39,8 +39,9 @@
 #include "music_mpg123.h"
 #include "music_drflac.h"
 #include "music_flac.h"
-#include "native_midi/native_midi.h"
+#include "music_wavpack.h"
 #include "music_gme.h"
+#include "native_midi/native_midi.h"
 #include "music_midi_adl.h"
 #include "music_midi_opn.h"
 #include "music_midi_edmidi.h"
@@ -579,14 +580,14 @@ static Mix_MusicInterface *s_music_interfaces[] =
 #ifdef MUSIC_FLAC_LIBFLAC
     &Mix_MusicInterface_FLAC,
 #endif
+#ifdef MUSIC_WAVPACK
+    &Mix_MusicInterface_WAVPACK,
+#endif
 #ifdef MUSIC_OGG
     &Mix_MusicInterface_OGG,
 #endif
 #ifdef MUSIC_OPUS
     &Mix_MusicInterface_Opus,
-#endif
-#ifdef MUSIC_GME
-    &Mix_MusicInterface_GME,
 #endif
 #ifdef MUSIC_MID_ADLMIDI
     &Mix_MusicInterface_ADLMIDI,
@@ -628,6 +629,9 @@ static Mix_MusicInterface *s_music_interfaces[] =
 #endif
 #ifdef MUSIC_MID_NATIVE_ALT
     &Mix_MusicInterface_NATIVEXMI,
+#endif
+#ifdef MUSIC_GME
+    &Mix_MusicInterface_GME,
 #endif
 };
 
@@ -1176,6 +1180,10 @@ SDL_bool open_music_type_ex(Mix_MusicType type, int midi_player)
         add_music_decoder("FLAC");
         add_chunk_decoder("FLAC");
     }
+    if (has_music(MUS_WAVPACK)) {
+        add_music_decoder("WAVPACK");
+        add_chunk_decoder("WAVPACK");
+    }
 
     return (opened > 0) ? SDL_TRUE : SDL_FALSE;
 }
@@ -1475,6 +1483,11 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
     /* FLAC files have the magic four bytes "fLaC" */
     if (SDL_memcmp(magic, "fLaC", 4) == 0) {
         return MUS_FLAC;
+    }
+
+    /* WavPack files have the magic four bytes "wvpk" */
+    if (SDL_memcmp(magic, "wvpk", 4) == 0) {
+        return MUS_WAVPACK;
     }
 
     /* MIDI files have the magic four bytes "MThd" */

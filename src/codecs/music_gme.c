@@ -1,6 +1,6 @@
 /*
   SDL_mixer:  An audio mixer library based on the SDL library
-  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -94,7 +94,10 @@ static int GME_Load(void)
         FUNCTION_LOADER(gme_delete, void (*)(Music_Emu*))
 #if defined(GME_DYNAMIC)
         gme.gme_set_autoload_playback_limit = (void (*)(Music_Emu*,int)) SDL_LoadFunction(gme.handle, "gme_set_autoload_playback_limit");
-#elif defined(GME_HAS_SET_AUTOLOAD_PLAYBACK_LIMIT)
+        if (!gme.gme_set_autoload_playback_limit) {
+            SDL_ClearError();   /* gme_set_autoload_playback_limit is optional. */
+        }
+#elif (GME_VERSION >= 0x000603)
         gme.gme_set_autoload_playback_limit = gme_set_autoload_playback_limit;
 #else
         gme.gme_set_autoload_playback_limit = NULL;

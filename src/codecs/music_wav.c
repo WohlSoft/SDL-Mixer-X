@@ -931,8 +931,7 @@ static SDL_bool LoadWAVMusic(WAV_Music *wave)
         if (chunk_length == 0)
             break;
 
-        switch (chunk_type)
-        {
+        switch (chunk_type) {
         case FMT:
             found_FMT = SDL_TRUE;
             if (!ParseFMT(wave, chunk_length))
@@ -1134,7 +1133,6 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
         Mix_SetError("Bad AIFF-C file (no FVER chunk)");
         return SDL_FALSE;
     }
-
 
     wave->samplesize = channels * (samplesize / 8);
     wave->stop = wave->start + channels * numsamples * (samplesize / 8);
