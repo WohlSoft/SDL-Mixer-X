@@ -104,7 +104,7 @@
 #define stb_vorbis_get_samples_short _mix_stb_vorbis_get_samples_short
 /* Workaround to don't conflict with another statically-linked stb-vorbis: END */
 
-#include "stb_vorbis/stb_vorbis_c90.h"
+#include "stb_vorbis/stb_vorbis.h"
 
 typedef struct {
     SDL_RWops *src;

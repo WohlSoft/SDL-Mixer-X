@@ -108,6 +108,11 @@ if(USE_OGG_VORBIS)
             ${CMAKE_CURRENT_LIST_DIR}/music_ogg_stb.c
             ${CMAKE_CURRENT_LIST_DIR}/music_ogg.h
         )
+        if(DEFINED FLAG_C99)
+            set_source_files_properties("${CMAKE_CURRENT_LIST_DIR}/music_ogg_stb.c"
+                COMPILE_FLAGS ${FLAG_C99}
+            )
+        endif()
         appendPcmFormats("OGG Voribs")
     endif()
 
