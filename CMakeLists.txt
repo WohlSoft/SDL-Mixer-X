@@ -408,7 +408,7 @@ set(SDLMixerX_INSTALLS)
 
 if(SDL_MIXER_X_STATIC AND NOT BUILD_AS_VB6_BINDING)
     add_library(SDL2_mixer_ext_Static STATIC ${SDLMixerX_SOURCES})
-    if(WIN32)
+    if(CMAKE_STATIC_LIBRARY_PREFIX STREQUAL "" AND CMAKE_STATIC_LIBRARY_SUFFIX STREQUAL ".lib")
         set_target_properties(SDL2_mixer_ext_Static PROPERTIES OUTPUT_NAME SDL2_mixer_ext-static)
     else()
         set_target_properties(SDL2_mixer_ext_Static PROPERTIES OUTPUT_NAME SDL2_mixer_ext)
