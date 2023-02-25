@@ -1,6 +1,6 @@
 # SDL Mixer X
 
-An audio mixer library, a fork of [SDL_mixer](http://www.libsdl.org/projects/SDL_mixer/) library
+An audio mixer library, a fork of [SDL_mixer](https://github.com/libsdl-org/SDL_mixer) library
 
 # Description
 SDL_Mixer is a sample multi-channel audio mixer library.
