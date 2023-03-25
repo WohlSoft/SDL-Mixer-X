@@ -7,6 +7,8 @@ set(SDLMixerX_VERSION_PATCH 0)
 set(SDLMixerX_VERSION_TWEAK 0)
 set(SDLMixerX_VERSION      "${SDLMixerX_VERSION_MAJOR}.${SDLMixerX_VERSION_MINOR}.${SDLMixerX_VERSION_PATCH}.${SDLMixerX_VERSION_TWEAK}")
 
+set(SDL_REQUIRED_VERSION 2.0.7)
+
 # =================Library ABI version=======================
 
 # Calculate a libtool-like version number
@@ -562,6 +564,7 @@ install(FILES
 )
 
 if(NOT ANDROID)
+    set(SDL_VERSION ${SDL_REQUIRED_VERSION})
     set(prefix ${CMAKE_INSTALL_PREFIX})
     set(exec_prefix "\${prefix}")
     set(libdir "\${exec_prefix}/lib${LIB_SUFFIX}")
