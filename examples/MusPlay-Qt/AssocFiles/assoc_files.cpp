@@ -217,11 +217,11 @@ static bool xIconSize(QList<QListWidgetItem> &items, int iconSize)
     const QString home = QDir::home().absolutePath();
     if(success) success = xCopyFile(QString(":/cat_musplay/cat_musplay_%1x%1.png")
                                     .arg(iconSize),
-                                    QString("%1/.local/share/icons/PgeMusplay-%2.png")
+                                    QString("%1/.local/share/icons/MoondustMusplay-%2.png")
                                     .arg(home).arg(iconSize));
     if(success) success = xCopyFile(QString(":/file_musplay/file_musplay_%1x%1.png")
                                     .arg(iconSize),
-                                    QString("%1/.local/share/icons/pge_musplay_file-%2.png")
+                                    QString("%1/.local/share/icons/moondust_musplay_file-%2.png")
                                     .arg(home).arg(iconSize));
     for(int i = 0; i < items.size(); i++)
     {
@@ -230,11 +230,11 @@ static bool xIconSize(QList<QListWidgetItem> &items, int iconSize)
             auto &item = items[i];
             if(success) success = xInstallIconResource("mimetypes",
                                                        iconSize,
-                                                       "pge_musplay_file-%1.png",
+                                                       "moondust_musplay_file-%1.png",
                                                        QString("x-application-music-%1").arg(item.data(Qt::UserRole).toString()));
         }
     }
-    if(success) success = xInstallIconResource("apps", iconSize, "PgeMusplay-%1.png", "PgeMusplay");
+    if(success) success = xInstallIconResource("apps", iconSize, "MoondustMusplay-%1.png", "MoondustMusplay");
 
     return success;
 }
@@ -313,10 +313,12 @@ void AssocFiles::on_AssocFiles_accepted()
     {
         QTextStream shtct(&shortcut);
         QString shortcut_text = shtct.readAll();
-        QFile saveAs(home + "/.local/share/applications/pge_musplay.desktop");
+        QFile saveAs(home + "/.local/share/applications/sdlmixer_musplay.desktop");
 
         if(success) success = saveAs.open(QFile::WriteOnly | QFile::Text);
-        if(success) QTextStream(&saveAs) << shortcut_text.arg(QApplication::applicationDirPath() + "/", minesForDesktopFile);
+        if(success) QTextStream(&saveAs) << shortcut_text.arg(QApplication::applicationFilePath(),
+                                                              QApplication::applicationDirPath() + "/",
+                                                              minesForDesktopFile);
     }
 
     for(int i = 0; i < items.size(); i++)
@@ -324,7 +326,7 @@ void AssocFiles::on_AssocFiles_accepted()
         if(items[i].checkState() == Qt::Checked)
         {
             auto &item = items[i];
-            if(success) success = xRunCommand("xdg-mime", {"default", "pge_musplay.desktop", QString("application/x-pge-music-%1").arg(item.data(Qt::UserRole).toString())});
+            if(success) success = xRunCommand("xdg-mime", {"default", "sdlmixer_musplay.desktop", QString("application/x-pge-music-%1").arg(item.data(Qt::UserRole).toString())});
         }
     }
 
