@@ -112,8 +112,18 @@ if(NOT EMSCRIPTEN
    AND NOT NINTENDO_3DS
    AND NOT NINTENDO_WII
    AND NOT NINTENDO_WIIU)
-    option(SDL_MIXER_X_STATIC   "Build static library of SDL Mixer X" ON)
-    option(SDL_MIXER_X_SHARED   "Build shared library of SDL Mixer X" ON)
+    
+    set(SDL_MIXER_X_STATIC_ENABLED_BY_DEFAULT ON)
+    set(SDL_MIXER_X_SHARED_ENABLED_BY_DEFAULT OFF)
+
+    # When defined, respect CMake's BUILD_SHARED_LIBS setting
+    if (BUILD_SHARED_LIBS)
+        set(SDL_MIXER_X_SHARED_ENABLED_BY_DEFAULT ON)
+        set(SDL_MIXER_X_STATIC_ENABLED_BY_DEFAULT OFF)
+    endif()
+
+    option(SDL_MIXER_X_STATIC   "Build static library of SDL Mixer X" ${SDL_MIXER_X_STATIC_ENABLED_BY_DEFAULT})
+    option(SDL_MIXER_X_SHARED   "Build shared library of SDL Mixer X" ${SDL_MIXER_X_SHARED_ENABLED_BY_DEFAULT})
 else()
     set(SDL_MIXER_X_STATIC ON)
     set(SDL_MIXER_X_SHARED OFF)
