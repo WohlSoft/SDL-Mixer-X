@@ -128,7 +128,7 @@ static void EDMIDI_Unload(void)
 typedef struct {
     int mods_num;
     double tempo;
-    double gain;
+    float gain;
 } EDMidi_Setup;
 
 #define EDMIDI_DEFAULT_MODS_COUNT     8
@@ -141,7 +141,7 @@ static void EDMIDI_SetDefault(EDMidi_Setup *setup)
 {
     setup->mods_num = EDMIDI_DEFAULT_MODS_COUNT;
     setup->tempo = 1.0;
-    setup->gain = 2.0;
+    setup->gain = 2.0f;
 }
 
 void _Mix_EDMIDI_setSetDefaults()
@@ -155,7 +155,7 @@ typedef struct
     struct EDMIDIPlayer *edmidi;
     int volume;
     double tempo;
-    double gain;
+    float gain;
 
     SDL_AudioStream *stream;
     void *buffer;
@@ -169,7 +169,7 @@ typedef struct
 static void EDMIDI_setvolume(void *music_p, int volume)
 {
     EDMIDI_Music *music = (EDMIDI_Music *)music_p;
-    double v = SDL_floor(((double)(volume) * music->gain) + 0.5);
+    float v = SDL_floorf(((float)(volume) * music->gain) + 0.5f);
     music->volume = (int)v;
 }
 
@@ -177,7 +177,7 @@ static void EDMIDI_setvolume(void *music_p, int volume)
 static int EDMIDI_getvolume(void *music_p)
 {
     EDMIDI_Music *music = (EDMIDI_Music *)music_p;
-    double v = SDL_floor(((double)(music->volume) / music->gain) + 0.5);
+    float v = SDL_floorf(((float)(music->volume) / music->gain) + 0.5f);
     return (int)v;
 }
 
@@ -224,9 +224,9 @@ static void process_args(const char *args, EDMidi_Setup *setup)
                     break;
                 case 'g':
                     if (arg[0] == '=') {
-                        setup->gain = SDL_strtod(arg + 1, NULL);
-                        if (setup->gain < 0.0) {
-                            setup->gain = 1.0;
+                        setup->gain = (float)SDL_strtod(arg + 1, NULL);
+                        if (setup->gain < 0.0f) {
+                            setup->gain = 1.0f;
                         }
                     }
                     break;

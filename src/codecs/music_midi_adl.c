@@ -184,7 +184,7 @@ typedef struct {
     int emulator;
     char custom_bank_path[2048];
     double tempo;
-    double gain;
+    float gain;
 } AdlMidi_Setup;
 
 #define ADLMIDI_DEFAULT_CHIPS_COUNT     4
@@ -212,7 +212,7 @@ static void ADLMIDI_SetDefaultMin(AdlMidi_Setup *setup)
     setup->auto_arpeggio = 0;
     setup->soft_pan = 1;
     setup->tempo = 1.0;
-    setup->gain = 2.0;
+    setup->gain = 2.0f;
 }
 
 static void ADLMIDI_SetDefault(AdlMidi_Setup *setup)
@@ -383,7 +383,7 @@ typedef struct
     struct ADL_MIDIPlayer *adlmidi;
     int volume;
     double tempo;
-    double gain;
+    float gain;
 
     SDL_AudioStream *stream;
     void *buffer;
@@ -397,7 +397,7 @@ typedef struct
 static void ADLMIDI_setvolume(void *music_p, int volume)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
-    double v = SDL_floor(((double)(volume) * music->gain) + 0.5);
+    float v = SDL_floorf(((float)(volume) * music->gain) + 0.5f);
     music->volume = (int)v;
 }
 
@@ -405,7 +405,7 @@ static void ADLMIDI_setvolume(void *music_p, int volume)
 static int ADLMIDI_getvolume(void *music_p)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
-    double v = SDL_floor(((double)(music->volume) / music->gain) + 0.5);
+    float v = SDL_floorf(((float)(music->volume) / music->gain) + 0.5f);
     return (int)v;
 }
 
@@ -460,9 +460,9 @@ static void process_args(const char *args, AdlMidi_Setup *setup)
                     break;
                 case 'g':
                     if (arg[0] == '=') {
-                        setup->gain = SDL_strtod(arg + 1, NULL);
-                        if (setup->gain < 0.0) {
-                            setup->gain = 1.0;
+                        setup->gain = (float)SDL_strtod(arg + 1, NULL);
+                        if (setup->gain < 0.0f) {
+                            setup->gain = 1.0f;
                         }
                     }
                     break;

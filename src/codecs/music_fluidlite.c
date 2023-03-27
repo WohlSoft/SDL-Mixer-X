@@ -131,7 +131,7 @@ static void FLUIDSYNTH_Unload()
 typedef struct {
     char custom_soundfonts[2048];
     double tempo;
-    double gain;
+    float  gain;
 
     int      chorus;
     int      chorus_nr;
@@ -162,7 +162,7 @@ static void FLUIDSYNTH_SetDefault(FluidSynth_Setup *setup)
 {
     setup->custom_soundfonts[0] = '\0';
     setup->tempo = 1.0;
-    setup->gain = 1.0;
+    setup->gain = 1.0f;
 
     setup->chorus = SDL_FALSE;
     setup->chorus_nr = FLUID_CHORUS_DEFAULT_N;

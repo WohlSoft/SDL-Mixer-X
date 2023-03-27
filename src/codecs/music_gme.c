@@ -134,7 +134,7 @@ typedef struct {
     int track_number;
     int echo_disable;
     double tempo;
-    double gain;
+    float gain;
 } Gme_Setup;
 
 static Gme_Setup gme_setup = {
@@ -146,7 +146,7 @@ static void GME_SetDefault(Gme_Setup *setup)
     setup->track_number = 0;
     setup->echo_disable = 0;
     setup->tempo = 1.0;
-    setup->gain = 1.0;
+    setup->gain = 1.0f;
 }
 
 
@@ -162,7 +162,7 @@ typedef struct
     int loop_length;
     int volume;
     double tempo;
-    double gain;
+    float gain;
     SDL_AudioStream *stream;
     void *buffer;
     size_t buffer_size;
@@ -197,7 +197,7 @@ static void GME_Delete(void *context);
 static void GME_SetVolume(void *music_p, int volume)
 {
     GME_Music *music = (GME_Music*)music_p;
-    double v = SDL_floor(((double)(volume) * music->gain) + 0.5);
+    float v = SDL_floorf(((float)(volume) * music->gain) + 0.5f);
     music->volume = (int)v;
 }
 
@@ -205,7 +205,7 @@ static void GME_SetVolume(void *music_p, int volume)
 static int GME_GetVolume(void *music_p)
 {
     GME_Music *music = (GME_Music*)music_p;
-    double v = SDL_floor(((double)(music->volume) / music->gain) + 0.5);
+    float v = SDL_floorf(((float)(music->volume) / music->gain) + 0.5f);
     return (int)v;
 }
 
@@ -255,9 +255,9 @@ static void process_args(const char *args, Gme_Setup *setup)
                     break;
                 case 'g':
                     if (arg[0] == '=') {
-                        setup->gain = SDL_strtod(arg + 1, NULL);
-                        if (setup->gain < 0.0) {
-                            setup->gain = 1.0;
+                        setup->gain = (float)SDL_strtod(arg + 1, NULL);
+                        if (setup->gain < 0.0f) {
+                            setup->gain = 1.0f;
                         }
                     }
                     break;

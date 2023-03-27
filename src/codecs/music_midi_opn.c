@@ -169,7 +169,7 @@ typedef struct {
     int emulator;
     char custom_bank_path[2048];
     double tempo;
-    double gain;
+    float gain;
 } OpnMidi_Setup;
 
 #define OPNMIDI_DEFAULT_CHIPS_COUNT     6
@@ -188,7 +188,7 @@ static void OPNMIDI_SetDefaultMin(OpnMidi_Setup *setup)
     setup->auto_arpeggio = 1;
     setup->soft_pan = 1;
     setup->tempo = 1.0;
-    setup->gain = 2.0;
+    setup->gain = 2.0f;
 }
 
 static void OPNMIDI_SetDefault(OpnMidi_Setup *setup)
@@ -295,7 +295,7 @@ typedef struct
     int playing;
     int volume;
     double tempo;
-    double gain;
+    float gain;
 
     SDL_AudioStream *stream;
     void *buffer;
@@ -310,7 +310,7 @@ typedef struct
 static void OPNMIDI_setvolume(void *music_p, int volume)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music*)music_p;
-    double v = SDL_floor(((double)(volume) * music->gain) + 0.5);
+    float v = SDL_floorf(((float)(volume) * music->gain) + 0.5f);
     music->volume = (int)v;
 }
 
@@ -318,7 +318,7 @@ static void OPNMIDI_setvolume(void *music_p, int volume)
 static int OPNMIDI_getvolume(void *music_p)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music*)music_p;
-    double v = SDL_floor(((double)(music->volume) / music->gain) + 0.5);
+    float v = SDL_floor(((float)(music->volume) / music->gain) + 0.5f);
     return (int)v;
 }
 
@@ -386,9 +386,9 @@ static void process_args(const char *args, OpnMidi_Setup *setup)
                     break;
                 case 'g':
                     if (arg[0] == '=') {
-                        setup->gain = SDL_strtod(arg + 1, NULL);
-                        if (setup->gain < 0.0) {
-                            setup->gain = 1.0;
+                        setup->gain = (float)SDL_strtod(arg + 1, NULL);
+                        if (setup->gain < 0.0f) {
+                            setup->gain = 1.0f;
                         }
                     }
                     break;
