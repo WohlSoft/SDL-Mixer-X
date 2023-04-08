@@ -138,7 +138,12 @@ option(USE_SYSTEM_SDL2   "Use SDL2 from system" OFF)
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     set(FLAG_C99 "-std=c99")
     # Turn on warnings and legacy C/C++ standards to support more compilers
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wno-long-long -Wno-missing-field-initializers -std=c89")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wno-long-long -Wno-missing-field-initializers")
+    if(NINTENDO_3DS)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu90")
+    else()
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c89")
+    endif()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -std=c++98")
     # Deny undefined symbols
     if(NOT APPLE)
