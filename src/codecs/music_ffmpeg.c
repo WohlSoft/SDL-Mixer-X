@@ -681,7 +681,7 @@ static void *FFMPEG_NewRW(struct SDL_RWops *src, int freesrc)
         if (tag) {
             meta_tags_set(&music->tags, MIX_META_ARTIST, tag->value);
         } else {
-            /* Try to seaarch for "author" instead */
+            /* Try to search for "author" instead */
             tag = ffmpeg.av_dict_get(music->fmt_ctx->metadata, "author", tag, AV_DICT_MATCH_CASE);
             if (tag) {
                 meta_tags_set(&music->tags, MIX_META_ARTIST, tag->value);
