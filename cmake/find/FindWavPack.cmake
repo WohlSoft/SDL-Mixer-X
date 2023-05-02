@@ -1,6 +1,6 @@
 # - Find WavPack
 # Once done this will define
-#   WAVPACK_FOUND        - System has Opus
+#   WAVPACK_FOUND        - System has wavpack
 #   WAVPACK_INCLUDE_DIRS - The WavPack include directories
 #   WAVPACK_LIBRARIES    - The libraries needed to use WavPack
 
@@ -18,7 +18,7 @@ if(WavPack_INCLUDE_DIR AND WavPack_LIBRARY)
 endif()
 
 include(FindPackageHandleStandardArgs)
-# handle the QUIETLY and REQUIRED arguments and set Opus_FOUND to TRUE
+# handle the QUIETLY and REQUIRED arguments and set wavpack_FOUND to TRUE
 # if all listed variables are TRUE
 find_package_handle_standard_args(WavPack DEFAULT_MSG
                                   WavPack_LIBRARY WavPack_INCLUDE_DIR)
