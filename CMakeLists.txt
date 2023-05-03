@@ -337,7 +337,7 @@ if(USE_MIDI)
        NOT USE_MIDI_TIMIDITY AND
        NOT USE_MIDI_FLUIDSYNTH AND
        NOT USE_MIDI_NATIVE)
-        message_error("To have MIDI support you must enable at least one MIDI sequencer library")
+        message(FATAL_ERROR "To have MIDI support you must enable at least one MIDI sequencer library")
     endif()
 else()
     message("== !!! MIDI SUPORT HAS BEEN DISABLED !!! ==")
