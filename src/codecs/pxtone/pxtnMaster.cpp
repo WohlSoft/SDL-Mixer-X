@@ -130,7 +130,7 @@ pxtnERR pxtnMaster::io_r_v5( void* desc )
 
 	if( !_io_read_le16( desc, &beat_clock ) ) return pxtnERR_desc_r;
 	if( !_io_read( desc, &beat_num    ,sizeof(int8_t ), 1 ) ) return pxtnERR_desc_r;
-	if( !_io_read_le32( desc, &beat_tempo ) ) return pxtnERR_desc_r;
+	if( !_io_read_le32f( desc, &beat_tempo ) ) return pxtnERR_desc_r;
 	if( !_io_read_le32( desc, &clock_repeat ) ) return pxtnERR_desc_r;
 	if( !_io_read_le32( desc, &clock_last ) ) return pxtnERR_desc_r;
 

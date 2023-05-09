@@ -24,7 +24,7 @@ protected:
 	pxtnIO_r    _io_read ;
 	bool		_io_read_le16 ( void* user, void* p_dst ) const;
 	bool		_io_read_le32 ( void* user, void* p_dst ) const;
-	bool		_io_read_le64 ( void* user, void* p_dst ) const;
+	bool		_io_read_le32f ( void* user, void* p_dst ) const;
 	pxtnIO_w    _io_write;
 	pxtnIO_seek _io_seek ;
 	pxtnIO_pos  _io_pos  ;

@@ -123,13 +123,13 @@ bool pxtnData::_io_read_le32 ( void* user, void* p_dst ) const
 #endif
 }
 
-bool pxtnData::_io_read_le64 ( void* user, void* p_dst ) const
+bool pxtnData::_io_read_le32f ( void *user, void *p_dst ) const
 {
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
-	return _io_read( user, p_dst, sizeof(uint64_t), 1 );
+	return _io_read( user, p_dst, sizeof(float), 1 );
 #else
-	bool ret = _io_read( user, p_dst, sizeof(uint64_t), 1 );
-	*((uint64_t*)p_dst) = SDL_Swap64( *(uint64_t*)p_dst );
+	bool ret = _io_read( user, p_dst, sizeof(uint32_t), 1 );
+	*((float*)p_dst) = SDL_SwapFloat( *(float*)p_dst );
 	return ret;
 #endif
 }
