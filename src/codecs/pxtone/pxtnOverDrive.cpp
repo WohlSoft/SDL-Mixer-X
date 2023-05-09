@@ -62,9 +62,9 @@ SDL_FORCE_INLINE void swapEndian( _OVERDRIVESTRUCT &over)
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 	over.xxx =   SDL_Swap16(over.xxx);
 	over.group = SDL_Swap16(over.group);
-	over.cut =   SDL_Swap32(over.cut);
-	over.amp =   SDL_Swap32(over.amp);
-	over.yyy =   SDL_Swap32(over.yyy);
+	over.cut =   SDL_SwapFloat(over.cut);
+	over.amp =   SDL_SwapFloat(over.amp);
+	over.yyy =   SDL_SwapFloat(over.yyy);
 #else
 	(void)over;
 #endif

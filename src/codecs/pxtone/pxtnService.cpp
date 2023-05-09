@@ -1322,7 +1322,7 @@ _x1x_PROJECT;
 SDL_FORCE_INLINE void swapEndian( _x1x_PROJECT &prjc)
 {
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	prjc.x1x_beat_tempo =  SDL_Swap32(prjc.x1x_beat_tempo);
+	prjc.x1x_beat_tempo =  SDL_SwapFloat(prjc.x1x_beat_tempo);
 	prjc.x1x_beat_clock =  SDL_Swap16(prjc.x1x_beat_clock);
 	prjc.x1x_beat_num =    SDL_Swap16(prjc.x1x_beat_num);
 	prjc.x1x_beat_note =   SDL_Swap16(prjc.x1x_beat_note);

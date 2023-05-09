@@ -125,8 +125,8 @@ SDL_FORCE_INLINE void swapEndian( _DELAYSTRUCT &dela)
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 	dela.unit =  SDL_Swap16(dela.unit);
 	dela.group = SDL_Swap16(dela.group);
-	dela.rate =  SDL_Swap32(dela.rate);
-	dela.freq =  SDL_Swap32(dela.freq);
+	dela.rate =  SDL_SwapFloat(dela.rate);
+	dela.freq =  SDL_SwapFloat(dela.freq);
 #else
 	(void)dela;
 #endif
