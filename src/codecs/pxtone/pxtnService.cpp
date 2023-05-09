@@ -9,6 +9,8 @@
 
 #include "./pxtnService.h"
 
+#include "SDL_endian.h"
+
 
 #define _VERSIONSIZE    16
 #define _CODESIZE        8
@@ -729,9 +731,15 @@ pxtnERR pxtnService::_io_assiWOIC_r( void* desc )
 	_ASSIST_WOICE assi = {0};
 	int32_t       size =  0 ;
 
-	if( !_io_read( desc, &size,    4, 1 )    ) return pxtnERR_desc_r     ;
+	if( !_io_read_le32( desc, &size )    ) return pxtnERR_desc_r     ;
 	if( size != sizeof(assi)           ) return pxtnERR_fmt_unknown;
 	if( !_io_read( desc, &assi, size, 1 )    ) return pxtnERR_desc_r     ;
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	assi.woice_index = SDL_Swap16(assi.woice_index);
+	assi.rrr = SDL_Swap16(assi.rrr);
+#endif
+
 	if( assi.rrr                       ) return pxtnERR_fmt_unknown;
 	if( assi.woice_index >= _woice_num ) return pxtnERR_fmt_unknown;
 
@@ -779,9 +787,15 @@ pxtnERR pxtnService::_io_assiUNIT_r( void* desc )
 	_ASSIST_UNIT assi = {0};
 	int32_t      size;
 
-	if( !_io_read( desc, &size, 4,            1 ) ) return pxtnERR_desc_r     ;
+	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r     ;
 	if( size != sizeof(assi)                ) return pxtnERR_fmt_unknown;
 	if( !_io_read( desc, &assi, sizeof(assi), 1 ) ) return pxtnERR_desc_r     ;
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	assi.unit_index = SDL_Swap16(assi.unit_index);
+	assi.rrr = SDL_Swap16(assi.rrr);
+#endif
+
 	if( assi.rrr                            ) return pxtnERR_fmt_unknown;
 	if( assi.unit_index >= _unit_num        ) return pxtnERR_fmt_unknown;
 
@@ -826,9 +840,15 @@ pxtnERR pxtnService::_io_UNIT_num_r    ( void* desc, int32_t* p_num )
 	_NUM_UNIT data = {0};
 	int32_t   size =  0 ;
 
-	if( !_io_read( desc, &size, 4,                   1 ) ) return pxtnERR_desc_r     ;
+	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r     ;
 	if( size != sizeof( _NUM_UNIT )                ) return pxtnERR_fmt_unknown;
 	if( !_io_read( desc, &data, sizeof( _NUM_UNIT ), 1 ) ) return pxtnERR_desc_r     ;
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	data.num = SDL_Swap16(data.num);
+	data.rrr = SDL_Swap16(data.rrr);
+#endif
+
 	if( data.rrr                                   ) return pxtnERR_fmt_unknown;
 	if( data.num > _unit_max                       ) return pxtnERR_fmt_new    ;
 	if( data.num <         0                       ) return pxtnERR_fmt_unknown;
@@ -1063,8 +1083,8 @@ pxtnERR pxtnService::_ReadVersion( void* desc, _enum_FMTVER *p_fmt_ver, uint16_t
 	else return pxtnERR_fmt_unknown;
 
 	// exe version
-	if( !_io_read( desc, p_exe_ver, sizeof(uint16_t), 1 ) ) return pxtnERR_desc_r;
-	if( !_io_read( desc, &dummy   , sizeof(uint16_t), 1 ) ) return pxtnERR_desc_r;
+	if( !_io_read_le16( desc, p_exe_ver ) ) return pxtnERR_desc_r;
+	if( !_io_read_le16( desc, &dummy ) ) return pxtnERR_desc_r;
 
 	return pxtnOK;
 }
@@ -1172,7 +1192,7 @@ pxtnERR pxtnService::_pre_count_event( void* desc, int32_t* p_count )
 		case _TAG_assiUNIT    :
 		case _TAG_assiWOIC    :
 
-			if( !_io_read( desc, &size, sizeof(int32_t), 1 ) ){ res = pxtnERR_desc_r; goto term; }
+			if( !_io_read_le32( desc, &size ) ){ res = pxtnERR_desc_r; goto term; }
 			if( !_io_seek( desc, SEEK_CUR, size )            ){ res = pxtnERR_desc_r; goto term; }
 			break;
 
@@ -1288,8 +1308,19 @@ bool pxtnService::_x1x_Project_Read( void* desc )
 	int32_t  size;
 	float    beat_tempo;
 
-	if( !_io_read( desc, &size, 4,                      1 ) ) return false;
+	if( !_io_read_le32( desc, &size ) ) return false;
 	if( !_io_read( desc, &prjc, sizeof( _x1x_PROJECT ), 1 ) ) return false;
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	prjc.x1x_beat_tempo =  SDL_Swap32(prjc.x1x_beat_tempo);
+	prjc.x1x_beat_clock =  SDL_Swap16(prjc.x1x_beat_clock);
+	prjc.x1x_beat_num =    SDL_Swap16(prjc.x1x_beat_num);
+	prjc.x1x_beat_note =   SDL_Swap16(prjc.x1x_beat_note);
+	prjc.x1x_meas_num =    SDL_Swap16(prjc.x1x_meas_num);
+	prjc.x1x_channel_num = SDL_Swap16(prjc.x1x_channel_num);
+	prjc.x1x_bps =         SDL_Swap16(prjc.x1x_bps);
+	prjc.x1x_sps =         SDL_Swap16(prjc.x1x_sps);
+#endif
 
 	beat_num   = prjc.x1x_beat_num  ;
 	beat_tempo = prjc.x1x_beat_tempo;

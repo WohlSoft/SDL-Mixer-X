@@ -5,6 +5,9 @@
 #include "./pxtnMaster.h"
 #include "./pxtnEvelist.h"
 
+#include "SDL_endian.h"
+
+
 pxtnMaster::pxtnMaster( pxtnIO_r io_read, pxtnIO_w io_write, pxtnIO_seek io_seek, pxtnIO_pos io_pos )
 {
 	_set_io_funcs( io_read, io_write, io_seek, io_pos );
@@ -122,14 +125,14 @@ pxtnERR pxtnMaster::io_r_v5( void* desc )
 
 	uint32_t  size         = 0;
 
-	if( !_io_read( desc, &size, sizeof(uint32_t), 1 ) ) return pxtnERR_desc_r;
+	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r;
 	if( size != 15                              ) return pxtnERR_fmt_unknown;
 
-	if( !_io_read( desc, &beat_clock  ,sizeof(int16_t), 1 ) ) return pxtnERR_desc_r;
+	if( !_io_read_le16( desc, &beat_clock ) ) return pxtnERR_desc_r;
 	if( !_io_read( desc, &beat_num    ,sizeof(int8_t ), 1 ) ) return pxtnERR_desc_r;
-	if( !_io_read( desc, &beat_tempo  ,sizeof(float  ), 1 ) ) return pxtnERR_desc_r;
-	if( !_io_read( desc, &clock_repeat,sizeof(int32_t), 1 ) ) return pxtnERR_desc_r;
-	if( !_io_read( desc, &clock_last  ,sizeof(int32_t), 1 ) ) return pxtnERR_desc_r;
+	if( !_io_read_le32( desc, &beat_tempo ) ) return pxtnERR_desc_r;
+	if( !_io_read_le32( desc, &clock_repeat ) ) return pxtnERR_desc_r;
+	if( !_io_read_le32( desc, &clock_last ) ) return pxtnERR_desc_r;
 
 	_beat_clock = beat_clock;
 	_beat_num   = beat_num  ;
@@ -144,7 +147,7 @@ pxtnERR pxtnMaster::io_r_v5( void* desc )
 int32_t pxtnMaster::io_r_v5_EventNum( void* desc )
 {
 	uint32_t size;
-	if( !_io_read( desc, &size, sizeof(uint32_t),  1 ) ) return 0;
+	if( !_io_read_le32( desc, &size ) ) return 0;
 	if( size != 15                               ) return 0;
 	int8_t buf[ 15 ];
 	if( !_io_read( desc,  buf , sizeof(int8_t ), 15 )  ) return 0;
@@ -178,8 +181,14 @@ pxtnERR pxtnMaster::io_r_x4x( void* desc )
 	int32_t     beat_clock, beat_num, repeat_clock, last_clock;
 	float       beat_tempo = 0;
 
-	if( !_io_read( desc, &size,                     4, 1 ) ) return pxtnERR_desc_r;
+	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r;
 	if( !_io_read( desc, &mast, sizeof( _x4x_MASTER ), 1 ) ) return pxtnERR_desc_r;
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	mast.data_num = SDL_Swap16(mast.data_num);
+	mast.rrr = SDL_Swap16(mast.rrr);
+	mast.event_num = SDL_Swap32(mast.event_num);
+#endif
 
 	// unknown format
 	if( mast.data_num != 3 ) return pxtnERR_fmt_unknown;
@@ -232,8 +241,14 @@ int32_t pxtnMaster::io_r_x4x_EventNum( void* desc )
 	int32_t     e   ;
 
 	memset( &mast, 0, sizeof( _x4x_MASTER ) );
-	if( !_io_read( desc, &size,                     4, 1 ) ) return 0;
+	if( !_io_read_le32( desc, &size ) ) return 0;
 	if( !_io_read( desc, &mast, sizeof( _x4x_MASTER ), 1 ) ) return 0;
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	mast.data_num = SDL_Swap16(mast.data_num);
+	mast.rrr = SDL_Swap16(mast.rrr);
+	mast.event_num = SDL_Swap32(mast.event_num);
+#endif
 
 	if( mast.data_num != 3 ) return 0;
 

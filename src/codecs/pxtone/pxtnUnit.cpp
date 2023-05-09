@@ -5,6 +5,9 @@
 #include "./pxtnUnit.h"
 #include "./pxtnEvelist.h"
 
+#include "SDL_endian.h"
+
+
 pxtnUnit::pxtnUnit( pxtnIO_r io_read, pxtnIO_w io_write, pxtnIO_seek io_seek, pxtnIO_pos io_pos )
 {
 	_set_io_funcs( io_read, io_write, io_seek, io_pos );
@@ -317,8 +320,14 @@ bool pxtnUnit::Read_v1x( void* desc, int32_t *p_group )
 	_x1x_UNIT unit;
 	int32_t   size;
 
-	if( !_io_read( desc, &size, 4,                   1 ) ) return false;
+	if( !_io_read_le32( desc, &size ) ) return false;
 	if( !_io_read( desc, &unit, sizeof( _x1x_UNIT ), 1 ) ) return false;
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	unit.type = SDL_Swap16(unit.type);
+	unit.group = SDL_Swap16(unit.group);
+#endif
+
 	if( (pxtnWOICETYPE)unit.type != pxtnWOICE_PCM        ) return false;
 
 	memcpy( _name_buf, unit.name, pxtnMAX_TUNEUNITNAME ); _name_buf[ pxtnMAX_TUNEUNITNAME ] = '\0';
@@ -342,8 +351,14 @@ pxtnERR pxtnUnit::Read_v3x( void* desc, int32_t *p_group )
 	_x3x_UNIT unit = {0};
 	int32_t   size =  0 ;
 
-	if( !_io_read( desc, &size, 4,                   1 ) ) return pxtnERR_desc_r;
+	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r;
 	if( !_io_read( desc, &unit, sizeof( _x3x_UNIT ), 1 ) ) return pxtnERR_desc_r;
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	unit.type = SDL_Swap16(unit.type);
+	unit.group = SDL_Swap16(unit.group);
+#endif
+
 	if( (pxtnWOICETYPE)unit.type != pxtnWOICE_PCM &&
 		(pxtnWOICETYPE)unit.type != pxtnWOICE_PTV &&
 		(pxtnWOICETYPE)unit.type != pxtnWOICE_PTN ) return pxtnERR_fmt_unknown;

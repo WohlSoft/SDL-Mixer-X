@@ -8,7 +8,7 @@ bool pxtnText::_read4_malloc( char **pp, int32_t* p_buf_size, void* desc )
 {
 	if( !pp ) return false;
 
-	if( !_io_read( desc, p_buf_size, 4, 1 ) ) return false;
+	if( !_io_read_le32( desc, p_buf_size ) ) return false;
 	if( *p_buf_size < 0                     ) return false;
 
 	bool b_ret  = false;

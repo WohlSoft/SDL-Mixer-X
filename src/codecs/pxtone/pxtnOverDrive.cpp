@@ -2,6 +2,9 @@
 
 #include "./pxtnOverDrive.h"
 
+#include "SDL_endian.h"
+
+
 pxtnOverDrive::pxtnOverDrive( pxtnIO_r io_read, pxtnIO_w io_write, pxtnIO_seek io_seek, pxtnIO_pos io_pos )
 {
 	_set_io_funcs( io_read, io_write, io_seek, io_pos );
@@ -78,8 +81,16 @@ pxtnERR pxtnOverDrive::Read( void* desc )
 	int32_t          size =  0 ;
 
 	memset( &over, 0, sizeof(_OVERDRIVESTRUCT) );
-	if( !_io_read( desc, &size, 4,                        1 ) ) return pxtnERR_desc_r;
+	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r;
 	if( !_io_read( desc, &over, sizeof(_OVERDRIVESTRUCT), 1 ) ) return pxtnERR_desc_r;
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	over.xxx = SDL_Swap16(over.xxx);
+	over.group = SDL_Swap16(over.group);
+	over.cut = SDL_Swap32(over.cut);
+	over.amp = SDL_Swap32(over.amp);
+	over.yyy = SDL_Swap32(over.yyy);
+#endif
 
 	if( over.xxx                         ) return pxtnERR_fmt_unknown;
 	if( over.yyy                         ) return pxtnERR_fmt_unknown;

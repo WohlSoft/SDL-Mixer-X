@@ -6,6 +6,9 @@
 
 #include "./pxtnDelay.h"
 
+#include "SDL_endian.h"
+
+
 pxtnDelay::pxtnDelay( pxtnIO_r io_read, pxtnIO_w io_write, pxtnIO_seek io_seek, pxtnIO_pos io_pos )
 {
 	_set_io_funcs( io_read, io_write, io_seek, io_pos );
@@ -141,8 +144,16 @@ pxtnERR pxtnDelay::Read( void* desc )
 	_DELAYSTRUCT dela = {0};
 	int32_t      size =  0 ;
 
-	if( !_io_read( desc, &size, 4,                    1 ) ) return pxtnERR_desc_r     ;
+	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r     ;
 	if( !_io_read( desc, &dela, sizeof(_DELAYSTRUCT), 1 ) ) return pxtnERR_desc_r     ;
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	dela.unit = SDL_Swap16(dela.unit);
+	dela.group = SDL_Swap16(dela.group);
+	dela.rate = SDL_Swap32(dela.rate);
+	dela.freq = SDL_Swap32(dela.freq);
+#endif
+
 	if( dela.unit >= DELAYUNIT_num                  ) return pxtnERR_fmt_unknown;
 
 	_unit  = (DELAYUNIT)dela.unit;

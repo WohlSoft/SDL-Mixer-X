@@ -4,6 +4,8 @@
 
 #include "./pxtnWoice.h"
 
+#include "SDL_endian.h"
+
 //////////////////////
 // matePCM
 //////////////////////
@@ -54,8 +56,20 @@ pxtnERR pxtnWoice::io_matePCM_r( void* desc )
 	_MATERIALSTRUCT_PCM pcm  = {0};
 	int32_t             size =  0 ;
 
-	if( !_io_read( desc, &size,                             4, 1 ) ) return pxtnERR_desc_r;
+	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r;
 	if( !_io_read( desc, &pcm , sizeof( _MATERIALSTRUCT_PCM ), 1 ) ) return pxtnERR_desc_r;
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	pcm.x3x_unit_no = SDL_Swap16(pcm.x3x_unit_no);
+	pcm.basic_key =   SDL_Swap16(pcm.basic_key);
+	pcm.voice_flags = SDL_Swap32(pcm.voice_flags);
+	pcm.basic_key =   SDL_Swap16(pcm.basic_key);
+	pcm.ch =          SDL_Swap16(pcm.ch);
+	pcm.bps =         SDL_Swap16(pcm.bps);
+	pcm.sps =         SDL_Swap32(pcm.sps);
+	pcm.tuning =      SDL_Swap32(pcm.tuning);
+	pcm.data_size =   SDL_Swap32(pcm.data_size);
+#endif
 
 	if( ((int32_t)pcm.voice_flags) & PTV_VOICEFLAG_UNCOVERED )return pxtnERR_fmt_unknown;
 
@@ -139,8 +153,15 @@ pxtnERR pxtnWoice::io_matePTN_r( void* desc )
 	_MATERIALSTRUCT_PTN ptn  = {0};
 	int32_t             size =  0 ;
 
-	if( !_io_read( desc, &size, sizeof(int32_t            ), 1 ) ) return pxtnERR_desc_r;
+	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r;
 	if( !_io_read( desc, &ptn,  sizeof(_MATERIALSTRUCT_PTN), 1 ) ) return pxtnERR_desc_r;
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	ptv.x3x_unit_no = SDL_Swap16(ptv.x3x_unit_no);
+	ptv.rrr =         SDL_Swap16(ptv.rrr);
+	ptv.x3x_tuning =  SDL_Swap32(ptv.x3x_tuning);
+	ptv.size =        SDL_Swap32(ptv.size);
+#endif
 
 	if     ( ptn.rrr > 1 ) return pxtnERR_fmt_unknown;
 	else if( ptn.rrr < 0 ) return pxtnERR_fmt_unknown;
@@ -220,8 +241,15 @@ pxtnERR pxtnWoice::io_matePTV_r( void* desc )
 	_MATERIALSTRUCT_PTV ptv  = {0};
 	int32_t             size =  0 ;
 
-	if( !_io_read( desc, &size, sizeof(int32_t              ), 1 ) ) return pxtnERR_desc_r;
+	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r;
 	if( !_io_read( desc, &ptv,  sizeof( _MATERIALSTRUCT_PTV ), 1 ) ) return pxtnERR_desc_r;
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	ptv.x3x_unit_no = SDL_Swap16(ptv.x3x_unit_no);
+	ptv.rrr =         SDL_Swap16(ptv.rrr);
+	ptv.x3x_tuning =  SDL_Swap32(ptv.x3x_tuning);
+	ptv.size =        SDL_Swap32(ptv.size);
+#endif
 
 	if( ptv.rrr ) return pxtnERR_fmt_unknown;
 

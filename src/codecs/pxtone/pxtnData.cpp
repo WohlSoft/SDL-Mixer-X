@@ -1,5 +1,5 @@
 #include "./pxtnData.h"
-
+#include "SDL_endian.h"
 
 
 static bool _v_to_int( uint32_t* p_i, const uint8_t* bytes5, int byte_num )
@@ -39,7 +39,7 @@ static bool _v_to_int( uint32_t* p_i, const uint8_t* bytes5, int byte_num )
 		return false;
 	}
 
-	*p_i = *((int32_t*)b);
+	*p_i = SDL_SwapLE32(*((int32_t*)b));
 	return true;
 }
 
@@ -47,12 +47,14 @@ void _int_to_v( uint8_t* bytes5, int* p_byte_num, uint32_t i )
 {
 	uint8_t a[ 5 ] = {};
 
+	i = SDL_SwapLE32(i);
+
 	bytes5[ 0 ] = 0; a[ 0 ] = *( (uint8_t *)(&i) + 0 );
 	bytes5[ 1 ] = 0; a[ 1 ] = *( (uint8_t *)(&i) + 1 );
 	bytes5[ 2 ] = 0; a[ 2 ] = *( (uint8_t *)(&i) + 2 );
 	bytes5[ 3 ] = 0; a[ 3 ] = *( (uint8_t *)(&i) + 3 );
 	bytes5[ 4 ] = 0; a[ 4 ] = 0;
-	
+
 	// 1byte(7bit)
 	if     ( i < 0x00000080 )
 	{
@@ -99,10 +101,43 @@ void _int_to_v( uint8_t* bytes5, int* p_byte_num, uint32_t i )
 	}
 }
 
+bool pxtnData::_io_read_le16 ( void* user, void* p_dst ) const
+{
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+	return _io_read( user, p_dst, sizeof(uint16_t), 1 );
+#else
+	bool ret = _io_read( user, p_dst, sizeof(uint16_t), 1 );
+	*((uint16_t)p_dst) = SDL_Swap16( *(uint16_t)p_dst );
+	return ret;
+#endif
+}
+
+bool pxtnData::_io_read_le32 ( void* user, void* p_dst ) const
+{
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+	return _io_read( user, p_dst, sizeof(uint32_t), 1 );
+#else
+	bool ret = _io_read( user, p_dst, sizeof(uint32_t), 1 );
+	*((uint32_t)p_dst) = SDL_Swap32( *(uint32_t)p_dst );
+	return ret;
+#endif
+}
+
+bool pxtnData::_io_read_le64 ( void* user, void* p_dst ) const
+{
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+	return _io_read( user, p_dst, sizeof(uint64_t), 1 );
+#else
+	bool ret = _io_read( user, p_dst, sizeof(uint64_t), 1 );
+	*((uint64_t)p_dst) = SDL_Swap64( *(uint64_t)p_dst );
+	return ret;
+#endif
+}
+
 int32_t pxtnData::_data_check_v_size ( uint32_t v ) const
-{	
+{
 	if     ( v < 0x00000080 ) return 1; // 1byte( 7bit)
-	else if( v < 0x00004000 ) return 2; // 2byte(14bit)	
+	else if( v < 0x00004000 ) return 2; // 2byte(14bit)
 	else if( v < 0x00200000 ) return 3; // 3byte(21bit)
 	else if( v < 0x10000000 ) return 4; // 4byte(28bit)
 

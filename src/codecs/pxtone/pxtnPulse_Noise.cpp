@@ -235,7 +235,7 @@ pxtnERR pxtnPulse_Noise::read( void* desc )
 
 	if( !_io_read( desc, code, 1, 8 )         ){ res = pxtnERR_desc_r     ; goto term; }
 	if( memcmp( code, _code, 8 )        ){ res = pxtnERR_inv_code   ; goto term; }
-	if( !_io_read( desc, &ver     , 4, 1 )    ){ res = pxtnERR_desc_r     ; goto term; }
+	if( !_io_read_le32( desc, &ver )    ){ res = pxtnERR_desc_r     ; goto term; }
 	if( ver > _ver                      ){ res = pxtnERR_fmt_new    ; goto term; }
 	if( !_data_r_v( desc, &_smp_num_44k )    ){ res = pxtnERR_desc_r     ; goto term; }
 	if( !_io_read( desc, &unit_num, 1, 1 )    ){ res = pxtnERR_desc_r     ; goto term; }

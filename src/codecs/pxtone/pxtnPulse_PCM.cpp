@@ -4,6 +4,9 @@
 #include "./pxtnMem.h"
 #include "./pxtnPulse_PCM.h"
 
+#include "SDL_endian.h"
+
+
 typedef struct
 {
 	uint16_t formatID;     // PCM:0x0001
@@ -95,8 +98,18 @@ pxtnERR pxtnPulse_PCM::read( void* desc )
 	}
 
 	// read format.
-	if( !_io_read( desc ,&size  , sizeof(uint32_t), 1 ) ){ res = pxtnERR_desc_r     ; goto term; }
+	if( !_io_read_le32( desc ,&size ) ){ res = pxtnERR_desc_r     ; goto term; }
 	if( !_io_read( desc, &format,               18, 1 ) ){ res = pxtnERR_desc_r     ; goto term; }
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	format.formatID =       SDL_Swap16(format.formatID);
+	format.ch =             SDL_Swap16(format.ch);
+	format.sps =            SDL_Swap32(format.sps);
+	format.byte_per_sec =   SDL_Swap32(format.byte_per_sec);
+	format.block_size =     SDL_Swap16(format.block_size);
+	format.bps =            SDL_Swap16(format.bps);
+	format.ext =            SDL_Swap16(format.ext);
+#endif
 
 	if( format.formatID != 0x0001               ){ res = pxtnERR_pcm_unknown; goto term; }
 	if( format.ch  != 1 && format.ch  !=  2     ){ res = pxtnERR_pcm_unknown; goto term; }
@@ -108,7 +121,7 @@ pxtnERR pxtnPulse_PCM::read( void* desc )
 	while( 1 )
 	{
 		if( !_io_read( desc, buf  , sizeof(char), 4 )      ){ res = pxtnERR_desc_r; goto term; }
-		if( !_io_read( desc, &size, sizeof(uint32_t ), 1 ) ){ res = pxtnERR_desc_r; goto term; }
+		if( !_io_read_le32( desc, &size ) ){ res = pxtnERR_desc_r; goto term; }
 		if( buf[0] == 'd' && buf[1] == 'a' && buf[2] == 't' && buf[3] == 'a' ) break;
 		if( !_io_seek( desc, SEEK_CUR, size )              ){ res = pxtnERR_desc_r; goto term; }
 	}

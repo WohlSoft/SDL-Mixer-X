@@ -1,6 +1,9 @@
 
 #include "./pxtnEvelist.h"
 
+#include "SDL_endian.h"
+
+
 void pxtnEvelist::Release()
 {
 	if( _eves ) free( _eves );
@@ -760,8 +763,8 @@ pxtnERR pxtnEvelist::io_Read( void* desc )
 	int32_t size     = 0;
 	int32_t eve_num  = 0;
 
-	if( !_io_read( desc, &size   , 4, 1 ) ) return pxtnERR_desc_r;
-	if( !_io_read( desc, &eve_num, 4, 1 ) ) return pxtnERR_desc_r;
+	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r;
+	if( !_io_read_le32( desc, &eve_num ) ) return pxtnERR_desc_r;
 
 	int32_t clock    = 0;
 	int32_t absolute = 0;
@@ -788,8 +791,8 @@ int32_t pxtnEvelist::io_Read_EventNum( void* desc ) const
 	int32_t size    = 0;
 	int32_t eve_num = 0;
 
-	if( !_io_read( desc, &size   , 4, 1 ) ) return 0;
-	if( !_io_read( desc, &eve_num, 4, 1 ) ) return 0;
+	if( !_io_read_le32( desc, &size ) ) return 0;
+	if( !_io_read_le32( desc, &eve_num ) ) return 0;
 
 	int32_t count   = 0;
 	int32_t clock   = 0;
@@ -832,8 +835,16 @@ pxtnERR pxtnEvelist::io_Unit_Read_x4x_EVENT( void* desc, bool bTailAbsolute, boo
 	int32_t          e        = 0;
 	int32_t          size     = 0;
 
-	if( !_io_read( desc, &size, 4,                          1 ) ) return pxtnERR_desc_r;
+	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r;
 	if( !_io_read( desc, &evnt, sizeof( _x4x_EVENTSTRUCT ), 1 ) ) return pxtnERR_desc_r;
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	evnt.unit_index = SDL_Swap16(evnt.unit_index);
+	evnt.event_kind = SDL_Swap16(evnt.event_kind);
+	evnt.data_num = SDL_Swap16(evnt.data_num);
+	evnt.rrr = SDL_Swap16(evnt.rrr);
+	evnt.event_num = SDL_Swap32(evnt.event_num);
+#endif
 
 	if( evnt.data_num != 2               ) return pxtnERR_fmt_unknown;
 	if( evnt.event_kind >= EVENTKIND_NUM ) return pxtnERR_fmt_unknown;
@@ -865,8 +876,16 @@ pxtnERR pxtnEvelist::io_Read_x4x_EventNum( void* desc, int32_t* p_num ) const
 	int32_t          e    =  0 ;
 	int32_t          size =  0 ;
 
-	if( !_io_read( desc, &size, 4,                          1 ) ) return pxtnERR_desc_r;
+	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r;
 	if( !_io_read( desc, &evnt, sizeof( _x4x_EVENTSTRUCT ), 1 ) ) return pxtnERR_desc_r;
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	evnt.unit_index = SDL_Swap16(evnt.unit_index);
+	evnt.event_kind = SDL_Swap16(evnt.event_kind);
+	evnt.data_num = SDL_Swap16(evnt.data_num);
+	evnt.rrr = SDL_Swap16(evnt.rrr);
+	evnt.event_num = SDL_Swap32(evnt.event_num);
+#endif
 
 	// support only 2
 	if( evnt.data_num != 2 ) return pxtnERR_fmt_unknown;

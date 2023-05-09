@@ -255,9 +255,9 @@ pxtnERR pxtnWoice::PTV_Read( void* desc )
 	int32_t        num       =     0;
 
 	if( !_io_read( desc, code    ,               1, 8 ) ){ res = pxtnERR_desc_r  ; goto term; }
-	if( !_io_read( desc, &version, sizeof(int32_t), 1 ) ){ res = pxtnERR_desc_r  ; goto term; }
+	if( !_io_read_le32( desc, &version ) ){ res = pxtnERR_desc_r  ; goto term; }
 	if( memcmp( code, _code, 8 )                  ){ res = pxtnERR_inv_code; goto term; }
-	if( !_io_read( desc, &total  , sizeof(int32_t), 1 ) ){ res = pxtnERR_desc_r  ; goto term; }
+	if( !_io_read_le32( desc, &total ) ){ res = pxtnERR_desc_r  ; goto term; }
 	if( version > _version                        ){ res = pxtnERR_fmt_new ; goto term; }
 
 	// p_ptv-> (5)
