@@ -63,6 +63,7 @@ option(AUDIOCODECS_BUILD_FLUIDLITE "Build FluidLite at AudioCodecs" ON)
 option(AUDIOCODECS_BUILD_ADLMIDI "Build libADLMIDI at AudioCodecs" ON)
 option(AUDIOCODECS_BUILD_OPNMIDI "Build libOPNMIDI at AudioCodecs" ON)
 option(AUDIOCODECS_BUILD_EDMIDI "Build libEDMIDI at AudioCodecs" ON)
+option(AUDIOCODECS_BUILD_WAVPACK "Build WAVPACK at AudioCodecs" ON)
 
 option(AUDIO_CODECS_BUILD_LOCAL_SDL2_SHARED "Build shared version of SDL2 from local AudioCodecs' copy" ON)
 
@@ -96,6 +97,7 @@ ExternalProject_Add(
         "-DBUILD_ADLMIDI=${AUDIOCODECS_BUILD_ADLMIDI}"
         "-DBUILD_OPNMIDI=${AUDIOCODECS_BUILD_OPNMIDI}"
         "-DBUILD_EDMIDI=${AUDIOCODECS_BUILD_EDMIDI}"
+        "-DBUILD_WAVPACK=${AUDIOCODECS_BUILD_WAVPACK}"
 )
 
 if(WIN32) # For VB6-targeted build only
