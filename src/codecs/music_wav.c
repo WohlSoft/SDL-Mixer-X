@@ -152,6 +152,10 @@ typedef struct {
 #define NAME        0x454D414E      /* "NAME" */
 #define _c__        0x20296328      /* "(c) " */
 
+#define _8SVX       0x58565338      /* "8SVX" */
+#define VHDR        0x52444856      /* "VHDR" */
+#define BODY        0x59444F42      /* "BODY" */
+
 /* Supported compression types */
 #define NONE        0x454E4F4E      /* "NONE" */
 #define sowt        0x74776F73      /* "sowt" */
@@ -1007,7 +1011,11 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
     SDL_bool found_SSND = SDL_FALSE;
     SDL_bool found_COMM = SDL_FALSE;
     SDL_bool found_FVER = SDL_FALSE;
+    SDL_bool found_VHDR = SDL_FALSE;
+    SDL_bool found_BODY = SDL_FALSE;
+    SDL_bool is_AIFF = SDL_FALSE;
     SDL_bool is_AIFC = SDL_FALSE;
+    SDL_bool is_8SVX = SDL_FALSE;
 
     Uint32 chunk_type;
     Uint32 chunk_length;
@@ -1034,12 +1042,18 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
     /* Check the magic header */
     chunk_length = SDL_ReadBE32(src);
     AIFFmagic = SDL_ReadLE32(src);
-    if (AIFFmagic != AIFF && AIFFmagic != AIFC) {
-        Mix_SetError("Unrecognized file type (not AIFF or AIFC)");
+    if (AIFFmagic != AIFF && AIFFmagic != AIFC && AIFFmagic != _8SVX) {
+        Mix_SetError("Unrecognized file type (not AIFF, AIFC, nor 8SVX)");
         return SDL_FALSE;
+    }
+    if (AIFFmagic == AIFF) {
+        is_AIFF = SDL_TRUE;
     }
     if (AIFFmagic == AIFC) {
         is_AIFC = SDL_TRUE;
+    }
+    else if (AIFFmagic == _8SVX) {
+        is_8SVX = SDL_TRUE;
     }
 
     /* From what I understand of the specification, chunks may appear in
@@ -1107,10 +1121,30 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
             samplesize = SDL_ReadBE16(src);
             SDL_RWread(src, sane_freq, sizeof(sane_freq), 1);
             frequency = SANE_to_Uint32(sane_freq);
+            if (frequency == 0) {
+                Mix_SetError("Bad AIFF sample frequency");
+                return SDL_FALSE;
+            }
             if (is_AIFC) {
                 compressionType = SDL_ReadLE32(src);
                 /* here must be a "compressionName" which is a padded string */
             }
+            break;
+
+        case VHDR:
+            found_VHDR  = SDL_TRUE;
+            SDL_ReadBE32(src);
+            SDL_ReadBE32(src);
+            SDL_ReadBE32(src);
+            frequency = SDL_ReadBE16(src);
+            channels = 1;
+            samplesize = 8;
+            break;
+
+        case BODY:
+            found_BODY  = 1;
+            numsamples  = chunk_length;
+            wave->start = SDL_RWtell(src);
             break;
 
         default:
@@ -1119,13 +1153,23 @@ static SDL_bool LoadAIFFMusic(WAV_Music *wave)
         }
     } while (next_chunk < file_length && SDL_RWseek(src, next_chunk, RW_SEEK_SET) >= 0);
 
-    if (!found_SSND) {
+    if ((is_AIFF || is_AIFC) && !found_SSND) {
         Mix_SetError("Bad AIFF/AIFF-C file (no SSND chunk)");
         return SDL_FALSE;
     }
 
-    if (!found_COMM) {
+    if ((is_AIFF || is_AIFC) && !found_COMM) {
         Mix_SetError("Bad AIFF/AIFF-C file (no COMM chunk)");
+        return SDL_FALSE;
+    }
+
+    if (is_8SVX && !found_VHDR) {
+        Mix_SetError("Bad 8SVX (no VHDR chunk)");
+        return SDL_FALSE;
+    }
+
+    if (is_8SVX && !found_BODY) {
+        Mix_SetError("Bad 8SVX (no BODY chunk)");
         return SDL_FALSE;
     }
 
