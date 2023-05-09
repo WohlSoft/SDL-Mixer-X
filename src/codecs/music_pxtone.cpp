@@ -176,7 +176,7 @@ static void *PXTONE_NewRW(struct SDL_RWops *src, int freesrc)
 
     comment = music->pxtn->text->get_comment_buf(&comment_len);
     if (comment) {
-        meta_tags_set(&music->tags, MIX_META_COPYRIGHT, comment);
+        meta_tags_set(&music->tags, MIX_META_ALBUM, comment);
     }
 
     return music;
@@ -266,6 +266,12 @@ static int PXTONE_PlayAudio(void *music_p, void *data, int bytes)
     return music_pcm_getaudio(music_p, data, bytes, music->volume, PXTONE_GetSome);
 }
 
+static const char* PXTONE_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
+{
+    PXTONE_Music *music = (PXTONE_Music *)context;
+    return meta_tags_get(&music->tags, tag_type);
+}
+
 /* Set the volume for a EDMIDI stream */
 static void PXTONE_SetVolume(void *music_p, int volume)
 {
@@ -316,7 +322,7 @@ Mix_MusicInterface Mix_MusicInterface_PXTONE =
     NULL,   /* LoopStart [MIXER-X]*/
     NULL,   /* LoopEnd [MIXER-X]*/
     NULL,   /* LoopLength [MIXER-X]*/
-    NULL,   /*GetMetaTag*/
+    PXTONE_GetMetaTag,
     NULL,   /* GetNumTracks */
     NULL,   /* StartTrack */
     NULL,   /* Pause */
