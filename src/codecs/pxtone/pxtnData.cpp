@@ -36,6 +36,7 @@ static bool _v_to_int( uint32_t* p_i, const uint8_t* bytes5, int byte_num )
 		b[4] =  (bytes5[4]&0x7F)>>4;
 		break;
 	case 6:
+	default:
 		return false;
 	}
 
