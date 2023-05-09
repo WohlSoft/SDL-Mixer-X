@@ -57,6 +57,19 @@ typedef struct
 }
 _OVERDRIVESTRUCT;
 
+SDL_FORCE_INLINE void swapEndian( _OVERDRIVESTRUCT &over)
+{
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	over.xxx =   SDL_Swap16(over.xxx);
+	over.group = SDL_Swap16(over.group);
+	over.cut =   SDL_Swap32(over.cut);
+	over.amp =   SDL_Swap32(over.amp);
+	over.yyy =   SDL_Swap32(over.yyy);
+#else
+	(void)over;
+#endif
+}
+
 bool pxtnOverDrive::Write( void* desc ) const
 {
 	_OVERDRIVESTRUCT over;
@@ -83,14 +96,7 @@ pxtnERR pxtnOverDrive::Read( void* desc )
 	memset( &over, 0, sizeof(_OVERDRIVESTRUCT) );
 	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r;
 	if( !_io_read( desc, &over, sizeof(_OVERDRIVESTRUCT), 1 ) ) return pxtnERR_desc_r;
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	over.xxx = SDL_Swap16(over.xxx);
-	over.group = SDL_Swap16(over.group);
-	over.cut = SDL_Swap32(over.cut);
-	over.amp = SDL_Swap32(over.amp);
-	over.yyy = SDL_Swap32(over.yyy);
-#endif
+	swapEndian( over );
 
 	if( over.xxx                         ) return pxtnERR_fmt_unknown;
 	if( over.yyy                         ) return pxtnERR_fmt_unknown;

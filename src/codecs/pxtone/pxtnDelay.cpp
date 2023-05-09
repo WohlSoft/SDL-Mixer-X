@@ -120,6 +120,18 @@ typedef struct
 }
 _DELAYSTRUCT;
 
+SDL_FORCE_INLINE void swapEndian( _DELAYSTRUCT &dela)
+{
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	dela.unit =  SDL_Swap16(dela.unit);
+	dela.group = SDL_Swap16(dela.group);
+	dela.rate =  SDL_Swap32(dela.rate);
+	dela.freq =  SDL_Swap32(dela.freq);
+#else
+	(void)dela;
+#endif
+}
+
 bool pxtnDelay::Write( void* desc ) const
 {
 	_DELAYSTRUCT    dela;
@@ -146,13 +158,7 @@ pxtnERR pxtnDelay::Read( void* desc )
 
 	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r     ;
 	if( !_io_read( desc, &dela, sizeof(_DELAYSTRUCT), 1 ) ) return pxtnERR_desc_r     ;
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	dela.unit = SDL_Swap16(dela.unit);
-	dela.group = SDL_Swap16(dela.group);
-	dela.rate = SDL_Swap32(dela.rate);
-	dela.freq = SDL_Swap32(dela.freq);
-#endif
+	swapEndian( dela );
 
 	if( dela.unit >= DELAYUNIT_num                  ) return pxtnERR_fmt_unknown;
 

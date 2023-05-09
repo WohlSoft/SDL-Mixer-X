@@ -703,6 +703,16 @@ typedef struct
 }
 _ASSIST_WOICE;
 
+SDL_FORCE_INLINE void swapEndian( _ASSIST_WOICE &assi)
+{
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	assi.woice_index = SDL_Swap16(assi.woice_index);
+	assi.rrr =         SDL_Swap16(assi.rrr);
+#else
+	(void)assi;
+#endif
+}
+
 bool pxtnService::_io_assiWOIC_w( void* desc, int32_t idx ) const
 {
 	if( !_b_init ) return false;
@@ -734,11 +744,7 @@ pxtnERR pxtnService::_io_assiWOIC_r( void* desc )
 	if( !_io_read_le32( desc, &size )    ) return pxtnERR_desc_r     ;
 	if( size != sizeof(assi)           ) return pxtnERR_fmt_unknown;
 	if( !_io_read( desc, &assi, size, 1 )    ) return pxtnERR_desc_r     ;
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	assi.woice_index = SDL_Swap16(assi.woice_index);
-	assi.rrr = SDL_Swap16(assi.rrr);
-#endif
+	swapEndian( assi );
 
 	if( assi.rrr                       ) return pxtnERR_fmt_unknown;
 	if( assi.woice_index >= _woice_num ) return pxtnERR_fmt_unknown;
@@ -760,6 +766,17 @@ typedef struct
 	char      name[ pxtnMAX_TUNEUNITNAME ];
 }
 _ASSIST_UNIT;
+
+SDL_FORCE_INLINE void swapEndian( _ASSIST_UNIT &unit)
+{
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	unit.unit_index = SDL_Swap16(unit.unit_index);
+	unit.rrr =        SDL_Swap16(unit.rrr);
+#else
+	(void)unit;
+#endif
+}
+
 
 bool pxtnService::_io_assiUNIT_w( void* desc, int32_t idx ) const
 {
@@ -790,11 +807,7 @@ pxtnERR pxtnService::_io_assiUNIT_r( void* desc )
 	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r     ;
 	if( size != sizeof(assi)                ) return pxtnERR_fmt_unknown;
 	if( !_io_read( desc, &assi, sizeof(assi), 1 ) ) return pxtnERR_desc_r     ;
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	assi.unit_index = SDL_Swap16(assi.unit_index);
-	assi.rrr = SDL_Swap16(assi.rrr);
-#endif
+	swapEndian( assi );
 
 	if( assi.rrr                            ) return pxtnERR_fmt_unknown;
 	if( assi.unit_index >= _unit_num        ) return pxtnERR_fmt_unknown;
@@ -813,6 +826,17 @@ typedef struct
 	int16_t rrr;
 }
 _NUM_UNIT;
+
+SDL_FORCE_INLINE void swapEndian( _NUM_UNIT &data)
+{
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	data.num = SDL_Swap16(data.num);
+	data.rrr = SDL_Swap16(data.rrr);
+#else
+	(void)data;
+#endif
+}
+
 
 bool pxtnService::_io_UNIT_num_w( void* desc ) const
 {
@@ -843,11 +867,7 @@ pxtnERR pxtnService::_io_UNIT_num_r    ( void* desc, int32_t* p_num )
 	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r     ;
 	if( size != sizeof( _NUM_UNIT )                ) return pxtnERR_fmt_unknown;
 	if( !_io_read( desc, &data, sizeof( _NUM_UNIT ), 1 ) ) return pxtnERR_desc_r     ;
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	data.num = SDL_Swap16(data.num);
-	data.rrr = SDL_Swap16(data.rrr);
-#endif
+	swapEndian( data );
 
 	if( data.rrr                                   ) return pxtnERR_fmt_unknown;
 	if( data.num > _unit_max                       ) return pxtnERR_fmt_new    ;
@@ -1299,6 +1319,22 @@ typedef struct
 }
 _x1x_PROJECT;
 
+SDL_FORCE_INLINE void swapEndian( _x1x_PROJECT &prjc)
+{
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	prjc.x1x_beat_tempo =  SDL_Swap32(prjc.x1x_beat_tempo);
+	prjc.x1x_beat_clock =  SDL_Swap16(prjc.x1x_beat_clock);
+	prjc.x1x_beat_num =    SDL_Swap16(prjc.x1x_beat_num);
+	prjc.x1x_beat_note =   SDL_Swap16(prjc.x1x_beat_note);
+	prjc.x1x_meas_num =    SDL_Swap16(prjc.x1x_meas_num);
+	prjc.x1x_channel_num = SDL_Swap16(prjc.x1x_channel_num);
+	prjc.x1x_bps =         SDL_Swap16(prjc.x1x_bps);
+	prjc.x1x_sps =         SDL_Swap16(prjc.x1x_sps);
+#else
+	(void)prjc;
+#endif
+}
+
 bool pxtnService::_x1x_Project_Read( void* desc )
 {
 	if( !_b_init ) return false;
@@ -1310,17 +1346,7 @@ bool pxtnService::_x1x_Project_Read( void* desc )
 
 	if( !_io_read_le32( desc, &size ) ) return false;
 	if( !_io_read( desc, &prjc, sizeof( _x1x_PROJECT ), 1 ) ) return false;
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	prjc.x1x_beat_tempo =  SDL_Swap32(prjc.x1x_beat_tempo);
-	prjc.x1x_beat_clock =  SDL_Swap16(prjc.x1x_beat_clock);
-	prjc.x1x_beat_num =    SDL_Swap16(prjc.x1x_beat_num);
-	prjc.x1x_beat_note =   SDL_Swap16(prjc.x1x_beat_note);
-	prjc.x1x_meas_num =    SDL_Swap16(prjc.x1x_meas_num);
-	prjc.x1x_channel_num = SDL_Swap16(prjc.x1x_channel_num);
-	prjc.x1x_bps =         SDL_Swap16(prjc.x1x_bps);
-	prjc.x1x_sps =         SDL_Swap16(prjc.x1x_sps);
-#endif
+	swapEndian( prjc );
 
 	beat_num   = prjc.x1x_beat_num  ;
 	beat_tempo = prjc.x1x_beat_tempo;

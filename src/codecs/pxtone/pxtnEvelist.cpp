@@ -825,6 +825,19 @@ typedef struct
 }
 _x4x_EVENTSTRUCT;
 
+SDL_FORCE_INLINE void swapEndian( _x4x_EVENTSTRUCT &evnt)
+{
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	evnt.unit_index = SDL_Swap16(evnt.unit_index);
+	evnt.event_kind = SDL_Swap16(evnt.event_kind);
+	evnt.data_num =   SDL_Swap16(evnt.data_num);
+	evnt.rrr =        SDL_Swap16(evnt.rrr);
+	evnt.event_num =  SDL_Swap32(evnt.event_num);
+#else
+	(void)evnt;
+#endif
+}
+
 // write event.
 pxtnERR pxtnEvelist::io_Unit_Read_x4x_EVENT( void* desc, bool bTailAbsolute, bool bCheckRRR )
 {
@@ -837,14 +850,7 @@ pxtnERR pxtnEvelist::io_Unit_Read_x4x_EVENT( void* desc, bool bTailAbsolute, boo
 
 	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r;
 	if( !_io_read( desc, &evnt, sizeof( _x4x_EVENTSTRUCT ), 1 ) ) return pxtnERR_desc_r;
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	evnt.unit_index = SDL_Swap16(evnt.unit_index);
-	evnt.event_kind = SDL_Swap16(evnt.event_kind);
-	evnt.data_num = SDL_Swap16(evnt.data_num);
-	evnt.rrr = SDL_Swap16(evnt.rrr);
-	evnt.event_num = SDL_Swap32(evnt.event_num);
-#endif
+	swapEndian( evnt );
 
 	if( evnt.data_num != 2               ) return pxtnERR_fmt_unknown;
 	if( evnt.event_kind >= EVENTKIND_NUM ) return pxtnERR_fmt_unknown;
@@ -878,14 +884,7 @@ pxtnERR pxtnEvelist::io_Read_x4x_EventNum( void* desc, int32_t* p_num ) const
 
 	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r;
 	if( !_io_read( desc, &evnt, sizeof( _x4x_EVENTSTRUCT ), 1 ) ) return pxtnERR_desc_r;
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	evnt.unit_index = SDL_Swap16(evnt.unit_index);
-	evnt.event_kind = SDL_Swap16(evnt.event_kind);
-	evnt.data_num = SDL_Swap16(evnt.data_num);
-	evnt.rrr = SDL_Swap16(evnt.rrr);
-	evnt.event_num = SDL_Swap32(evnt.event_num);
-#endif
+	swapEndian( evnt );
 
 	// support only 2
 	if( evnt.data_num != 2 ) return pxtnERR_fmt_unknown;

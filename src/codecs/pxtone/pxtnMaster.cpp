@@ -167,6 +167,17 @@ typedef struct
 }
 _x4x_MASTER;
 
+SDL_FORCE_INLINE void swapEndian( _x4x_MASTER &mast)
+{
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	mast.data_num =  SDL_Swap16(mast.data_num);
+	mast.rrr =       SDL_Swap16(mast.rrr);
+	mast.event_num = SDL_Swap32(mast.event_num);
+#else
+	(void)mast;
+#endif
+}
+
 // read( project )
 pxtnERR pxtnMaster::io_r_x4x( void* desc )
 {
@@ -183,12 +194,7 @@ pxtnERR pxtnMaster::io_r_x4x( void* desc )
 
 	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r;
 	if( !_io_read( desc, &mast, sizeof( _x4x_MASTER ), 1 ) ) return pxtnERR_desc_r;
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	mast.data_num = SDL_Swap16(mast.data_num);
-	mast.rrr = SDL_Swap16(mast.rrr);
-	mast.event_num = SDL_Swap32(mast.event_num);
-#endif
+	swapEndian( mast );
 
 	// unknown format
 	if( mast.data_num != 3 ) return pxtnERR_fmt_unknown;
@@ -243,12 +249,7 @@ int32_t pxtnMaster::io_r_x4x_EventNum( void* desc )
 	memset( &mast, 0, sizeof( _x4x_MASTER ) );
 	if( !_io_read_le32( desc, &size ) ) return 0;
 	if( !_io_read( desc, &mast, sizeof( _x4x_MASTER ), 1 ) ) return 0;
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	mast.data_num = SDL_Swap16(mast.data_num);
-	mast.rrr = SDL_Swap16(mast.rrr);
-	mast.event_num = SDL_Swap32(mast.event_num);
-#endif
+	swapEndian( mast );
 
 	if( mast.data_num != 3 ) return 0;
 

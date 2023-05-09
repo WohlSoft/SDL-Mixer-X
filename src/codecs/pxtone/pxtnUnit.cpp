@@ -315,6 +315,16 @@ typedef struct
 }
 _x1x_UNIT;
 
+SDL_FORCE_INLINE void swapEndian( _x1x_UNIT &unit)
+{
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	unit.type =  SDL_Swap16(unit.type);
+	unit.group = SDL_Swap16(unit.group);
+#else
+	(void)unit;
+#endif
+}
+
 bool pxtnUnit::Read_v1x( void* desc, int32_t *p_group )
 {
 	_x1x_UNIT unit;
@@ -322,11 +332,7 @@ bool pxtnUnit::Read_v1x( void* desc, int32_t *p_group )
 
 	if( !_io_read_le32( desc, &size ) ) return false;
 	if( !_io_read( desc, &unit, sizeof( _x1x_UNIT ), 1 ) ) return false;
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	unit.type = SDL_Swap16(unit.type);
-	unit.group = SDL_Swap16(unit.group);
-#endif
+	swapEndian( unit );
 
 	if( (pxtnWOICETYPE)unit.type != pxtnWOICE_PCM        ) return false;
 
@@ -346,6 +352,16 @@ typedef struct
 }
 _x3x_UNIT;
 
+SDL_FORCE_INLINE void swapEndian( _x3x_UNIT &unit)
+{
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	unit.type =  SDL_Swap16(unit.type);
+	unit.group = SDL_Swap16(unit.group);
+#else
+	(void)unit;
+#endif
+}
+
 pxtnERR pxtnUnit::Read_v3x( void* desc, int32_t *p_group )
 {
 	_x3x_UNIT unit = {0};
@@ -353,11 +369,7 @@ pxtnERR pxtnUnit::Read_v3x( void* desc, int32_t *p_group )
 
 	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r;
 	if( !_io_read( desc, &unit, sizeof( _x3x_UNIT ), 1 ) ) return pxtnERR_desc_r;
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	unit.type = SDL_Swap16(unit.type);
-	unit.group = SDL_Swap16(unit.group);
-#endif
+	swapEndian( unit );
 
 	if( (pxtnWOICETYPE)unit.type != pxtnWOICE_PCM &&
 		(pxtnWOICETYPE)unit.type != pxtnWOICE_PTV &&

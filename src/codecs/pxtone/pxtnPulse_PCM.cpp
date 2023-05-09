@@ -19,6 +19,21 @@ typedef struct
 }
 WAVEFORMATCHUNK;
 
+SDL_FORCE_INLINE void swapEndian( WAVEFORMATCHUNK &format)
+{
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	format.formatID =       SDL_Swap16(format.formatID);
+	format.ch =             SDL_Swap16(format.ch);
+	format.sps =            SDL_Swap32(format.sps);
+	format.byte_per_sec =   SDL_Swap32(format.byte_per_sec);
+	format.block_size =     SDL_Swap16(format.block_size);
+	format.bps =            SDL_Swap16(format.bps);
+	format.ext =            SDL_Swap16(format.ext);
+#else
+	(void)format;
+#endif
+}
+
 void pxtnPulse_PCM::Release()
 {
 	if( _p_smp ) free( _p_smp );
@@ -100,16 +115,7 @@ pxtnERR pxtnPulse_PCM::read( void* desc )
 	// read format.
 	if( !_io_read_le32( desc ,&size ) ){ res = pxtnERR_desc_r     ; goto term; }
 	if( !_io_read( desc, &format,               18, 1 ) ){ res = pxtnERR_desc_r     ; goto term; }
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	format.formatID =       SDL_Swap16(format.formatID);
-	format.ch =             SDL_Swap16(format.ch);
-	format.sps =            SDL_Swap32(format.sps);
-	format.byte_per_sec =   SDL_Swap32(format.byte_per_sec);
-	format.block_size =     SDL_Swap16(format.block_size);
-	format.bps =            SDL_Swap16(format.bps);
-	format.ext =            SDL_Swap16(format.ext);
-#endif
+	swapEndian( format );
 
 	if( format.formatID != 0x0001               ){ res = pxtnERR_pcm_unknown; goto term; }
 	if( format.ch  != 1 && format.ch  !=  2     ){ res = pxtnERR_pcm_unknown; goto term; }
@@ -130,6 +136,16 @@ pxtnERR pxtnPulse_PCM::read( void* desc )
 	if( res != pxtnOK ) goto term;
 
 	if( !_io_read( desc, _p_smp, sizeof(uint8_t), size )   ){ res = pxtnERR_desc_r; goto term; }
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	if( format.bps == 16 )
+	{
+		uint16_t *s = (uint16_t*)_p_smp;
+		uint32_t len = size / 2;
+		for(uint32_t i = 0; i < len; ++i, ++s)
+			*s = SDL_SwapLE16(*s);
+	}
+#endif
 
 	res = pxtnOK;
 term:
