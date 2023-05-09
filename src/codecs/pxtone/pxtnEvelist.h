@@ -23,7 +23,7 @@ enum
 	EVENTKIND_TUNING    ,// 14
 	EVENTKIND_PAN_TIME  ,// 15
 
-	EVENTKIND_NUM       ,// 16
+	EVENTKIND_NUM       // 16
 };
 
 #define EVENTDEFAULT_VOLUME       104
@@ -97,7 +97,7 @@ public:
 
 	bool    Record_Add_i         ( int32_t clock,             uint8_t unit_no, uint8_t kind, int32_t   value   );
 	bool    Record_Add_f         ( int32_t clock,             uint8_t unit_no, uint8_t kind, float value_f     );
-		    			         
+
 	bool    Linear_Start         ();
 	void    Linear_Add_i         ( int32_t clock,             uint8_t unit_no, uint8_t kind, int32_t   value   );
 	void    Linear_Add_f         ( int32_t clock,             uint8_t unit_no, uint8_t kind, float value_f     );
@@ -107,7 +107,7 @@ public:
 	int32_t Record_Value_Set     ( int32_t clock1, int32_t clock2, uint8_t unit_no, uint8_t kind, int32_t value );
 	int32_t Record_Value_Change  ( int32_t clock1, int32_t clock2, uint8_t unit_no, uint8_t kind, int32_t value );
 	int32_t Record_Value_Omit    (                                                  uint8_t kind, int32_t value );
-	int32_t Record_Value_Replace (                                                  uint8_t kind, int32_t old_value, int32_t new_value ); 
+	int32_t Record_Value_Replace (                                                  uint8_t kind, int32_t old_value, int32_t new_value );
 	int32_t Record_Delete        ( int32_t clock1, int32_t clock2, uint8_t unit_no, uint8_t kind                );
 	int32_t Record_Delete        ( int32_t clock1, int32_t clock2, uint8_t unit_no                              );
 

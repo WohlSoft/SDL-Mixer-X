@@ -18,13 +18,14 @@ pxtoneNoise::pxtoneNoise( pxtnIO_r io_read, pxtnIO_w io_write, pxtnIO_seek io_se
 
 pxtoneNoise::~pxtoneNoise()
 {
-	if( _bldr ) delete (pxtnPulse_NoiseBuilder*)_bldr; _bldr = NULL;
+	if( _bldr ) delete (pxtnPulse_NoiseBuilder*)_bldr;
+	_bldr = NULL;
 }
 
 bool pxtoneNoise::init()
 {
-	pxtnPulse_NoiseBuilder *bldr = new pxtnPulse_NoiseBuilder( _io_read, _io_write, _io_seek, _io_pos );	
-	if( !bldr->Init() ){ free( bldr ); return false; }	
+	pxtnPulse_NoiseBuilder *bldr = new pxtnPulse_NoiseBuilder( _io_read, _io_write, _io_seek, _io_pos );
+	if( !bldr->Init() ){ delete bldr; return false; }
 	_bldr = bldr;
 	return true;
 }

@@ -7,7 +7,7 @@
 #define _OCTAVE_NUM         16   // octave num.
 #define _KEY_PER_OCTAVE     12   // key per octave
 #define _FREQUENCY_PER_KEY  0x10 // sample per key
-		 
+
 #define _BASIC_FREQUENCY_INDEX ((_OCTAVE_NUM/2) * _KEY_PER_OCTAVE * _FREQUENCY_PER_KEY )
 #define _TABLE_SIZE            ( _OCTAVE_NUM    * _KEY_PER_OCTAVE * _FREQUENCY_PER_KEY )
 
@@ -26,7 +26,7 @@ double pxtnPulse_Frequency::_GetDivideOctaveRate( int32_t  divi )
  		add = 1;
 		for( j = 0; j < i; j++ ) add = add * 0.1;
 
-		// check 0 .. 9 
+		// check 0 .. 9
 		for( j = 0; j < 10; j++ )
 		{
 			work = parameter + add * j;
@@ -58,7 +58,9 @@ pxtnPulse_Frequency::pxtnPulse_Frequency( pxtnIO_r io_read, pxtnIO_w io_write, p
 
 pxtnPulse_Frequency::~pxtnPulse_Frequency()
 {
-	if( _freq_table ) free( _freq_table ); _freq_table = NULL;
+	if( _freq_table )
+		free( _freq_table );
+	_freq_table = NULL;
 }
 
 bool pxtnPulse_Frequency::Init()
@@ -67,21 +69,21 @@ bool pxtnPulse_Frequency::Init()
 	double oct_table[ _OCTAVE_NUM ] =
 	{
 		0.00390625, //0  -8
-		0.0078125,  //1  -7 
+		0.0078125,  //1  -7
 		0.015625,   //2  -6
 		0.03125,    //3  -5
 		0.0625,     //4  -4
 		0.125,      //5  -3
 		0.25,       //6  -2
 		0.5,        //7  -1
-		1,          //8  
+		1,          //8
 		2,          //9   1
 		4,          //a   2
 		8,          //b   3
 		16,         //c   4
 		32,         //d   5
 		64,         //e   6
-		128,        //f   7
+		128         //f   7
 	};
 
 	int32_t    key ;

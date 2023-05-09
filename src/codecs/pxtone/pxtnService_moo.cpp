@@ -12,16 +12,16 @@ void pxtnService::_moo_constructor()
 	_moo_b_end_vomit    = true ;
 	_moo_b_mute_by_unit = false;
 	_moo_b_loop         = true ;
-	
+
 	_moo_fade_fade      =     0;
 	_moo_master_vol     =  1.0f;
 	_moo_bt_clock       =     0;
 	_moo_bt_num         =     0;
-					    
+
 	_moo_freq           = NULL ;
 	_moo_group_smps     = NULL ;
 	_moo_p_eve          = NULL ;
-					    
+
 	_moo_smp_count      =     0;
 	_moo_smp_end        =     0;
 }
@@ -31,7 +31,8 @@ bool pxtnService::_moo_release()
 	if( !_moo_b_init ) return false;
 	_moo_b_init = false;
 	SAFE_DELETE( _moo_freq );
-	if( _moo_group_smps ) free( _moo_group_smps ); _moo_group_smps = NULL;
+	if( _moo_group_smps ) free( _moo_group_smps );
+	_moo_group_smps = NULL;
 	return true;
 }
 
@@ -126,7 +127,7 @@ bool pxtnService::_moo_PXTONE_SAMPLE( void *p_data )
 
 		switch( _moo_p_eve->kind )
 		{
-		case EVENTKIND_ON       : 
+		case EVENTKIND_ON       :
 			{
 				int32_t on_count = (int32_t)( (_moo_p_eve->clock + _moo_p_eve->value - clock) * _moo_clock_rate );
 				if( on_count <= 0 ){ p_u->Tone_ZeroLives(); break; }
@@ -260,7 +261,7 @@ bool pxtnService::_moo_PXTONE_SAMPLE( void *p_data )
 
 
 ///////////////////////
-// get / set 
+// get / set
 ///////////////////////
 
 bool pxtnService::moo_is_valid_data() const
@@ -417,7 +418,7 @@ bool pxtnService::moo_set_master_volume( float v )
 
 
 ////////////////////
-// 
+//
 ////////////////////
 
 bool pxtnService::Moo( void* p_buf, int32_t  size )
@@ -451,7 +452,7 @@ bool pxtnService::Moo( void* p_buf, int32_t  size )
 
 	if( _sampled_proc )
 	{
-		int32_t clock = (int32_t)( _moo_smp_count / _moo_clock_rate );
+//		int32_t clock = (int32_t)( _moo_smp_count / _moo_clock_rate );
 		if( !_sampled_proc( _sampled_user, this ) ){ _moo_b_end_vomit = true; goto term; }
 	}
 

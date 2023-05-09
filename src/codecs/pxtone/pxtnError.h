@@ -50,7 +50,7 @@ enum pxtnERR
 	pxtnERR_x3x_add_tuning  ,
 	pxtnERR_x3x_key         ,
 
-	pxtnERR_num,
+	pxtnERR_num
 };
 
 const char* pxtnError_get_string( pxtnERR err_code );

@@ -126,12 +126,22 @@ bool pxtnPulse_Noise::_WriteOscillator( const pxNOISEDESIGN_OSCILLATOR *p_osc, v
 pxtnERR pxtnPulse_Noise::_ReadOscillator( pxNOISEDESIGN_OSCILLATOR *p_osc, void* desc )
 {
 	int32_t work;
-	if( !_data_r_v( desc, &work )     ) return pxtnERR_desc_r     ; p_osc->type     = (pxWAVETYPE)work;
+	if( !_data_r_v( desc, &work )     ) return pxtnERR_desc_r     ;
+	p_osc->type     = (pxWAVETYPE)work;
+
 	if( p_osc->type >= pxWAVETYPE_num ) return pxtnERR_fmt_unknown;
-	if( !_data_r_v( desc, &work )     ) return pxtnERR_desc_r     ; p_osc->b_rev    = work ? true : false;
-	if( !_data_r_v( desc, &work )     ) return pxtnERR_desc_r     ; p_osc->freq     = (float)work / 10;
-	if( !_data_r_v( desc, &work )     ) return pxtnERR_desc_r     ; p_osc->volume   = (float)work / 10;
-	if( !_data_r_v( desc, &work )     ) return pxtnERR_desc_r     ; p_osc->offset   = (float)work / 10;
+
+	if( !_data_r_v( desc, &work )     ) return pxtnERR_desc_r     ;
+	p_osc->b_rev    = work ? true : false;
+
+	if( !_data_r_v( desc, &work )     ) return pxtnERR_desc_r     ;
+	p_osc->freq     = (float)work / 10;
+
+	if( !_data_r_v( desc, &work )     ) return pxtnERR_desc_r     ;
+	p_osc->volume   = (float)work / 10;
+
+	if( !_data_r_v( desc, &work )     ) return pxtnERR_desc_r     ;
+	p_osc->offset   = (float)work / 10;
 
 	return pxtnOK;
 }
@@ -222,16 +232,16 @@ pxtnERR pxtnPulse_Noise::read( void* desc )
 	char       code[ 8 ] = {0};
 
 	Release();
-	
+
 	if( !_io_read( desc, code, 1, 8 )         ){ res = pxtnERR_desc_r     ; goto term; }
 	if( memcmp( code, _code, 8 )        ){ res = pxtnERR_inv_code   ; goto term; }
-	if( !_io_read( desc, &ver     , 4, 1 )    ){ res = pxtnERR_desc_r     ; goto term; }	
-	if( ver > _ver                      ){ res = pxtnERR_fmt_new    ; goto term; }	
+	if( !_io_read( desc, &ver     , 4, 1 )    ){ res = pxtnERR_desc_r     ; goto term; }
+	if( ver > _ver                      ){ res = pxtnERR_fmt_new    ; goto term; }
 	if( !_data_r_v( desc, &_smp_num_44k )    ){ res = pxtnERR_desc_r     ; goto term; }
 	if( !_io_read( desc, &unit_num, 1, 1 )    ){ res = pxtnERR_desc_r     ; goto term; }
 	if( unit_num < 0                    ){ res = pxtnERR_inv_data   ; goto term; }
 	if( unit_num > MAX_NOISEEDITUNITNUM ){ res = pxtnERR_fmt_unknown; goto term; }
-	_unit_num = unit_num;			    
+	_unit_num = unit_num;
 
 	if( !pxtnMem_zero_alloc( (void**)&_units, sizeof(pxNOISEDESIGN_UNIT) * _unit_num ) ){ res = pxtnERR_memory; goto term; }
 
@@ -261,7 +271,7 @@ pxtnERR pxtnPulse_Noise::read( void* desc )
 			if( !_io_read( desc, &byte, 1, 1 ) ){ res = pxtnERR_desc_r; goto term; }
 			pU->pan = byte;
 		}
-		
+
 		if( flags & NOISEEDITFLAG_OSC_MAIN ){ res = _ReadOscillator( &pU->main, desc ); if( res != pxtnOK ) goto term; }
 		if( flags & NOISEEDITFLAG_OSC_FREQ ){ res = _ReadOscillator( &pU->freq, desc ); if( res != pxtnOK ) goto term; }
 		if( flags & NOISEEDITFLAG_OSC_VOLU ){ res = _ReadOscillator( &pU->volu, desc ); if( res != pxtnOK ) goto term; }
@@ -370,11 +380,13 @@ int32_t pxtnPulse_Noise::Compare     ( const pxtnPulse_Noise *p_src ) const
 		if( _CompareOsci( &p_src->_units[ u ].freq, &_units[ u ].freq ) ) return 1;
 		if( _CompareOsci( &p_src->_units[ u ].volu, &_units[ u ].volu ) ) return 1;
 
+#if 0 // 自分と自分を比較しますか？ 役に立たないコード！
 		for( int32_t e = 0; e < _units[ u ].enve_num; e++ )
 		{
 			if( _units[ u ].enves[ e ].x != _units[ u ].enves[ e ].x ) return 1;
 			if( _units[ u ].enves[ e ].y != _units[ u ].enves[ e ].y ) return 1;
 		}
+#endif
 	}
 	return 0;
 }

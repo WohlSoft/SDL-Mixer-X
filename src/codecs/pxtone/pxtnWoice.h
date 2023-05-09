@@ -32,7 +32,7 @@ enum pxtnWOICETYPE
 	pxtnWOICE_PCM ,
 	pxtnWOICE_PTV ,
 	pxtnWOICE_PTN ,
-	pxtnWOICE_OGGV,
+	pxtnWOICE_OGGV
 };
 
 enum pxtnVOICETYPE
@@ -41,7 +41,7 @@ enum pxtnVOICETYPE
 	pxtnVOICE_Overtone ,
 	pxtnVOICE_Noise    ,
 	pxtnVOICE_Sampling ,
-	pxtnVOICE_OggVorbis,
+	pxtnVOICE_OggVorbis
 };
 
 typedef struct
@@ -85,7 +85,7 @@ typedef struct
 	float             tuning     ;
 	uint32_t          voice_flags;
 	uint32_t          data_flags ;
-					  
+
 	pxtnVOICETYPE     type       ;
 	pxtnPulse_PCM     *p_pcm     ;
 	pxtnPulse_Noise   *p_ptn     ;
@@ -100,7 +100,7 @@ pxtnVOICEUNIT;
 
 typedef struct
 {
-	double  smp_pos    ;       
+	double  smp_pos    ;
 	float   offset_freq;
 	int32_t env_volume ;
 	int32_t life_count ;

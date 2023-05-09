@@ -52,9 +52,9 @@ private:
 		_enum_FMTVER_x2x, // no version of exe
 		_enum_FMTVER_x3x, // unit has voice / basic-key for only view
 		_enum_FMTVER_x4x, // unit has event
-		_enum_FMTVER_v5 ,
+		_enum_FMTVER_v5
 	};
-	
+
 	bool _b_init;
 	bool _b_edit;
 	bool _b_fix_evels_num;
@@ -97,7 +97,7 @@ private:
 	bool     _moo_b_valid_data;
 	bool     _moo_b_end_vomit ;
 	bool     _moo_b_init      ;
-		    
+
 	bool     _moo_b_mute_by_unit;
 	bool     _moo_b_loop      ;
 
@@ -107,12 +107,12 @@ private:
 	int32_t  _moo_smp_start   ;
 	int32_t  _moo_smp_end     ;
 	int32_t  _moo_smp_repeat  ;
-		
+
 	int32_t  _moo_fade_count  ;
 	int32_t  _moo_fade_max    ;
 	int32_t  _moo_fade_fade   ;
 	float    _moo_master_vol  ;
-		
+
 	int32_t  _moo_top;
 	float    _moo_smp_stride  ;
 	int32_t  _moo_time_pan_index;
@@ -223,7 +223,7 @@ public :
 
 	bool    moo_is_valid_data() const;
 	bool    moo_is_end_vomit () const;
-		    
+
 	bool    moo_set_mute_by_unit( bool b );
 	bool    moo_set_loop        ( bool b );
 	bool    moo_set_fade( int32_t fade, float sec );

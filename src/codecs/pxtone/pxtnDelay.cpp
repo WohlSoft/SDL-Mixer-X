@@ -10,13 +10,13 @@ pxtnDelay::pxtnDelay( pxtnIO_r io_read, pxtnIO_w io_write, pxtnIO_seek io_seek, 
 {
 	_set_io_funcs( io_read, io_write, io_seek, io_pos );
 
-	_b_played = true; 
-	_unit     = DELAYUNIT_Beat;    
+	_b_played = true;
+	_unit     = DELAYUNIT_Beat;
 	_group    =    0;
 	_rate     = 33.0;
 	_freq     =  3.f;
-	_smp_num  =    0;  
-	_offset   =    0;  
+	_smp_num  =    0;
+	_offset   =    0;
 	_rate_s32 =  100;
 
 	memset( _bufs, 0, sizeof(_bufs) );
@@ -68,6 +68,7 @@ pxtnERR pxtnDelay::Tone_Ready( int32_t beat_num, float beat_tempo, int32_t sps )
 		case DELAYUNIT_Beat  : _smp_num = (int32_t)( sps * 60            / beat_tempo / _freq ); break;
 		case DELAYUNIT_Meas  : _smp_num = (int32_t)( sps * 60 * beat_num / beat_tempo / _freq ); break;
 		case DELAYUNIT_Second: _smp_num = (int32_t)( sps                              / _freq ); break;
+		default: break;
 		}
 
 		for( int32_t c = 0; c < pxtnMAX_CHANNEL; c++ )
