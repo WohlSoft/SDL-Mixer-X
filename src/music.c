@@ -1612,7 +1612,9 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
 #endif
 
 #ifdef MUSIC_PXTONE
-    if (SDL_memcmp(magic, "PTTUNE ", 6) == 0)
+    if (SDL_memcmp(magic, "PTTUNE", 6) == 0)
+        return MUS_PXTONE;
+    if (SDL_memcmp(magic, "PTCOLLAGE", 9) == 0)
         return MUS_PXTONE;
 #endif
 

@@ -113,7 +113,7 @@ static void *PXTONE_NewRW(struct SDL_RWops *src, int freesrc)
         return NULL;
     }
 
-    if (!music->pxtn->set_destination_quality(music_spec.channels, music_spec.samples)) {
+    if (!music->pxtn->set_destination_quality(music_spec.channels, music_spec.freq)) {
         PXTONE_Delete(music);
         Mix_SetError("PXTONE: Failed to set the destination quality");
         return NULL;
@@ -224,6 +224,8 @@ static int PXTONE_Play(void *music_p, int play_count)
         prep.start_pos_float = 0;
         prep.master_volume   = 1.0f;
 
+        music->pxtn->moo_set_loop(play_count < 0);
+
         if (!music->pxtn->moo_preparation(&prep)) {
             Mix_SetError("PXTONE: Failed to initialize the moo");
             return -1;
@@ -243,14 +245,6 @@ static int PXTONE_GetSome(void *context, void *data, int bytes, SDL_bool *done)
     if (filled != 0) {
         return filled;
     }
-
-//    if (!music->play_count) {
-//        /* All done */
-//        *done = SDL_TRUE;
-//        return 0;
-//    }
-
-    // got_some = SDL_FALSE;
 
     ret = music->pxtn->Moo(music->buffer, music->buffer_size);
     if (!ret) {
