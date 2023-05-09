@@ -157,10 +157,11 @@ pxtnERR pxtnWoice::io_matePTN_r( void* desc )
 	if( !_io_read( desc, &ptn,  sizeof(_MATERIALSTRUCT_PTN), 1 ) ) return pxtnERR_desc_r;
 
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	ptv.x3x_unit_no = SDL_Swap16(ptv.x3x_unit_no);
-	ptv.rrr =         SDL_Swap16(ptv.rrr);
-	ptv.x3x_tuning =  SDL_Swap32(ptv.x3x_tuning);
-	ptv.size =        SDL_Swap32(ptv.size);
+	ptn.x3x_unit_no = SDL_Swap16(ptn.x3x_unit_no);
+	ptn.basic_key =   SDL_Swap16(ptn.basic_key);
+	ptn.voice_flags = SDL_Swap32(ptn.voice_flags);
+	ptn.tuning =      SDL_Swap32(ptn.tuning);
+	ptn.rrr =         SDL_Swap32(ptn.rrr);
 #endif
 
 	if     ( ptn.rrr > 1 ) return pxtnERR_fmt_unknown;

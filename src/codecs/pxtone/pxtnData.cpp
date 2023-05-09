@@ -107,7 +107,7 @@ bool pxtnData::_io_read_le16 ( void* user, void* p_dst ) const
 	return _io_read( user, p_dst, sizeof(uint16_t), 1 );
 #else
 	bool ret = _io_read( user, p_dst, sizeof(uint16_t), 1 );
-	*((uint16_t)p_dst) = SDL_Swap16( *(uint16_t)p_dst );
+	*((uint16_t*)p_dst) = SDL_Swap16( *(uint16_t*)p_dst );
 	return ret;
 #endif
 }
@@ -118,7 +118,7 @@ bool pxtnData::_io_read_le32 ( void* user, void* p_dst ) const
 	return _io_read( user, p_dst, sizeof(uint32_t), 1 );
 #else
 	bool ret = _io_read( user, p_dst, sizeof(uint32_t), 1 );
-	*((uint32_t)p_dst) = SDL_Swap32( *(uint32_t)p_dst );
+	*((uint32_t*)p_dst) = SDL_Swap32( *(uint32_t*)p_dst );
 	return ret;
 #endif
 }
@@ -129,7 +129,7 @@ bool pxtnData::_io_read_le64 ( void* user, void* p_dst ) const
 	return _io_read( user, p_dst, sizeof(uint64_t), 1 );
 #else
 	bool ret = _io_read( user, p_dst, sizeof(uint64_t), 1 );
-	*((uint64_t)p_dst) = SDL_Swap64( *(uint64_t)p_dst );
+	*((uint64_t*)p_dst) = SDL_Swap64( *(uint64_t*)p_dst );
 	return ret;
 #endif
 }
