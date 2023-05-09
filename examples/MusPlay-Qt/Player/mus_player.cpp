@@ -207,6 +207,7 @@ namespace PGE_MusicPlayer
                     type == MUS_FLUIDLITE ? "MUS/XMI(Fluid)" :
                     type == MUS_NATIVEMIDI ? "MUS/XMI(Native)" :
                     type == MUS_FFMPEG ? "FFMPEG" :
+                    type == MUS_PXTONE ? "PXTONE" :
 #else
 #   if SDL_MIXER_MAJOR_VERSION > 2 || \
     (SDL_MIXER_MAJOR_VERSION == 2 && SDL_MIXER_MINOR_VERSION > 0) || \
