@@ -54,5 +54,5 @@ if(USE_PXTONE)
         ${CMAKE_CURRENT_LIST_DIR}/music_pxtone.cpp
         ${CMAKE_CURRENT_LIST_DIR}/music_pxtone.h
     )
-    appendChiptuneFormats("PTTUNE")
+    appendChiptuneFormats("PTTUNE;PTCOP")
 endif()
