@@ -105,7 +105,7 @@ static void *PXTONE_NewRW(struct SDL_RWops *src, int freesrc)
     music->gain = 1.0f;
     music->volume = MIX_MAX_VOLUME;
 
-    music->pxtn = new pxtnService( _pxtn_r, _pxtn_w, _pxtn_s, _pxtn_p );
+    music->pxtn = new pxtnService(_pxtn_r, _pxtn_w, _pxtn_s, _pxtn_p);
 
     if (music->pxtn->init() != pxtnOK ) {
         PXTONE_Delete(music);
