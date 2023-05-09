@@ -75,6 +75,7 @@ SDL_AudioSpec *Mix_LoadAIFF_RW (SDL_RWops *src, int freesrc,
     Uint32 chunk_type;
     Uint32 chunk_length;
     Sint64 next_chunk;
+    Sint64 file_length;
 
     /* AIFF magic header */
     Uint32 FORMchunk;
@@ -98,6 +99,9 @@ SDL_AudioSpec *Mix_LoadAIFF_RW (SDL_RWops *src, int freesrc,
         goto done;
     }
 
+    file_length = SDL_RWsize(src);
+
+    /* Check the magic header */
     FORMchunk   = SDL_ReadLE32(src);
     chunk_length    = SDL_ReadBE32(src);
     if (chunk_length == AIFF) { /* The FORMchunk has already been read */
@@ -124,9 +128,11 @@ SDL_AudioSpec *Mix_LoadAIFF_RW (SDL_RWops *src, int freesrc,
         chunk_type  = SDL_ReadLE32(src);
         chunk_length = SDL_ReadBE32(src);
         next_chunk  = SDL_RWtell(src) + chunk_length;
-        /* Paranoia to avoid infinite loops */
-        if (chunk_length == 0)
-            break;
+
+        /* a 0 pad byte can be stored for any odd-length chunk */
+        if (chunk_length % 2) {
+            next_chunk++;
+        }
 
         switch (chunk_type) {
             case SSND:
@@ -170,12 +176,7 @@ SDL_AudioSpec *Mix_LoadAIFF_RW (SDL_RWops *src, int freesrc,
             default:
                 break;
         }
-        /* a 0 pad byte can be stored for any odd-length chunk */
-        if (chunk_length&1)
-            next_chunk++;
-    } while ((((AIFFmagic == AIFF) && (!found_SSND || !found_COMM))
-          || ((AIFFmagic == _8SVX) && (!found_VHDR || !found_BODY)))
-          && SDL_RWseek(src, next_chunk, RW_SEEK_SET) != 1);
+    } while (next_chunk < file_length && SDL_RWseek(src, next_chunk, RW_SEEK_SET) >= 0);
 
     if ((AIFFmagic == AIFF) && !found_SSND) {
         Mix_SetError("Bad AIFF (no SSND chunk)");
