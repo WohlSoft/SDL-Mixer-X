@@ -38,12 +38,26 @@
 #define FORM        0x4d524f46      /* "FORM" */
 
 #define AIFF        0x46464941      /* "AIFF" */
+#define AIFC        0x43464941      /* "AIFС" */
+#define FVER        0x52455646      /* "FVER" */
 #define SSND        0x444e5353      /* "SSND" */
 #define COMM        0x4d4d4f43      /* "COMM" */
 
 #define _8SVX       0x58565338      /* "8SVX" */
 #define VHDR        0x52444856      /* "VHDR" */
 #define BODY        0x59444F42      /* "BODY" */
+
+/* Supported compression types */
+#define NONE        0x454E4F4E      /* "NONE" */
+#define sowt        0x74776F73      /* "sowt" */
+#define raw_        0x20776172      /* "raw " */
+#define ulaw        0x77616C75      /* "ulaw" */
+#define alaw        0x77616C61      /* "alaw" */
+#define ULAW        0x57414C55      /* "ULAW" */
+#define ALAW        0x57414C41      /* "ALAW" */
+#define fl32        0x32336C66      /* "fl32" */
+#define fl64        0x34366C66      /* "fl64" */
+#define FL32        0x32334C46      /* "FL32" */
 
 /* This function was taken from libsndfile. I don't pretend to fully
  * understand it.
@@ -68,6 +82,7 @@ SDL_AudioSpec *Mix_LoadAIFF_RW (SDL_RWops *src, int freesrc,
     int was_error;
     int found_SSND;
     int found_COMM;
+    int found_FVER;
     int found_VHDR;
     int found_BODY;
     Sint64 start = 0;
@@ -91,6 +106,8 @@ SDL_AudioSpec *Mix_LoadAIFF_RW (SDL_RWops *src, int freesrc,
     Uint16 samplesize = 0;
     Uint8 sane_freq[10];
     Uint32 frequency = 0;
+    Uint32 AIFCVersion1 = 0;
+    Uint32 compressionType = 0;
 
     /* Make sure we are passed a valid data source */
     was_error = 0;
@@ -111,8 +128,8 @@ SDL_AudioSpec *Mix_LoadAIFF_RW (SDL_RWops *src, int freesrc,
     } else {
         AIFFmagic    = SDL_ReadLE32(src);
     }
-    if ((FORMchunk != FORM) || ((AIFFmagic != AIFF) && (AIFFmagic != _8SVX))) {
-        Mix_SetError("Unrecognized file type (not AIFF nor 8SVX)");
+    if ((FORMchunk != FORM) || ((AIFFmagic != AIFF) && (AIFFmagic != AIFC) && (AIFFmagic != _8SVX))) {
+        Mix_SetError("Unrecognized file type (not AIFF, AIFC, nor 8SVX)");
         was_error = 1;
         goto done;
     }
@@ -121,6 +138,7 @@ SDL_AudioSpec *Mix_LoadAIFF_RW (SDL_RWops *src, int freesrc,
 
     found_SSND = 0;
     found_COMM = 0;
+    found_FVER = 0;
     found_VHDR = 0;
     found_BODY = 0;
 
@@ -143,6 +161,12 @@ SDL_AudioSpec *Mix_LoadAIFF_RW (SDL_RWops *src, int freesrc,
                 (void)blocksize; /* unused. */
                 break;
 
+            case FVER:
+                found_FVER = SDL_TRUE;
+                AIFCVersion1 = SDL_ReadBE32(src);
+                (void)AIFCVersion1; /* unused */
+                break;
+
             case COMM:
                 found_COMM  = 1;
                 channels    = SDL_ReadBE16(src);
@@ -154,6 +178,10 @@ SDL_AudioSpec *Mix_LoadAIFF_RW (SDL_RWops *src, int freesrc,
                     Mix_SetError("Bad AIFF sample frequency");
                     was_error = 1;
                     goto done;
+                }
+                if (AIFFmagic == AIFC) {
+                    compressionType = SDL_ReadLE32(src);
+                    /* here must be a "compressionName" which is a padded string */
                 }
                 break;
 
@@ -178,13 +206,13 @@ SDL_AudioSpec *Mix_LoadAIFF_RW (SDL_RWops *src, int freesrc,
         }
     } while (next_chunk < file_length && SDL_RWseek(src, next_chunk, RW_SEEK_SET) >= 0);
 
-    if ((AIFFmagic == AIFF) && !found_SSND) {
+    if ((AIFFmagic == AIFF || AIFFmagic == AIFC) && !found_SSND) {
         Mix_SetError("Bad AIFF (no SSND chunk)");
         was_error = 1;
         goto done;
     }
 
-    if ((AIFFmagic == AIFF) && !found_COMM) {
+    if ((AIFFmagic == AIFF || AIFFmagic == AIFC) && !found_COMM) {
         Mix_SetError("Bad AIFF (no COMM chunk)");
         was_error = 1;
         goto done;
@@ -202,17 +230,47 @@ SDL_AudioSpec *Mix_LoadAIFF_RW (SDL_RWops *src, int freesrc,
         goto done;
     }
 
+    if ((AIFFmagic == AIFC) && !found_FVER) {
+        Mix_SetError("Bad AIFF-C file (no FVER chunk)");
+        was_error = 1;
+        goto done;
+    }
+
     /* Decode the audio data format */
     SDL_memset(spec, 0, sizeof(*spec));
     spec->freq = frequency;
     switch (samplesize) {
         case 8:
-            spec->format = AUDIO_S8;
+            if (AIFFmagic != AIFC)
+                spec->format = AUDIO_S8;
+            else switch (compressionType) {
+            case raw_: spec->format = AUDIO_U8; break;
+            case sowt: spec->format = AUDIO_S8; break;
+            default: goto unsupported_format;
+            }
             break;
         case 16:
-            spec->format = AUDIO_S16MSB;
+            if (AIFFmagic != AIFC)
+                spec->format = AUDIO_S16MSB;
+            else switch (compressionType) {
+            case sowt: spec->format = AUDIO_S16LSB; break;
+            case NONE: spec->format = AUDIO_S16MSB; break;
+            default: goto unsupported_format;
+            }
+            break;
+        case 32:
+            if (AIFFmagic != AIFC)
+                spec->format = AUDIO_S32MSB;
+            else switch (compressionType) {
+            case sowt: spec->format = AUDIO_S32LSB; break;
+            case NONE: spec->format = AUDIO_S32MSB; break;
+            case fl32:
+            case FL32: spec->format = AUDIO_F32MSB; break;
+            default: goto unsupported_format;
+            }
             break;
         default:
+unsupported_format:
             Mix_SetError("Unsupported AIFF samplesize");
             was_error = 1;
             goto done;
@@ -224,12 +282,14 @@ SDL_AudioSpec *Mix_LoadAIFF_RW (SDL_RWops *src, int freesrc,
     *audio_buf = (Uint8 *)SDL_malloc(*audio_len);
     if (*audio_buf == NULL) {
         Mix_OutOfMemory();
-        return(NULL);
+        was_error = 1;
+        goto done;
     }
     SDL_RWseek(src, start, RW_SEEK_SET);
     if (SDL_RWread(src, *audio_buf, *audio_len, 1) != 1) {
         Mix_SetError("Unable to read audio data");
-        return(NULL);
+        was_error = 1;
+        goto done;
     }
 
     /* Don't return a buffer that isn't a multiple of samplesize */
