@@ -94,6 +94,7 @@ static void *PXTONE_NewRW(struct SDL_RWops *src, int freesrc)
     const char *name;
     int32_t name_len;
     const char *comment;
+    char *temp_string;
     int32_t comment_len;
 
     music = (PXTONE_Music *)SDL_calloc(1, sizeof *music);
@@ -171,12 +172,16 @@ static void *PXTONE_NewRW(struct SDL_RWops *src, int freesrc)
 
     name = music->pxtn->text->get_name_buf(&name_len);
     if (name) {
-        meta_tags_set(&music->tags, MIX_META_TITLE, name);
+        temp_string = SDL_iconv_string("UTF-8", "Shift-JIS", name, name_len + 2);
+        meta_tags_set(&music->tags, MIX_META_TITLE, temp_string);
+        SDL_free(temp_string);
     }
 
     comment = music->pxtn->text->get_comment_buf(&comment_len);
     if (comment) {
-        meta_tags_set(&music->tags, MIX_META_ALBUM, comment);
+        temp_string = SDL_iconv_string("UTF-8", "Shift-JIS", comment, comment_len + 2);
+        meta_tags_set(&music->tags, MIX_META_ALBUM, temp_string);
+        SDL_free(temp_string);
     }
 
     return music;
