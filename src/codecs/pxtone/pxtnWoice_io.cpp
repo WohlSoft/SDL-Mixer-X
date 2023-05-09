@@ -90,6 +90,16 @@ pxtnERR pxtnWoice::io_matePCM_r( void* desc )
 		if( !_io_read( desc, p_vc->p_pcm->get_p_buf_variable(), 1, pcm.data_size ) ){ res = pxtnERR_desc_r; goto term; }
 		_type = pxtnWOICE_PCM;
 
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+		if( pcm.bps == 16 )
+		{
+			uint16_t *s = (uint16_t*)p_vc->p_pcm->get_p_buf_variable();
+			uint32_t len = pcm.data_size / 2;
+			for(uint32_t i = 0; i < len; ++i, ++s)
+				*s = SDL_SwapLE16(*s);
+		}
+#endif
+
 		p_vc->voice_flags = pcm.voice_flags;
 		p_vc->basic_key   = pcm.basic_key  ;
 		p_vc->tuning      = pcm.tuning     ;
