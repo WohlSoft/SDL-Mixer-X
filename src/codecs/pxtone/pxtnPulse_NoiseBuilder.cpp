@@ -4,6 +4,7 @@
 #include "./pxtnMem.h"
 #include "./pxtnPulse_NoiseBuilder.h"
 
+#include "SDL_endian.h"
 
 #define _BASIC_SPS     44100.0
 #define _BASIC_FREQUENCY 100.0 // 100 Hz
@@ -138,8 +139,13 @@ short pxtnPulse_NoiseBuilder::_random_get()
 	w1 = (short)_rand_buf[ 0 ] + _rand_buf[ 1 ];
 	p1 = (char *)&w1;
 	p2 = (char *)&w2;
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
 	p2[ 0 ] = p1[ 1 ];
 	p2[ 1 ] = p1[ 0 ];
+#else
+	p2[ 2 ] = p1[ 3 ];
+	p2[ 3 ] = p1[ 2 ];
+#endif
 	_rand_buf[ 1 ] = (short)_rand_buf[ 0 ];
 	_rand_buf[ 0 ] = (short)w2;
 
