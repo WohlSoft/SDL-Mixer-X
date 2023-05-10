@@ -13,6 +13,7 @@ It is an additional changelog file. It extends the CHANGES.txt that lists change
  * Fixed the confusion of the selected banks and the chips number at ADLMIDI and OPNMIDI.
  * Fixed several issues
  * Stabilized work of the Alternative Native MIDI on Windows.
+ * Added the PXTONE library to support playback of .pttune and .ptcol files
 
 2.5.0: (2021-09-21)
  * Added std-vorbis library as an alternative for OGG Vorbis streams
