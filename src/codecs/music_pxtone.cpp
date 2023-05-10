@@ -90,7 +90,6 @@ static void PXTONE_Delete(void *context);
 static void *PXTONE_NewRW(struct SDL_RWops *src, int freesrc)
 {
     PXTONE_Music *music = NULL;
-    Sint32 smp_total;
     const char *name;
     int32_t name_len;
     const char *comment;
@@ -136,7 +135,7 @@ static void *PXTONE_NewRW(struct SDL_RWops *src, int freesrc)
     music->evals_loaded = true;
 
     // PREPARATION PLAYING MUSIC.
-    smp_total = music->pxtn->moo_get_total_sample();
+    music->pxtn->moo_get_total_sample();
 
     pxtnVOMITPREPARATION prep;
     SDL_memset(&prep, 0, sizeof(pxtnVOMITPREPARATION));
