@@ -9,8 +9,6 @@
 
 #include "./pxtnService.h"
 
-#include "SDL_endian.h"
-
 
 #define _VERSIONSIZE    16
 #define _CODESIZE        8
@@ -703,11 +701,11 @@ typedef struct
 }
 _ASSIST_WOICE;
 
-SDL_FORCE_INLINE void swapEndian( _ASSIST_WOICE &assi)
+px_FORCE_INLINE void swapEndian( _ASSIST_WOICE &assi)
 {
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	assi.woice_index = SDL_Swap16(assi.woice_index);
-	assi.rrr =         SDL_Swap16(assi.rrr);
+#ifdef px_BIG_ENDIAN
+	assi.woice_index = pxtnData::_swap16(assi.woice_index);
+	assi.rrr =         pxtnData::_swap16(assi.rrr);
 #else
 	(void)assi;
 #endif
@@ -767,11 +765,11 @@ typedef struct
 }
 _ASSIST_UNIT;
 
-SDL_FORCE_INLINE void swapEndian( _ASSIST_UNIT &unit)
+px_FORCE_INLINE void swapEndian( _ASSIST_UNIT &unit)
 {
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	unit.unit_index = SDL_Swap16(unit.unit_index);
-	unit.rrr =        SDL_Swap16(unit.rrr);
+#ifdef px_BIG_ENDIAN
+	unit.unit_index = pxtnData::_swap16(unit.unit_index);
+	unit.rrr =        pxtnData::_swap16(unit.rrr);
 #else
 	(void)unit;
 #endif
@@ -827,11 +825,11 @@ typedef struct
 }
 _NUM_UNIT;
 
-SDL_FORCE_INLINE void swapEndian( _NUM_UNIT &data)
+px_FORCE_INLINE void swapEndian( _NUM_UNIT &data)
 {
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	data.num = SDL_Swap16(data.num);
-	data.rrr = SDL_Swap16(data.rrr);
+#ifdef px_BIG_ENDIAN
+	data.num = pxtnData::_swap16(data.num);
+	data.rrr = pxtnData::_swap16(data.rrr);
 #else
 	(void)data;
 #endif
@@ -1319,17 +1317,17 @@ typedef struct
 }
 _x1x_PROJECT;
 
-SDL_FORCE_INLINE void swapEndian( _x1x_PROJECT &prjc)
+px_FORCE_INLINE void swapEndian( _x1x_PROJECT &prjc)
 {
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	prjc.x1x_beat_tempo =  SDL_SwapFloat(prjc.x1x_beat_tempo);
-	prjc.x1x_beat_clock =  SDL_Swap16(prjc.x1x_beat_clock);
-	prjc.x1x_beat_num =    SDL_Swap16(prjc.x1x_beat_num);
-	prjc.x1x_beat_note =   SDL_Swap16(prjc.x1x_beat_note);
-	prjc.x1x_meas_num =    SDL_Swap16(prjc.x1x_meas_num);
-	prjc.x1x_channel_num = SDL_Swap16(prjc.x1x_channel_num);
-	prjc.x1x_bps =         SDL_Swap16(prjc.x1x_bps);
-	prjc.x1x_sps =         SDL_Swap16(prjc.x1x_sps);
+#ifdef px_BIG_ENDIAN
+	prjc.x1x_beat_tempo =  pxtnData::_swap_float(prjc.x1x_beat_tempo);
+	prjc.x1x_beat_clock =  pxtnData::_swap16(prjc.x1x_beat_clock);
+	prjc.x1x_beat_num =    pxtnData::_swap16(prjc.x1x_beat_num);
+	prjc.x1x_beat_note =   pxtnData::_swap16(prjc.x1x_beat_note);
+	prjc.x1x_meas_num =    pxtnData::_swap16(prjc.x1x_meas_num);
+	prjc.x1x_channel_num = pxtnData::_swap16(prjc.x1x_channel_num);
+	prjc.x1x_bps =         pxtnData::_swap16(prjc.x1x_bps);
+	prjc.x1x_sps =         pxtnData::_swap16(prjc.x1x_sps);
 #else
 	(void)prjc;
 #endif

@@ -1,9 +1,6 @@
 
 #include "./pxtnEvelist.h"
 
-#include "SDL_endian.h"
-
-
 void pxtnEvelist::Release()
 {
 	if( _eves ) free( _eves );
@@ -825,14 +822,14 @@ typedef struct
 }
 _x4x_EVENTSTRUCT;
 
-SDL_FORCE_INLINE void swapEndian( _x4x_EVENTSTRUCT &evnt)
+px_FORCE_INLINE void swapEndian( _x4x_EVENTSTRUCT &evnt)
 {
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	evnt.unit_index = SDL_Swap16(evnt.unit_index);
-	evnt.event_kind = SDL_Swap16(evnt.event_kind);
-	evnt.data_num =   SDL_Swap16(evnt.data_num);
-	evnt.rrr =        SDL_Swap16(evnt.rrr);
-	evnt.event_num =  SDL_Swap32(evnt.event_num);
+#ifdef px_BIG_ENDIAN
+	evnt.unit_index = pxtnData::_swap16(evnt.unit_index);
+	evnt.event_kind = pxtnData::_swap16(evnt.event_kind);
+	evnt.data_num =   pxtnData::_swap16(evnt.data_num);
+	evnt.rrr =        pxtnData::_swap16(evnt.rrr);
+	evnt.event_num =  pxtnData::_swap32(evnt.event_num);
 #else
 	(void)evnt;
 #endif

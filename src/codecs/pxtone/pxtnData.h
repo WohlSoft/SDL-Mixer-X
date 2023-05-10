@@ -47,6 +47,30 @@ public :
 
 	bool init();
 	bool Xxx ();
+
+#ifdef px_BIG_ENDIAN
+	static inline uint16_t _swap16( uint16_t x )
+	{
+		return static_cast<uint16_t>(((x << 8) & 0xFF00) | ((x >> 8) & 0x00FF));
+	}
+
+	static inline uint32_t _swap32( uint32_t x )
+	{
+		return static_cast<uint32_t>(((x << 24) & 0xFF000000) | ((x << 8) & 0x00FF0000) | ((x >> 8) & 0x0000FF00) | ((x >> 24) & 0x000000FF));
+	}
+
+	static inline float _swap_float( float x )
+	{
+		union
+		{
+			float f;
+			uint32_t ui32;
+		} swapper;
+		swapper.f = x;
+		swapper.ui32 = _swap32(swapper.ui32);
+		return swapper.f;
+	}
+#endif /* PXTONE_BIG_ENDIAN */
 };
 
 #endif

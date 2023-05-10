@@ -6,9 +6,6 @@
 
 #include "./pxtnDelay.h"
 
-#include "SDL_endian.h"
-
-
 pxtnDelay::pxtnDelay( pxtnIO_r io_read, pxtnIO_w io_write, pxtnIO_seek io_seek, pxtnIO_pos io_pos )
 {
 	_set_io_funcs( io_read, io_write, io_seek, io_pos );
@@ -120,13 +117,13 @@ typedef struct
 }
 _DELAYSTRUCT;
 
-SDL_FORCE_INLINE void swapEndian( _DELAYSTRUCT &dela)
+px_FORCE_INLINE void swapEndian( _DELAYSTRUCT &dela)
 {
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	dela.unit =  SDL_Swap16(dela.unit);
-	dela.group = SDL_Swap16(dela.group);
-	dela.rate =  SDL_SwapFloat(dela.rate);
-	dela.freq =  SDL_SwapFloat(dela.freq);
+#ifdef px_BIG_ENDIAN
+	dela.unit =  pxtnData::_swap16(dela.unit);
+	dela.group = pxtnData::_swap16(dela.group);
+	dela.rate =  pxtnData::_swap_float(dela.rate);
+	dela.freq =  pxtnData::_swap_float(dela.freq);
 #else
 	(void)dela;
 #endif

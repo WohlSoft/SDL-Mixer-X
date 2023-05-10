@@ -5,9 +5,6 @@
 #include "./pxtnUnit.h"
 #include "./pxtnEvelist.h"
 
-#include "SDL_endian.h"
-
-
 pxtnUnit::pxtnUnit( pxtnIO_r io_read, pxtnIO_w io_write, pxtnIO_seek io_seek, pxtnIO_pos io_pos )
 {
 	_set_io_funcs( io_read, io_write, io_seek, io_pos );
@@ -315,11 +312,11 @@ typedef struct
 }
 _x1x_UNIT;
 
-SDL_FORCE_INLINE void swapEndian( _x1x_UNIT &unit)
+px_FORCE_INLINE void swapEndian( _x1x_UNIT &unit)
 {
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	unit.type =  SDL_Swap16(unit.type);
-	unit.group = SDL_Swap16(unit.group);
+#ifdef px_BIG_ENDIAN
+	unit.type =  pxtnData::_swap16(unit.type);
+	unit.group = pxtnData::_swap16(unit.group);
 #else
 	(void)unit;
 #endif
@@ -352,11 +349,11 @@ typedef struct
 }
 _x3x_UNIT;
 
-SDL_FORCE_INLINE void swapEndian( _x3x_UNIT &unit)
+px_FORCE_INLINE void swapEndian( _x3x_UNIT &unit)
 {
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	unit.type =  SDL_Swap16(unit.type);
-	unit.group = SDL_Swap16(unit.group);
+#ifdef px_BIG_ENDIAN
+	unit.type =  pxtnData::_swap16(unit.type);
+	unit.group = pxtnData::_swap16(unit.group);
 #else
 	(void)unit;
 #endif

@@ -5,9 +5,6 @@
 #include "./pxtnMaster.h"
 #include "./pxtnEvelist.h"
 
-#include "SDL_endian.h"
-
-
 pxtnMaster::pxtnMaster( pxtnIO_r io_read, pxtnIO_w io_write, pxtnIO_seek io_seek, pxtnIO_pos io_pos )
 {
 	_set_io_funcs( io_read, io_write, io_seek, io_pos );
@@ -167,12 +164,12 @@ typedef struct
 }
 _x4x_MASTER;
 
-SDL_FORCE_INLINE void swapEndian( _x4x_MASTER &mast)
+px_FORCE_INLINE void swapEndian( _x4x_MASTER &mast)
 {
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	mast.data_num =  SDL_Swap16(mast.data_num);
-	mast.rrr =       SDL_Swap16(mast.rrr);
-	mast.event_num = SDL_Swap32(mast.event_num);
+#ifdef px_BIG_ENDIAN
+	mast.data_num =  pxtnData::_swap16(mast.data_num);
+	mast.rrr =       pxtnData::_swap16(mast.rrr);
+	mast.event_num = pxtnData::_swap32(mast.event_num);
 #else
 	(void)mast;
 #endif

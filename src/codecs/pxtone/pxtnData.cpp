@@ -1,5 +1,5 @@
 #include "./pxtnData.h"
-#include "SDL_endian.h"
+
 
 
 static bool _v_to_int( uint32_t* p_i, const uint8_t* bytes5, int byte_num )
@@ -40,7 +40,8 @@ static bool _v_to_int( uint32_t* p_i, const uint8_t* bytes5, int byte_num )
 		return false;
 	}
 
-	*p_i = SDL_SwapLE32(*((int32_t*)b));
+	*p_i = static_cast<uint32_t>( (b[0] & 0x000000FF) | ((b[1] << 8) & 0x0000FF00) | ((b[2] << 16) & 0x00FF0000) | ((b[3] << 24) & 0xFF000000) );
+
 	return true;
 }
 
@@ -48,12 +49,10 @@ void _int_to_v( uint8_t* bytes5, int* p_byte_num, uint32_t i )
 {
 	uint8_t a[ 5 ] = {};
 
-	i = SDL_SwapLE32(i);
-
-	bytes5[ 0 ] = 0; a[ 0 ] = *( (uint8_t *)(&i) + 0 );
-	bytes5[ 1 ] = 0; a[ 1 ] = *( (uint8_t *)(&i) + 1 );
-	bytes5[ 2 ] = 0; a[ 2 ] = *( (uint8_t *)(&i) + 2 );
-	bytes5[ 3 ] = 0; a[ 3 ] = *( (uint8_t *)(&i) + 3 );
+	bytes5[ 0 ] = 0; a[ 0 ] = (uint8_t)((i >> 0 ) & 0xFF); //*( (uint8_t *)(&i) + 0 );
+	bytes5[ 1 ] = 0; a[ 1 ] = (uint8_t)((i >> 8 ) & 0xFF); //*( (uint8_t *)(&i) + 1 );
+	bytes5[ 2 ] = 0; a[ 2 ] = (uint8_t)((i >> 16) & 0xFF); //*( (uint8_t *)(&i) + 2 );
+	bytes5[ 3 ] = 0; a[ 3 ] = (uint8_t)((i >> 24) & 0xFF); //*( (uint8_t *)(&i) + 3 );
 	bytes5[ 4 ] = 0; a[ 4 ] = 0;
 
 	// 1byte(7bit)
@@ -104,35 +103,42 @@ void _int_to_v( uint8_t* bytes5, int* p_byte_num, uint32_t i )
 
 bool pxtnData::_io_read_le16 ( void* user, void* p_dst ) const
 {
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN
-	return _io_read( user, p_dst, sizeof(uint16_t), 1 );
-#else
-	bool ret = _io_read( user, p_dst, sizeof(uint16_t), 1 );
-	*((uint16_t*)p_dst) = SDL_Swap16( *(uint16_t*)p_dst );
+	uint8_t in[2] = {0, 0};
+	uint16_t *out = reinterpret_cast<uint16_t*>( p_dst );
+
+	bool ret = _io_read( user, (void*)in, 1, 2 );
+	*out = static_cast<uint16_t>( (in[0] & 0x00FF) | ((in[1] << 8) & 0xFF00) );
+
 	return ret;
-#endif
 }
 
 bool pxtnData::_io_read_le32 ( void* user, void* p_dst ) const
 {
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN
-	return _io_read( user, p_dst, sizeof(uint32_t), 1 );
-#else
-	bool ret = _io_read( user, p_dst, sizeof(uint32_t), 1 );
-	*((uint32_t*)p_dst) = SDL_Swap32( *(uint32_t*)p_dst );
+	uint8_t in[4] = {0, 0, 0, 0};
+	uint32_t *out = reinterpret_cast<uint32_t*>( p_dst );
+
+	bool ret = _io_read( user, (void*)in, 1, 4 );
+	*out = static_cast<uint32_t>( (in[0] & 0x000000FF) | ((in[1] << 8) & 0x0000FF00) | ((in[2] << 16) & 0x00FF0000) | ((in[3] << 24) & 0xFF000000) );
+
 	return ret;
-#endif
 }
 
 bool pxtnData::_io_read_le32f ( void *user, void *p_dst ) const
 {
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN
-	return _io_read( user, p_dst, sizeof(float), 1 );
-#else
-	bool ret = _io_read( user, p_dst, sizeof(uint32_t), 1 );
-	*((float*)p_dst) = SDL_SwapFloat( *(float*)p_dst );
+	uint8_t in[4] = {0, 0, 0, 0};
+
+	union
+	{
+		float f;
+		uint32_t ui32;
+	} swapper;
+
+	float *out = reinterpret_cast<float*>( p_dst );
+	bool ret = _io_read( user, (void*)in, 1, 4 );
+	swapper.ui32 = static_cast<uint32_t>( (in[0] & 0x000000FF) | ((in[1] << 8) & 0x0000FF00) | ((in[2] << 16) & 0x00FF0000) | ((in[3] << 24) & 0xFF000000) );
+	*out = swapper.f;
+
 	return ret;
-#endif
 }
 
 int32_t pxtnData::_data_check_v_size ( uint32_t v ) const
@@ -202,7 +208,6 @@ bool pxtnData::copy_from( const pxtnData* src )
 	_io_seek  = src->_io_seek ;
 	return true;
 }
-
 
 pxtnData::pxtnData()
 {

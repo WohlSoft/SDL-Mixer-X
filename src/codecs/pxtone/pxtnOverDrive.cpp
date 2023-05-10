@@ -2,9 +2,6 @@
 
 #include "./pxtnOverDrive.h"
 
-#include "SDL_endian.h"
-
-
 pxtnOverDrive::pxtnOverDrive( pxtnIO_r io_read, pxtnIO_w io_write, pxtnIO_seek io_seek, pxtnIO_pos io_pos )
 {
 	_set_io_funcs( io_read, io_write, io_seek, io_pos );
@@ -57,14 +54,14 @@ typedef struct
 }
 _OVERDRIVESTRUCT;
 
-SDL_FORCE_INLINE void swapEndian( _OVERDRIVESTRUCT &over)
+px_FORCE_INLINE void swapEndian( _OVERDRIVESTRUCT &over)
 {
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	over.xxx =   SDL_Swap16(over.xxx);
-	over.group = SDL_Swap16(over.group);
-	over.cut =   SDL_SwapFloat(over.cut);
-	over.amp =   SDL_SwapFloat(over.amp);
-	over.yyy =   SDL_SwapFloat(over.yyy);
+#ifdef px_BIG_ENDIAN
+	over.xxx =   pxtnData::_swap16(over.xxx);
+	over.group = pxtnData::_swap16(over.group);
+	over.cut =   pxtnData::_swap_float(over.cut);
+	over.amp =   pxtnData::_swap_float(over.amp);
+	over.yyy =   pxtnData::_swap_float(over.yyy);
 #else
 	(void)over;
 #endif
