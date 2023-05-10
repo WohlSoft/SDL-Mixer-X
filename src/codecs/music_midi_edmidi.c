@@ -131,7 +131,7 @@ typedef struct {
     float gain;
 } EDMidi_Setup;
 
-#define EDMIDI_DEFAULT_MODS_COUNT     8
+#define EDMIDI_DEFAULT_MODS_COUNT     2
 
 static EDMidi_Setup edmidi_setup = {
     EDMIDI_DEFAULT_MODS_COUNT, 1.0, 2.0
@@ -335,7 +335,7 @@ static EDMIDI_Music *EDMIDI_LoadSongRW(SDL_RWops *src, const char *args)
 
     length = SDL_RWseek(src, 0, RW_SEEK_END);
     if (length < 0) {
-        Mix_SetError("ADL-MIDI: wrong file\n");
+        Mix_SetError("EDMIDI: wrong file\n");
         EDMIDI_delete(music);
         return NULL;
     }
@@ -357,7 +357,7 @@ static EDMIDI_Music *EDMIDI_LoadSongRW(SDL_RWops *src, const char *args)
     if (filesize == 0) {
         SDL_free(bytes);
         EDMIDI_delete(music);
-        Mix_SetError("ADL-MIDI: wrong file\n");
+        Mix_SetError("EDMIDI: wrong file\n");
         return NULL;
     }
 
@@ -370,7 +370,7 @@ static EDMIDI_Music *EDMIDI_LoadSongRW(SDL_RWops *src, const char *args)
     }
 
     if (err < 0) {
-        Mix_SetError("ADL-MIDI: %s", EDMIDI.edmidi_errorInfo(music->edmidi));
+        Mix_SetError("EDMIDI: %s", EDMIDI.edmidi_errorInfo(music->edmidi));
         SDL_free(bytes);
         EDMIDI_delete(music);
         return NULL;
