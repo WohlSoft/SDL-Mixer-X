@@ -181,7 +181,7 @@ static void *PXTONE_NewRW(struct SDL_RWops *src, int freesrc)
     comment = music->pxtn->text->get_comment_buf(&comment_len);
     if (comment) {
         temp_string = SDL_iconv_string("UTF-8", "Shift-JIS", comment, comment_len + 2);
-        meta_tags_set(&music->tags, MIX_META_ALBUM, temp_string);
+        meta_tags_set(&music->tags, MIX_META_COPYRIGHT, temp_string);
         SDL_free(temp_string);
     }
 
