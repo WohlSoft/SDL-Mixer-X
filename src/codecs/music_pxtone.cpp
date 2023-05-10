@@ -139,7 +139,7 @@ static void *PXTONE_NewRW(struct SDL_RWops *src, int freesrc)
 
     pxtnVOMITPREPARATION prep;
     SDL_memset(&prep, 0, sizeof(pxtnVOMITPREPARATION));
-    prep.flags          |= pxtnVOMITPREPFLAG_loop;
+    prep.flags          |= pxtnVOMITPREPFLAG_loop | pxtnVOMITPREPFLAG_unit_mute;
     prep.start_pos_float = 0;
     prep.master_volume   = 1.0f;
 
@@ -224,7 +224,7 @@ static int PXTONE_Play(void *music_p, int play_count)
 
         pxtnVOMITPREPARATION prep;
         SDL_memset(&prep, 0, sizeof(pxtnVOMITPREPARATION));
-        prep.flags          |= pxtnVOMITPREPFLAG_loop;
+        prep.flags          |= pxtnVOMITPREPFLAG_loop | pxtnVOMITPREPFLAG_unit_mute;
         prep.start_pos_float = 0;
         prep.master_volume   = 1.0f;
 
@@ -292,6 +292,28 @@ static int PXTONE_GetVolume(void *music_p)
     return (int)v;
 }
 
+static int PXTONE_GetTracksCount(void *music_p)
+{
+    PXTONE_Music *music = (PXTONE_Music *)music_p;
+    if (music) {
+        return music->pxtn->Unit_Num();
+    }
+    return -1;
+}
+
+static int PXTONE_SetTrackMute(void *music_p, int track, int mute)
+{
+    PXTONE_Music *music = (PXTONE_Music *)music_p;
+    if (music) {
+        pxtnUnit *u = music->pxtn->Unit_Get_variable( track );
+        if (u) {
+            u->set_played( !mute );
+        }
+        return 0;
+    }
+    return -1;
+}
+
 Mix_MusicInterface Mix_MusicInterface_PXTONE =
 {
     "PXTONE",
@@ -321,8 +343,8 @@ Mix_MusicInterface Mix_MusicInterface_PXTONE =
     NULL,   /* GetSpeed [MIXER-X] */
     NULL,   /* SetPitch [MIXER-X] */
     NULL,   /* GetPitch [MIXER-X] */
-    NULL,   /* GetTracksCount */
-    NULL,   /* SetTrackMuted */
+    PXTONE_GetTracksCount,
+    PXTONE_SetTrackMute,
     NULL,   /* LoopStart [MIXER-X]*/
     NULL,   /* LoopEnd [MIXER-X]*/
     NULL,   /* LoopLength [MIXER-X]*/
