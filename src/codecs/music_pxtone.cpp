@@ -34,6 +34,7 @@ typedef struct
     int freesrc;
 
     int volume;
+    double tempo;
     float gain;
 
     pxtnService*   pxtn;
@@ -102,6 +103,7 @@ static void *PXTONE_NewRW(struct SDL_RWops *src, int freesrc)
         return NULL;
     }
 
+    music->tempo = 1.0;
     music->gain = 1.0f;
     music->volume = MIX_MAX_VOLUME;
 
@@ -230,7 +232,7 @@ static int PXTONE_Play(void *music_p, int play_count)
 
         music->pxtn->moo_set_loop(play_count < 0);
 
-        if (!music->pxtn->moo_preparation(&prep)) {
+        if (!music->pxtn->moo_preparation(&prep, music->tempo)) {
             Mix_SetError("PXTONE: Failed to initialize the moo");
             return -1;
         }
@@ -292,6 +294,26 @@ static int PXTONE_GetVolume(void *music_p)
     return (int)v;
 }
 
+static int PXTONE_SetTempo(void *music_p, double tempo)
+{
+    PXTONE_Music *music = (PXTONE_Music *)music_p;
+    if (music && (tempo > 0.0)) {
+        music->tempo = tempo;
+        music->pxtn->moo_set_tempo_mod(music->tempo);
+        return 0;
+    }
+    return -1;
+}
+
+static double PXTONE_GetTempo(void *music_p)
+{
+    PXTONE_Music *music = (PXTONE_Music *)music_p;
+    if (music) {
+        return music->tempo;
+    }
+    return -1.0;
+}
+
 static int PXTONE_GetTracksCount(void *music_p)
 {
     PXTONE_Music *music = (PXTONE_Music *)music_p;
@@ -337,8 +359,8 @@ Mix_MusicInterface Mix_MusicInterface_PXTONE =
     NULL,   /* Seek */
     NULL,   /* Tell [MIXER-X]*/
     NULL,   /* Duration */
-    NULL,   /* SetTempo [MIXER-X] */
-    NULL,   /* GetTempo [MIXER-X] */
+    PXTONE_SetTempo,  /* SetTempo [MIXER-X] */
+    PXTONE_GetTempo,  /* GetTempo [MIXER-X] */
     NULL,   /* SetSpeed [MIXER-X] */
     NULL,   /* GetSpeed [MIXER-X] */
     NULL,   /* SetPitch [MIXER-X] */

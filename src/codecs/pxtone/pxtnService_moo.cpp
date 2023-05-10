@@ -310,7 +310,7 @@ bool pxtnService::moo_set_fade( int32_t  fade, float sec )
 ////////////////////////////
 
 // preparation
-bool pxtnService::moo_preparation( const pxtnVOMITPREPARATION *p_prep )
+bool pxtnService::moo_preparation(const pxtnVOMITPREPARATION *p_prep , float tempo_mod )
 {
 	if( !_moo_b_init || !_moo_b_valid_data || !_dst_ch_num || !_dst_sps || !_dst_byte_per_smp )
 	{
@@ -348,6 +348,7 @@ bool pxtnService::moo_preparation( const pxtnVOMITPREPARATION *p_prep )
 	_moo_bt_clock   = master->get_beat_clock();
 	_moo_bt_num     = master->get_beat_num  ();
 	_moo_bt_tempo   = master->get_beat_tempo();
+	_moo_tempo_mod  = tempo_mod;
 	_moo_clock_rate = (float)( 60.0f * (double)_dst_sps / ( (double)_moo_bt_tempo * (double)_moo_bt_clock ) );
 	_moo_smp_stride = ( 44100.0f / _dst_sps );
 	_moo_top        = 0x7fff;
@@ -378,6 +379,32 @@ bool pxtnService::moo_preparation( const pxtnVOMITPREPARATION *p_prep )
 	else        _moo_b_end_vomit = true ;
 
 	return b_ret;
+}
+
+bool pxtnService::moo_set_tempo_mod( float tempo_mod )
+{
+	if( !_moo_b_init || !_moo_b_valid_data || !_dst_ch_num || !_dst_sps || !_dst_byte_per_smp )
+	{
+		 _moo_b_end_vomit = true ;
+		 return false;
+	}
+
+	_moo_tempo_mod = tempo_mod;
+
+	int32_t meas_end     = master->get_play_meas  ();
+	int32_t meas_repeat  = master->get_repeat_meas();
+
+	float old_pos = _moo_smp_count / _moo_clock_rate;
+
+	_moo_bt_tempo   = master->get_beat_tempo() * _moo_tempo_mod;
+	_moo_clock_rate = (float)( 60.0f * (double)_dst_sps / ( (double)_moo_bt_tempo * (double)_moo_bt_clock ) );
+
+	_moo_smp_end    = (int32_t)( (double)meas_end    * (double)_moo_bt_num * (double)_moo_bt_clock * _moo_clock_rate );
+	_moo_smp_repeat = (int32_t)( (double)meas_repeat * (double)_moo_bt_num * (double)_moo_bt_clock * _moo_clock_rate );
+
+	_moo_smp_count  = (old_pos * _moo_clock_rate);
+
+	return true;
 }
 
 int32_t pxtnService::moo_get_sampling_offset() const
