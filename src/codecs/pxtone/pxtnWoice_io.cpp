@@ -308,6 +308,18 @@ typedef struct
 }
 _MATERIALSTRUCT_OGGV;
 
+px_FORCE_INLINE void swapEndian( _MATERIALSTRUCT_OGGV &mate)
+{
+#ifdef px_BIG_ENDIAN
+	mate.xxx =           pxtnData::_swap16(mate.xxx);
+	mate.basic_key =     pxtnData::_swap16(mate.basic_key);
+	mate.voice_flags =   pxtnData::_swap32(mate.voice_flags);
+	mate.tuning =        pxtnData::_swap_float(mate.tuning);
+#else
+	(void)mate;
+#endif
+}
+
 bool pxtnWoice::io_mateOGGV_w( void* desc ) const
 {
 	if( !_voices ) return false;
@@ -339,8 +351,10 @@ pxtnERR pxtnWoice::io_mateOGGV_r( void* desc )
 	_MATERIALSTRUCT_OGGV mate = {};
 	int32_t              size =  0;
 
-	if( !_io_read( desc, &size, 4,                              1 ) ) return pxtnERR_desc_r;
+	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r;
 	if( !_io_read( desc, &mate, sizeof( _MATERIALSTRUCT_OGGV ), 1 ) ) return pxtnERR_desc_r;
+
+	swapEndian( mate );
 
 	if( ((int32_t)mate.voice_flags) & PTV_VOICEFLAG_UNCOVERED ) return pxtnERR_fmt_unknown;
 

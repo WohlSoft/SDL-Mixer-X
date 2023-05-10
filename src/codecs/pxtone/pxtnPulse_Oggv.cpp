@@ -3,11 +3,96 @@
 
 #ifdef pxINCLUDE_OGGVORBIS
 
+#if defined(pxINCLUDE_OGGVORBIS_STB)
+#include "SDL_stdinc.h"
+#include "SDL_version.h"
+#include "SDL_rwops.h"
+#include "SDL_assert.h"
+#define STB_VORBIS_SDL 1 /* for SDL_mixer-specific stuff. */
+#define STB_VORBIS_NO_STDIO 1
+#define STB_VORBIS_NO_CRT 1
+#define STB_VORBIS_NO_PUSHDATA_API 1
+#define STB_VORBIS_MAX_CHANNELS 8   /* For 7.1 surround sound */
+#define STB_FORCEINLINE SDL_FORCE_INLINE
+#if px_IS_BIG_ENDIAN
+#define STB_VORBIS_BIG_ENDIAN 1
+#endif
+#define STBV_CDECL SDLCALL /* for SDL_qsort */
+
+#ifdef assert
+#undef assert
+#endif
+#ifdef memset
+#undef memset
+#endif
+#ifdef memcpy
+#undef memcpy
+#endif
+#define assert SDL_assert
+#define memset SDL_memset
+#define memcmp SDL_memcmp
+#define memcpy SDL_memcpy
+#define qsort SDL_qsort
+#define malloc SDL_malloc
+#define realloc SDL_realloc
+#define free SDL_free
+
+#define pow SDL_pow
+#define floor SDL_floor
+#define ldexp(v, e) SDL_scalbn((v), (e))
+#define abs(x) SDL_abs(x)
+#define cos(x) SDL_cos(x)
+#define sin(x) SDL_sin(x)
+#define log(x) SDL_log(x)
+#if SDL_VERSION_ATLEAST(2, 0, 9)
+#define exp(x) SDL_exp(x) /* Available since SDL 2.0.9 */
+#endif
+
+/* Workaround to don't conflict with another statically-linked stb-vorbis */
+#define stb_vorbis_get_info _pxtn_stb_vorbis_get_info
+#define stb_vorbis_get_comment _pxtn_stb_vorbis_get_comment
+#define stb_vorbis_get_error _pxtn_stb_vorbis_get_error
+#define stb_vorbis_close _pxtn_stb_vorbis_close
+#define stb_vorbis_get_sample_offset _pxtn_stb_vorbis_get_sample_offset
+#define stb_vorbis_get_playback_sample_offset _pxtn_stb_vorbis_get_playback_sample_offset
+#define stb_vorbis_get_file_offset _pxtn_stb_vorbis_get_file_offset
+#define stb_vorbis_open_pushdata _pxtn_stb_vorbis_open_pushdata
+#define stb_vorbis_decode_frame_pushdata _pxtn_stb_vorbis_decode_frame_pushdata
+#define stb_vorbis_flush_pushdata _pxtn_stb_vorbis_flush_pushdata
+#define stb_vorbis_decode_filename _pxtn_stb_vorbis_decode_filename
+#define stb_vorbis_decode_memory _pxtn_stb_vorbis_decode_memory
+#define stb_vorbis_open_memory _pxtn_stb_vorbis_open_memory
+#define stb_vorbis_open_filename _pxtn_stb_vorbis_open_filename
+#define stb_vorbis_open_file _pxtn_stb_vorbis_open_file
+#define stb_vorbis_open_file_section _pxtn_stb_vorbis_open_file_section
+#define stb_vorbis_open_rwops_section _pxtn_stb_vorbis_open_rwops_section
+#define stb_vorbis_open_rwops _pxtn_stb_vorbis_open_rwops
+#define stb_vorbis_seek_frame _pxtn_stb_vorbis_seek_frame
+#define stb_vorbis_seek _pxtn_stb_vorbis_seek
+#define stb_vorbis_seek_start _pxtn_stb_vorbis_seek_start
+#define stb_vorbis_stream_length_in_samples _pxtn_stb_vorbis_stream_length_in_samples
+#define stb_vorbis_stream_length_in_seconds _pxtn_stb_vorbis_stream_length_in_seconds
+#define stb_vorbis_get_frame_float _pxtn_stb_vorbis_get_frame_float
+#define stb_vorbis_get_frame_short_interleaved _pxtn_stb_vorbis_get_frame_short_interleaved
+#define stb_vorbis_get_frame_short _pxtn_stb_vorbis_get_frame_short
+#define stb_vorbis_get_samples_float_interleaved _pxtn_stb_vorbis_get_samples_float_interleaved
+#define stb_vorbis_get_samples_float _pxtn_stb_vorbis_get_samples_float
+#define stb_vorbis_get_samples_short_interleaved _pxtn_stb_vorbis_get_samples_short_interleaved
+#define stb_vorbis_get_samples_short _pxtn_stb_vorbis_get_samples_short
+/* Workaround to don't conflict with another statically-linked stb-vorbis: END */
+
+#include "../stb_vorbis/stb_vorbis.h"
+
+#elif defined(pxINCLUDE_OGGVORBIS_TREMOR)
+#include <tremor/ivorbisfile.h>
+#else
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
+#endif
 
 #include "./pxtnPulse_Oggv.h"
 
+#if !defined(pxINCLUDE_OGGVORBIS_STB)
 typedef struct
 {
     char*   p_buf; // ogg vorbis-data on memory.s
@@ -77,12 +162,13 @@ static int _mclose_dummy( void* p_void )
 	if( !pom ) return -1;
 	return 0;
 }
-
+#endif
 
 bool pxtnPulse_Oggv::_SetInformation()
 {
 	bool b_ret = false;
 
+#if !defined(pxINCLUDE_OGGVORBIS_STB)
 	OVMEM ovmem;
 	ovmem.p_buf = _p_data;
 	ovmem.pos   =       0;
@@ -90,11 +176,12 @@ bool pxtnPulse_Oggv::_SetInformation()
 
 	// set callback func.
 	ov_callbacks   oc; 
-    oc.read_func  = _mread       ;
-    oc.seek_func  = _mseek       ;
-    oc.close_func = _mclose_dummy;
-    oc.tell_func  = _mtell       ;
-  
+	oc.read_func  = _mread       ;
+	oc.seek_func  = _mseek       ;
+	oc.close_func = _mclose_dummy;
+	oc.tell_func  = _mtell       ;
+
+	bool           vf_loaded = false;
 	OggVorbis_File vf;
 	
 	vorbis_info*  vi;
@@ -108,20 +195,42 @@ bool pxtnPulse_Oggv::_SetInformation()
 	case OV_EFAULT    : goto End; //{printf("Internal logic fault; indicates a bug or heap/stack corruption. \n");exit(1);}
 	default:
 		break;
-    }
+	}
 
-    vi = ov_info( &vf,-1 );
+	vf_loaded = true;
+
+	vi = ov_info( &vf,-1 );
 
 	_ch      = vi->channels;
 	_sps2    = vi->rate    ;
 	_smp_num = (int32_t)ov_pcm_total( &vf, -1 );
-    
-    // end.
-    ov_clear( &vf );
+
+	// end.
+#else
+
+	stb_vorbis *vf = NULL;
+
+	stb_vorbis_info vi;
+
+	vf = stb_vorbis_open_memory( (const uint8_t*)_p_data, _size, NULL, NULL );
+	if( vf == NULL ) { goto End; }
+
+	vi = stb_vorbis_get_info( vf );
+
+	_ch      = vi.channels;
+	_sps2    = vi.sample_rate;
+	_smp_num = (int32_t)stb_vorbis_stream_length_in_samples( vf );
+
+#endif
 
 	b_ret = true;
 
 End:
+#if !defined(pxINCLUDE_OGGVORBIS_STB)
+    if( vf_loaded ) ov_clear( &vf );
+#else
+    if( vf ) stb_vorbis_close( vf );
+#endif
     return b_ret;
 
 }
@@ -150,7 +259,8 @@ pxtnPulse_Oggv::~pxtnPulse_Oggv()
 
 void pxtnPulse_Oggv::Release()
 {
-	if( _p_data ) free( _p_data ); _p_data = NULL;
+	if( _p_data ) free( _p_data );
+	_p_data = NULL;
 	_ch      = 0;
 	_sps2    = 0;
 	_smp_num = 0;
@@ -171,7 +281,8 @@ term:
 
 	if( res != pxtnOK )
 	{
-		if( _p_data ) free( _p_data ); _p_data = NULL; _size = 0;
+		if( _p_data ) free( _p_data );
+		_p_data = NULL; _size = 0;
 	}
 	return res;
 }
@@ -180,9 +291,14 @@ pxtnERR pxtnPulse_Oggv::Decode( pxtnPulse_PCM * p_pcm ) const
 {
 	pxtnERR res = pxtnERR_VOID;
 
+#if !defined(pxINCLUDE_OGGVORBIS_STB)
+	bool           vf_loaded = false;
 	OggVorbis_File vf;
 	vorbis_info*   vi;
 	ov_callbacks   oc; 
+
+	int32_t current_section;
+	char    pcmout[ 4096 ] = {0};
 
 	OVMEM ovmem;
 
@@ -190,13 +306,13 @@ pxtnERR pxtnPulse_Oggv::Decode( pxtnPulse_PCM * p_pcm ) const
 	ovmem.pos   =       0;
 	ovmem.size  = _size  ;
 
-    // set callback func.
-    oc.read_func  = _mread       ;
-    oc.seek_func  = _mseek       ;
-    oc.close_func = _mclose_dummy;
-    oc.tell_func  = _mtell       ;
-  
-    switch( ov_open_callbacks( &ovmem, &vf, NULL, 0, oc ) )
+	// set callback func.
+	oc.read_func  = _mread       ;
+	oc.seek_func  = _mseek       ;
+	oc.close_func = _mclose_dummy;
+	oc.tell_func  = _mtell       ;
+
+	switch( ov_open_callbacks( &ovmem, &vf, NULL, 0, oc ) )
 	{
 	case OV_EREAD     : res = pxtnERR_ogg; goto term; //{printf("A read from media returned an error.\n");exit(1);} 
 	case OV_ENOTVORBIS: res = pxtnERR_ogg; goto term; //{printf("Bitstream is not Vorbis data. \n");exit(1);}
@@ -204,40 +320,84 @@ pxtnERR pxtnPulse_Oggv::Decode( pxtnPulse_PCM * p_pcm ) const
 	case OV_EBADHEADER: res = pxtnERR_ogg; goto term; //{printf("Invalid Vorbis bitstream header. \n");exit(1);}
 	case OV_EFAULT    : res = pxtnERR_ogg; goto term; //{printf("Internal logic fault; indicates a bug or heap/stack corruption. \n");exit(1);}
 	default: break;
-    }
+	}
 
-    vi    = ov_info( &vf,-1 );
-	
-	int32_t current_section;
-	char    pcmout[ 4096 ] = {0}; //take 4k out of the data segment, not the stack
+	vf_loaded = true;
+
+	vi    = ov_info( &vf,-1 );
+
+	//take 4k out of the data segment, not the stack
 	{
 		int32_t smp_num = (int32_t)ov_pcm_total( &vf, -1 );
-		uint32_t bytes;
-
-		bytes = vi->channels * 2 * smp_num;
+		// uint32_t bytes = vi->channels * 2 * smp_num;
 
 		res = p_pcm->Create( vi->channels, vi->rate, 16, smp_num );
 		if( res != pxtnOK ) goto term;
 	}
-    // decode..
+	// decode..
 	{
 		int32_t ret = 0;
 		uint8_t  *p  = (uint8_t*)p_pcm->get_p_buf_variable();
 		do
 		{
-			ret = ov_read( &vf, pcmout, 4096, 0, 2, 1, &current_section );
+#if defined(pxINCLUDE_OGGVORBIS_TREMOR)
+			ret = ov_read( &vf, pcmout, 4096, &current_section );
+#else
+			ret = ov_read( &vf, pcmout, 4096, px_IS_BIG_ENDIAN, 2, 1, &current_section );
+#endif
 			if( ret > 0 ) memcpy( p, pcmout, ret ); //fwrite( pcmout, 1, ret, of );
 			p += ret;
 		}
 		while( ret );
 	}
-    
-    // end.
-    ov_clear( &vf );
+
+	// end.
+#else // pxINCLUDE_OGGVORBIS_STB
+
+	int error;
+	stb_vorbis *vf = NULL;
+	stb_vorbis_info vi;
+	char    pcmout[ 4096 ] = {0};
+
+	vf = stb_vorbis_open_memory( (const uint8_t*)_p_data, _size, &error, NULL );
+	if( vf == NULL ) { res = pxtnERR_ogg; goto term; }
+
+	vi = stb_vorbis_get_info( vf );
+
+	//take 4k out of the data segment, not the stack
+	{
+		int32_t smp_num = (int32_t)stb_vorbis_stream_length_in_samples( vf );
+		// uint32_t bytes = vi->channels * 2 * smp_num;
+
+		res = p_pcm->Create( vi.channels, vi.sample_rate, 16, smp_num );
+		if( res != pxtnOK ) goto term;
+	}
+
+	// decode..
+	{
+		int32_t ret = 0;
+		uint8_t  *p  = (uint8_t*)p_pcm->get_p_buf_variable();
+		do
+		{
+			ret = stb_vorbis_get_samples_short_interleaved( vf, vi.channels, (short*)pcmout, sizeof(pcmout) / sizeof(short) );
+			ret *= vi.channels * sizeof(short);
+			if( ret > 0 ) memcpy( p, pcmout, ret ); //fwrite( pcmout, 1, ret, of );
+			p += ret;
+		}
+		while( ret );
+	}
+
+#endif // pxINCLUDE_OGGVORBIS_STB
 
 	res = pxtnOK;
 
 term:
+#if !defined(pxINCLUDE_OGGVORBIS_STB)
+    if( vf_loaded ) ov_clear( &vf );
+#else
+    if( vf ) stb_vorbis_close( vf );
+#endif
+
     return res;
 }
 
@@ -288,10 +448,10 @@ bool pxtnPulse_Oggv::pxtn_read( void* desc )
 {
 	bool  b_ret  = false;
 
-	if( !_io_read( desc, &_ch     , sizeof(int32_t), 1 ) ) goto End;
-	if( !_io_read( desc, &_sps2   , sizeof(int32_t), 1 ) ) goto End;
-	if( !_io_read( desc, &_smp_num, sizeof(int32_t), 1 ) ) goto End;
-	if( !_io_read( desc, &_size   , sizeof(int32_t), 1 ) ) goto End;
+	if( !_io_read_le32( desc, &_ch      ) ) goto End;
+	if( !_io_read_le32( desc, &_sps2    ) ) goto End;
+	if( !_io_read_le32( desc, &_smp_num ) ) goto End;
+	if( !_io_read_le32( desc, &_size    ) ) goto End;
 
 	if( !_size ) goto End;
 
@@ -303,7 +463,8 @@ End:
 
 	if( !b_ret )
 	{
-		if( _p_data ) free( _p_data ); _p_data = NULL; _size = 0;
+		if( _p_data ) free( _p_data );
+		_p_data = NULL; _size = 0;
 	}
 
 	return b_ret;
