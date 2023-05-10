@@ -86,6 +86,7 @@
 #elif defined(pxINCLUDE_OGGVORBIS_TREMOR)
 #include <tremor/ivorbisfile.h>
 #else
+#define OV_EXCLUDE_STATIC_CALLBACKS
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 #endif
