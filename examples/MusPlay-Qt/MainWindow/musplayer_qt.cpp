@@ -168,7 +168,9 @@ void MusPlayer_Qt::dropEvent(QDropEvent *e)
     if(ui->recordWav->isChecked())
         return;
 
-    for(const QUrl &url : e->mimeData()->urls())
+    auto l = e->mimeData()->urls();
+
+    for(const QUrl &url : qAsConst(l))
     {
         const QString &fileName = url.toLocalFile();
         m_currentMusic = fileName;
