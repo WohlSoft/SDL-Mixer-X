@@ -137,6 +137,8 @@ set(AUDIO_CODECS_INSTALL_PATH "" CACHE PATH "Path to installed AudioCodecs prefi
 option(MIXERX_ENABLE_LGPL   "Enable components with LGPL license" OFF)
 option(MIXERX_ENABLE_GPL    "Enable using of components with GPL and LGPL licenses" OFF)
 
+option(ENABLE_ADDRESS_SANITIZER "Enable the Address Sanitizer GCC feature" OFF)
+
 set(MIXERX_ZLIB TRUE)
 if(MIXERX_ENABLE_LGPL OR MIXERX_ENABLE_GPL)
     set(MIXERX_LGPL TRUE)
@@ -453,12 +455,15 @@ if(SDL_MIXER_X_STATIC AND NOT BUILD_AS_VB6_BINDING)
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<$<CONFIG:Debug>:>"
         )
     endif()
+    if(ENABLE_ADDRESS_SANITIZER)
+        target_compile_options(SDL2_mixer_ext_Static PRIVATE -fsanitize=address)
+    endif()
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
         add_custom_command(
             TARGET SDL2_mixer_ext_Static POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy
-                    ${SDLMixerX_SOURCE_DIR}/include/SDL_mixer.h
-                    ${AUDIO_CODECS_INSTALL_DIR}/include/SDL2/SDL_mixer_ext.h)
+                    "${SDLMixerX_SOURCE_DIR}/include/SDL_mixer.h"
+                    "${AUDIO_CODECS_INSTALL_DIR}/include/SDL2/SDL_mixer_ext.h")
     endif()
 endif()
 
@@ -496,12 +501,16 @@ if(SDL_MIXER_X_SHARED AND NOT BUILD_AS_VB6_BINDING)
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<$<CONFIG:Debug>:>"
         )
     endif()
+    if(ENABLE_ADDRESS_SANITIZER)
+        target_compile_options(SDL2_mixer_ext PRIVATE -fsanitize=address)
+        target_link_options(SDL2_mixer_ext PRIVATE -fsanitize=address)
+    endif()
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
         add_custom_command(
             TARGET SDL2_mixer_ext POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy
-                    ${SDLMixerX_SOURCE_DIR}/include/SDL_mixer.h
-                    ${AUDIO_CODECS_INSTALL_DIR}/include/SDL2/SDL_mixer_ext.h)
+                    "${SDLMixerX_SOURCE_DIR}/include/SDL_mixer.h"
+                    "${AUDIO_CODECS_INSTALL_DIR}/include/SDL2/SDL_mixer_ext.h")
     endif()
 endif()
 
@@ -537,8 +546,8 @@ if(BUILD_AS_VB6_BINDING)
     add_custom_command(
         TARGET SDL2_mixer_ext_VB6 POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
-                ${CMAKE_SOURCE_DIR}/VB6_Wrapper/modSDL2_mixer_ext_vb6.bas
-                ${CMAKE_BINARY_DIR}/sdl-mixer-vb6)
+                "${CMAKE_SOURCE_DIR}/VB6_Wrapper/modSDL2_mixer_ext_vb6.bas"
+                "${CMAKE_BINARY_DIR}/sdl-mixer-vb6")
 endif()
 
 option(BUILD_EXAMPLES "Build examples" OFF)

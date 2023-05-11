@@ -109,6 +109,11 @@ else()
     target_link_libraries(sdlmixer_musplay ${PGE_MUSPLAY_LINK_LIBS})
 endif()
 
+if(ENABLE_ADDRESS_SANITIZER)
+    target_compile_options(sdlmixer_musplay PRIVATE -fsanitize=address)
+    target_link_options(sdlmixer_musplay PRIVATE -fsanitize=address)
+endif()
+
 qt5_use_modules(sdlmixer_musplay Widgets Network)
 
 install(TARGETS sdlmixer_musplay
