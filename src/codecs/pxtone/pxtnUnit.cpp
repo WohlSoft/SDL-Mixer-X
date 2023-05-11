@@ -36,7 +36,7 @@ void pxtnUnit::Tone_Init()
 
 void pxtnUnit::Tone_Clear()
 {
-	for( int32_t i = 0; i < pxtnMAX_CHANNEL; i++ ) memset( _pan_time_bufs[ i ], 0, sizeof(int ) * pxtnBUFSIZE_TIMEPAN );
+	for( int32_t i = 0; i < pxtnMAX_CHANNEL; i++ ) memset( _pan_time_bufs[ i ], 0, sizeof(int32_t) * pxtnBUFSIZE_TIMEPAN );
 }
 
 void pxtnUnit::Tone_Reset_and_2prm( int32_t voice_idx, int32_t env_rls_clock, float offset_freq )
@@ -232,7 +232,7 @@ void pxtnUnit::Tone_Supple( int32_t  *group_smps, int32_t ch, int32_t  time_pan_
 	group_smps[ _v_GROUPNO ] += _pan_time_bufs[ ch ][ idx ];
 }
 
-int  pxtnUnit::Tone_Increment_Key()
+int32_t  pxtnUnit::Tone_Increment_Key()
 {
 	// prtament..
 	if( _portament_sample_num && _key_margin )

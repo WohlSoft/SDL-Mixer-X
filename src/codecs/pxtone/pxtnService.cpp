@@ -489,7 +489,7 @@ bool pxtnService::Unit_SetOpratedAll( bool b )
 	return true;
 }
 
-bool pxtnService::Unit_Solo( int idx )
+bool pxtnService::Unit_Solo( int32_t idx )
 {
 	if( !_b_init ) return false;
 	for( int32_t u = 0; u < _unit_num; u++ )
@@ -1152,7 +1152,7 @@ bool pxtnService::_x3x_SetVoiceNames()
 	for( int32_t i = 0; i < _woice_num; i++ )
 	{
 		char name[ pxtnMAX_TUNEWOICENAME + 1 ];
-		sprintf( name, "voice_%02d", i );
+		sprintf( name, "voice_%02d", (int)i );
 		_woices[ i ]->set_name_buf( name, 8 );
 	}
 	return true;

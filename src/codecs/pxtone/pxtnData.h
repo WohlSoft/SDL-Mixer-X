@@ -7,7 +7,7 @@
 
 typedef bool (* pxtnIO_r   )( void* user,       void* p_dst, int32_t size, int32_t num );
 typedef bool (* pxtnIO_w   )( void* user, const void* p_dst, int32_t size, int32_t num );
-typedef bool (* pxtnIO_seek)( void* user,       int   mode , int32_t size              );
+typedef bool (* pxtnIO_seek)( void* user,     int32_t mode , int32_t size              );
 typedef bool (* pxtnIO_pos )( void* user,                    int32_t* p_pos            );
 
 class pxtnData

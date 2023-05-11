@@ -2,7 +2,7 @@
 
 
 
-static bool _v_to_int( uint32_t* p_i, const uint8_t* bytes5, int byte_num )
+static bool _v_to_int( uint32_t* p_i, const uint8_t* bytes5, int32_t byte_num )
 {
 	uint8_t b[ 5 ] = {};
 
@@ -45,7 +45,7 @@ static bool _v_to_int( uint32_t* p_i, const uint8_t* bytes5, int byte_num )
 	return true;
 }
 
-void _int_to_v( uint8_t* bytes5, int* p_byte_num, uint32_t i )
+void _int_to_v( uint8_t* bytes5, int32_t* p_byte_num, uint32_t i )
 {
 	uint8_t a[ 5 ] = {};
 
@@ -168,7 +168,7 @@ bool pxtnData::_data_r_v( void* desc, int32_t* pv ) const
 	if( !desc ) return false;
 
 	uint8_t  a[ 5 ] = {};
-	int  count = 0;
+	int32_t  count = 0;
 	for( count = 0; count < 5; count++ )
 	{
 		if( !_io_read( desc, &a[ count ], 1, 1 ) ) return false;

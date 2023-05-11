@@ -515,7 +515,7 @@ pxtnPulse_PCM *pxtnPulse_NoiseBuilder::BuildNoise( pxtnPulse_Noise *p_noise, int
 End:
 	if( units )
 	{
-		for( int i = 0; i < unit_num; i++ ) pxtnMem_free( (void**)&units[ i ].enves );
+		for( int32_t i = 0; i < unit_num; i++ ) pxtnMem_free( (void**)&units[ i ].enves );
 		pxtnMem_free( (void**)&units );
 	}
 

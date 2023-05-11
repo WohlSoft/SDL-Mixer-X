@@ -49,7 +49,7 @@ typedef struct
 
 
 // I/O..
-static bool _pxtn_r(void* user, void* p_dst, int size, int num)
+static bool _pxtn_r(void* user, void* p_dst, Sint32 size, Sint32 num)
 {
     int i = SDL_RWread((SDL_RWops*)user, p_dst, size, num);
     if ( i < num ) {
@@ -58,7 +58,7 @@ static bool _pxtn_r(void* user, void* p_dst, int size, int num)
     return true;
 }
 
-static bool _pxtn_w(void* user,const void* p_dst, int size, int num)
+static bool _pxtn_w(void* user,const void* p_dst, Sint32 size, Sint32 num)
 {
     int i = SDL_RWwrite((SDL_RWops*)user, p_dst, size, num);
     if ( i < num ) {
@@ -67,7 +67,7 @@ static bool _pxtn_w(void* user,const void* p_dst, int size, int num)
     return true;
 }
 
-static bool _pxtn_s(void* user, int mode, int size)
+static bool _pxtn_s(void* user, Sint32 mode, Sint32 size)
 {
     if (SDL_RWseek((SDL_RWops*)user, size, mode) < 0) {
         return false;
@@ -173,14 +173,14 @@ static void *PXTONE_NewRW(struct SDL_RWops *src, int freesrc)
 
     name = music->pxtn->text->get_name_buf(&name_len);
     if (name) {
-        temp_string = SDL_iconv_string("UTF-8", "Shift-JIS", name, name_len + 2);
+        temp_string = SDL_iconv_string("UTF-8", "Shift-JIS", name, name_len + 1);
         meta_tags_set(&music->tags, MIX_META_TITLE, temp_string);
         SDL_free(temp_string);
     }
 
     comment = music->pxtn->text->get_comment_buf(&comment_len);
     if (comment) {
-        temp_string = SDL_iconv_string("UTF-8", "Shift-JIS", comment, comment_len + 2);
+        temp_string = SDL_iconv_string("UTF-8", "Shift-JIS", comment, comment_len + 1);
         meta_tags_set(&music->tags, MIX_META_COPYRIGHT, temp_string);
         SDL_free(temp_string);
     }

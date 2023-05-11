@@ -128,7 +128,7 @@ static size_t _mread( void *p, size_t size, size_t nmemb, void* p_void )
 	return nmemb;
 }
 
-static int _mseek( void* p_void, ogg_int64_t offset, int32_t mode )
+static int32_t _mseek( void* p_void, ogg_int64_t offset, int32_t mode )
 {
 	int32_t newpos;
 	OVMEM *pom = (OVMEM*)p_void;
@@ -157,7 +157,7 @@ static long _mtell( void* p_void )
 	return pom->pos;
 }
 
-static int _mclose_dummy( void* p_void )
+static int32_t _mclose_dummy( void* p_void )
 {
 	OVMEM* pom = (OVMEM*)p_void;
 	if( !pom ) return -1;
@@ -402,7 +402,7 @@ term:
     return res;
 }
 
-bool pxtnPulse_Oggv::GetInfo( int* p_ch, int* p_sps, int* p_smp_num )
+bool pxtnPulse_Oggv::GetInfo( int32_t* p_ch, int32_t* p_sps, int32_t* p_smp_num )
 {
 	if( !_p_data ) return false;
 

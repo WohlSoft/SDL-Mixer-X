@@ -278,8 +278,8 @@ pxtnERR pxtnWoice::PTV_Read( void* desc )
 		if( !_data_r_v( desc, &p_vc->pan       )             ){ res = pxtnERR_desc_r; goto term; }
 		if( !_data_r_v( desc, &work1           )             ){ res = pxtnERR_desc_r; goto term; }
 		memcpy( &p_vc->tuning, &work1, sizeof( 4 )     );
-		if( !_data_r_v( desc, (int*)&p_vc->voice_flags )     ){ res = pxtnERR_desc_r; goto term; }
-		if( !_data_r_v( desc, (int*)&p_vc->data_flags  )     ){ res = pxtnERR_desc_r; goto term; }
+		if( !_data_r_v( desc, (int32_t*)&p_vc->voice_flags )     ){ res = pxtnERR_desc_r; goto term; }
+		if( !_data_r_v( desc, (int32_t*)&p_vc->data_flags  )     ){ res = pxtnERR_desc_r; goto term; }
 
 		// no support.
 		if( p_vc->voice_flags & PTV_VOICEFLAG_UNCOVERED ){ res = pxtnERR_fmt_unknown; goto term; }
