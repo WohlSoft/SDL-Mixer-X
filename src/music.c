@@ -1454,16 +1454,16 @@ readHeader:
 
 Mix_MusicType detect_music_type(SDL_RWops *src)
 {
-    Uint8 magic[25];
+    Uint8 magic[100];
     Sint64 start = SDL_RWtell(src);
 
-    SDL_memset(magic, 0, 25);
-    if (SDL_RWread(src, magic, 1, 24) != 24) {
+    SDL_memset(magic, 0, 100);
+    if (SDL_RWread(src, magic, 1, 99) != 99) {
         Mix_SetError("Couldn't read first 24 bytes of audio data");
         return MUS_NONE;
     }
     SDL_RWseek(src, start, RW_SEEK_SET);
-    magic[24]       = '\0';
+    magic[99]       = '\0';
 
     /* Drop out some known but not supported file types (Archives, etc.) */
     if (SDL_memcmp(magic, "PK\x03\x04", 3) == 0) {
@@ -1562,7 +1562,13 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
         return MUS_MOD;
     if (SDL_memcmp(magic, "ASYLUM Music Format V", 22) == 0)
         return MUS_MOD;
+    if (SDL_memcmp(magic, "DIGI Booster module", 19) == 0)
+        return MUS_MOD;
+    if (SDL_memcmp(magic, "OKTASONG", 8) == 0)
+        return MUS_MOD;
     if (SDL_memcmp(magic, "Extreme", 7) == 0)
+        return MUS_MOD;
+    if (SDL_memcmp(magic, "\xc1\x83\x2a\x9e", 4) == 0) /* UMX */
         return MUS_MOD;
     if (SDL_memcmp(magic, "IMPM", 4) == 0)
         return MUS_MOD;
@@ -1570,10 +1576,22 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
         return MUS_MOD;
     if (SDL_memcmp(magic, "DDMF", 4) == 0)
         return MUS_MOD;
+    if (SDL_memcmp(magic, "DSM\x10", 4) == 0)
+        return MUS_MOD;
+    if (SDL_memcmp(magic, "DMML", 4) == 0)
+        return MUS_MOD;
+    if (SDL_memcmp(magic, "KRIS", 4) == 0)
+        return MUS_MOD;
+    if (SDL_memcmp(magic + 6, "Music   ", 8) == 0) /* ABK */
+        return MUS_MOD;
     /*  SMF files have the magic four bytes "RIFF" */
     if ((SDL_memcmp(magic, "RIFF", 4) == 0) &&
        (SDL_memcmp(magic + 8,  "DSMF", 4) == 0) &&
        (SDL_memcmp(magic + 12, "SONG", 4) == 0))
+        return MUS_MOD;
+    if ((SDL_memcmp(magic, "FORM", 4) == 0) && /* EMOD */
+       (SDL_memcmp(magic + 8,  "EMOD", 4) == 0) &&
+       (SDL_memcmp(magic + 12, "EMIC", 4) == 0))
         return MUS_MOD;
     if (SDL_memcmp(magic, "MAS_UTrack_V00", 14) == 0)
         return MUS_MOD;
@@ -1581,9 +1599,19 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
         return MUS_MOD;
     if (SDL_memcmp(magic, "FAR=", 4) == 0)
         return MUS_MOD;
+    if (SDL_memcmp(magic, "\x00MGT", 4) == 0)
+        return MUS_MOD;
+    if (SDL_memcmp(magic, "\xbdMCS", 4) == 0)
+        return MUS_MOD;
     if (SDL_memcmp(magic, "MTM", 3) == 0)
         return MUS_MOD;
     if (SDL_memcmp(magic, "MMD", 3) == 0)
+        return MUS_MOD;
+    if (SDL_memcmp(magic, "MED\x2", 4) == 0)
+        return MUS_MOD;
+    if (SDL_memcmp(magic, "MED\x3", 4) == 0)
+        return MUS_MOD;
+    if (SDL_memcmp(magic, "MED\x2", 4) == 0)
         return MUS_MOD;
     if (SDL_memcmp(magic, "PSM\x20", 4) == 0)
         return MUS_MOD;
@@ -1593,9 +1621,17 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
         return MUS_MOD;
     if (SDL_memcmp(magic, "OKTA", 4) == 0)
         return MUS_MOD;
+    if (SDL_memcmp(magic + 44, "PTMF", 4) == 0) /* PTM */
+        return MUS_MOD;
+    if (SDL_memcmp(magic + 44, "SCRM", 4) == 0) /* S3M */
+        return MUS_MOD;
     if (SDL_memcmp(magic, "JN", 2) == 0)
         return MUS_MOD;
     if (SDL_memcmp(magic, "if", 2) == 0)
+        return MUS_MOD;
+    if (SDL_memcmp(magic, "\x69\x66", 2) == 0) /* 669 */
+        return MUS_MOD;
+    if (SDL_memcmp(magic, "\x4a\x4e", 2) == 0) /* 669 */
         return MUS_MOD;
 
 #if defined(MUSIC_FFMPEG)
@@ -1790,27 +1826,12 @@ Mix_Music * MIXCALLCC Mix_LoadMUS(const char *file)
     ext = SDL_strrchr(file, '.');
     if (ext) {
         ++ext; /* skip the dot in the extension */
-        if (SDL_strcasecmp(ext, "669") == 0 ||
-            SDL_strcasecmp(ext, "AMF") == 0 ||
-            SDL_strcasecmp(ext, "AMS") == 0 ||
-            SDL_strcasecmp(ext, "DBM") == 0 ||
-            SDL_strcasecmp(ext, "DSM") == 0 ||
-            SDL_strcasecmp(ext, "FAR") == 0 ||
-            SDL_strcasecmp(ext, "IT") == 0 ||
-            SDL_strcasecmp(ext, "MED") == 0 ||
-            SDL_strcasecmp(ext, "MDL") == 0 ||
+        if (SDL_strcasecmp(ext, "AMS") == 0 ||
             SDL_strcasecmp(ext, "MOD") == 0 ||
             SDL_strcasecmp(ext, "MOL") == 0 ||
-            SDL_strcasecmp(ext, "MTM") == 0 ||
             SDL_strcasecmp(ext, "NST") == 0 ||
-            SDL_strcasecmp(ext, "OKT") == 0 ||
-            SDL_strcasecmp(ext, "PTM") == 0 ||
-            SDL_strcasecmp(ext, "S3M") == 0 ||
             SDL_strcasecmp(ext, "STM") == 0 ||
-            SDL_strcasecmp(ext, "ULT") == 0 ||
-            SDL_strcasecmp(ext, "UMX") == 0 ||
-            SDL_strcasecmp(ext, "WOW") == 0 ||
-            SDL_strcasecmp(ext, "XM") == 0) {
+            SDL_strcasecmp(ext, "WOW") == 0) {
             type = MUS_MOD;
         }
         else if (SDL_strcasecmp(ext, "MP4") == 0 ||
