@@ -70,6 +70,8 @@ AssocFiles::AssocFiles(QWidget *parent) :
     formats << tentry{"uni",  "UNI - MikMod", tr("MikMod Music", "File Type Name")};
     formats << tentry{"xm",   "XM - FastTracker 2", tr("FastTracker 2 Music", "File Type Name")};
 
+    formats << tentry{"pttune",   "PTTUNE - PXTONE Tune", tr("PXTONE Tune", "File Type Name")};
+    formats << tentry{"ptcop",   "PTTUNE - PXTONE Collage Project", tr("PXTONE Collage Project", "File Type Name")};
 
     for(int i=0; i<formats.size(); i++)
     {
@@ -127,6 +129,9 @@ void AssocFiles::on_reset_clicked()
     defaultFormats["ult"] = true;
     defaultFormats["uni"] = true;
     defaultFormats["xm"]  = true;
+
+    defaultFormats["pttune"]  = true;
+    defaultFormats["ptcop"]  = true;
 
     for(int i=0; i<items.size(); i++)
     {
@@ -307,6 +312,18 @@ void AssocFiles::on_AssocFiles_accepted()
             "flac",
             "        <magic priority=\"60\">\n"
             "            <match type=\"string\" offset=\"0\" value=\"fLaC\"/>\n"
+            "        </magic>\n"
+        },
+        {
+            "ptcop",
+            "        <magic priority=\"60\">\n"
+            "            <match type=\"string\" offset=\"0\" value=\"PTCOLLAGE\"/>\n"
+            "        </magic>\n"
+        },
+        {
+            "pttune",
+            "        <magic priority=\"60\">\n"
+            "            <match type=\"string\" offset=\"0\" value=\"PTTUNE\"/>\n"
             "        </magic>\n"
         }
     };
