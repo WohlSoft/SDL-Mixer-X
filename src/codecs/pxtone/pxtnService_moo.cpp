@@ -347,7 +347,7 @@ bool pxtnService::moo_preparation(const pxtnVOMITPREPARATION *p_prep , float tem
 
 	_moo_bt_clock   = master->get_beat_clock();
 	_moo_bt_num     = master->get_beat_num  ();
-	_moo_bt_tempo   = master->get_beat_tempo();
+	_moo_bt_tempo   = master->get_beat_tempo() * tempo_mod;
 	_moo_tempo_mod  = tempo_mod;
 	_moo_clock_rate = (float)( 60.0f * (double)_dst_sps / ( (double)_moo_bt_tempo * (double)_moo_bt_clock ) );
 	_moo_smp_stride = ( 44100.0f / _dst_sps );
