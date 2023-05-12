@@ -100,6 +100,7 @@ private:
 
 	bool     _moo_b_mute_by_unit;
 	bool     _moo_b_loop      ;
+	int32_t  _moo_loops_num   ;
 
 	int32_t  _moo_smp_smooth  ;
 	float    _moo_clock_rate  ; // as the sample
@@ -228,6 +229,7 @@ public :
 
 	bool    moo_set_mute_by_unit( bool b );
 	bool    moo_set_loop        ( bool b );
+	bool    moo_set_loops_num   ( int32_t n );
 	bool    moo_set_fade( int32_t fade, float sec );
 	bool    moo_set_master_volume( float v );
 

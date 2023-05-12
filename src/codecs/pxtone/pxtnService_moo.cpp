@@ -12,6 +12,7 @@ void pxtnService::_moo_constructor()
 	_moo_b_end_vomit    = true ;
 	_moo_b_mute_by_unit = false;
 	_moo_b_loop         = true ;
+	_moo_loops_num      =    -1;
 
 	_moo_fade_fade      =     0;
 	_moo_master_vol     =  1.0f;
@@ -251,6 +252,8 @@ bool pxtnService::_moo_PXTONE_SAMPLE( void *p_data )
 
 	if( _moo_smp_count >= _moo_smp_end )
 	{
+		if( _moo_loops_num > 0)       _moo_loops_num--;
+		else if( _moo_loops_num == 0) _moo_b_loop = false;
 		if( !_moo_b_loop ) return false;
 		_moo_smp_count = _moo_smp_repeat;
 		_moo_p_eve     = evels->get_Records();
@@ -293,6 +296,14 @@ int32_t pxtnService::moo_get_end_clock() const
 
 bool pxtnService::moo_set_mute_by_unit( bool b ){ if( !_moo_b_init ) return false; _moo_b_mute_by_unit = b; return true; }
 bool pxtnService::moo_set_loop        ( bool b ){ if( !_moo_b_init ) return false; _moo_b_loop         = b; return true; }
+
+bool pxtnService::moo_set_loops_num( int32_t n )
+{
+	if( !_moo_b_init ) return false;
+	_moo_loops_num = n;
+	if(_moo_loops_num > 0) --_moo_loops_num;
+	return true;
+}
 
 bool pxtnService::moo_set_fade( int32_t  fade, float sec )
 {
