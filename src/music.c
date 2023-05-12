@@ -1557,6 +1557,13 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
     if (SDL_memcmp(magic, "\x1f\x8b", 2) == 0)
         return MUS_GME;
 
+#ifdef MUSIC_PXTONE
+    if (SDL_memcmp(magic, "PTTUNE", 6) == 0)
+        return MUS_PXTONE;
+    if (SDL_memcmp(magic, "PTCOLLAGE", 9) == 0)
+        return MUS_PXTONE;
+#endif
+
     /* Detect some module files */
     if (SDL_memcmp(magic, "Extended Module", 15) == 0)
         return MUS_MOD;
@@ -1645,13 +1652,6 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
         return MUS_FFMPEG;
     if (SDL_memcmp(magic + 4, "ftypM4A ", 8) == 0) /* AAC */
         return MUS_FFMPEG;
-#endif
-
-#ifdef MUSIC_PXTONE
-    if (SDL_memcmp(magic, "PTTUNE", 6) == 0)
-        return MUS_PXTONE;
-    if (SDL_memcmp(magic, "PTCOLLAGE", 9) == 0)
-        return MUS_PXTONE;
 #endif
 
 #if defined(MUSIC_MP3_MPG123) || defined(MUSIC_MP3_DRMP3)
