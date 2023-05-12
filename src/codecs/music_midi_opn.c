@@ -422,10 +422,8 @@ static void OPNMIDI_delete(void *music_p);
 static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
 {
     void *bytes = 0;
-    long filesize = 0;
     int err = 0;
-    Sint64 length = 0;
-    unsigned char byte[1];
+    size_t length = 0;
     OpnMIDI_Music *music = NULL;
     OpnMidi_Setup setup = opnmidi_setup;
     unsigned short src_format = music_spec.format;
@@ -500,30 +498,9 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
         return NULL;
     }
 
-    length = SDL_RWseek(src, 0, RW_SEEK_END);
-    if (length < 0) {
-        Mix_SetError("OPN2-MIDI: wrong file\n");
-        OPNMIDI_delete(music);
-        return NULL;
-    }
-
-    SDL_RWseek(src, 0, RW_SEEK_SET);
-    bytes = SDL_malloc((size_t)length);
+    bytes = SDL_LoadFile_RW(src, &length, SDL_FALSE);
     if (!bytes) {
         SDL_OutOfMemory();
-        OPNMIDI_delete(music);
-        return NULL;
-    }
-
-    filesize = 0;
-    while (SDL_RWread(src, &byte, sizeof(Uint8), 1) != 0) {
-        ((unsigned char*)bytes)[filesize] = byte[0];
-        filesize++;
-    }
-
-    if (filesize == 0) {
-        Mix_SetError("OPN2-MIDI: wrong file\n");
-        SDL_free(bytes);
         OPNMIDI_delete(music);
         return NULL;
     }
@@ -562,7 +539,7 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
     OPNMIDI.opn2_setNumChips(music->opnmidi, (setup.chips_count >= 0) ? setup.chips_count : OPNMIDI_DEFAULT_CHIPS_COUNT);
     OPNMIDI.opn2_setTempo(music->opnmidi, music->tempo);
 
-    err = OPNMIDI.opn2_openData( music->opnmidi, bytes, (unsigned long)filesize);
+    err = OPNMIDI.opn2_openData( music->opnmidi, bytes, (unsigned long)length);
     SDL_free(bytes);
 
     if (err != 0) {

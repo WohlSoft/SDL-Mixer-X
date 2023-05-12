@@ -523,10 +523,8 @@ static void ADLMIDI_delete(void *music_p);
 static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
 {
     void *bytes = 0;
-    long filesize = 0;
     int err = 0;
-    Sint64 length = 0;
-    unsigned char byte[1];
+    size_t length = 0;
     AdlMIDI_Music *music = NULL;
     AdlMidi_Setup setup = adlmidi_setup;
     unsigned short src_format = music_spec.format;
@@ -601,31 +599,10 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
         return NULL;
     }
 
-    length = SDL_RWseek(src, 0, RW_SEEK_END);
-    if (length < 0) {
-        Mix_SetError("ADL-MIDI: wrong file\n");
-        ADLMIDI_delete(music);
-        return NULL;
-    }
-
-    SDL_RWseek(src, 0, RW_SEEK_SET);
-    bytes = SDL_malloc((size_t)length);
+    bytes = SDL_LoadFile_RW(src, &length, SDL_FALSE);
     if (!bytes) {
         SDL_OutOfMemory();
         ADLMIDI_delete(music);
-        return NULL;
-    }
-
-    filesize = 0;
-    while (SDL_RWread(src, &byte, sizeof(Uint8), 1) != 0) {
-        ((Uint8 *)bytes)[filesize] = byte[0];
-        filesize++;
-    }
-
-    if (filesize == 0) {
-        SDL_free(bytes);
-        ADLMIDI_delete(music);
-        Mix_SetError("ADL-MIDI: wrong file\n");
         return NULL;
     }
 
@@ -668,7 +645,7 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
     }
     ADLMIDI.adl_setTempo(music->adlmidi, music->tempo);
 
-    err = ADLMIDI.adl_openData(music->adlmidi, bytes, (unsigned long)filesize);
+    err = ADLMIDI.adl_openData(music->adlmidi, bytes, (unsigned long)length);
     SDL_free(bytes);
 
     if (err != 0) {
