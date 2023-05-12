@@ -531,6 +531,11 @@ void MusPlayer_Qt::refreshMetaData()
     double loopStart = Mix_GetMusicLoopStartTime(PGE_MusicPlayer::s_playMus);
     double loopEnd = Mix_GetMusicLoopEndTime(PGE_MusicPlayer::s_playMus);
 
+    qDebug() << "Duration:" << total
+             << "Position:" << curPos
+             << "loopStart:" << loopStart
+             << "loopEnd:" << loopEnd;
+
     m_seekBar->clearLoopPoints();
     m_seekBar->setEnabled(false);
 
