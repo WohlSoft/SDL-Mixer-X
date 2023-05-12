@@ -37,8 +37,9 @@ typedef struct
     double tempo;
     float gain;
 
-    pxtnService*   pxtn;
-    bool           evals_loaded;
+    pxtnService *pxtn;
+    bool evals_loaded;
+    int flags;
 
     SDL_AudioStream *stream;
     void *buffer;
@@ -220,17 +221,20 @@ static void PXTONE_Delete(void *context)
 /* Start playback of a given Game Music Emulators stream */
 static int PXTONE_Play(void *music_p, int play_count)
 {
+    pxtnVOMITPREPARATION prep;
     PXTONE_Music *music = (PXTONE_Music*)music_p;
+
     if (music) {
         SDL_AudioStreamClear(music->stream);
-
-        pxtnVOMITPREPARATION prep;
         SDL_memset(&prep, 0, sizeof(pxtnVOMITPREPARATION));
-        prep.flags          |= pxtnVOMITPREPFLAG_loop | pxtnVOMITPREPFLAG_unit_mute;
-        prep.start_pos_float = 0;
-        prep.master_volume   = 1.0f;
+        prep.flags |= pxtnVOMITPREPFLAG_unit_mute;
+        if (play_count < 0) {
+            prep.flags |= pxtnVOMITPREPFLAG_loop;
+        }
 
-        music->pxtn->moo_set_loop(play_count < 0);
+        music->flags = prep.flags;
+        prep.start_pos_float = 0.0f;
+        prep.master_volume   = 1.0f;
 
         if (!music->pxtn->moo_preparation(&prep, music->tempo)) {
             Mix_SetError("PXTONE: Failed to initialize the moo");
@@ -292,6 +296,37 @@ static int PXTONE_GetVolume(void *music_p)
     PXTONE_Music *music = (PXTONE_Music *)music_p;
     float v = SDL_floorf(((float)(music->volume) / music->gain) + 0.5f);
     return (int)v;
+}
+
+/* Jump (seek) to a given position (time is in seconds) */
+static int PXTONE_Seek(void *music_p, double time)
+{
+    pxtnVOMITPREPARATION prep;
+    PXTONE_Music *music = (PXTONE_Music*)music_p;
+
+    SDL_memset(&prep, 0, sizeof(pxtnVOMITPREPARATION));
+    prep.flags = music->flags;
+    prep.start_pos_sample = (int32_t)((time * music_spec.freq) / music->tempo);
+    prep.master_volume   = 1.0f;
+    if (!music->pxtn->moo_preparation(&prep, music->tempo)) {
+        Mix_SetError("PXTONE: Failed to re-initialize the moo for seek");
+        return -1;
+    }
+    return 0;
+}
+
+static double PXTONE_Tell(void *music_p)
+{
+    PXTONE_Music *music = (PXTONE_Music*)music_p;
+    int32_t ret = music->pxtn->moo_get_sampling_offset();
+    return ((double)ret / music_spec.freq) * music->tempo;
+}
+
+static double PXTONE_Duration(void *music_p)
+{
+    PXTONE_Music *music = (PXTONE_Music*)music_p;
+    int32_t ret = music->pxtn->moo_get_total_sample();
+    return ret > 0 ? ((double)ret / music_spec.freq) * music->tempo : -1.0;
 }
 
 static int PXTONE_SetTempo(void *music_p, double tempo)
@@ -356,9 +391,9 @@ Mix_MusicInterface Mix_MusicInterface_PXTONE =
     NULL,   /* IsPlaying */
     PXTONE_PlayAudio,
     NULL,   /* Jump */
-    NULL,   /* Seek */
-    NULL,   /* Tell [MIXER-X]*/
-    NULL,   /* Duration */
+    PXTONE_Seek,   /* Seek */
+    PXTONE_Tell,   /* Tell [MIXER-X]*/
+    PXTONE_Duration,
     PXTONE_SetTempo,  /* SetTempo [MIXER-X] */
     PXTONE_GetTempo,  /* GetTempo [MIXER-X] */
     NULL,   /* SetSpeed [MIXER-X] */
