@@ -255,10 +255,8 @@ static void EDMIDI_delete(void *music_p);
 static EDMIDI_Music *EDMIDI_LoadSongRW(SDL_RWops *src, const char *args)
 {
     void *bytes = 0;
-    long filesize = 0;
     int err = 0;
-    Sint64 length = 0;
-    unsigned char byte[1];
+    size_t length = 0;
     EDMIDI_Music *music = NULL;
     EDMidi_Setup setup = edmidi_setup;
     unsigned short src_format = music_spec.format;
@@ -333,31 +331,10 @@ static EDMIDI_Music *EDMIDI_LoadSongRW(SDL_RWops *src, const char *args)
         return NULL;
     }
 
-    length = SDL_RWseek(src, 0, RW_SEEK_END);
-    if (length < 0) {
-        Mix_SetError("EDMIDI: wrong file\n");
-        EDMIDI_delete(music);
-        return NULL;
-    }
-
-    SDL_RWseek(src, 0, RW_SEEK_SET);
-    bytes = SDL_malloc((size_t)length);
+    bytes = SDL_LoadFile_RW(src, &length, SDL_FALSE);
     if (!bytes) {
         SDL_OutOfMemory();
         EDMIDI_delete(music);
-        return NULL;
-    }
-
-    filesize = 0;
-    while (SDL_RWread(src, &byte, sizeof(Uint8), 1) != 0) {
-        ((Uint8 *)bytes)[filesize] = byte[0];
-        filesize++;
-    }
-
-    if (filesize == 0) {
-        SDL_free(bytes);
-        EDMIDI_delete(music);
-        Mix_SetError("EDMIDI: wrong file\n");
         return NULL;
     }
 
@@ -378,7 +355,7 @@ static EDMIDI_Music *EDMIDI_LoadSongRW(SDL_RWops *src, const char *args)
 
     EDMIDI.edmidi_setTempo(music->edmidi, music->tempo);
 
-    err = EDMIDI.edmidi_openData(music->edmidi, bytes, (unsigned long)filesize);
+    err = EDMIDI.edmidi_openData(music->edmidi, bytes, (unsigned long)length);
     SDL_free(bytes);
 
     if (err != 0) {
