@@ -228,10 +228,9 @@ static int PXTONE_Play(void *music_p, int play_count)
         SDL_AudioStreamClear(music->stream);
         SDL_memset(&prep, 0, sizeof(pxtnVOMITPREPARATION));
         prep.flags |= pxtnVOMITPREPFLAG_unit_mute;
-        if (play_count < 0) {
+        if ((play_count < 0) || (play_count > 1)) {
             prep.flags |= pxtnVOMITPREPFLAG_loop;
         }
-
         music->flags = prep.flags;
         prep.start_pos_float = 0.0f;
         prep.master_volume   = 1.0f;
@@ -240,6 +239,7 @@ static int PXTONE_Play(void *music_p, int play_count)
             Mix_SetError("PXTONE: Failed to initialize the moo");
             return -1;
         }
+        music->pxtn->moo_set_loops_num(play_count);
     }
     return 0;
 }
