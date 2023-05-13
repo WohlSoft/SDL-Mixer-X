@@ -818,18 +818,16 @@ typedef struct
 }
 _x4x_EVENTSTRUCT;
 
+#ifdef px_BIG_ENDIAN
 px_FORCE_INLINE void swapEndian( _x4x_EVENTSTRUCT &evnt)
 {
-#ifdef px_BIG_ENDIAN
 	evnt.unit_index = pxtnData::_swap16(evnt.unit_index);
 	evnt.event_kind = pxtnData::_swap16(evnt.event_kind);
 	evnt.data_num =   pxtnData::_swap16(evnt.data_num);
 	evnt.rrr =        pxtnData::_swap16(evnt.rrr);
 	evnt.event_num =  pxtnData::_swap32(evnt.event_num);
-#else
-	(void)evnt;
-#endif
 }
+#endif
 
 // write event.
 pxtnERR pxtnEvelist::io_Unit_Read_x4x_EVENT( void* desc, bool bTailAbsolute, bool bCheckRRR )

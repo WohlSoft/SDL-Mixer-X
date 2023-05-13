@@ -5,6 +5,17 @@
 
 #include "pxtn.h"
 
+#ifdef px_BIG_ENDIAN
+#   define pxSwapLE16(x)    pxtnData::_swap16(x)
+#   define pxSwapLE32(x)    pxtnData::_swap32(x)
+#   define pxSwapFloatLE(x) pxtnData::_swap_float(x)
+#else
+#   define pxSwapLE16(x)    (x)
+#   define pxSwapLE32(x)    (x)
+#   define pxSwapFloatLE(x) (x)
+#   define swapEndian(x)    (void)x
+#endif
+
 typedef bool (* pxtnIO_r   )( void* user,       void* p_dst, int32_t size, int32_t num );
 typedef bool (* pxtnIO_w   )( void* user, const void* p_dst, int32_t size, int32_t num );
 typedef bool (* pxtnIO_seek)( void* user,     int32_t mode , int32_t size              );
@@ -14,8 +25,8 @@ class pxtnData
 {
 private:
 
-	void operator = (const pxtnData& src){}
-	pxtnData        (const pxtnData& src){}
+	void operator = (const pxtnData& src){ (void)src; }
+	pxtnData        (const pxtnData& src){ (void)src; }
 
 protected:
 

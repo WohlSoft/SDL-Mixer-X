@@ -22,9 +22,9 @@ typedef struct
 }
 _MATERIALSTRUCT_PCM;
 
+#ifdef px_BIG_ENDIAN
 px_FORCE_INLINE void swapEndian( _MATERIALSTRUCT_PCM &pcm)
 {
-#ifdef px_BIG_ENDIAN
 	pcm.x3x_unit_no = pxtnData::_swap16(pcm.x3x_unit_no);
 	pcm.basic_key =   pxtnData::_swap16(pcm.basic_key);
 	pcm.voice_flags = pxtnData::_swap32(pcm.voice_flags);
@@ -33,10 +33,8 @@ px_FORCE_INLINE void swapEndian( _MATERIALSTRUCT_PCM &pcm)
 	pcm.sps =         pxtnData::_swap32(pcm.sps);
 	pcm.tuning =      pxtnData::_swap_float(pcm.tuning);
 	pcm.data_size =   pxtnData::_swap32(pcm.data_size);
-#else
-	(void)pcm;
-#endif
 }
+#endif
 
 bool pxtnWoice::io_matePCM_w( void* desc ) const
 {
@@ -46,15 +44,14 @@ bool pxtnWoice::io_matePCM_w( void* desc ) const
  
 	memset( &pcm, 0, sizeof( _MATERIALSTRUCT_PCM ) );
 
-	pcm.sps         = (uint32_t)p_pcm->get_sps     ();
-	pcm.bps         = (uint16_t)p_pcm->get_bps     ();
-	pcm.ch          = (uint16_t)p_pcm->get_ch      ();
-	pcm.data_size   = (uint32_t)p_pcm->get_buf_size();
+	pcm.sps         = pxSwapLE32((uint32_t)p_pcm->get_sps     ());
+	pcm.bps         = pxSwapLE16((uint16_t)p_pcm->get_bps     ());
+	pcm.ch          = pxSwapLE16((uint16_t)p_pcm->get_ch      ());
+	pcm.data_size   = pxSwapLE32((uint32_t)p_pcm->get_buf_size());
 	pcm.x3x_unit_no = (uint16_t)0;
-	pcm.tuning      =           p_vc->tuning     ;
-	pcm.voice_flags =           p_vc->voice_flags;
-	pcm.basic_key   = (uint16_t)p_vc->basic_key  ;
-	swapEndian( pcm );
+	pcm.tuning      = pxSwapFloatLE(p_vc->tuning)          ;
+	pcm.voice_flags = pxSwapLE32(p_vc->voice_flags)        ;
+	pcm.basic_key   = pxSwapLE16((uint16_t)p_vc->basic_key);
 
 	uint32_t size = sizeof( _MATERIALSTRUCT_PCM ) + pcm.data_size;
 
@@ -138,18 +135,16 @@ typedef struct
 }
 _MATERIALSTRUCT_PTN;
 
+#ifdef px_BIG_ENDIAN
 px_FORCE_INLINE void swapEndian( _MATERIALSTRUCT_PTN &ptv)
 {
-#ifdef px_BIG_ENDIAN
 	ptv.x3x_unit_no = pxtnData::_swap16(ptv.x3x_unit_no);
 	ptv.basic_key =   pxtnData::_swap16(ptv.basic_key);
 	ptv.voice_flags = pxtnData::_swap32(ptv.voice_flags);
 	ptv.tuning =      pxtnData::_swap_float(ptv.tuning);
 	ptv.rrr =         pxtnData::_swap32(ptv.rrr);
-#else
-	(void)ptv;
-#endif
 }
+#endif
 
 
 bool pxtnWoice::io_matePTN_w( void* desc ) const
@@ -238,17 +233,15 @@ typedef struct
 }
 _MATERIALSTRUCT_PTV;
 
+#ifdef px_BIG_ENDIAN
 px_FORCE_INLINE void swapEndian( _MATERIALSTRUCT_PTV &ptv)
 {
-#ifdef px_BIG_ENDIAN
 	ptv.x3x_unit_no = pxtnData::_swap16(ptv.x3x_unit_no);
 	ptv.rrr =         pxtnData::_swap16(ptv.rrr);
 	ptv.x3x_tuning =  pxtnData::_swap_float(ptv.x3x_tuning);
 	ptv.size =        pxtnData::_swap32(ptv.size);
-#else
-	(void)ptv;
-#endif
 }
+#endif
 
 bool pxtnWoice::io_matePTV_w( void* desc ) const
 {
@@ -323,17 +316,15 @@ typedef struct
 }
 _MATERIALSTRUCT_OGGV;
 
+#ifdef px_BIG_ENDIAN
 px_FORCE_INLINE void swapEndian( _MATERIALSTRUCT_OGGV &mate)
 {
-#ifdef px_BIG_ENDIAN
 	mate.xxx =           pxtnData::_swap16(mate.xxx);
 	mate.basic_key =     pxtnData::_swap16(mate.basic_key);
 	mate.voice_flags =   pxtnData::_swap32(mate.voice_flags);
 	mate.tuning =        pxtnData::_swap_float(mate.tuning);
-#else
-	(void)mate;
-#endif
 }
+#endif
 
 bool pxtnWoice::io_mateOGGV_w( void* desc ) const
 {
@@ -346,11 +337,9 @@ bool pxtnWoice::io_mateOGGV_w( void* desc ) const
 
 	int32_t oggv_size = p_vc->p_oggv->GetSize();
 	
-	mate.tuning      =           p_vc->tuning     ;
-	mate.voice_flags =           p_vc->voice_flags;
-	mate.basic_key   = (uint16_t)p_vc->basic_key  ;
-
-	swapEndian( mate );
+	mate.tuning      =        pxSwapFloatLE(p_vc->tuning)     ;
+	mate.voice_flags =           pxSwapLE16(p_vc->voice_flags);
+	mate.basic_key   = pxSwapLE16((uint16_t)p_vc->basic_key)  ;
 
 	uint32_t size = sizeof( _MATERIALSTRUCT_OGGV ) + oggv_size;
 

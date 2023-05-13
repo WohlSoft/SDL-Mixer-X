@@ -117,17 +117,15 @@ typedef struct
 }
 _DELAYSTRUCT;
 
+#ifdef px_BIG_ENDIAN
 px_FORCE_INLINE void swapEndian( _DELAYSTRUCT &dela)
 {
-#ifdef px_BIG_ENDIAN
 	dela.unit =  pxtnData::_swap16(dela.unit);
 	dela.group = pxtnData::_swap16(dela.group);
 	dela.rate =  pxtnData::_swap_float(dela.rate);
 	dela.freq =  pxtnData::_swap_float(dela.freq);
-#else
-	(void)dela;
-#endif
 }
+#endif
 
 bool pxtnDelay::Write( void* desc ) const
 {
@@ -135,12 +133,10 @@ bool pxtnDelay::Write( void* desc ) const
 	int32_t            size;
 
 	memset( &dela, 0, sizeof( _DELAYSTRUCT ) );
-	dela.unit  = (uint16_t)_unit ;
-	dela.group = (uint16_t)_group;
-	dela.rate  = _rate;
-	dela.freq  = _freq;
-
-	swapEndian( dela );
+	dela.unit  = pxSwapLE16((uint16_t)_unit);
+	dela.group = pxSwapLE16((uint16_t)_group);
+	dela.rate  = pxSwapFloatLE(_rate);
+	dela.freq  = pxSwapFloatLE(_freq);
 
 	// dela ----------
 	size = sizeof( _DELAYSTRUCT );

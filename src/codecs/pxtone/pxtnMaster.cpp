@@ -164,16 +164,14 @@ typedef struct
 }
 _x4x_MASTER;
 
+#ifdef px_BIG_ENDIAN
 px_FORCE_INLINE void swapEndian( _x4x_MASTER &mast)
 {
-#ifdef px_BIG_ENDIAN
 	mast.data_num =  pxtnData::_swap16(mast.data_num);
 	mast.rrr =       pxtnData::_swap16(mast.rrr);
 	mast.event_num = pxtnData::_swap32(mast.event_num);
-#else
-	(void)mast;
-#endif
 }
+#endif
 
 // read( project )
 pxtnERR pxtnMaster::io_r_x4x( void* desc )

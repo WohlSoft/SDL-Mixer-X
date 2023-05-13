@@ -16,9 +16,9 @@ typedef struct
 }
 WAVEFORMATCHUNK;
 
+#ifdef px_BIG_ENDIAN
 px_FORCE_INLINE void swapEndian( WAVEFORMATCHUNK &format)
 {
-#ifdef px_BIG_ENDIAN
 	format.formatID =       pxtnData::_swap16(format.formatID);
 	format.ch =             pxtnData::_swap16(format.ch);
 	format.sps =            pxtnData::_swap32(format.sps);
@@ -26,10 +26,8 @@ px_FORCE_INLINE void swapEndian( WAVEFORMATCHUNK &format)
 	format.block_size =     pxtnData::_swap16(format.block_size);
 	format.bps =            pxtnData::_swap16(format.bps);
 	format.ext =            pxtnData::_swap16(format.ext);
-#else
-	(void)format;
-#endif
 }
+#endif
 
 void pxtnPulse_PCM::Release()
 {
@@ -179,15 +177,13 @@ bool pxtnPulse_PCM::write  ( void* desc, const char* pstrLIST ) const
 
 	sample_size         = ( _smp_head + _smp_body + _smp_tail ) * _ch * _bps / 8;
 
-	format.formatID     = 0x0001;// PCM
-	format.ch           = (uint16_t) _ch;
-	format.sps          = (uint32_t) _sps;
-	format.bps          = (uint16_t) _bps;
-	format.byte_per_sec = (uint32_t)(_sps * _bps * _ch / 8);
-	format.block_size   = (uint16_t)(             _bps * _ch / 8);
+	format.formatID     = pxSwapLE16(0x0001);// PCM
+	format.ch           = pxSwapLE16((uint16_t) _ch);
+	format.sps          = pxSwapLE32((uint32_t) _sps);
+	format.bps          = pxSwapLE16((uint16_t) _bps);
+	format.byte_per_sec = pxSwapLE32((uint32_t)(_sps * _bps * _ch / 8));
+	format.block_size   = pxSwapLE16((uint16_t)(             _bps * _ch / 8));
 	format.ext          = 0;
-
-	swapEndian( format );
 
 	fact_size = ( _smp_head + _smp_body + _smp_tail );
 	riff_size  = sample_size;

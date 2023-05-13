@@ -312,15 +312,13 @@ typedef struct
 }
 _x1x_UNIT;
 
+#ifdef px_BIG_ENDIAN
 px_FORCE_INLINE void swapEndian( _x1x_UNIT &unit)
 {
-#ifdef px_BIG_ENDIAN
 	unit.type =  pxtnData::_swap16(unit.type);
 	unit.group = pxtnData::_swap16(unit.group);
-#else
-	(void)unit;
-#endif
 }
+#endif
 
 bool pxtnUnit::Read_v1x( void* desc, int32_t *p_group )
 {
@@ -349,15 +347,13 @@ typedef struct
 }
 _x3x_UNIT;
 
+#ifdef px_BIG_ENDIAN
 px_FORCE_INLINE void swapEndian( _x3x_UNIT &unit)
 {
-#ifdef px_BIG_ENDIAN
 	unit.type =  pxtnData::_swap16(unit.type);
 	unit.group = pxtnData::_swap16(unit.group);
-#else
-	(void)unit;
-#endif
 }
+#endif
 
 pxtnERR pxtnUnit::Read_v3x( void* desc, int32_t *p_group )
 {

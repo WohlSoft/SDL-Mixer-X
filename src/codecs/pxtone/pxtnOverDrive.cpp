@@ -54,18 +54,16 @@ typedef struct
 }
 _OVERDRIVESTRUCT;
 
+#ifdef px_BIG_ENDIAN
 px_FORCE_INLINE void swapEndian( _OVERDRIVESTRUCT &over)
 {
-#ifdef px_BIG_ENDIAN
 	over.xxx =   pxtnData::_swap16(over.xxx);
 	over.group = pxtnData::_swap16(over.group);
 	over.cut =   pxtnData::_swap_float(over.cut);
 	over.amp =   pxtnData::_swap_float(over.amp);
 	over.yyy =   pxtnData::_swap_float(over.yyy);
-#else
-	(void)over;
-#endif
 }
+#endif
 
 bool pxtnOverDrive::Write( void* desc ) const
 {
@@ -73,11 +71,9 @@ bool pxtnOverDrive::Write( void* desc ) const
 	int32_t              size;
 
 	memset( &over, 0, sizeof( _OVERDRIVESTRUCT ) );
-	over.cut   = _cut_f;
-	over.amp   = _amp_f;
-	over.group = (uint16_t)_group;
-
-	swapEndian( over );
+	over.cut   = pxSwapFloatLE(_cut_f);
+	over.amp   = pxSwapFloatLE(_amp_f);
+	over.group = pxSwapLE16((uint16_t)_group);
 
 	// dela ----------
 	size = sizeof( _OVERDRIVESTRUCT );

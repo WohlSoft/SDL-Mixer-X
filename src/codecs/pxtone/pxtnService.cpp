@@ -701,15 +701,13 @@ typedef struct
 }
 _ASSIST_WOICE;
 
+#ifdef px_BIG_ENDIAN
 px_FORCE_INLINE void swapEndian( _ASSIST_WOICE &assi)
 {
-#ifdef px_BIG_ENDIAN
 	assi.woice_index = pxtnData::_swap16(assi.woice_index);
 	assi.rrr =         pxtnData::_swap16(assi.rrr);
-#else
-	(void)assi;
-#endif
 }
+#endif
 
 bool pxtnService::_io_assiWOIC_w( void* desc, int32_t idx ) const
 {
@@ -723,8 +721,7 @@ bool pxtnService::_io_assiWOIC_w( void* desc, int32_t idx ) const
 	if( name_size > pxtnMAX_TUNEWOICENAME ) return false;
 
 	memcpy( assi.name, p_name, name_size );
-	assi.woice_index = (uint16_t)idx;
-	swapEndian( assi );
+	assi.woice_index = pxSwapLE16((uint16_t)idx);
 
 	size = sizeof( _ASSIST_WOICE );
 	if( !_io_write_le32( desc, &size ) ) return false;
@@ -766,15 +763,13 @@ typedef struct
 }
 _ASSIST_UNIT;
 
+#ifdef px_BIG_ENDIAN
 px_FORCE_INLINE void swapEndian( _ASSIST_UNIT &unit)
 {
-#ifdef px_BIG_ENDIAN
 	unit.unit_index = pxtnData::_swap16(unit.unit_index);
 	unit.rrr =        pxtnData::_swap16(unit.rrr);
-#else
-	(void)unit;
-#endif
 }
+#endif
 
 
 bool pxtnService::_io_assiUNIT_w( void* desc, int32_t idx ) const
@@ -787,8 +782,7 @@ bool pxtnService::_io_assiUNIT_w( void* desc, int32_t idx ) const
 	const char*  p_name = _units[ idx ]->get_name_buf( &name_size );
 
 	memcpy( assi.name, p_name, name_size );
-	assi.unit_index = (uint16_t)idx;
-	swapEndian( assi );
+	assi.unit_index = pxSwapLE16((uint16_t)idx);
 
 	size = sizeof(assi);
 	if( !_io_write_le32( desc, &size ) ) return false;
@@ -827,15 +821,13 @@ typedef struct
 }
 _NUM_UNIT;
 
+#ifdef px_BIG_ENDIAN
 px_FORCE_INLINE void swapEndian( _NUM_UNIT &data)
 {
-#ifdef px_BIG_ENDIAN
 	data.num = pxtnData::_swap16(data.num);
 	data.rrr = pxtnData::_swap16(data.rrr);
-#else
-	(void)data;
-#endif
 }
+#endif
 
 
 bool pxtnService::_io_UNIT_num_w( void* desc ) const
@@ -847,8 +839,7 @@ bool pxtnService::_io_UNIT_num_w( void* desc ) const
 
 	memset( &data, 0, sizeof( _NUM_UNIT ) );
 
-	data.num = (int16_t)_unit_num;
-	swapEndian( data );
+	data.num = pxSwapLE16((int16_t)_unit_num);
 
 	size     = sizeof(_NUM_UNIT);
 
@@ -1320,9 +1311,9 @@ typedef struct
 }
 _x1x_PROJECT;
 
+#ifdef px_BIG_ENDIAN
 px_FORCE_INLINE void swapEndian( _x1x_PROJECT &prjc)
 {
-#ifdef px_BIG_ENDIAN
 	prjc.x1x_beat_tempo =  pxtnData::_swap_float(prjc.x1x_beat_tempo);
 	prjc.x1x_beat_clock =  pxtnData::_swap16(prjc.x1x_beat_clock);
 	prjc.x1x_beat_num =    pxtnData::_swap16(prjc.x1x_beat_num);
@@ -1331,10 +1322,8 @@ px_FORCE_INLINE void swapEndian( _x1x_PROJECT &prjc)
 	prjc.x1x_channel_num = pxtnData::_swap16(prjc.x1x_channel_num);
 	prjc.x1x_bps =         pxtnData::_swap16(prjc.x1x_bps);
 	prjc.x1x_sps =         pxtnData::_swap16(prjc.x1x_sps);
-#else
-	(void)prjc;
-#endif
 }
+#endif
 
 bool pxtnService::_x1x_Project_Read( void* desc )
 {
