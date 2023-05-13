@@ -11,9 +11,9 @@
 #   include "SDL_assert.h"
 #   define STB_VORBIS_SDL 1 /* for SDL_mixer-specific stuff. */
 #   define STB_FORCEINLINE SDL_FORCE_INLINE
+#   define STB_VORBIS_NO_CRT 1
 #endif
 #define STB_VORBIS_NO_STDIO 1
-#define STB_VORBIS_NO_CRT 1
 #define STB_VORBIS_NO_PUSHDATA_API 1
 #define STB_VORBIS_MAX_CHANNELS 8   /* For 7.1 surround sound */
 #if px_IS_BIG_ENDIAN
@@ -269,8 +269,7 @@ pxtnPulse_Oggv::~pxtnPulse_Oggv()
 
 void pxtnPulse_Oggv::Release()
 {
-	if( _p_data ) free( _p_data );
-	_p_data = NULL;
+	if( _p_data ) { free( _p_data ); } _p_data = NULL;
 	_ch      = 0;
 	_sps2    = 0;
 	_smp_num = 0;
@@ -291,8 +290,7 @@ term:
 
 	if( res != pxtnOK )
 	{
-		if( _p_data ) free( _p_data );
-		_p_data = NULL; _size = 0;
+		if( _p_data ) { free( _p_data ); } _p_data = NULL; _size = 0;
 	}
 	return res;
 }
@@ -445,11 +443,11 @@ bool pxtnPulse_Oggv::pxtn_write( void* desc ) const
 {
 	if( !_p_data ) return false;
 
-	if( !_io_write_le32( desc, &_ch ) ) return false;
-	if( !_io_write_le32( desc, &_sps2 ) ) return false;
-	if( !_io_write_le32( desc, &_smp_num ) ) return false;
-	if( !_io_write_le32( desc, &_size ) ) return false;
-	if( !_io_write( desc,  _p_data , sizeof(char   ),_size ) ) return false;
+	if( !_io_write_le32( desc, &_ch                      ) ) return false;
+	if( !_io_write_le32( desc, &_sps2                    ) ) return false;
+	if( !_io_write_le32( desc, &_smp_num                 ) ) return false;
+	if( !_io_write_le32( desc, &_size                    ) ) return false;
+	if( !_io_write( desc,  _p_data , sizeof(char), _size ) ) return false;
 
 	return true;
 }
@@ -473,8 +471,7 @@ End:
 
 	if( !b_ret )
 	{
-		if( _p_data ) free( _p_data );
-		_p_data = NULL; _size = 0;
+		if( _p_data ) { free( _p_data ); } _p_data = NULL; _size = 0;
 	}
 
 	return b_ret;

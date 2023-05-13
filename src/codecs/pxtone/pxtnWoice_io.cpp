@@ -336,9 +336,9 @@ bool pxtnWoice::io_mateOGGV_w( void* desc ) const
 
 	int32_t oggv_size = p_vc->p_oggv->GetSize();
 
-	mate.tuning      =       pxSwapFloatLE( p_vc->tuning )     ;
-	mate.voice_flags =          pxSwapLE16( p_vc->voice_flags );
-	mate.basic_key   = pxSwapLE16( (uint16_t)p_vc->basic_key ) ;
+	mate.tuning      =        pxSwapFloatLE( p_vc->tuning )     ;
+	mate.voice_flags =           pxSwapLE16( p_vc->voice_flags );
+	mate.basic_key   = pxSwapLE16( (uint16_t)p_vc->basic_key )  ;
 
 	uint32_t size = sizeof( _MATERIALSTRUCT_OGGV ) + oggv_size;
 
@@ -370,7 +370,7 @@ pxtnERR pxtnWoice::io_mateOGGV_r( void* desc )
 
 		p_vc->type = pxtnVOICE_OggVorbis;
 
-		if( !p_vc->p_oggv->pxtn_read( desc ) ) goto End;
+		if( !p_vc->p_oggv->pxtn_read( desc ) ) { res= pxtnERR_desc_r; goto End;}
 
 		p_vc->voice_flags  = mate.voice_flags;
 		p_vc->basic_key    = mate.basic_key  ;
