@@ -19,7 +19,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-/* This file supports playing supported files with PXTone */
+/* This file supports playing supported files with PXTONE */
 
 #ifdef __cplusplus
 extern "C" {

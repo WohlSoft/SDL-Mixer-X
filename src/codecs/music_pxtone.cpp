@@ -26,7 +26,7 @@
 #include "./pxtone/pxtnError.h"
 
 
-/* This file supports Game Music Emulator music streams */
+/* This file supports PXTONE music streams */
 typedef struct
 {
     SDL_RWops *src;
@@ -49,31 +49,19 @@ typedef struct
 } PXTONE_Music;
 
 
-// I/O..
 static bool _pxtn_r(void* user, void* p_dst, Sint32 size, Sint32 num)
 {
-    int i = SDL_RWread((SDL_RWops*)user, p_dst, size, num);
-    if ( i < num ) {
-        return false;
-    }
-    return true;
+    return SDL_RWread((SDL_RWops*)user, p_dst, size, num) == (size_t)num;
 }
 
 static bool _pxtn_w(void* user,const void* p_dst, Sint32 size, Sint32 num)
 {
-    int i = SDL_RWwrite((SDL_RWops*)user, p_dst, size, num);
-    if ( i < num ) {
-        return false;
-    }
-    return true;
+    return SDL_RWwrite((SDL_RWops*)user, p_dst, size, num) == (size_t)num;
 }
 
 static bool _pxtn_s(void* user, Sint32 mode, Sint32 size)
 {
-    if (SDL_RWseek((SDL_RWops*)user, size, mode) < 0) {
-        return false;
-    }
-    return true;
+    return SDL_RWseek((SDL_RWops*)user, size, mode) >= 0;
 }
 
 static bool _pxtn_p(void* user, int32_t* p_pos)
@@ -137,7 +125,7 @@ static void *PXTONE_NewRW(struct SDL_RWops *src, int freesrc)
 
     music->evals_loaded = true;
 
-    // PREPARATION PLAYING MUSIC.
+    /* PREPARATION PLAYING MUSIC */
     music->pxtn->moo_get_total_sample();
 
     pxtnVOMITPREPARATION prep;
@@ -148,7 +136,7 @@ static void *PXTONE_NewRW(struct SDL_RWops *src, int freesrc)
 
     if (!music->pxtn->moo_preparation(&prep)) {
         PXTONE_Delete(music);
-        Mix_SetError("PXTONE: Failed to initialize the moo");
+        Mix_SetError("PXTONE: Failed to initialize the output (Moo)");
         return NULL;
     }
 
@@ -160,7 +148,7 @@ static void *PXTONE_NewRW(struct SDL_RWops *src, int freesrc)
         return NULL;
     }
 
-    music->buffer_samples = music_spec.samples * music_spec.channels /*channels*/;
+    music->buffer_samples = music_spec.samples * music_spec.channels;
     music->buffer_size = music->buffer_samples * sizeof(Sint16);
     music->buffer = SDL_malloc(music->buffer_size);
     if (!music->buffer) {
@@ -189,7 +177,7 @@ static void *PXTONE_NewRW(struct SDL_RWops *src, int freesrc)
     return music;
 }
 
-/* Close the given Game Music Emulators stream */
+/* Close the given PXTONE stream */
 static void PXTONE_Delete(void *context)
 {
     PXTONE_Music *music = (PXTONE_Music*)context;
@@ -218,7 +206,7 @@ static void PXTONE_Delete(void *context)
     }
 }
 
-/* Start playback of a given Game Music Emulators stream */
+/* Start playback of a given PXTONE stream */
 static int PXTONE_Play(void *music_p, int play_count)
 {
     pxtnVOMITPREPARATION prep;
@@ -236,7 +224,7 @@ static int PXTONE_Play(void *music_p, int play_count)
         prep.master_volume   = 1.0f;
 
         if (!music->pxtn->moo_preparation(&prep, music->tempo)) {
-            Mix_SetError("PXTONE: Failed to initialize the moo");
+            Mix_SetError("PXTONE: Failed to update the output (Moo)");
             return -1;
         }
         music->pxtn->moo_set_loops_num(play_count);
@@ -249,7 +237,6 @@ static int PXTONE_GetSome(void *context, void *data, int bytes, SDL_bool *done)
     PXTONE_Music *music = (PXTONE_Music *)context;
     int filled;
     bool ret;
-    // SDL_bool got_some;
 
     filled = SDL_AudioStreamGet(music->stream, data, bytes);
     if (filled != 0) {
@@ -269,7 +256,7 @@ static int PXTONE_GetSome(void *context, void *data, int bytes, SDL_bool *done)
     return 0;
 }
 
-/* Play some of a stream previously started with GME_play() */
+/* Play some of a stream previously started with pxtn->moo_preparation() */
 static int PXTONE_PlayAudio(void *music_p, void *data, int bytes)
 {
     PXTONE_Music *music = (PXTONE_Music*)music_p;
@@ -282,7 +269,7 @@ static const char* PXTONE_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
     return meta_tags_get(&music->tags, tag_type);
 }
 
-/* Set the volume for a EDMIDI stream */
+/* Set the volume for a PXTONE stream */
 static void PXTONE_SetVolume(void *music_p, int volume)
 {
     PXTONE_Music *music = (PXTONE_Music *)music_p;
@@ -290,7 +277,7 @@ static void PXTONE_SetVolume(void *music_p, int volume)
     music->volume = (int)v;
 }
 
-/* Get the volume for a EDMIDI stream */
+/* Get the volume for a PXTONE stream */
 static int PXTONE_GetVolume(void *music_p)
 {
     PXTONE_Music *music = (PXTONE_Music *)music_p;
@@ -309,7 +296,7 @@ static int PXTONE_Seek(void *music_p, double time)
     prep.start_pos_sample = (int32_t)((time * music_spec.freq) / music->tempo);
     prep.master_volume   = 1.0f;
     if (!music->pxtn->moo_preparation(&prep, music->tempo)) {
-        Mix_SetError("PXTONE: Failed to re-initialize the moo for seek");
+        Mix_SetError("PXTONE: Failed to update the setup of output (Moo) for seek");
         return -1;
     }
     return 0;
@@ -391,20 +378,20 @@ Mix_MusicInterface Mix_MusicInterface_PXTONE =
     NULL,   /* IsPlaying */
     PXTONE_PlayAudio,
     NULL,   /* Jump */
-    PXTONE_Seek,   /* Seek */
-    PXTONE_Tell,   /* Tell [MIXER-X]*/
+    PXTONE_Seek,
+    PXTONE_Tell,
     PXTONE_Duration,
-    PXTONE_SetTempo,  /* SetTempo [MIXER-X] */
-    PXTONE_GetTempo,  /* GetTempo [MIXER-X] */
+    PXTONE_SetTempo,  /* [MIXER-X] */
+    PXTONE_GetTempo,  /* [MIXER-X] */
     NULL,   /* SetSpeed [MIXER-X] */
     NULL,   /* GetSpeed [MIXER-X] */
     NULL,   /* SetPitch [MIXER-X] */
     NULL,   /* GetPitch [MIXER-X] */
     PXTONE_GetTracksCount,
     PXTONE_SetTrackMute,
-    NULL,   /* LoopStart [MIXER-X]*/
-    NULL,   /* LoopEnd [MIXER-X]*/
-    NULL,   /* LoopLength [MIXER-X]*/
+    NULL,   /* LoopStart */
+    NULL,   /* LoopEnd */
+    NULL,   /* LoopLength */
     PXTONE_GetMetaTag,
     NULL,   /* GetNumTracks */
     NULL,   /* StartTrack */
