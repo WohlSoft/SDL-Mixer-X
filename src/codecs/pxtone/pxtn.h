@@ -19,16 +19,23 @@
 #include <stdio.h>
 #include <math.h>
 
+#ifdef pxUseSDL
 #include "SDL_endian.h"
 
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 #   define px_BIG_ENDIAN
+#endif
+
+#   define px_FORCE_INLINE     SDL_FORCE_INLINE
+#else
+#   define px_FORCE_INLINE     static inline
+#endif // pxUseSDL
+
+#ifdef px_BIG_ENDIAN
 #   define px_IS_BIG_ENDIAN     1
 #else
 #   define px_IS_BIG_ENDIAN     0
 #endif
-
-#define px_FORCE_INLINE     SDL_FORCE_INLINE
 
 typedef struct
 {
