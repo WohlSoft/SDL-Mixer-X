@@ -303,7 +303,7 @@ pxtnVOICETONE *pxtnUnit::get_tone( int32_t voice_idx )
 }
 
 
-// v1x (20byte) ================= 
+// v1x (20byte) =================
 typedef struct
 {
 	char     name[ pxtnMAX_TUNEUNITNAME ];

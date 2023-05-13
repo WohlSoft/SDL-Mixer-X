@@ -42,9 +42,9 @@ public :
 	~pxtnUnit();
 
 	void    Tone_Init ();
-		    
+
 	void    Tone_Clear();
-		    
+
 	void    Tone_Reset_and_2prm( int32_t voice_idx, int32_t env_rls_clock, float offset_freq );
 	void    Tone_Envelope  ();
 	void    Tone_KeyOn     ();
@@ -52,13 +52,13 @@ public :
 	void    Tone_Key       ( int32_t key );
 	void    Tone_Pan_Volume( int32_t ch, int32_t pan );
 	void    Tone_Pan_Time  ( int32_t ch, int32_t pan, int32_t sps );
-		    
+
 	void    Tone_Velocity  ( int32_t val );
 	void    Tone_Volume    ( int32_t val );
 	void    Tone_Portament ( int32_t val );
 	void    Tone_GroupNo   ( int32_t val );
 	void    Tone_Tuning    ( float   val );
-		    			   
+
 	void    Tone_Sample    ( bool b_mute_by_unit, int32_t ch_num, int32_t time_pan_index, int32_t smooth_smp );
 	void    Tone_Supple    ( int32_t *group_smps, int32_t ch_num, int32_t time_pan_index ) const;
 	int32_t Tone_Increment_Key   ();
@@ -70,7 +70,7 @@ public :
 	bool        set_name_buf( const char *name_buf, int32_t    buf_size );
 	const char* get_name_buf(                       int32_t* p_buf_size ) const;
 	bool        is_name_buf () const;
-	
+
 	pxtnVOICETONE *get_tone( int32_t voice_idx );
 
 	void set_operated( bool b );

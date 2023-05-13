@@ -176,7 +176,7 @@ bool pxtnPulse_Oggv::_SetInformation()
 	ovmem.size  = _size  ;
 
 	// set callback func.
-	ov_callbacks   oc; 
+	ov_callbacks   oc;
 	oc.read_func  = _mread       ;
 	oc.seek_func  = _mseek       ;
 	oc.close_func = _mclose_dummy;
@@ -184,12 +184,12 @@ bool pxtnPulse_Oggv::_SetInformation()
 
 	bool           vf_loaded = false;
 	OggVorbis_File vf;
-	
+
 	vorbis_info*  vi;
 
 	switch( ov_open_callbacks( &ovmem, &vf, NULL, 0, oc ) )
 	{
-	case OV_EREAD     : goto End; //{printf("A read from media returned an error.\n");exit(1);} 
+	case OV_EREAD     : goto End; //{printf("A read from media returned an error.\n");exit(1);}
 	case OV_ENOTVORBIS: goto End; //{printf("Bitstream is not Vorbis data. \n");exit(1);}
 	case OV_EVERSION  : goto End; //{printf("Vorbis version mismatch. \n");exit(1);}
 	case OV_EBADHEADER: goto End; //{printf("Invalid Vorbis bitstream header. \n");exit(1);}
@@ -296,7 +296,7 @@ pxtnERR pxtnPulse_Oggv::Decode( pxtnPulse_PCM * p_pcm ) const
 	bool           vf_loaded = false;
 	OggVorbis_File vf;
 	vorbis_info*   vi;
-	ov_callbacks   oc; 
+	ov_callbacks   oc;
 
 	int32_t current_section;
 	char    pcmout[ 4096 ] = {0};
@@ -315,7 +315,7 @@ pxtnERR pxtnPulse_Oggv::Decode( pxtnPulse_PCM * p_pcm ) const
 
 	switch( ov_open_callbacks( &ovmem, &vf, NULL, 0, oc ) )
 	{
-	case OV_EREAD     : res = pxtnERR_ogg; goto term; //{printf("A read from media returned an error.\n");exit(1);} 
+	case OV_EREAD     : res = pxtnERR_ogg; goto term; //{printf("A read from media returned an error.\n");exit(1);}
 	case OV_ENOTVORBIS: res = pxtnERR_ogg; goto term; //{printf("Bitstream is not Vorbis data. \n");exit(1);}
 	case OV_EVERSION  : res = pxtnERR_ogg; goto term; //{printf("Vorbis version mismatch. \n");exit(1);}
 	case OV_EBADHEADER: res = pxtnERR_ogg; goto term; //{printf("Invalid Vorbis bitstream header. \n");exit(1);}

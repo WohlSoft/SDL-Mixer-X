@@ -48,7 +48,7 @@ double pxtnPulse_Oscillator::GetOneSample_Coodinate( int32_t index )
 	int32_t  x1, y1, x2, y2;
 	int32_t  w, h;
 	double work;
-	
+
 	i = _point_reso * index / _sample_num;
 
 	// find target 2 ponits

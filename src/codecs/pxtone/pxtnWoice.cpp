@@ -68,7 +68,7 @@ bool pxtnWoice::is_name_buf () const
 }
 
 static void _Voice_Release( pxtnVOICEUNIT* p_vc, pxtnVOICEINSTANCE* p_vi )
-{							
+{
 	if( p_vc )
 	{
 		SAFE_DELETE( p_vc->p_pcm  );
@@ -287,7 +287,7 @@ void pxtnWoice::_UpdateWavePTV( pxtnVOICEUNIT* p_vc, pxtnVOICEINSTANCE* p_vi, in
 	osci.ReadyGetSample( p_vc->wave.points, p_vc->wave.num, p_vc->volume, p_vi->smp_body_w, p_vc->wave.reso );
 
 	if( p_vc->type == pxtnVOICE_Overtone ) b_ovt = true ;
-	else                                   b_ovt = false; 
+	else                                   b_ovt = false;
 
 	p_vi->b_sine_over = false;
 
@@ -492,7 +492,7 @@ pxtnERR pxtnWoice::Tone_Ready_envelope( int32_t sps )
 		{
 			p_vi->env_release = (int32_t)( (double)p_enve->points[ p_enve->head_num ].x * sps / p_enve->fps );
 		}
-		else 
+		else
 		{
 			p_vi->env_release = 0;
 		}

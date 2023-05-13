@@ -41,7 +41,7 @@ bool pxtnWoice::io_matePCM_w( void* desc ) const
 	const pxtnPulse_PCM* p_pcm =  _voices[ 0 ].p_pcm;
 	pxtnVOICEUNIT*       p_vc  = &_voices[ 0 ];
 	_MATERIALSTRUCT_PCM  pcm;
- 
+
 	memset( &pcm, 0, sizeof( _MATERIALSTRUCT_PCM ) );
 
 	pcm.sps         = pxSwapLE32((uint32_t)p_pcm->get_sps     ());
@@ -183,7 +183,7 @@ bool pxtnWoice::io_matePTN_w( void* desc ) const
 
 pxtnERR pxtnWoice::io_matePTN_r( void* desc )
 {
-	pxtnERR             res  = pxtnERR_VOID; 
+	pxtnERR             res  = pxtnERR_VOID;
 	_MATERIALSTRUCT_PTN ptn  = {0};
 	int32_t             size =  0 ;
 
@@ -336,7 +336,7 @@ bool pxtnWoice::io_mateOGGV_w( void* desc ) const
 	if( !p_vc->p_oggv ) return false;
 
 	int32_t oggv_size = p_vc->p_oggv->GetSize();
-	
+
 	mate.tuning      =        pxSwapFloatLE(p_vc->tuning)     ;
 	mate.voice_flags =           pxSwapLE16(p_vc->voice_flags);
 	mate.basic_key   = pxSwapLE16((uint16_t)p_vc->basic_key)  ;
@@ -377,7 +377,7 @@ pxtnERR pxtnWoice::io_mateOGGV_r( void* desc )
 		p_vc->basic_key    = mate.basic_key  ;
 		p_vc->tuning       = mate.tuning     ;
 	}
-	
+
 	_x3x_basic_key = mate.basic_key;
 	_x3x_tuning    =              0;
 	_type          = pxtnWOICE_OGGV;
