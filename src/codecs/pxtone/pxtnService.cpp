@@ -724,9 +724,10 @@ bool pxtnService::_io_assiWOIC_w( void* desc, int32_t idx ) const
 
 	memcpy( assi.name, p_name, name_size );
 	assi.woice_index = (uint16_t)idx;
+	swapEndian( assi );
 
 	size = sizeof( _ASSIST_WOICE );
-	if( !_io_write( desc, &size, sizeof(uint32_t), 1 ) ) return false;
+	if( !_io_write_le32( desc, &size ) ) return false;
 	if( !_io_write( desc, &assi, size,             1 ) ) return false;
 
 	return true;
@@ -787,9 +788,10 @@ bool pxtnService::_io_assiUNIT_w( void* desc, int32_t idx ) const
 
 	memcpy( assi.name, p_name, name_size );
 	assi.unit_index = (uint16_t)idx;
+	swapEndian( assi );
 
 	size = sizeof(assi);
-	if( !_io_write( desc, &size, sizeof(uint32_t), 1 ) ) return false;
+	if( !_io_write_le32( desc, &size ) ) return false;
 	if( !_io_write( desc, &assi, size            , 1 ) ) return false;
 
 	return true;
@@ -846,10 +848,11 @@ bool pxtnService::_io_UNIT_num_w( void* desc ) const
 	memset( &data, 0, sizeof( _NUM_UNIT ) );
 
 	data.num = (int16_t)_unit_num;
+	swapEndian( data );
 
 	size     = sizeof(_NUM_UNIT);
 
-	if( !_io_write( desc, &size, sizeof(int32_t), 1 ) ) return false;
+	if( !_io_write_le32( desc, &size ) ) return false;
 	if( !_io_write( desc, &data, size           , 1 ) ) return false;
 
 	return true;
@@ -893,8 +896,8 @@ pxtnERR pxtnService::write( void* desc, bool b_tune, uint16_t exe_ver )
 	else        { if( !_io_write( desc, _code_proj_v5, 1, _VERSIONSIZE ) ){ res = pxtnERR_desc_w; goto End; } }
 
 	// exe version
-	if( !_io_write( desc, &exe_ver, sizeof(uint16_t), 1 )                ){ res = pxtnERR_desc_w; goto End; }
-	if( !_io_write( desc, &rrr    , sizeof(uint16_t), 1 )                ){ res = pxtnERR_desc_w; goto End; }
+	if( !_io_write_le16( desc, &exe_ver )                                ){ res = pxtnERR_desc_w; goto End; }
+	if( !_io_write_le16( desc, &rrr )                                    ){ res = pxtnERR_desc_w; goto End; }
 
 	// master
 	if( !_io_write( desc, _code_MasterV5    , 1, _CODESIZE ) ){ res = pxtnERR_desc_w; goto End; }

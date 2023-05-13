@@ -141,6 +141,49 @@ bool pxtnData::_io_read_le32f ( void *user, void *p_dst ) const
 	return ret;
 }
 
+bool pxtnData::_io_write_le16( void *user, const void *p_dst ) const
+{
+	uint8_t out[2] = {0, 0};
+	uint16_t in = *reinterpret_cast<const uint16_t*>( p_dst );
+
+	out[0] = ((in >> 0) & 0xFF);
+	out[1] = ((in >> 8) & 0xFF);
+
+	return _io_write( user, (void*)out, 1, 2 );
+}
+
+bool pxtnData::_io_write_le32(void *user, const void *p_dst ) const
+{
+	uint8_t out[4] = {0, 0};
+	uint32_t in = *reinterpret_cast<const uint32_t*>( p_dst );
+
+	out[0] = ((in >>  0) & 0xFF);
+	out[1] = ((in >>  8) & 0xFF);
+	out[2] = ((in >> 16) & 0xFF);
+	out[3] = ((in >> 24) & 0xFF);
+
+	return _io_write( user, (void*)out, 1, 4 );
+}
+
+bool pxtnData::_io_write_le32f( void *user, const void *p_dst ) const
+{
+	uint8_t out[4] = {0, 0};
+	union
+	{
+		float f;
+		uint32_t ui32;
+	} swapper;
+
+	swapper.f = *reinterpret_cast<const float*>( p_dst );
+
+	out[0] = ((swapper.ui32 >>  0) & 0xFF);
+	out[1] = ((swapper.ui32 >>  8) & 0xFF);
+	out[2] = ((swapper.ui32 >> 16) & 0xFF);
+	out[3] = ((swapper.ui32 >> 24) & 0xFF);
+
+	return _io_write( user, (void*)out, 1, 4 );
+}
+
 int32_t pxtnData::_data_check_v_size ( uint32_t v ) const
 {
 	if     ( v < 0x00000080 ) return 1; // 1byte( 7bit)

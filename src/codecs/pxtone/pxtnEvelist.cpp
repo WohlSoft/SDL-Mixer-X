@@ -728,8 +728,8 @@ bool pxtnEvelist::io_Write( void* desc, int32_t rough ) const
 	}
 
 	int32_t size = sizeof(int32_t) + ralatived_size;
-	if( !_io_write( desc, &size   , sizeof(int32_t), 1 ) ) return false;
-	if( !_io_write( desc, &eve_num, sizeof(int32_t), 1 ) ) return false;
+	if( !_io_write_le32( desc, &size ) ) return false;
+	if( !_io_write_le32( desc, &eve_num ) ) return false;
 
 	absolute = 0;
 

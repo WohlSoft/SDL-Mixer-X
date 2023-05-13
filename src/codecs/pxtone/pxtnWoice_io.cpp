@@ -54,12 +54,22 @@ bool pxtnWoice::io_matePCM_w( void* desc ) const
 	pcm.tuning      =           p_vc->tuning     ;
 	pcm.voice_flags =           p_vc->voice_flags;
 	pcm.basic_key   = (uint16_t)p_vc->basic_key  ;
+	swapEndian( pcm );
 
 	uint32_t size = sizeof( _MATERIALSTRUCT_PCM ) + pcm.data_size;
 
-	if( !_io_write( desc, &size, sizeof(uint32_t           ), 1 ) ) return false;
+	if( !_io_write_le32( desc, &size ) ) return false;
 	if( !_io_write( desc, &pcm , sizeof(_MATERIALSTRUCT_PCM), 1 ) ) return false;
+#ifndef px_BIG_ENDIAN
 	if( !_io_write( desc, p_pcm->get_p_buf(), 1, pcm.data_size  ) ) return false;
+#else
+	if( p_pcm->get_bps() == 16 )
+	{
+		uint16_t *s = (uint16_t*)p_pcm->get_p_buf();
+		uint32_t len = p_pcm->get_buf_size() / 2;
+		for(uint32_t i = 0; i < len; ++i, ++s) { if ( !_io_write_le16( desc, s ) ) return false; }
+	}
+#endif
 
 	return true;
 }
@@ -158,8 +168,10 @@ bool pxtnWoice::io_matePTN_w( void* desc ) const
 	ptn.basic_key   = (uint16_t)p_vc->basic_key  ;
 	ptn.rrr         =                           1;
 
+	swapEndian( ptn );
+
 	// pre
-	if( !_io_write( desc, &size, sizeof(int32_t),             1 ) ) return false;
+	if( !_io_write_le32( desc, &size ) ) return false;
 	if( !_io_write( desc, &ptn,  sizeof(_MATERIALSTRUCT_PTN), 1 ) ) return false;
 
 	size += sizeof(_MATERIALSTRUCT_PTN);
@@ -250,9 +262,12 @@ bool pxtnWoice::io_matePTV_w( void* desc ) const
 	ptv.x3x_tuning  =           0;//1.0f;//p_w->tuning;
 	ptv.size        =           0;
 
+	swapEndian( ptv );
+
 	// pre write
-	if( !_io_write( desc, &size, sizeof(int32_t),             1 ) ) return false;
+	if( !_io_write_le32( desc, &size ) ) return false;
 	if( !_io_write( desc, &ptv,  sizeof(_MATERIALSTRUCT_PTV), 1 ) ) return false;
+	swapEndian( ptv );
 
 	if( !PTV_Write( desc, &ptv.size ) ) return false;
 
@@ -260,7 +275,7 @@ bool pxtnWoice::io_matePTV_w( void* desc ) const
 
 	size = ptv.size +  sizeof(_MATERIALSTRUCT_PTV);
 
-	if( !_io_write( desc, &size, sizeof(int32_t),             1 ) ) return false;
+	if( !_io_write_le32( desc, &size ) ) return false;
 	if( !_io_write( desc, &ptv,  sizeof(_MATERIALSTRUCT_PTV), 1 ) ) return false;
 
 	if( !_io_seek ( desc, SEEK_CUR, ptv.size ) ) return false;
@@ -335,9 +350,11 @@ bool pxtnWoice::io_mateOGGV_w( void* desc ) const
 	mate.voice_flags =           p_vc->voice_flags;
 	mate.basic_key   = (uint16_t)p_vc->basic_key  ;
 
+	swapEndian( mate );
+
 	uint32_t size = sizeof( _MATERIALSTRUCT_OGGV ) + oggv_size;
 
-	if( !_io_write( desc, &size, sizeof(uint32_t)            , 1 ) ) return false;
+	if( !_io_write_le32( desc, &size ) ) return false;
 	if( !_io_write( desc, &mate, sizeof(_MATERIALSTRUCT_OGGV), 1 ) ) return false;
 
 	if( !p_vc->p_oggv->pxtn_write( desc ) ) return false;

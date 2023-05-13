@@ -139,7 +139,7 @@ pxtnERR pxtnPulse_PCM::read( void* desc )
 	{
 		uint16_t *s = (uint16_t*)_p_smp;
 		uint32_t len = size / 2;
-		for(uint32_t i = 0; i < len; ++i, ++s)
+		for( uint32_t i = 0; i < len; ++i, ++s )
 			*s = pxtnData::_swap16(*s);
 	}
 #endif
@@ -187,6 +187,8 @@ bool pxtnPulse_PCM::write  ( void* desc, const char* pstrLIST ) const
 	format.block_size   = (uint16_t)(             _bps * _ch / 8);
 	format.ext          = 0;
 
+	swapEndian( format );
+
 	fact_size = ( _smp_head + _smp_body + _smp_tail );
 	riff_size  = sample_size;
 	riff_size +=  4;// 'WAVE'
@@ -209,7 +211,7 @@ bool pxtnPulse_PCM::write  ( void* desc, const char* pstrLIST ) const
 	// open file..
 
 	if( !_io_write( desc, tag_RIFF,     sizeof(char    ), 4 ) ) goto End;
-	if( !_io_write( desc, &riff_size,   sizeof(uint32_t), 1 ) ) goto End;
+	if( !_io_write_le32( desc, &riff_size ) ) goto End;
 	if( !_io_write( desc, tag_WAVE,     sizeof(char    ), 4 ) ) goto End;
 	if( !_io_write( desc, tag_fmt_,     sizeof(char    ), 8 ) ) goto End;
 	if( !_io_write( desc, &format,                    18, 1 ) ) goto End;
@@ -217,17 +219,26 @@ bool pxtnPulse_PCM::write  ( void* desc, const char* pstrLIST ) const
 	if( bText )
 	{
 		if( !_io_write( desc, tag_LIST,     sizeof(char    ), 4 ) ) goto End;
-		if( !_io_write( desc, &list_size,   sizeof(uint32_t), 1 ) ) goto End;
+		if( !_io_write_le32( desc, &list_size ) ) goto End;
 		if( !_io_write( desc, tag_INFO,     sizeof(char    ), 8 ) ) goto End;
-		if( !_io_write( desc, &isft_size,   sizeof(uint32_t), 1 ) ) goto End;
+		if( !_io_write_le32( desc, &isft_size ) ) goto End;
 		if( !_io_write( desc, pstrLIST,     sizeof(char    ), isft_size ) ) goto End;
 	}
 
 	if( !_io_write( desc, tag_fact,     sizeof(char    ), 8 ) ) goto End;
-	if( !_io_write( desc, &fact_size,   sizeof(uint32_t), 1 ) ) goto End;
+	if( !_io_write_le32( desc, &fact_size ) ) goto End;
 	if( !_io_write( desc, tag_data,     sizeof(char    ), 4 ) ) goto End;
-	if( !_io_write( desc, &sample_size, sizeof(int32_t ), 1 ) ) goto End;
+	if( !_io_write_le32( desc, &sample_size ) ) goto End;
+#ifndef px_BIG_ENDIAN
 	if( !_io_write( desc, _p_smp, sizeof(char), sample_size ) ) goto End;
+#else
+	if( _bps == 16 )
+	{
+		uint16_t *s = (uint16_t*)_p_smp;
+		uint32_t len = sample_size / 2;
+		for( uint32_t i = 0; i < len; ++i, ++s ) { if( !_io_write_le16( desc, s ) ) goto End; }
+	}
+#endif
 
 	b_ret = true;
 

@@ -436,10 +436,10 @@ bool pxtnPulse_Oggv::pxtn_write( void* desc ) const
 {
 	if( !_p_data ) return false;
 
-	if( !_io_write( desc, &_ch     , sizeof(int32_t),    1 ) ) return false;
-	if( !_io_write( desc, &_sps2   , sizeof(int32_t),    1 ) ) return false;
-	if( !_io_write( desc, &_smp_num, sizeof(int32_t),    1 ) ) return false;
-	if( !_io_write( desc, &_size   , sizeof(int32_t),    1 ) ) return false;
+	if( !_io_write_le32( desc, &_ch ) ) return false;
+	if( !_io_write_le32( desc, &_sps2 ) ) return false;
+	if( !_io_write_le32( desc, &_smp_num ) ) return false;
+	if( !_io_write_le32( desc, &_size ) ) return false;
 	if( !_io_write( desc,  _p_data , sizeof(char   ),_size ) ) return false;
 
 	return true;

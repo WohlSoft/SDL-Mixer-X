@@ -101,12 +101,12 @@ bool pxtnMaster::io_w_v5( void* desc, int32_t rough ) const
 	int32_t   clock_last   = bclock * _beat_num * get_last_meas  ();
 	int8_t    bnum   = _beat_num  ;
 	float btempo = _beat_tempo;
-	if( !_io_write( desc, &size        , sizeof(uint32_t), 1 ) ) return false;
-	if( !_io_write( desc, &bclock      , sizeof(int16_t ), 1 ) ) return false;
+	if( !_io_write_le32( desc, &size ) ) return false;
+	if( !_io_write_le16( desc, &bclock ) ) return false;
 	if( !_io_write( desc, &bnum        , sizeof(int8_t  ), 1 ) ) return false;
-	if( !_io_write( desc, &btempo      , sizeof(float   ), 1 ) ) return false;
-	if( !_io_write( desc, &clock_repeat, sizeof(int32_t ), 1 ) ) return false;
-	if( !_io_write( desc, &clock_last  , sizeof(int32_t ), 1 ) ) return false;
+	if( !_io_write_le32f( desc, &btempo ) ) return false;
+	if( !_io_write_le32( desc, &clock_repeat ) ) return false;
+	if( !_io_write_le32( desc, &clock_last ) ) return false;
 
 	return true;
 }

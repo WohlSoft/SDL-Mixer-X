@@ -169,7 +169,7 @@ bool pxtnPulse_Noise::write( void* desc, int32_t *p_add ) const
 	else        seek =      0;
 
 	if( !_io_write( desc,_code, 1, 8 ) ) goto End;
-	if( !_io_write( desc,&_ver, 4, 1 ) ) goto End;
+	if( !_io_write_le32( desc, &_ver ) ) goto End;
 	seek += 12;
 	if( !_data_w_v( desc, _smp_num_44k, &seek ) ) goto End;
 

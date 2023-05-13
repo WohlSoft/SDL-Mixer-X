@@ -200,8 +200,8 @@ bool pxtnWoice::PTV_Write( void* desc, int32_t *p_total ) const
 	int32_t        total =     0;
 
 	if( !_io_write( desc, _code     ,                1, 8 ) ) goto term;
-	if( !_io_write( desc, &_version , sizeof(uint32_t), 1 ) ) goto term;
-	if( !_io_write( desc, &total    , sizeof(int32_t ), 1 ) ) goto term;
+	if( !_io_write_le32( desc, &_version ) ) goto term;
+	if( !_io_write_le32( desc, &total ) ) goto term;
 
 	work = 0;
 
@@ -231,7 +231,7 @@ bool pxtnWoice::PTV_Write( void* desc, int32_t *p_total ) const
 
 	// total size
 	if( !_io_seek ( desc, SEEK_CUR, -(total + 4)     ) ) goto term;
-	if( !_io_write( desc, &total, sizeof(int32_t), 1 ) ) goto term;
+	if( !_io_write_le32( desc, &total ) ) goto term;
 	if( !_io_seek ( desc, SEEK_CUR,  (total    )     ) ) goto term;
 
 	if( p_total ) *p_total = 16 + total;

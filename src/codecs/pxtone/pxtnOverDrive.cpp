@@ -77,9 +77,11 @@ bool pxtnOverDrive::Write( void* desc ) const
 	over.amp   = _amp_f;
 	over.group = (uint16_t)_group;
 
+	swapEndian( over );
+
 	// dela ----------
 	size = sizeof( _OVERDRIVESTRUCT );
-	if( !_io_write( desc, &size, sizeof(uint32_t), 1 ) ) return false;
+	if( !_io_write_le32( desc, &size ) ) return false;
 	if( !_io_write( desc, &over, size,        1 ) ) return false;
 
 	return true;

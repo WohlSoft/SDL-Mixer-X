@@ -140,9 +140,11 @@ bool pxtnDelay::Write( void* desc ) const
 	dela.rate  = _rate;
 	dela.freq  = _freq;
 
+	swapEndian( dela );
+
 	// dela ----------
 	size = sizeof( _DELAYSTRUCT );
-	if( !_io_write( desc, &size, sizeof(int32_t), 1 ) ) return false;
+	if( !_io_write_le32( desc, &size ) ) return false;
 	if( !_io_write( desc, &dela, size,            1 ) ) return false;
 
 	return true;
