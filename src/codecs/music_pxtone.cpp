@@ -25,6 +25,21 @@
 #include "./pxtone/pxtnService.h"
 #include "./pxtone/pxtnError.h"
 
+/* Global flags which are applying on initializing of GME player with a file */
+typedef struct {
+    double tempo;
+    float gain;
+} PXTONE_Setup;
+
+static PXTONE_Setup pxtone_setup = {
+    1.0, 1.0f
+};
+
+static void PXTONE_SetDefault(PXTONE_Setup *setup)
+{
+    setup->tempo = 1.0;
+    setup->gain = 1.0f;
+}
 
 /* This file supports PXTONE music streams */
 typedef struct
@@ -74,10 +89,75 @@ static bool _pxtn_p(void* user, int32_t* p_pos)
     return true;
 }
 
+static void process_args(const char *args, PXTONE_Setup *setup)
+{
+#define ARG_BUFFER_SIZE    1024
+    char arg[ARG_BUFFER_SIZE];
+    char type = '-';
+    size_t maxlen = 0;
+    size_t i, j = 0;
+    /* first value is an integer without prefox sign. So, begin the scan with opened value state */
+    int value_opened = 1;
+
+    if (args == NULL) {
+        return;
+    }
+    maxlen = SDL_strlen(args);
+    if (maxlen == 0) {
+        return;
+    }
+
+    maxlen += 1;
+    PXTONE_SetDefault(setup);
+
+    for (i = 0; i < maxlen; i++) {
+        char c = args[i];
+        if (value_opened == 1) {
+            if ((c == ';') || (c == '\0')) {
+                int value;
+                arg[j] = '\0';
+                value = SDL_atoi(arg);
+                switch(type)
+                {
+                case 't':
+                    if (arg[0] == '=') {
+                        setup->tempo = SDL_strtod(arg + 1, NULL);
+                        if (setup->tempo <= 0.0) {
+                            setup->tempo = 1.0;
+                        }
+                    }
+                    break;
+                case 'g':
+                    if (arg[0] == '=') {
+                        setup->gain = (float)SDL_strtod(arg + 1, NULL);
+                        if (setup->gain < 0.0f) {
+                            setup->gain = 1.0f;
+                        }
+                    }
+                    break;
+                case '\0':
+                    break;
+                default:
+                    break;
+                }
+                value_opened = 0;
+            }
+            arg[j++] = c;
+        } else {
+            if (c == '\0') {
+                return;
+            }
+            type = c;
+            value_opened = 1;
+            j = 0;
+        }
+    }
+#undef ARG_BUFFER_SIZE
+}
 
 static void PXTONE_Delete(void *context);
 
-static void *PXTONE_NewRW(struct SDL_RWops *src, int freesrc)
+static void *PXTONE_NewRWex(struct SDL_RWops *src, int freesrc, const char *args)
 {
     PXTONE_Music *music = NULL;
     const char *name;
@@ -86,6 +166,7 @@ static void *PXTONE_NewRW(struct SDL_RWops *src, int freesrc)
     char *temp_string;
     int32_t comment_len;
     pxtnERR ret;
+    PXTONE_Setup setup = pxtone_setup;
 
     music = (PXTONE_Music *)SDL_calloc(1, sizeof *music);
     if (!music) {
@@ -93,8 +174,10 @@ static void *PXTONE_NewRW(struct SDL_RWops *src, int freesrc)
         return NULL;
     }
 
-    music->tempo = 1.0;
-    music->gain = 1.0f;
+    process_args(args, &setup);
+
+    music->tempo = setup.tempo;
+    music->gain = setup.gain;
     music->volume = MIX_MAX_VOLUME;
 
     music->pxtn = new pxtnService(_pxtn_r, _pxtn_w, _pxtn_s, _pxtn_p);
@@ -180,6 +263,12 @@ static void *PXTONE_NewRW(struct SDL_RWops *src, int freesrc)
 
     return music;
 }
+
+static void *PXTONE_NewRW(struct SDL_RWops *src, int freesrc)
+{
+    return PXTONE_NewRWex(src, freesrc, NULL);
+}
+
 
 /* Close the given PXTONE stream */
 static void PXTONE_Delete(void *context)
@@ -373,7 +462,7 @@ Mix_MusicInterface Mix_MusicInterface_PXTONE =
     NULL,   /* Load */
     NULL,   /* Open */
     PXTONE_NewRW,
-    NULL,   /* CreateFromRWex [MIXER-X]*/
+    PXTONE_NewRWex, /* [MIXER-X]*/
     NULL,   /* CreateFromFile */
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     PXTONE_SetVolume,
