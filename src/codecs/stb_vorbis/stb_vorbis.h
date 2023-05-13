@@ -1416,6 +1416,8 @@ static uint8 get8(vorb *z)
    if (c == EOF) { z->eof = TRUE; return 0; }
    return c;
    }
+   #else
+   return 0;
    #endif
 }
 
