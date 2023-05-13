@@ -221,7 +221,7 @@ static bool xInstallIconResource(QString context, int iconSize, QString iconName
     return xRunCommand("xdg-icon-resource", args);
 }
 
-static bool xIconSize(QList<QListWidgetItem> &items, int iconSize)
+static bool xIconSize(int iconSize)
 {
     bool success = true;
     const QString home = QDir::home().absolutePath();
@@ -369,10 +369,10 @@ void AssocFiles::on_AssocFiles_accepted()
     outMimeS.flush();
     outMime.close();
 
-    if(success) success = xIconSize(items, 16);
-    if(success) success = xIconSize(items, 32);
-    if(success) success = xIconSize(items, 48);
-    if(success) success = xIconSize(items, 256);
+    if(success) success = xIconSize(16);
+    if(success) success = xIconSize(32);
+    if(success) success = xIconSize(48);
+    if(success) success = xIconSize(256);
 
     QFile shortcut(":/PGE Music Player.desktop.template");
     if(success) success = shortcut.open(QFile::ReadOnly | QFile::Text);
