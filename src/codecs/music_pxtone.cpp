@@ -96,9 +96,7 @@ static void process_args(const char *args, PXTONE_Setup *setup)
     char type = '-';
     size_t maxlen = 0;
     size_t i, j = 0;
-    /* first value is an integer without prefox sign. So, begin the scan with opened value state */
-    int value_opened = 1;
-
+    int value_opened = 0;
     if (args == NULL) {
         return;
     }
