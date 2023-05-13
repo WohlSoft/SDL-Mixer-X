@@ -114,9 +114,7 @@ static void process_args(const char *args, PXTONE_Setup *setup)
         char c = args[i];
         if (value_opened == 1) {
             if ((c == ';') || (c == '\0')) {
-                int value;
                 arg[j] = '\0';
-                value = SDL_atoi(arg);
                 switch(type)
                 {
                 case 't':
