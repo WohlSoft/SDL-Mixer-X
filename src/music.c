@@ -46,6 +46,7 @@
 #include "music_midi_opn.h"
 #include "music_midi_edmidi.h"
 #include "music_ffmpeg.h"
+#include "music_pxtone.h"
 
 #include "utils.h"
 
@@ -605,6 +606,9 @@ static Mix_MusicInterface *s_music_interfaces[] =
 #endif
 #ifdef MUSIC_FFMPEG
     &Mix_MusicInterface_FFMPEG,
+#endif
+#ifdef MUSIC_PXTONE
+    &Mix_MusicInterface_PXTONE,
 #endif
 #ifdef MUSIC_MOD_XMP
     &Mix_MusicInterface_XMP,
@@ -1552,6 +1556,13 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
         return MUS_GME;
     if (SDL_memcmp(magic, "\x1f\x8b", 2) == 0)
         return MUS_GME;
+
+#ifdef MUSIC_PXTONE
+    if (SDL_memcmp(magic, "PTTUNE", 6) == 0)
+        return MUS_PXTONE;
+    if (SDL_memcmp(magic, "PTCOLLAGE", 9) == 0)
+        return MUS_PXTONE;
+#endif
 
     /* Detect some module files */
     if (SDL_memcmp(magic, "Extended Module", 15) == 0)

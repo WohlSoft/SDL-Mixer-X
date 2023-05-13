@@ -310,6 +310,7 @@ typedef enum {
     /* MixerX specific codecs starts with 100 */
     , /*Comma was placed here to simplfy the comparison to mainstream part of this enumeration */
     MUS_FFMPEG = 100,
+    MUS_PXTONE,
     /* Special cases to play formats IMF, MUS, or XMI are can't be played without specific MIDI libraries */
     MUS_ADLMIDI = 200,
     MUS_OPNMIDI,
@@ -393,7 +394,7 @@ typedef enum {
     MIX_CHIP_CHANALLOC_AUTO = -1,
     MIX_CHIP_CHANALLOC_OffDelay = 0,
     MIX_CHIP_CHANALLOC_SameInst,
-    MIX_CHIP_CHANALLOC_AnyFree,
+    MIX_CHIP_CHANALLOC_AnyFree
 } Mix_ChipChanAllocMode;
 
 /**
