@@ -106,7 +106,7 @@ public :
 			uint32_t ui32;
 		} swapper;
 		swapper.f = x;
-		swapper.ui32 = _swap32(swapper.ui32);
+		swapper.ui32 = _swap32( swapper.ui32 );
 		return swapper.f;
 	}
 #endif /* PXTONE_BIG_ENDIAN */

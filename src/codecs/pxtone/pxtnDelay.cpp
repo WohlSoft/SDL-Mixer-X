@@ -120,10 +120,10 @@ _DELAYSTRUCT;
 #ifdef px_BIG_ENDIAN
 px_FORCE_INLINE void swapEndian( _DELAYSTRUCT &dela)
 {
-	dela.unit =  pxtnData::_swap16(dela.unit);
-	dela.group = pxtnData::_swap16(dela.group);
-	dela.rate =  pxtnData::_swap_float(dela.rate);
-	dela.freq =  pxtnData::_swap_float(dela.freq);
+	dela.unit =  pxtnData::_swap16( dela.unit )    ;
+	dela.group = pxtnData::_swap16( dela.group )   ;
+	dela.rate =  pxtnData::_swap_float( dela.rate );
+	dela.freq =  pxtnData::_swap_float( dela.freq );
 }
 #endif
 
@@ -133,14 +133,14 @@ bool pxtnDelay::Write( void* desc ) const
 	int32_t            size;
 
 	memset( &dela, 0, sizeof( _DELAYSTRUCT ) );
-	dela.unit  = pxSwapLE16((uint16_t)_unit);
-	dela.group = pxSwapLE16((uint16_t)_group);
-	dela.rate  = pxSwapFloatLE(_rate);
-	dela.freq  = pxSwapFloatLE(_freq);
+	dela.unit  = pxSwapLE16( (uint16_t)_unit ) ;
+	dela.group = pxSwapLE16( (uint16_t)_group );
+	dela.rate  = pxSwapFloatLE( _rate );
+	dela.freq  = pxSwapFloatLE( _freq );
 
 	// dela ----------
 	size = sizeof( _DELAYSTRUCT );
-	if( !_io_write_le32( desc, &size ) ) return false;
+	if( !_io_write_le32( desc, &size                ) ) return false;
 	if( !_io_write( desc, &dela, size,            1 ) ) return false;
 
 	return true;
@@ -151,7 +151,7 @@ pxtnERR pxtnDelay::Read( void* desc )
 	_DELAYSTRUCT dela = {0};
 	int32_t      size =  0 ;
 
-	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r     ;
+	if( !_io_read_le32( desc, &size                     ) ) return pxtnERR_desc_r     ;
 	if( !_io_read( desc, &dela, sizeof(_DELAYSTRUCT), 1 ) ) return pxtnERR_desc_r     ;
 	swapEndian( dela );
 

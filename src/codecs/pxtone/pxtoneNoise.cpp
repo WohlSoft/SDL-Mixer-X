@@ -18,8 +18,7 @@ pxtoneNoise::pxtoneNoise( pxtnIO_r io_read, pxtnIO_w io_write, pxtnIO_seek io_se
 
 pxtoneNoise::~pxtoneNoise()
 {
-	if( _bldr ) delete (pxtnPulse_NoiseBuilder*)_bldr;
-	_bldr = NULL;
+	if( _bldr ) { delete (pxtnPulse_NoiseBuilder*)_bldr; } _bldr = NULL;
 }
 
 bool pxtoneNoise::init()

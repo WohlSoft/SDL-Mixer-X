@@ -126,22 +126,12 @@ bool pxtnPulse_Noise::_WriteOscillator( const pxNOISEDESIGN_OSCILLATOR *p_osc, v
 pxtnERR pxtnPulse_Noise::_ReadOscillator( pxNOISEDESIGN_OSCILLATOR *p_osc, void* desc )
 {
 	int32_t work;
-	if( !_data_r_v( desc, &work )     ) return pxtnERR_desc_r     ;
-	p_osc->type     = (pxWAVETYPE)work;
-
-	if( p_osc->type >= pxWAVETYPE_num ) return pxtnERR_fmt_unknown;
-
-	if( !_data_r_v( desc, &work )     ) return pxtnERR_desc_r     ;
-	p_osc->b_rev    = work ? true : false;
-
-	if( !_data_r_v( desc, &work )     ) return pxtnERR_desc_r     ;
-	p_osc->freq     = (float)work / 10;
-
-	if( !_data_r_v( desc, &work )     ) return pxtnERR_desc_r     ;
-	p_osc->volume   = (float)work / 10;
-
-	if( !_data_r_v( desc, &work )     ) return pxtnERR_desc_r     ;
-	p_osc->offset   = (float)work / 10;
+	if( !_data_r_v( desc, &work )     ) { return pxtnERR_desc_r     ; } p_osc->type     = (pxWAVETYPE)work;
+	if( p_osc->type >= pxWAVETYPE_num ) { return pxtnERR_fmt_unknown; }
+	if( !_data_r_v( desc, &work )     ) { return pxtnERR_desc_r     ; } p_osc->b_rev    = work ? true : false;
+	if( !_data_r_v( desc, &work )     ) { return pxtnERR_desc_r     ; } p_osc->freq     = (float)work / 10;
+	if( !_data_r_v( desc, &work )     ) { return pxtnERR_desc_r     ; } p_osc->volume   = (float)work / 10;
+	if( !_data_r_v( desc, &work )     ) { return pxtnERR_desc_r     ; } p_osc->offset   = (float)work / 10;
 
 	return pxtnOK;
 }

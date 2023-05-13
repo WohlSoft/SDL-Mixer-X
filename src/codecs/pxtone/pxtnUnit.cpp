@@ -315,8 +315,8 @@ _x1x_UNIT;
 #ifdef px_BIG_ENDIAN
 px_FORCE_INLINE void swapEndian( _x1x_UNIT &unit)
 {
-	unit.type =  pxtnData::_swap16(unit.type);
-	unit.group = pxtnData::_swap16(unit.group);
+	unit.type =  pxtnData::_swap16( unit.type ) ;
+	unit.group = pxtnData::_swap16( unit.group );
 }
 #endif
 
@@ -325,7 +325,7 @@ bool pxtnUnit::Read_v1x( void* desc, int32_t *p_group )
 	_x1x_UNIT unit;
 	int32_t   size;
 
-	if( !_io_read_le32( desc, &size ) ) return false;
+	if( !_io_read_le32( desc, &size                    ) ) return false;
 	if( !_io_read( desc, &unit, sizeof( _x1x_UNIT ), 1 ) ) return false;
 	swapEndian( unit );
 
@@ -350,8 +350,8 @@ _x3x_UNIT;
 #ifdef px_BIG_ENDIAN
 px_FORCE_INLINE void swapEndian( _x3x_UNIT &unit)
 {
-	unit.type =  pxtnData::_swap16(unit.type);
-	unit.group = pxtnData::_swap16(unit.group);
+	unit.type =  pxtnData::_swap16( unit.type ) ;
+	unit.group = pxtnData::_swap16( unit.group );
 }
 #endif
 
@@ -360,7 +360,7 @@ pxtnERR pxtnUnit::Read_v3x( void* desc, int32_t *p_group )
 	_x3x_UNIT unit = {0};
 	int32_t   size =  0 ;
 
-	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r;
+	if( !_io_read_le32( desc, &size                    ) ) return pxtnERR_desc_r;
 	if( !_io_read( desc, &unit, sizeof( _x3x_UNIT ), 1 ) ) return pxtnERR_desc_r;
 	swapEndian( unit );
 

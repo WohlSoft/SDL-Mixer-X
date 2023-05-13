@@ -1006,7 +1006,7 @@ static void *setup_malloc(vorb *f, int sz)
       f->setup_offset += sz;
       return p;
    }
-   return sz ? malloc(sz) : NULL;
+   return sz ? malloc(sz) : (void*)NULL;
 }
 
 static void setup_free(vorb *f, void *p)
@@ -1029,6 +1029,7 @@ static void *setup_temp_malloc(vorb *f, int sz)
 static void setup_temp_free(vorb *f, void **_p, int sz)
 {
    void *p = *_p;
+   (void)p;
    *_p = NULL;
    if (f->alloc.alloc_buffer) {
       f->temp_offset += (sz+7)&~7;

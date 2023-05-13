@@ -26,9 +26,15 @@
 #   define px_BIG_ENDIAN
 #endif
 
-#   define px_FORCE_INLINE     SDL_FORCE_INLINE
+#   define px_FORCE_INLINE  SDL_FORCE_INLINE
 #else
-#   define px_FORCE_INLINE     static inline
+#if defined(_MSC_VER)
+    #define px_FORCE_INLINE __forceinline
+#elif (defined(__GNUC__) && (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 2))) || defined(__clang__)
+    #define px_FORCE_INLINE static __inline __attribute__((always_inline))
+#else
+    #define px_FORCE_INLINE static inline
+#endif
 #endif // pxUseSDL
 
 #ifdef px_BIG_ENDIAN

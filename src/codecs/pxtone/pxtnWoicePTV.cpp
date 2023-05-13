@@ -118,10 +118,8 @@ pxtnERR pxtnWoice::_Read_Wave( void* desc, pxtnVOICEUNIT *p_vc )
 		if( !pxtnMem_zero_alloc( (void **)&p_vc->wave.points, sizeof(pxtnPOINT) * num ) ) return pxtnERR_memory;
 		for( i = 0; i < num; i++ )
 		{
-			if( !_io_read( desc, &uc, 1, 1 ) ) return pxtnERR_desc_r;
-			p_vc->wave.points[ i ].x = uc;
-			if( !_io_read( desc, &sc, 1, 1 ) ) return pxtnERR_desc_r;
-			p_vc->wave.points[ i ].y = sc;
+			if( !_io_read( desc, &uc, 1, 1 ) ) { return pxtnERR_desc_r; } p_vc->wave.points[ i ].x = uc;
+			if( !_io_read( desc, &sc, 1, 1 ) ) { return pxtnERR_desc_r; } p_vc->wave.points[ i ].y = sc;
 		}
 		num = p_vc->wave.num;
 		break;
@@ -199,9 +197,9 @@ bool pxtnWoice::PTV_Write( void* desc, int32_t *p_total ) const
 	int32_t        v     =     0;
 	int32_t        total =     0;
 
-	if( !_io_write( desc, _code     ,                1, 8 ) ) goto term;
+	if( !_io_write( desc, _code   , 1, 8 ) ) goto term;
 	if( !_io_write_le32( desc, &_version ) ) goto term;
-	if( !_io_write_le32( desc, &total ) ) goto term;
+	if( !_io_write_le32( desc, &total    ) ) goto term;
 
 	work = 0;
 
@@ -230,9 +228,9 @@ bool pxtnWoice::PTV_Write( void* desc, int32_t *p_total ) const
 	}
 
 	// total size
-	if( !_io_seek ( desc, SEEK_CUR, -(total + 4)     ) ) goto term;
-	if( !_io_write_le32( desc, &total ) ) goto term;
-	if( !_io_seek ( desc, SEEK_CUR,  (total    )     ) ) goto term;
+	if( !_io_seek ( desc, SEEK_CUR, -(total + 4) ) ) goto term;
+	if( !_io_write_le32( desc, &total            ) ) goto term;
+	if( !_io_seek ( desc, SEEK_CUR,  (total    ) ) ) goto term;
 
 	if( p_total ) *p_total = 16 + total;
 	b_ret  = true;
@@ -254,11 +252,11 @@ pxtnERR pxtnWoice::PTV_Read( void* desc )
 	int32_t        total     =     0;
 	int32_t        num       =     0;
 
-	if( !_io_read( desc, code    ,               1, 8 ) ){ res = pxtnERR_desc_r  ; goto term; }
-	if( !_io_read_le32( desc, &version ) ){ res = pxtnERR_desc_r  ; goto term; }
-	if( memcmp( code, _code, 8 )                  ){ res = pxtnERR_inv_code; goto term; }
-	if( !_io_read_le32( desc, &total ) ){ res = pxtnERR_desc_r  ; goto term; }
-	if( version > _version                        ){ res = pxtnERR_fmt_new ; goto term; }
+	if( !_io_read( desc, code    ,   1, 8 ) ){ res = pxtnERR_desc_r  ; goto term; }
+	if( !_io_read_le32( desc, &version    ) ){ res = pxtnERR_desc_r  ; goto term; }
+	if( memcmp( code, _code, 8 )            ){ res = pxtnERR_inv_code; goto term; }
+	if( !_io_read_le32( desc, &total      ) ){ res = pxtnERR_desc_r  ; goto term; }
+	if( version > _version                  ){ res = pxtnERR_fmt_new ; goto term; }
 
 	// p_ptv-> (5)
 	if( !_data_r_v( desc, &_x3x_basic_key ) ){ res = pxtnERR_desc_r     ; goto term; }

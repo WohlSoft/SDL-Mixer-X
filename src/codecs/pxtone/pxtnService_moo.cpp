@@ -32,8 +32,7 @@ bool pxtnService::_moo_release()
 	if( !_moo_b_init ) return false;
 	_moo_b_init = false;
 	SAFE_DELETE( _moo_freq );
-	if( _moo_group_smps ) free( _moo_group_smps );
-	_moo_group_smps = NULL;
+	if( _moo_group_smps ) { free( _moo_group_smps ); } _moo_group_smps = NULL;
 	return true;
 }
 
@@ -301,7 +300,7 @@ bool pxtnService::moo_set_loops_num( int32_t n )
 {
 	if( !_moo_b_init ) return false;
 	_moo_loops_num = n;
-	if(_moo_loops_num > 0) --_moo_loops_num;
+	if( _moo_loops_num > 0 ) --_moo_loops_num;
 	return true;
 }
 
@@ -321,7 +320,7 @@ bool pxtnService::moo_set_fade( int32_t  fade, float sec )
 ////////////////////////////
 
 // preparation
-bool pxtnService::moo_preparation(const pxtnVOMITPREPARATION *p_prep , float tempo_mod )
+bool pxtnService::moo_preparation( const pxtnVOMITPREPARATION *p_prep , float tempo_mod )
 {
 	if( !_moo_b_init || !_moo_b_valid_data || !_dst_ch_num || !_dst_sps || !_dst_byte_per_smp )
 	{

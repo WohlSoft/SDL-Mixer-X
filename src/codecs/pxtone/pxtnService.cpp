@@ -704,8 +704,8 @@ _ASSIST_WOICE;
 #ifdef px_BIG_ENDIAN
 px_FORCE_INLINE void swapEndian( _ASSIST_WOICE &assi)
 {
-	assi.woice_index = pxtnData::_swap16(assi.woice_index);
-	assi.rrr =         pxtnData::_swap16(assi.rrr);
+	assi.woice_index = pxtnData::_swap16( assi.woice_index );
+	assi.rrr =         pxtnData::_swap16( assi.rrr )        ;
 }
 #endif
 
@@ -721,10 +721,10 @@ bool pxtnService::_io_assiWOIC_w( void* desc, int32_t idx ) const
 	if( name_size > pxtnMAX_TUNEWOICENAME ) return false;
 
 	memcpy( assi.name, p_name, name_size );
-	assi.woice_index = pxSwapLE16((uint16_t)idx);
+	assi.woice_index = pxSwapLE16( (uint16_t)idx );
 
 	size = sizeof( _ASSIST_WOICE );
-	if( !_io_write_le32( desc, &size ) ) return false;
+	if( !_io_write_le32( desc, &size                 ) ) return false;
 	if( !_io_write( desc, &assi, size,             1 ) ) return false;
 
 	return true;
@@ -766,8 +766,8 @@ _ASSIST_UNIT;
 #ifdef px_BIG_ENDIAN
 px_FORCE_INLINE void swapEndian( _ASSIST_UNIT &unit)
 {
-	unit.unit_index = pxtnData::_swap16(unit.unit_index);
-	unit.rrr =        pxtnData::_swap16(unit.rrr);
+	unit.unit_index = pxtnData::_swap16( unit.unit_index );
+	unit.rrr =        pxtnData::_swap16( unit.rrr )       ;
 }
 #endif
 
@@ -782,7 +782,7 @@ bool pxtnService::_io_assiUNIT_w( void* desc, int32_t idx ) const
 	const char*  p_name = _units[ idx ]->get_name_buf( &name_size );
 
 	memcpy( assi.name, p_name, name_size );
-	assi.unit_index = pxSwapLE16((uint16_t)idx);
+	assi.unit_index = pxSwapLE16( (uint16_t)idx );
 
 	size = sizeof(assi);
 	if( !_io_write_le32( desc, &size ) ) return false;
@@ -798,7 +798,7 @@ pxtnERR pxtnService::_io_assiUNIT_r( void* desc )
 	_ASSIST_UNIT assi = {0};
 	int32_t      size;
 
-	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r     ;
+	if( !_io_read_le32( desc, &size       ) ) return pxtnERR_desc_r     ;
 	if( size != sizeof(assi)                ) return pxtnERR_fmt_unknown;
 	if( !_io_read( desc, &assi, sizeof(assi), 1 ) ) return pxtnERR_desc_r     ;
 	swapEndian( assi );
@@ -824,8 +824,8 @@ _NUM_UNIT;
 #ifdef px_BIG_ENDIAN
 px_FORCE_INLINE void swapEndian( _NUM_UNIT &data)
 {
-	data.num = pxtnData::_swap16(data.num);
-	data.rrr = pxtnData::_swap16(data.rrr);
+	data.num = pxtnData::_swap16( data.num );
+	data.rrr = pxtnData::_swap16( data.rrr );
 }
 #endif
 
@@ -843,7 +843,7 @@ bool pxtnService::_io_UNIT_num_w( void* desc ) const
 
 	size     = sizeof(_NUM_UNIT);
 
-	if( !_io_write_le32( desc, &size ) ) return false;
+	if( !_io_write_le32( desc, &size                ) ) return false;
 	if( !_io_write( desc, &data, size           , 1 ) ) return false;
 
 	return true;
@@ -856,7 +856,7 @@ pxtnERR pxtnService::_io_UNIT_num_r    ( void* desc, int32_t* p_num )
 	_NUM_UNIT data = {0};
 	int32_t   size =  0 ;
 
-	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r     ;
+	if( !_io_read_le32( desc, &size              ) ) return pxtnERR_desc_r     ;
 	if( size != sizeof( _NUM_UNIT )                ) return pxtnERR_fmt_unknown;
 	if( !_io_read( desc, &data, sizeof( _NUM_UNIT ), 1 ) ) return pxtnERR_desc_r     ;
 	swapEndian( data );
@@ -1096,7 +1096,7 @@ pxtnERR pxtnService::_ReadVersion( void* desc, _enum_FMTVER *p_fmt_ver, uint16_t
 
 	// exe version
 	if( !_io_read_le16( desc, p_exe_ver ) ) return pxtnERR_desc_r;
-	if( !_io_read_le16( desc, &dummy ) ) return pxtnERR_desc_r;
+	if( !_io_read_le16( desc, &dummy    ) ) return pxtnERR_desc_r;
 
 	return pxtnOK;
 }
@@ -1314,14 +1314,14 @@ _x1x_PROJECT;
 #ifdef px_BIG_ENDIAN
 px_FORCE_INLINE void swapEndian( _x1x_PROJECT &prjc)
 {
-	prjc.x1x_beat_tempo =  pxtnData::_swap_float(prjc.x1x_beat_tempo);
-	prjc.x1x_beat_clock =  pxtnData::_swap16(prjc.x1x_beat_clock);
-	prjc.x1x_beat_num =    pxtnData::_swap16(prjc.x1x_beat_num);
-	prjc.x1x_beat_note =   pxtnData::_swap16(prjc.x1x_beat_note);
-	prjc.x1x_meas_num =    pxtnData::_swap16(prjc.x1x_meas_num);
-	prjc.x1x_channel_num = pxtnData::_swap16(prjc.x1x_channel_num);
-	prjc.x1x_bps =         pxtnData::_swap16(prjc.x1x_bps);
-	prjc.x1x_sps =         pxtnData::_swap16(prjc.x1x_sps);
+	prjc.x1x_beat_tempo =  pxtnData::_swap_float( prjc.x1x_beat_tempo );
+	prjc.x1x_beat_clock =  pxtnData::_swap16( prjc.x1x_beat_clock )    ;
+	prjc.x1x_beat_num =    pxtnData::_swap16( prjc.x1x_beat_num )      ;
+	prjc.x1x_beat_note =   pxtnData::_swap16( prjc.x1x_beat_note )     ;
+	prjc.x1x_meas_num =    pxtnData::_swap16( prjc.x1x_meas_num )      ;
+	prjc.x1x_channel_num = pxtnData::_swap16( prjc.x1x_channel_num )   ;
+	prjc.x1x_bps =         pxtnData::_swap16( prjc.x1x_bps )           ;
+	prjc.x1x_sps =         pxtnData::_swap16( prjc.x1x_sps )           ;
 }
 #endif
 
@@ -1334,7 +1334,7 @@ bool pxtnService::_x1x_Project_Read( void* desc )
 	int32_t  size;
 	float    beat_tempo;
 
-	if( !_io_read_le32( desc, &size ) ) return false;
+	if( !_io_read_le32( desc, &size                       ) ) return false;
 	if( !_io_read( desc, &prjc, sizeof( _x1x_PROJECT ), 1 ) ) return false;
 	swapEndian( prjc );
 

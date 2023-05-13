@@ -241,7 +241,7 @@ public :
 	int32_t moo_get_sampling_end   () const;
 
 	bool    moo_preparation( const pxtnVOMITPREPARATION *p_build, float tempo_mod = 1.0f );
-	bool    moo_set_tempo_mod(float tempo_mod);
+	bool    moo_set_tempo_mod( float tempo_mod );
 
 	bool    Moo( void* p_buf, int32_t size );
 };

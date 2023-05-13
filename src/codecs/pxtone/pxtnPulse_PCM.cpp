@@ -19,20 +19,19 @@ WAVEFORMATCHUNK;
 #ifdef px_BIG_ENDIAN
 px_FORCE_INLINE void swapEndian( WAVEFORMATCHUNK &format)
 {
-	format.formatID =       pxtnData::_swap16(format.formatID);
-	format.ch =             pxtnData::_swap16(format.ch);
-	format.sps =            pxtnData::_swap32(format.sps);
-	format.byte_per_sec =   pxtnData::_swap32(format.byte_per_sec);
-	format.block_size =     pxtnData::_swap16(format.block_size);
-	format.bps =            pxtnData::_swap16(format.bps);
-	format.ext =            pxtnData::_swap16(format.ext);
+	format.formatID =       pxtnData::_swap16( format.formatID )    ;
+	format.ch =             pxtnData::_swap16( format.ch )          ;
+	format.sps =            pxtnData::_swap32( format.sps )         ;
+	format.byte_per_sec =   pxtnData::_swap32( format.byte_per_sec );
+	format.block_size =     pxtnData::_swap16( format.block_size )  ;
+	format.bps =            pxtnData::_swap16( format.bps )         ;
+	format.ext =            pxtnData::_swap16( format.ext )         ;
 }
 #endif
 
 void pxtnPulse_PCM::Release()
 {
-	if( _p_smp ) free( _p_smp );
-	_p_smp = NULL;
+	if( _p_smp ) { free( _p_smp ); } _p_smp = NULL;
 	_ch       =    0;
 	_sps      =    0;
 	_bps      =    0;
@@ -108,7 +107,7 @@ pxtnERR pxtnPulse_PCM::read( void* desc )
 	}
 
 	// read format.
-	if( !_io_read_le32( desc ,&size ) ){ res = pxtnERR_desc_r     ; goto term; }
+	if( !_io_read_le32( desc ,&size                   ) ){ res = pxtnERR_desc_r     ; goto term; }
 	if( !_io_read( desc, &format,               18, 1 ) ){ res = pxtnERR_desc_r     ; goto term; }
 	swapEndian( format );
 
@@ -122,7 +121,7 @@ pxtnERR pxtnPulse_PCM::read( void* desc )
 	while( 1 )
 	{
 		if( !_io_read( desc, buf  , sizeof(char), 4 )      ){ res = pxtnERR_desc_r; goto term; }
-		if( !_io_read_le32( desc, &size ) ){ res = pxtnERR_desc_r; goto term; }
+		if( !_io_read_le32( desc, &size                  ) ){ res = pxtnERR_desc_r; goto term; }
 		if( buf[0] == 'd' && buf[1] == 'a' && buf[2] == 't' && buf[3] == 'a' ) break;
 		if( !_io_seek( desc, SEEK_CUR, size )              ){ res = pxtnERR_desc_r; goto term; }
 	}
@@ -137,8 +136,7 @@ pxtnERR pxtnPulse_PCM::read( void* desc )
 	{
 		uint16_t *s = (uint16_t*)_p_smp;
 		uint32_t len = size / 2;
-		for( uint32_t i = 0; i < len; ++i, ++s )
-			*s = pxtnData::_swap16(*s);
+		for( uint32_t i = 0; i < len; ++i, ++s ) { *s = pxtnData::_swap16(*s); }
 	}
 #endif
 
@@ -177,12 +175,12 @@ bool pxtnPulse_PCM::write  ( void* desc, const char* pstrLIST ) const
 
 	sample_size         = ( _smp_head + _smp_body + _smp_tail ) * _ch * _bps / 8;
 
-	format.formatID     = pxSwapLE16(0x0001);// PCM
-	format.ch           = pxSwapLE16((uint16_t) _ch);
-	format.sps          = pxSwapLE32((uint32_t) _sps);
-	format.bps          = pxSwapLE16((uint16_t) _bps);
-	format.byte_per_sec = pxSwapLE32((uint32_t)(_sps * _bps * _ch / 8));
-	format.block_size   = pxSwapLE16((uint16_t)(             _bps * _ch / 8));
+	format.formatID     = pxSwapLE16( 0x0001 );// PCM
+	format.ch           = pxSwapLE16( (uint16_t) _ch  );
+	format.sps          = pxSwapLE32( (uint32_t) _sps );
+	format.bps          = pxSwapLE16( (uint16_t) _bps );
+	format.byte_per_sec = pxSwapLE32( (uint32_t)(_sps * _bps * _ch / 8) );
+	format.block_size   = pxSwapLE16( (uint16_t)(             _bps * _ch / 8) );
 	format.ext          = 0;
 
 	fact_size = ( _smp_head + _smp_body + _smp_tail );
@@ -207,7 +205,7 @@ bool pxtnPulse_PCM::write  ( void* desc, const char* pstrLIST ) const
 	// open file..
 
 	if( !_io_write( desc, tag_RIFF,     sizeof(char    ), 4 ) ) goto End;
-	if( !_io_write_le32( desc, &riff_size ) ) goto End;
+	if( !_io_write_le32( desc, &riff_size                   ) ) goto End;
 	if( !_io_write( desc, tag_WAVE,     sizeof(char    ), 4 ) ) goto End;
 	if( !_io_write( desc, tag_fmt_,     sizeof(char    ), 8 ) ) goto End;
 	if( !_io_write( desc, &format,                    18, 1 ) ) goto End;
@@ -215,16 +213,16 @@ bool pxtnPulse_PCM::write  ( void* desc, const char* pstrLIST ) const
 	if( bText )
 	{
 		if( !_io_write( desc, tag_LIST,     sizeof(char    ), 4 ) ) goto End;
-		if( !_io_write_le32( desc, &list_size ) ) goto End;
+		if( !_io_write_le32( desc, &list_size                   ) ) goto End;
 		if( !_io_write( desc, tag_INFO,     sizeof(char    ), 8 ) ) goto End;
-		if( !_io_write_le32( desc, &isft_size ) ) goto End;
+		if( !_io_write_le32( desc, &isft_size                   ) ) goto End;
 		if( !_io_write( desc, pstrLIST,     sizeof(char    ), isft_size ) ) goto End;
 	}
 
 	if( !_io_write( desc, tag_fact,     sizeof(char    ), 8 ) ) goto End;
-	if( !_io_write_le32( desc, &fact_size ) ) goto End;
+	if( !_io_write_le32( desc, &fact_size                   ) ) goto End;
 	if( !_io_write( desc, tag_data,     sizeof(char    ), 4 ) ) goto End;
-	if( !_io_write_le32( desc, &sample_size ) ) goto End;
+	if( !_io_write_le32( desc, &sample_size                 ) ) goto End;
 #ifndef px_BIG_ENDIAN
 	if( !_io_write( desc, _p_smp, sizeof(char), sample_size ) ) goto End;
 #else

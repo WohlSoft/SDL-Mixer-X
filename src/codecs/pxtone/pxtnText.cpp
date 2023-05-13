@@ -8,7 +8,7 @@ bool pxtnText::_read4_malloc( char **pp, int32_t* p_buf_size, void* desc )
 {
 	if( !pp ) return false;
 
-	if( !_io_read_le32( desc, p_buf_size ) ) return false;
+	if( !_io_read_le32( desc, p_buf_size  ) ) return false;
 	if( *p_buf_size < 0                     ) return false;
 
 	bool b_ret  = false;
@@ -31,7 +31,7 @@ term:
 
 bool pxtnText::_write4( const char *p, int32_t buf_size, void* desc ) const
 {
-	if( !_io_write_le32( desc, &buf_size ) ) return false;
+	if( !_io_write_le32( desc,         &buf_size ) ) return false;
 	if( !_io_write( desc,  p,        1, buf_size ) ) return false;
 	return true;
 }
@@ -40,8 +40,7 @@ bool pxtnText::_write4( const char *p, int32_t buf_size, void* desc ) const
 bool pxtnText::set_name_buf( const char *name, int32_t buf_size )
 {
 	if( !name    ) return false;
-	if( _p_name_buf ) free( _p_name_buf );
-	_p_name_buf = NULL;
+	if( _p_name_buf ) { free( _p_name_buf ); } _p_name_buf = NULL;
 	if( buf_size <= 0 ){ _name_size = 0; return true; }
 	if( !(  _p_name_buf = (char *)malloc( buf_size + 1 ) ) ) return false;
 	memcpy( _p_name_buf, name   ,         buf_size );
@@ -53,8 +52,7 @@ bool pxtnText::set_name_buf( const char *name, int32_t buf_size )
 bool pxtnText::set_comment_buf( const char *comment, int32_t buf_size )
 {
 	if( !comment ) return false;
-	if( _p_comment_buf ) free( _p_comment_buf );
-	_p_comment_buf = NULL;
+	if( _p_comment_buf ) { free( _p_comment_buf ); } _p_comment_buf = NULL;
 	if( buf_size <= 0 ){ _comment_size = 0; return true; }
 	if( !(  _p_comment_buf = (char *)malloc( buf_size + 1 ) ) ) return false;
 	memcpy( _p_comment_buf, comment,         buf_size );
@@ -89,10 +87,8 @@ pxtnText::pxtnText( pxtnIO_r io_read, pxtnIO_w io_write, pxtnIO_seek io_seek, px
 
 pxtnText::~pxtnText()
 {
-	if( _p_comment_buf ) free( _p_comment_buf );
-	_p_comment_buf = NULL; _comment_size = 0;
-	if( _p_name_buf    ) free( _p_name_buf    );
-	_p_name_buf    = NULL; _name_size    = 0;
+	if( _p_comment_buf ) { free( _p_comment_buf ); } _p_comment_buf = NULL; _comment_size = 0;
+	if( _p_name_buf    ) { free( _p_name_buf    ); } _p_name_buf    = NULL; _name_size    = 0;
 }
 
 

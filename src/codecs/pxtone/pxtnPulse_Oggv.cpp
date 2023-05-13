@@ -4,49 +4,58 @@
 #ifdef pxINCLUDE_OGGVORBIS
 
 #if defined(pxINCLUDE_OGGVORBIS_STB)
-#include "SDL_stdinc.h"
-#include "SDL_version.h"
-#include "SDL_rwops.h"
-#include "SDL_assert.h"
-#define STB_VORBIS_SDL 1 /* for SDL_mixer-specific stuff. */
+#ifdef pxUseSDL
+#   include "SDL_stdinc.h"
+#   include "SDL_version.h"
+#   include "SDL_rwops.h"
+#   include "SDL_assert.h"
+#   define STB_VORBIS_SDL 1 /* for SDL_mixer-specific stuff. */
+#   define STB_FORCEINLINE SDL_FORCE_INLINE
+#endif
 #define STB_VORBIS_NO_STDIO 1
 #define STB_VORBIS_NO_CRT 1
 #define STB_VORBIS_NO_PUSHDATA_API 1
 #define STB_VORBIS_MAX_CHANNELS 8   /* For 7.1 surround sound */
-#define STB_FORCEINLINE SDL_FORCE_INLINE
 #if px_IS_BIG_ENDIAN
-#define STB_VORBIS_BIG_ENDIAN 1
+#   define STB_VORBIS_BIG_ENDIAN 1
 #endif
-#define STBV_CDECL SDLCALL /* for SDL_qsort */
 
-#ifdef assert
-#undef assert
-#endif
-#ifdef memset
-#undef memset
-#endif
-#ifdef memcpy
-#undef memcpy
-#endif
-#define assert SDL_assert
-#define memset SDL_memset
-#define memcmp SDL_memcmp
-#define memcpy SDL_memcpy
-#define qsort SDL_qsort
-#define malloc SDL_malloc
-#define realloc SDL_realloc
-#define free SDL_free
+#ifdef pxUseSDL
+#   define STBV_CDECL SDLCALL /* for SDL_qsort */
+#   ifdef assert
+#       undef assert
+#   endif
+#   ifdef memset
+#       undef memset
+#   endif
+#   ifdef memcpy
+#       undef memcpy
+#   endif
+#   define assert SDL_assert
+#   define memset SDL_memset
+#   define memcmp SDL_memcmp
+#   define memcpy SDL_memcpy
+#   define qsort SDL_qsort
+#   define malloc SDL_malloc
+#   define realloc SDL_realloc
+#   define free SDL_free
 
-#define pow SDL_pow
-#define floor SDL_floor
-#define ldexp(v, e) SDL_scalbn((v), (e))
-#define abs(x) SDL_abs(x)
-#define cos(x) SDL_cos(x)
-#define sin(x) SDL_sin(x)
-#define log(x) SDL_log(x)
-#if SDL_VERSION_ATLEAST(2, 0, 9)
-#define exp(x) SDL_exp(x) /* Available since SDL 2.0.9 */
-#endif
+#   define pow SDL_pow
+#   define floor SDL_floor
+#   define ldexp(v, e) SDL_scalbn((v), (e))
+#   define abs(x) SDL_abs(x)
+#   define cos(x) SDL_cos(x)
+#   define sin(x) SDL_sin(x)
+#   define log(x) SDL_log(x)
+#   if SDL_VERSION_ATLEAST(2, 0, 9)
+#       define exp(x) SDL_exp(x) /* Available since SDL 2.0.9 */
+#   endif
+#else
+#   include <stddef.h>
+#   include <assert.h>
+#   include <string.h>
+#   include <math.h>
+#endif // pxUseSDL
 
 /* Workaround to don't conflict with another statically-linked stb-vorbis */
 #define stb_vorbis_get_info _pxtn_stb_vorbis_get_info

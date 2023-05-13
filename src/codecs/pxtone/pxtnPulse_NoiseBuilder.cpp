@@ -118,8 +118,7 @@ pxtnPulse_NoiseBuilder::pxtnPulse_NoiseBuilder( pxtnIO_r io_read, pxtnIO_w io_wr
 pxtnPulse_NoiseBuilder::~pxtnPulse_NoiseBuilder()
 {
 	_b_init = false;
-	if( _freq ) delete _freq;
-	_freq = NULL;
+	if( _freq ) { delete _freq; } _freq = NULL;
 	for( int32_t i = 0; i < pxWAVETYPE_num; i++ ) pxtnMem_free( (void **)&_p_tables[ i ] );
 }
 
@@ -213,14 +212,14 @@ bool pxtnPulse_NoiseBuilder::Init()
 	// rect --
 	p = _p_tables[ pxWAVETYPE_Rect ];
 	for( s = 0; s < _smp_num / 2; s++ ){ *p = (short)( _SAMPLING_TOP  ); p++; }
-    for(      ; s < _smp_num    ; s++ ){ *p = (short)( -_SAMPLING_TOP ); p++; }
+	for(      ; s < _smp_num    ; s++ ){ *p = (short)( -_SAMPLING_TOP ); p++; }
 
 	// random --
 	p = _p_tables[ pxWAVETYPE_Random ];
 	_random_reset();
 	for( s = 0; s < _smp_num_rand; s++ ){ *p = _random_get(); p++; }
 
-    // saw2 --
+	// saw2 --
 	osci.ReadyGetSample( overtones_saw2, 16, 128, _smp_num, 0 );
 	p = _p_tables[ pxWAVETYPE_Saw2 ];
 	for( s = 0; s < _smp_num; s++ )
@@ -230,7 +229,7 @@ bool pxtnPulse_NoiseBuilder::Init()
 		p++;
 	}
 
-    // rect2 --
+	// rect2 --
 	osci.ReadyGetSample( overtones_rect2, 8, 128, _smp_num, 0 );
 	p = _p_tables[ pxWAVETYPE_Rect2 ];
 	for( s = 0; s < _smp_num; s++ )

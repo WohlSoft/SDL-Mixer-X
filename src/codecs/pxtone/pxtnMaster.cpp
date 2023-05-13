@@ -101,12 +101,12 @@ bool pxtnMaster::io_w_v5( void* desc, int32_t rough ) const
 	int32_t   clock_last   = bclock * _beat_num * get_last_meas  ();
 	int8_t    bnum   = _beat_num  ;
 	float btempo = _beat_tempo;
-	if( !_io_write_le32( desc, &size ) ) return false;
-	if( !_io_write_le16( desc, &bclock ) ) return false;
+	if( !_io_write_le32( desc, &size                         ) ) return false;
+	if( !_io_write_le16( desc, &bclock                       ) ) return false;
 	if( !_io_write( desc, &bnum        , sizeof(int8_t  ), 1 ) ) return false;
-	if( !_io_write_le32f( desc, &btempo ) ) return false;
-	if( !_io_write_le32( desc, &clock_repeat ) ) return false;
-	if( !_io_write_le32( desc, &clock_last ) ) return false;
+	if( !_io_write_le32f( desc, &btempo                      ) ) return false;
+	if( !_io_write_le32( desc, &clock_repeat                 ) ) return false;
+	if( !_io_write_le32( desc, &clock_last                   ) ) return false;
 
 	return true;
 }
@@ -125,11 +125,11 @@ pxtnERR pxtnMaster::io_r_v5( void* desc )
 	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r;
 	if( size != 15                              ) return pxtnERR_fmt_unknown;
 
-	if( !_io_read_le16( desc, &beat_clock ) ) return pxtnERR_desc_r;
+	if( !_io_read_le16( desc, &beat_clock                 ) ) return pxtnERR_desc_r;
 	if( !_io_read( desc, &beat_num    ,sizeof(int8_t ), 1 ) ) return pxtnERR_desc_r;
-	if( !_io_read_le32f( desc, &beat_tempo ) ) return pxtnERR_desc_r;
-	if( !_io_read_le32( desc, &clock_repeat ) ) return pxtnERR_desc_r;
-	if( !_io_read_le32( desc, &clock_last ) ) return pxtnERR_desc_r;
+	if( !_io_read_le32f( desc, &beat_tempo                ) ) return pxtnERR_desc_r;
+	if( !_io_read_le32( desc, &clock_repeat               ) ) return pxtnERR_desc_r;
+	if( !_io_read_le32( desc, &clock_last                 ) ) return pxtnERR_desc_r;
 
 	_beat_clock = beat_clock;
 	_beat_num   = beat_num  ;
@@ -144,7 +144,7 @@ pxtnERR pxtnMaster::io_r_v5( void* desc )
 int32_t pxtnMaster::io_r_v5_EventNum( void* desc )
 {
 	uint32_t size;
-	if( !_io_read_le32( desc, &size ) ) return 0;
+	if( !_io_read_le32( desc, &size            ) ) return 0;
 	if( size != 15                               ) return 0;
 	int8_t buf[ 15 ];
 	if( !_io_read( desc,  buf , sizeof(int8_t ), 15 )  ) return 0;
@@ -167,9 +167,9 @@ _x4x_MASTER;
 #ifdef px_BIG_ENDIAN
 px_FORCE_INLINE void swapEndian( _x4x_MASTER &mast)
 {
-	mast.data_num =  pxtnData::_swap16(mast.data_num);
-	mast.rrr =       pxtnData::_swap16(mast.rrr);
-	mast.event_num = pxtnData::_swap32(mast.event_num);
+	mast.data_num =  pxtnData::_swap16( mast.data_num ) ;
+	mast.rrr =       pxtnData::_swap16( mast.rrr )      ;
+	mast.event_num = pxtnData::_swap32( mast.event_num );
 }
 #endif
 
@@ -187,7 +187,7 @@ pxtnERR pxtnMaster::io_r_x4x( void* desc )
 	int32_t     beat_clock, beat_num, repeat_clock, last_clock;
 	float       beat_tempo = 0;
 
-	if( !_io_read_le32( desc, &size ) ) return pxtnERR_desc_r;
+	if( !_io_read_le32( desc, &size                      ) ) return pxtnERR_desc_r;
 	if( !_io_read( desc, &mast, sizeof( _x4x_MASTER ), 1 ) ) return pxtnERR_desc_r;
 	swapEndian( mast );
 
@@ -242,7 +242,7 @@ int32_t pxtnMaster::io_r_x4x_EventNum( void* desc )
 	int32_t     e   ;
 
 	memset( &mast, 0, sizeof( _x4x_MASTER ) );
-	if( !_io_read_le32( desc, &size ) ) return 0;
+	if( !_io_read_le32( desc, &size                      ) ) return 0;
 	if( !_io_read( desc, &mast, sizeof( _x4x_MASTER ), 1 ) ) return 0;
 	swapEndian( mast );
 

@@ -49,10 +49,10 @@ void _int_to_v( uint8_t* bytes5, int32_t* p_byte_num, uint32_t i )
 {
 	uint8_t a[ 5 ] = {};
 
-	bytes5[ 0 ] = 0; a[ 0 ] = (uint8_t)((i >> 0 ) & 0xFF); //*( (uint8_t *)(&i) + 0 );
-	bytes5[ 1 ] = 0; a[ 1 ] = (uint8_t)((i >> 8 ) & 0xFF); //*( (uint8_t *)(&i) + 1 );
-	bytes5[ 2 ] = 0; a[ 2 ] = (uint8_t)((i >> 16) & 0xFF); //*( (uint8_t *)(&i) + 2 );
-	bytes5[ 3 ] = 0; a[ 3 ] = (uint8_t)((i >> 24) & 0xFF); //*( (uint8_t *)(&i) + 3 );
+	bytes5[ 0 ] = 0; a[ 0 ] = (uint8_t)( (i >> 0 ) & 0xFF );
+	bytes5[ 1 ] = 0; a[ 1 ] = (uint8_t)( (i >> 8 ) & 0xFF );
+	bytes5[ 2 ] = 0; a[ 2 ] = (uint8_t)( (i >> 16) & 0xFF );
+	bytes5[ 3 ] = 0; a[ 3 ] = (uint8_t)( (i >> 24) & 0xFF );
 	bytes5[ 4 ] = 0; a[ 4 ] = 0;
 
 	// 1byte(7bit)
@@ -146,8 +146,8 @@ bool pxtnData::_io_write_le16( void *user, const void *p_dst ) const
 	uint8_t out[2] = {0, 0};
 	uint16_t in = *reinterpret_cast<const uint16_t*>( p_dst );
 
-	out[0] = ((in >> 0) & 0xFF);
-	out[1] = ((in >> 8) & 0xFF);
+	out[0] = ( (in >> 0) & 0xFF );
+	out[1] = ( (in >> 8) & 0xFF );
 
 	return _io_write( user, (void*)out, 1, 2 );
 }
@@ -157,10 +157,10 @@ bool pxtnData::_io_write_le32(void *user, const void *p_dst ) const
 	uint8_t out[4] = {0, 0};
 	uint32_t in = *reinterpret_cast<const uint32_t*>( p_dst );
 
-	out[0] = ((in >>  0) & 0xFF);
-	out[1] = ((in >>  8) & 0xFF);
-	out[2] = ((in >> 16) & 0xFF);
-	out[3] = ((in >> 24) & 0xFF);
+	out[0] = ( (in >>  0) & 0xFF );
+	out[1] = ( (in >>  8) & 0xFF );
+	out[2] = ( (in >> 16) & 0xFF );
+	out[3] = ( (in >> 24) & 0xFF );
 
 	return _io_write( user, (void*)out, 1, 4 );
 }
@@ -176,10 +176,10 @@ bool pxtnData::_io_write_le32f( void *user, const void *p_dst ) const
 
 	swapper.f = *reinterpret_cast<const float*>( p_dst );
 
-	out[0] = ((swapper.ui32 >>  0) & 0xFF);
-	out[1] = ((swapper.ui32 >>  8) & 0xFF);
-	out[2] = ((swapper.ui32 >> 16) & 0xFF);
-	out[3] = ((swapper.ui32 >> 24) & 0xFF);
+	out[0] = ( (swapper.ui32 >>  0) & 0xFF );
+	out[1] = ( (swapper.ui32 >>  8) & 0xFF );
+	out[2] = ( (swapper.ui32 >> 16) & 0xFF );
+	out[3] = ( (swapper.ui32 >> 24) & 0xFF );
 
 	return _io_write( user, (void*)out, 1, 4 );
 }
@@ -251,6 +251,7 @@ bool pxtnData::copy_from( const pxtnData* src )
 	_io_seek  = src->_io_seek ;
 	return true;
 }
+
 
 pxtnData::pxtnData()
 {
