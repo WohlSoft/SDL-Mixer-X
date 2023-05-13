@@ -85,6 +85,7 @@ static void *PXTONE_NewRW(struct SDL_RWops *src, int freesrc)
     const char *comment;
     char *temp_string;
     int32_t comment_len;
+    pxtnERR ret;
 
     music = (PXTONE_Music *)SDL_calloc(1, sizeof *music);
     if (!music) {
@@ -98,9 +99,10 @@ static void *PXTONE_NewRW(struct SDL_RWops *src, int freesrc)
 
     music->pxtn = new pxtnService(_pxtn_r, _pxtn_w, _pxtn_s, _pxtn_p);
 
-    if (music->pxtn->init() != pxtnOK ) {
+    ret = music->pxtn->init();
+    if (ret != pxtnOK ) {
         PXTONE_Delete(music);
-        Mix_SetError("PXTONE: Failed to initialize the library");
+        Mix_SetError("PXTONE: Failed to initialize the library: %s", pxtnError_get_string(ret));
         return NULL;
     }
 
@@ -110,16 +112,18 @@ static void *PXTONE_NewRW(struct SDL_RWops *src, int freesrc)
         return NULL;
     }
 
-    // LOAD MUSIC FILE.
-    if (music->pxtn->read(src) != pxtnOK) {
+    /* LOAD MUSIC DATA */
+    ret = music->pxtn->read(src);
+    if (ret != pxtnOK) {
         PXTONE_Delete(music);
-        Mix_SetError("PXTONE: Failed to set the source stream");
+        Mix_SetError("PXTONE: Failed to load a music data: %s", pxtnError_get_string(ret));
         return NULL;
     }
 
-    if (music->pxtn->tones_ready() != pxtnOK) {
+    ret = music->pxtn->tones_ready();
+    if (ret != pxtnOK) {
         PXTONE_Delete(music);
-        Mix_SetError("PXTONE: Failed to initialize tones");
+        Mix_SetError("PXTONE: Failed to initialize tones: %s", pxtnError_get_string(ret));
         return NULL;
     }
 
