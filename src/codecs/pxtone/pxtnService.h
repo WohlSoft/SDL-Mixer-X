@@ -239,6 +239,7 @@ public :
 	int32_t moo_get_end_clock      () const;
 	int32_t moo_get_sampling_offset() const;
 	int32_t moo_get_sampling_end   () const;
+	int32_t moo_get_sampling_repeat() const;
 
 	bool    moo_preparation( const pxtnVOMITPREPARATION *p_build, float tempo_mod = 1.0f );
 	bool    moo_set_tempo_mod( float tempo_mod );

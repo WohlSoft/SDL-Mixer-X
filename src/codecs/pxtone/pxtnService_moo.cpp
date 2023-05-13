@@ -431,6 +431,13 @@ int32_t pxtnService::moo_get_sampling_end() const
 	return _moo_smp_end;
 }
 
+int32_t pxtnService::moo_get_sampling_repeat() const
+{
+	if( !_moo_b_init     ) return 0;
+	if( _moo_b_end_vomit ) return 0;
+	return _moo_smp_repeat;
+}
+
 int32_t pxtnService::moo_get_total_sample   () const
 {
 	if( !_b_init           ) return 0;
