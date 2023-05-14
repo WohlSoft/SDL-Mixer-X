@@ -21,6 +21,11 @@ set(AUDIO_CODECS_REPOSITORY_PATH ${CMAKE_BINARY_DIR}/external/AudioCodecs)
 
 set(AUDIO_CODECS_SDL2_GIT_BRANCH "" CACHE STRING "GIT commit hash for SDL2 repository")
 set(AUDIO_CODECS_REPO_URL "https://github.com/WohlSoft/AudioCodecs.git" CACHE STRING "The GIT repository path to AudioCodecs")
+set(AUDIO_CODECS_REPO_TAG "" CACHE STRING "The tag/branch for AudioCodecs repository")
+
+if(NOT "${AUDIO_CODECS_REPO_TAG}" STREQUAL "")
+    set(AUDIO_CODECS_REPO_TAG_CODE GIT_TAG "${AUDIO_CODECS_REPO_TAG}")
+endif()
 
 option(WITH_SDL2_WASAPI "Enable WASAPI audio output support for Windows build of SDL2" ON)
 if(WIN32)
@@ -72,6 +77,7 @@ ExternalProject_Add(
     AudioCodecs
     PREFIX ${CMAKE_BINARY_DIR}/external/AudioCodecs
     GIT_REPOSITORY ${AUDIO_CODECS_REPO_URL}
+    ${AUDIO_CODECS_REPO_TAG_CODE}
     CMAKE_ARGS
         "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
         "-DCMAKE_DEBUG_POSTFIX=${MIX_DEBUG_SUFFIX}"
