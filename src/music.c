@@ -3120,7 +3120,7 @@ int MIXCALLCC Mix_PausedMusic(void)
     return (music_active == SDL_FALSE);
 }
 
-int Mix_StartTrack(Mix_Music *music, int track)
+int MIXCALLCC Mix_StartTrack(Mix_Music *music, int track)
 {
     int result;
 
@@ -3138,7 +3138,7 @@ int Mix_StartTrack(Mix_Music *music, int track)
     return result;
 }
 
-int Mix_GetNumTracks(Mix_Music *music)
+int MIXCALLCC Mix_GetNumTracks(Mix_Music *music)
 {
     int result;
 
