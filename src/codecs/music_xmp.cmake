@@ -30,7 +30,7 @@ if(USE_XMP)
     elseif(NOT USE_XMP_LITE AND NOT USE_XMP_LITE_ENFORCE)
         # AudioCodecs package doesn't include lite version at all
         if(WIN32)
-            list(APPEND SDL_MIXER_DEFINITIONS -DBUILDING_STATIC)
+            list(APPEND SDL_MIXER_DEFINITIONS -DBUILDING_STATIC -DLIBXMP_STATIC)
         endif()
 
         if(MSVC)
