@@ -8,11 +8,7 @@
 //#define pxINCLUDE_OGGVORBIS 1
 // $(SolutionDir)libogg\include;$(SolutionDir)libvorbis\include;
 
-#if defined(_WIN32)
-#include <cstdint>
-#else
 #include <stdint.h>
-#endif
 
 #include <stdlib.h>
 #include <string.h>
