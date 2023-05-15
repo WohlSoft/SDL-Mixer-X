@@ -1805,6 +1805,7 @@ Mix_Music * MIXCALLCC Mix_LoadMUS(const char *file)
             }
             music->interface = interface;
             music->context = context;
+            music->music_volume = music_volume;
             p = get_last_dirsep(music_file);
             SDL_strlcpy(music->filename, (p != NULL)? p + 1 : music_file, 1024);
             SDL_free(music_file);
