@@ -112,7 +112,7 @@ if(NOT EMSCRIPTEN
    AND NOT NINTENDO_3DS
    AND NOT NINTENDO_WII
    AND NOT NINTENDO_WIIU)
-    
+
     set(SDL_MIXER_X_STATIC_ENABLED_BY_DEFAULT ON)
     set(SDL_MIXER_X_SHARED_ENABLED_BY_DEFAULT OFF)
 
@@ -174,9 +174,14 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER_ID ST
         set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -Wl,-undefined,error" )
     endif()
 
+# Supress the std::vector::insert() GCC change warning
     if(VITA)
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DVITA -DVITA=1 -fcompare-debug-second")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVITA -DVITA=1 -fcompare-debug-second")
+    endif()
+    if(NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_SWITCH)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fcompare-debug-second")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcompare-debug-second")
     endif()
 endif()
 
@@ -441,7 +446,7 @@ if(SDL_MIXER_X_STATIC AND NOT BUILD_AS_VB6_BINDING)
         ${SDL_MIXER_INCLUDE_PATHS}
     )
     target_include_directories(SDL2_mixer_ext_Static PUBLIC
-        $<BUILD_INTERFACE:${SDLMixerX_SOURCE_DIR}/include> 
+        $<BUILD_INTERFACE:${SDLMixerX_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/SDL2>
     )
     if(BUILD_AUDIO_CODECS_NEEDED)
@@ -487,7 +492,7 @@ if(SDL_MIXER_X_SHARED AND NOT BUILD_AS_VB6_BINDING)
         ${SDL_MIXER_INCLUDE_PATHS}
     )
     target_include_directories(SDL2_mixer_ext PUBLIC
-        $<BUILD_INTERFACE:${SDLMixerX_SOURCE_DIR}/include> 
+        $<BUILD_INTERFACE:${SDLMixerX_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/SDL2>
     )
     if(BUILD_AUDIO_CODECS_NEEDED)
