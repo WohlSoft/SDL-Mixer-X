@@ -8,12 +8,14 @@ It is an additional changelog file. It extends the CHANGES.txt that lists change
  * Added support for the experimental libEDMIDI synthesizer
  * GPL and LGPL-licensed libraries will be disabled by default (They can be re-enabled using `-DMIXERX_ENABLE_LGPL=ON` and `-DMIXERX_ENABLE_GPL=ON` CMake options).
  * Added the FFMPEG support to play some audio formats supported by it, for example, AAC, WMA, ALAC, and OPUS inside WebM container, etc. (Use `-DUSE_FFMPEG=ON` to enable it)
+ * Fixed te detection of EA MUS files
  * The default bank for the libOPNMIDI has been updated.
  * Added an ability to switch tracks on the fly while playing multi-track music files (such as NSF/HES/GBM/etc. chiptunes and XMI MIDI files)
  * Fixed the confusion of the selected banks and the chips number at ADLMIDI and OPNMIDI.
  * Fixed several issues
  * Stabilized work of the Alternative Native MIDI on Windows.
  * Added the PXTONE library to support playback of .pttune and .ptcop files
+ * Fixed detection of FLAC files that starts with an ID3 tag.
 
 2.5.0: (2021-09-21)
  * Added std-vorbis library as an alternative for OGG Vorbis streams
