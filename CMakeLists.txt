@@ -306,7 +306,7 @@ include(music_wavpack)
 include(music_mpg123)
 include(music_drmp3)
 
-if(USE_MP3_MPG123 OR USE_WAV)
+if(USE_MP3_MPG123 OR USE_WAV OR USE_FLAC)
     list(APPEND SDLMixerX_SOURCES
         ${SDLMixerX_SOURCE_DIR}/src/codecs/mp3utils.c)
 endif()
