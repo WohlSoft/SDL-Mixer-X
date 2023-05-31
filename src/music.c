@@ -49,8 +49,9 @@
 #include "music_pxtone.h"
 
 #include "utils.h"
-#if defined(MUSIC_FLAC_DRFLAC) || defined(MUSIC_FLAC_LIBFLAC)
-#define ID3_EXTRA_FORMAT_CHECKS
+#if defined(MUSIC_FLAC_DRFLAC) || defined(MUSIC_FLAC_LIBFLAC) || \
+    defined(MUSIC_MP3_MPG123) || defined(MUSIC_MP3_DRMP3)
+#define ENABLE_ID3_FORMAT_DETECTOR
 #include "mp3utils.h"
 #endif
 
@@ -1382,25 +1383,28 @@ static int detect_ea_rsxx(SDL_RWops *in, Sint64 start, Uint8 magic_byte)
 #endif
 
 #if defined(MUSIC_MP3_MPG123) || defined(MUSIC_MP3_DRMP3)
-static int detect_mp3(Uint8 *magic, SDL_RWops *src, Sint64 start)
+static int detect_mp3(Uint8 *magic, SDL_RWops *src, Sint64 start, Sint64 offset)
 {
     const Uint32 null = 0;
-    Uint8 mp3_magic[10];
+    Uint8 mp3_magic[4];
     Sint64 end_file_pos = 0;
     const int max_search = 10240;
 
-    SDL_memcpy(mp3_magic, magic, 9);
+    SDL_memcpy(mp3_magic, magic, 4);
 
-    if (SDL_strncmp((char *)mp3_magic, "ID3", 3) == 0 ||
+    /* Attempt to quickly detect MP3 file if possible */
     /* see: https://bugzilla.libsdl.org/show_bug.cgi?id=5322 */
-       (magic[0] == 0xFF && (magic[1] & 0xE6) == 0xE2)) {
+    if ((magic[0] == 0xFF) && (magic[1] & 0xE6) == 0xE2) {
         SDL_RWseek(src, start, RW_SEEK_SET);
         return 1;
     }
 
+    /* If no success, try the deep scan of first 10 kilobytes of the file
+     * to detect the first valid MP3 frame */
+
     SDL_RWseek(src, 0, RW_SEEK_END);
     end_file_pos = SDL_RWtell(src);
-    SDL_RWseek(src, start, RW_SEEK_SET);
+    SDL_RWseek(src, start + offset, RW_SEEK_SET);
 
     /* If first 4 bytes are not zero */
     if (SDL_memcmp(mp3_magic, &null, 4) != 0) {
@@ -1408,34 +1412,32 @@ static int detect_mp3(Uint8 *magic, SDL_RWops *src, Sint64 start)
     }
 
 digMoreBytes:
-    {
-        /* Find the nearest 0xFF byte */
-        while ((SDL_RWread(src, mp3_magic, 1, 1) == 1) &&
-               (mp3_magic[0] != 0xFF) &&
-               (SDL_RWtell(src) < (start + max_search)) &&
-               (SDL_RWtell(src) < (end_file_pos - 1)) )
-        {}
+    /* Find the nearest 0xFF byte */
+    while ((SDL_RWread(src, mp3_magic, 1, 1) == 1) &&
+           (mp3_magic[0] != 0xFF) &&
+           (SDL_RWtell(src) < (start + offset + max_search)) &&
+           (SDL_RWtell(src) < (end_file_pos - 1)) )
+    {}
 
-        /* Can't read last 3 bytes of the frame header */
-        if (SDL_RWread(src, mp3_magic + 1, 1, 3) != 3) {
-            SDL_RWseek(src, start, RW_SEEK_SET);
-            return 0;
-        }
+    /* Can't read last 3 bytes of the frame header */
+    if (SDL_RWread(src, mp3_magic + 1, 1, 3) != 3) {
+        SDL_RWseek(src, start, RW_SEEK_SET);
+        return 0;
+    }
 
-        /* Go back to 3 bytes */
-        SDL_RWseek(src, -3, RW_SEEK_CUR);
+    /* Go back to 3 bytes */
+    SDL_RWseek(src, -3, RW_SEEK_CUR);
 
-        /* Got the end of search zone, however, found nothing */
-        if (SDL_RWtell(src) >= (start + max_search)) {
-            SDL_RWseek(src, start, RW_SEEK_SET);
-            return 0;
-        }
+    /* Got the end of search zone, however, found nothing */
+    if (SDL_RWtell(src) >= (start + offset + max_search)) {
+        SDL_RWseek(src, start, RW_SEEK_SET);
+        return 0;
+    }
 
-        /* Got the end of file, however, found nothing */
-        if (SDL_RWtell(src) >= (end_file_pos - 1)) {
-            SDL_RWseek(src, start, RW_SEEK_SET);
-            return 0;
-        }
+    /* Got the end of file, however, found nothing */
+    if (SDL_RWtell(src) >= (end_file_pos - 1)) {
+        SDL_RWseek(src, start, RW_SEEK_SET);
+        return 0;
     }
 
 readHeader:
@@ -1460,7 +1462,7 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
 {
     Uint8 magic[100];
     Sint64 start = SDL_RWtell(src);
-#ifdef ID3_EXTRA_FORMAT_CHECKS
+#ifdef ENABLE_ID3_FORMAT_DETECTOR
     Uint8 submagic[4];
     long id3len = 0;
     size_t readlen = 0;
@@ -1657,10 +1659,8 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
         return MUS_FFMPEG;
 #endif
 
-    if (SDL_memcmp(magic, "ID3", 3) == 0 ||
-    /* see: https://bugzilla.libsdl.org/show_bug.cgi?id=5322 */
-        (magic[0] == 0xFF && (magic[1] & 0xE6) == 0xE2)) {
-#ifdef ID3_EXTRA_FORMAT_CHECKS
+#ifdef ENABLE_ID3_FORMAT_DETECTOR
+    if (SDL_memcmp(magic, "ID3", 3) == 0) {
         id3len = get_id3v2_length(src);
 
         /* Check if there is something not an MP3, however, also has ID3 tag */
@@ -1674,15 +1674,19 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
                     return MUS_FLAC;
             }
         }
-#endif
+#   if defined(MUSIC_MP3_MPG123) || defined(MUSIC_MP3_DRMP3)
+        /* Detect MP3 format by frame header [needs scanning of bigger part of the file] */
+        if (detect_mp3(submagic, src, start, id3len)) {
+            return MUS_MP3;
+        }
+#   endif
+    }
+#   if defined(MUSIC_MP3_MPG123) || defined(MUSIC_MP3_DRMP3)
+    /* Detect MP3 format by frame header [needs scanning of bigger part of the file] */
+    else if (detect_mp3(magic, src, start, 0)) {
         return MUS_MP3;
     }
-
-#if defined(MUSIC_MP3_MPG123) || defined(MUSIC_MP3_DRMP3)
-    /* Detect MP3 format [needs scanning of bigger part of the file] */
-    if (detect_mp3(magic, src, start)) {
-        return MUS_MP3;
-    }
+#   endif
 #endif
 
 #ifdef MUSIC_MID_ADLMIDI
