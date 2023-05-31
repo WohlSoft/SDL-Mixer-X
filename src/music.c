@@ -49,11 +49,7 @@
 #include "music_pxtone.h"
 
 #include "utils.h"
-#if defined(MUSIC_FLAC_DRFLAC) || defined(MUSIC_FLAC_LIBFLAC) || \
-    defined(MUSIC_MP3_MPG123) || defined(MUSIC_MP3_DRMP3)
-#define ENABLE_ID3_FORMAT_DETECTOR
 #include "mp3utils.h"
-#endif
 
 /* Check to make sure we are building with a new enough SDL */
 #if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 7)
@@ -1298,7 +1294,6 @@ static Mix_MusicType xmi_compatible_midi_player()
 }
 #endif
 
-#ifdef MUSIC_MID_ADLMIDI
 static int detect_imf(SDL_RWops *in, Sint64 start)
 {
     size_t chunksize;
@@ -1380,9 +1375,7 @@ static int detect_ea_rsxx(SDL_RWops *in, Sint64 start, Uint8 magic_byte)
 
     return res;
 }
-#endif
 
-#if defined(MUSIC_MP3_MPG123) || defined(MUSIC_MP3_DRMP3)
 static int detect_mp3(Uint8 *magic, SDL_RWops *src, Sint64 start, Sint64 offset)
 {
     const Uint32 null = 0;
@@ -1456,17 +1449,14 @@ readHeader:
     SDL_RWseek(src, start, RW_SEEK_SET);
     return 1;
 }
-#endif
 
 Mix_MusicType detect_music_type(SDL_RWops *src)
 {
     Uint8 magic[100];
     Sint64 start = SDL_RWtell(src);
-#ifdef ENABLE_ID3_FORMAT_DETECTOR
     Uint8 submagic[4];
     long id3len = 0;
     size_t readlen = 0;
-#endif
 
     SDL_memset(magic, 0, 100);
     if (SDL_RWread(src, magic, 1, 99) != 99) {
@@ -1513,14 +1503,20 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
     if ((SDL_memcmp(magic, "RIFF", 4) == 0) && (SDL_memcmp(magic + 8, "RMID", 4) == 0)) {
         return MUS_MID;
     }
-#if defined(MUSIC_HAS_XMI_SUPPORT)
     if (SDL_memcmp(magic, "MUS\x1A", 4) == 0) {
+#if defined(MUSIC_HAS_XMI_SUPPORT)
         return xmi_compatible_midi_player();
+#else
+        return MUS_NONE;
+#endif
     }
     if ((SDL_memcmp(magic, "FORM", 4) == 0) && (SDL_memcmp(magic + 8, "XDIR", 4) == 0)) {
+#if defined(MUSIC_HAS_XMI_SUPPORT)
         return xmi_compatible_midi_player();
-    }
+#else
+        return MUS_NONE;
 #endif
+    }
 
     /* WAVE files have the magic four bytes "RIFF"
            AIFF files have the magic 12 bytes "FORM" XXXX "AIFF" */
@@ -1562,12 +1558,11 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
     if (SDL_memcmp(magic, "\x1f\x8b", 2) == 0)
         return MUS_GME;
 
-#ifdef MUSIC_PXTONE
+    /* PXTone Collage files */
     if (SDL_memcmp(magic, "PTTUNE", 6) == 0)
         return MUS_PXTONE;
     if (SDL_memcmp(magic, "PTCOLLAGE", 9) == 0)
         return MUS_PXTONE;
-#endif
 
     /* Detect some module files */
     if (SDL_memcmp(magic, "Extended Module", 15) == 0)
@@ -1659,7 +1654,6 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
         return MUS_FFMPEG;
 #endif
 
-#ifdef ENABLE_ID3_FORMAT_DETECTOR
     if (SDL_memcmp(magic, "ID3", 3) == 0) {
         id3len = get_id3v2_length(src);
 
@@ -1674,22 +1668,16 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
                     return MUS_FLAC;
             }
         }
-#   if defined(MUSIC_MP3_MPG123) || defined(MUSIC_MP3_DRMP3)
         /* Detect MP3 format by frame header [needs scanning of bigger part of the file] */
         if (detect_mp3(submagic, src, start, id3len)) {
             return MUS_MP3;
         }
-#   endif
     }
-#   if defined(MUSIC_MP3_MPG123) || defined(MUSIC_MP3_DRMP3)
     /* Detect MP3 format by frame header [needs scanning of bigger part of the file] */
     else if (detect_mp3(magic, src, start, 0)) {
         return MUS_MP3;
     }
-#   endif
-#endif
 
-#ifdef MUSIC_MID_ADLMIDI
     /* Detect id Software Music Format file */
     if (detect_imf(src, start)) {
         return MUS_ADLMIDI;
@@ -1702,9 +1690,8 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
             return MUS_ADLMIDI;
         }
     }
-#endif
 
-      /* Reset position to zero! */
+    /* Reset position to zero! */
     SDL_RWseek(src, start, RW_SEEK_SET);
 
     /* Assume MOD format.

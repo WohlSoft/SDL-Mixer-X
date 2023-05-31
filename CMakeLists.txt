@@ -306,11 +306,6 @@ include(music_wavpack)
 include(music_mpg123)
 include(music_drmp3)
 
-if(USE_MP3_MPG123 OR USE_WAV OR USE_FLAC)
-    list(APPEND SDLMixerX_SOURCES
-        ${SDLMixerX_SOURCE_DIR}/src/codecs/mp3utils.c)
-endif()
-
 # Differences between ModPlug and libXMP:
 # - ModPlug-exclusive formats: AMS, DMF, DSM, MT2
 # - XMP-exclusive formats: ABK, DIGI, DTM, EMOD, FLX, FNK, GDM, IMF, J2B, LIQ,
@@ -425,6 +420,7 @@ list(APPEND SDLMixerX_SOURCES
     ${SDLMixerX_SOURCE_DIR}/src/music.c ${SDLMixerX_SOURCE_DIR}/src/music.h
     ${SDLMixerX_SOURCE_DIR}/src/mixer_x_deprecated.c
     ${SDLMixerX_SOURCE_DIR}/src/utils.c ${SDLMixerX_SOURCE_DIR}/src/utils.h
+    ${SDLMixerX_SOURCE_DIR}/src/codecs/mp3utils.c
 )
 
 #file(GLOB SDLMixerX_SOURCES ${SDLMixerX_SOURCES})
