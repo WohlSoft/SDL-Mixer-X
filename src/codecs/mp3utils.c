@@ -1181,7 +1181,7 @@ long get_id3v2_length(SDL_RWops *src)
     Sint64 start;
 
     if(!src) {
-        return -1;
+        return 0;
     }
 
     start = SDL_RWtell(src);
@@ -1189,11 +1189,11 @@ long get_id3v2_length(SDL_RWops *src)
     SDL_RWseek(src, start, RW_SEEK_SET);
 
     if (!readsize) {
-        return -1;
+        return 0;
     }
 
     if (!is_id3v2(buf, readsize)) {
-        return -1;
+        return 0;
     }
 
     return get_id3v2_len(buf, (long)readsize);

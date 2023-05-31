@@ -1668,13 +1668,10 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
                     return MUS_FLAC;
             }
         }
-        /* Detect MP3 format by frame header [needs scanning of bigger part of the file] */
-        if (detect_mp3(submagic, src, start, id3len)) {
-            return MUS_MP3;
-        }
     }
+
     /* Detect MP3 format by frame header [needs scanning of bigger part of the file] */
-    else if (detect_mp3(magic, src, start, 0)) {
+    if (detect_mp3(submagic, src, start, id3len)) {
         return MUS_MP3;
     }
 
