@@ -700,14 +700,15 @@ void SetupMidi::on_mididevice_currentIndexChanged(int index)
 #ifdef SDL_MIXER_GE21
     switch(index)
     {
+    default:
     case 0:
         Mix_SetMidiPlayer(MIDI_ADLMIDI);
         break;
     case 1:
-        Mix_SetMidiPlayer(MIDI_Timidity);
+        Mix_SetMidiPlayer(MIDI_Native);
         break;
     case 2:
-        Mix_SetMidiPlayer(MIDI_Native);
+        Mix_SetMidiPlayer(MIDI_Timidity);
         break;
     case 3:
         Mix_SetMidiPlayer(MIDI_OPNMIDI);
@@ -718,18 +719,15 @@ void SetupMidi::on_mididevice_currentIndexChanged(int index)
     case 5:
         Mix_SetMidiPlayer(MIDI_EDMIDI);
         break;
-    default:
-        Mix_SetMidiPlayer(MIDI_ADLMIDI);
-        break;
     }
 #else
     Q_UNUSED(index);
 #endif
+
     updateAutoArgs();
+
     if(Mix_PlayingMusicStream(PGE_MusicPlayer::s_playMus) && (PGE_MusicPlayer::type == MUS_MID))
-    {
         emit songRestartNeeded();
-    }
 }
 
 void SetupMidi::on_midiRawArgs_editingFinished()

@@ -587,12 +587,12 @@ Uncheck this if you want to use default bank and keep custom bank field be fille
         </item>
         <item>
          <property name="text">
-          <string>Timidity (GUS-like wavetable MIDI Synth)</string>
+          <string>Native midi (Built-in MIDI of your OS)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Native midi (Built-in MIDI of your OS)</string>
+          <string>Timidity (GUS-like wavetable MIDI Synth)</string>
          </property>
         </item>
         <item>
