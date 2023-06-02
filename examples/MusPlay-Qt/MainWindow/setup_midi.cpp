@@ -741,7 +741,8 @@ void SetupMidi::on_midiRawArgs_editingFinished()
           (PGE_MusicPlayer::type == MUS_MID ||
            PGE_MusicPlayer::type == MUS_ADLMIDI ||
            PGE_MusicPlayer::type == MUS_GME ||
-           PGE_MusicPlayer::type == MUS_PXTONE))
+           PGE_MusicPlayer::type == MUS_PXTONE ||
+           PGE_MusicPlayer::type == MUS_OGG))
         {
             emit songRestartNeeded();
         }
