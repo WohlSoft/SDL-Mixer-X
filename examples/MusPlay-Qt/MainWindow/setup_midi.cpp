@@ -344,6 +344,7 @@ void SetupMidi::on_opn_bank_editingFinished()
         }
         ui->opn_bank->setModified(false);
     }
+    updateAutoArgs();
 #endif
 }
 
@@ -409,10 +410,10 @@ void SetupMidi::on_adl_bank_editingFinished()
             restartForAdl();
         }
         else
-        {
             Mix_ADLMIDI_setCustomBankFile(nullptr);
-        }
+
         ui->adl_bank->setModified(false);
+        updateAutoArgs();
     }
 #endif
 }
@@ -569,14 +570,11 @@ void SetupMidi::on_timidityCfgPath_editingFinished()
     {
         QString file = ui->timidityCfgPath->text();
         if(!file.isEmpty() && QFile::exists(file))
-        {
             Mix_SetTimidityCfg(file.toUtf8().data());
-        }
         else
-        {
             Mix_SetTimidityCfg(nullptr);
-        }
-        emit restartForTimidity();
+
+        restartForTimidity();
         ui->timidityCfgPath->setModified(false);
     }
 #endif
@@ -620,15 +618,13 @@ void SetupMidi::on_fluidSynthSF2Paths_editingFinished()
     {
         QString files = ui->fluidSynthSF2Paths->text();
         if(!files.isEmpty() && sfExists(files))
-        {
             Mix_SetSoundFonts(files.toUtf8().data());
-        }
         else
-        {
             Mix_SetSoundFonts(QString(qApp->applicationDirPath() + "/gm.sf2").toUtf8().data());
-        }
-        emit restartForFluidSynth();
+
+        restartForFluidSynth();
         ui->fluidSynthSF2Paths->setModified(false);
+        updateAutoArgs();
     }
 #endif
 }
@@ -654,7 +650,7 @@ void SetupMidi::on_resetDefaultADLMIDI_clicked()
     Mix_ADLMIDI_setChipsCount(ui->adlNumChips->value());
     m_setupLock = false;
     updateAutoArgs();
-    emit restartForAdl();
+    restartForAdl();
 #endif
 }
 
@@ -680,8 +676,10 @@ void SetupMidi::updateAutoArgs()
             args += QString("l%1;").arg(ui->adlVolumeModel->currentIndex());
         if(ui->adlChanAlloc->currentIndex() != 0)
             args += QString("o%1;").arg(ui->adlChanAlloc->currentIndex() - 1);
-        if(ui->adl_autoArpeggio->checkState() != Qt::Checked)
+        if(ui->adl_autoArpeggio->checkState() == Qt::Checked)
             args += QString("j%1;").arg(tristateToInt(ui->adl_autoArpeggio->checkState()));
+        if(ui->adl_use_custom->checkState() == Qt::Checked && !ui->adl_bank->text().isEmpty())
+            args += QString("x=%1;").arg(ui->adl_bank->text());
         break;
     case 1:
         break;
@@ -692,12 +690,16 @@ void SetupMidi::updateAutoArgs()
             args += QString("l%1;").arg(ui->opnVolumeModel->currentIndex());
         if(ui->opnNumChips->value() != 8)
             args += QString("c%1;").arg(ui->opnNumChips->value());
-        if(ui->opn_autoArpeggio->checkState() != Qt::Checked)
+        if(ui->opn_autoArpeggio->checkState() == Qt::Checked)
             args += QString("j%1;").arg(tristateToInt(ui->opn_autoArpeggio->checkState()));
         if(ui->opnChanAlloc->currentIndex() != 0)
             args += QString("o%1;").arg(ui->opnChanAlloc->currentIndex() - 1);
+        if(ui->opn_use_custom->checkState() == Qt::Checked && !ui->opn_bank->text().isEmpty())
+            args += QString("x=%1;").arg(ui->opn_bank->text());
         break;
     case 4:
+        if(!ui->fluidSynthSF2Paths->text().isEmpty())
+            args += QString("x=%1;").arg(ui->fluidSynthSF2Paths->text());
         break;
     case 5:
         break;
