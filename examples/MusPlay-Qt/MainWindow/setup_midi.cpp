@@ -89,6 +89,8 @@ void SetupMidi::loadSetup()
 
     sendSetup();
 #endif
+
+    updateWindowLayout();
 }
 
 void SetupMidi::saveSetup()
@@ -363,6 +365,16 @@ void SetupMidi::on_adl_use_custom_clicked(bool checked)
     on_adl_bank_editingFinished();
     if(!checked)
         restartForAdl();
+}
+
+void SetupMidi::updateWindowLayout()
+{
+    ui->adlmidi_extra->setVisible(ui->mididevice->currentIndex() == MIDI_ADLMIDI);
+    ui->opnmidi_extra->setVisible(ui->mididevice->currentIndex() == MIDI_OPNMIDI);
+    ui->timidity_extra->setVisible(ui->mididevice->currentIndex() == MIDI_Timidity);
+    ui->fluidsynth_extra->setVisible(ui->mididevice->currentIndex() == MIDI_Fluidsynth);
+    adjustSize();
+    update();
 }
 
 void SetupMidi::on_adl_bank_browse_clicked()
@@ -697,6 +709,7 @@ void SetupMidi::on_mididevice_currentIndexChanged(int index)
 {
     if(m_setupLock)
         return;
+
 #ifdef SDL_MIXER_GE21
     switch(index)
     {
@@ -725,6 +738,7 @@ void SetupMidi::on_mididevice_currentIndexChanged(int index)
 #endif
 
     updateAutoArgs();
+    updateWindowLayout();
 
     if(Mix_PlayingMusicStream(PGE_MusicPlayer::s_playMus) && (PGE_MusicPlayer::type == MUS_MID))
         emit songRestartNeeded();
