@@ -25,7 +25,7 @@
 #include "./pxtone/pxtnService.h"
 #include "./pxtone/pxtnError.h"
 
-/* Global flags which are applying on initializing of GME player with a file */
+/* Global flags which are applying on initializing of PXTone player with a file */
 typedef struct {
     double tempo;
     float gain;
