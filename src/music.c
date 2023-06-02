@@ -638,11 +638,12 @@ static Mix_MusicInterface *s_music_interfaces[] =
 #ifdef MUSIC_GME
     &Mix_MusicInterface_GME,
 #endif
+    NULL
 };
 
 int get_num_music_interfaces(void)
 {
-    return SDL_arraysize(s_music_interfaces);
+    return SDL_arraysize(s_music_interfaces) - 1;
 }
 
 Mix_MusicInterface *get_music_interface(int index)
@@ -974,9 +975,9 @@ void pause_async_music(int pause_on)
 /* Load the music interface libraries for a given music type */
 SDL_bool load_music_type(Mix_MusicType type)
 {
-    size_t i;
+    int i;
     int loaded = 0;
-    for (i = 0; i < SDL_arraysize(s_music_interfaces); ++i) {
+    for (i = 0; i < get_num_music_interfaces(); ++i) {
         Mix_MusicInterface *interface = s_music_interfaces[i];
         if (interface->type != type) {
             continue;
@@ -1118,7 +1119,7 @@ SDL_bool open_music_type(Mix_MusicType type)
 /* Open the music interfaces for a given music type, also select a MIDI library */
 SDL_bool open_music_type_ex(Mix_MusicType type, int midi_player)
 {
-    size_t i;
+    int i;
     int opened = 0;
     SDL_bool use_any_midi = SDL_FALSE;
     Mix_MusicAPI target_midi_api = MIX_MUSIC_NATIVEMIDI;
@@ -1135,7 +1136,7 @@ SDL_bool open_music_type_ex(Mix_MusicType type, int midi_player)
         }
     }
 
-    for (i = 0; i < SDL_arraysize(s_music_interfaces); ++i) {
+    for (i = 0; i < get_num_music_interfaces(); ++i) {
         Mix_MusicInterface *interface = s_music_interfaces[i];
         if (!interface->loaded) {
             continue;
@@ -1219,8 +1220,8 @@ void open_music(const SDL_AudioSpec *spec)
 /* Return SDL_TRUE if the music type is available */
 SDL_bool has_music(Mix_MusicType type)
 {
-    size_t i;
-    for (i = 0; i < SDL_arraysize(s_music_interfaces); ++i) {
+    int i;
+    for (i = 0; i < get_num_music_interfaces(); ++i) {
         Mix_MusicInterface *interface = s_music_interfaces[i];
         if (interface->type != type) {
             continue;
@@ -1752,7 +1753,7 @@ static int split_path_and_params(const char *path, char **file, char **args)
 /* Load a music file */
 Mix_Music * MIXCALLCC Mix_LoadMUS(const char *file)
 {
-    size_t i;
+    int i;
     void *context;
     char *ext;
     Mix_MusicType type;
@@ -1776,7 +1777,7 @@ Mix_Music * MIXCALLCC Mix_LoadMUS(const char *file)
     file = music_file;
     /* ========== Path arguments END ====== */
 
-    for (i = 0; i < SDL_arraysize(s_music_interfaces); ++i) {
+    for (i = 0; i < get_num_music_interfaces(); ++i) {
         Mix_MusicInterface *interface = s_music_interfaces[i];
         if (!interface->opened || (!interface->CreateFromFile && !interface->CreateFromFileEx)) {
             continue;
@@ -1900,7 +1901,7 @@ Mix_Music * MIXCALLCC Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int
 
 Mix_Music * MIXCALLCC Mix_LoadMUSType_RW_ARG(SDL_RWops *src, Mix_MusicType type, int freesrc, const char *args)
 {
-    size_t i;
+    int i;
     void *context;
     Sint64 start;
     int midi_player = midiplayer_current;
@@ -1939,7 +1940,7 @@ Mix_Music * MIXCALLCC Mix_LoadMUSType_RW_ARG(SDL_RWops *src, Mix_MusicType type,
         if (midi_player == MIDI_ANY) {
             use_any_midi = SDL_TRUE;
         }
-        for (i = 0; i < SDL_arraysize(s_music_interfaces); ++i) {
+        for (i = 0; i < get_num_music_interfaces(); ++i) {
             Mix_MusicInterface *interface = s_music_interfaces[i];
             if (!interface->opened || type != interface->type ||
                 (!interface->CreateFromRW && !interface->CreateFromRWex)) {
@@ -3234,12 +3235,12 @@ int MIXCALLCC Mix_GetSynchroValue(void)
 /* Uninitialize the music interfaces */
 void close_music(void)
 {
-    size_t i;
+    int i;
 
     Mix_HaltMusicStream(music_playing);
     _Mix_MultiMusic_HaltAll();
 
-    for (i = 0; i < SDL_arraysize(s_music_interfaces); ++i) {
+    for (i = 0; i < get_num_music_interfaces(); ++i) {
         Mix_MusicInterface *interface = s_music_interfaces[i];
         if (!interface || !interface->opened) {
             continue;
@@ -3269,11 +3270,11 @@ void close_music(void)
 /* Unload the music interface libraries */
 void unload_music(void)
 {
-    size_t i;
+    int i;
 
     _Mix_MultiMusic_CloseAndFree();
 
-    for (i = 0; i < SDL_arraysize(s_music_interfaces); ++i) {
+    for (i = 0; i < get_num_music_interfaces(); ++i) {
         Mix_MusicInterface *interface = s_music_interfaces[i];
         if (!interface || !interface->loaded) {
             continue;
