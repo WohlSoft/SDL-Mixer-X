@@ -527,6 +527,9 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
     }
 
     if (setup.emulator >= 0) {
+        if(setup.emulator >= OPNMIDI_VGM_DUMPER) {
+            setup.emulator++; /* Always skip the VGM Dumper */
+        }
         OPNMIDI.opn2_switchEmulator(music->opnmidi, setup.emulator);
     }
     OPNMIDI.opn2_setVolumeRangeModel(music->opnmidi, setup.volume_model);
