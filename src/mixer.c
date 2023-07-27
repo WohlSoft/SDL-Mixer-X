@@ -901,7 +901,19 @@ Mix_Chunk * MIXCALLCC Mix_LoadWAV_RW(SDL_RWops *src, int freesrc)
             return(NULL);
         }
 
-        chunk->abuf = wavecvt.buf;
+        /* Shrink buffer if appropriate, otherwise reuse directly */
+        if (wavecvt.len_cvt != wavecvt.len) {
+            chunk->abuf = (Uint8 *)SDL_realloc(wavecvt.buf, wavecvt.len_cvt);
+
+            /* Reuse buffer directly on realloc failure */
+            if(!chunk->abuf) {
+                chunk->abuf = wavecvt.buf;
+            }
+        }
+        else {
+            chunk->abuf = wavecvt.buf;
+        }
+
         chunk->alen = wavecvt.len_cvt;
     }
 
