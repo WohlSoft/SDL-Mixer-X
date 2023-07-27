@@ -102,6 +102,12 @@
 
 #include "./pxtnPulse_Oggv.h"
 
+#if defined(__3DS__)
+typedef int pxogg_int32_t;
+#else
+typedef int32_t pxogg_int32_t;
+#endif
+
 #if !defined(pxINCLUDE_OGGVORBIS_STB)
 typedef struct
 {
@@ -137,9 +143,9 @@ static size_t _mread( void *p, size_t size, size_t nmemb, void* p_void )
 	return nmemb;
 }
 
-static int _mseek( void* p_void, ogg_int64_t offset, int mode )
+static pxogg_int32_t _mseek( void* p_void, ogg_int64_t offset, pxogg_int32_t mode )
 {
-	int newpos;
+	pxogg_int32_t newpos;
 	OVMEM *pom = (OVMEM*)p_void;
 
 	if( !pom || pom->pos < 0 )       return -1;
@@ -147,9 +153,9 @@ static int _mseek( void* p_void, ogg_int64_t offset, int mode )
 
 	switch( mode )
 	{
-	case SEEK_SET: newpos =             (int)offset; break;
-	case SEEK_CUR: newpos = pom->pos  + (int)offset; break;
-	case SEEK_END: newpos = pom->size + (int)offset; break;
+	case SEEK_SET: newpos =             (pxogg_int32_t)offset; break;
+	case SEEK_CUR: newpos = pom->pos  + (pxogg_int32_t)offset; break;
+	case SEEK_END: newpos = pom->size + (pxogg_int32_t)offset; break;
 	default: return -1;
 	}
 	if( newpos < 0 ) return -1;
@@ -166,7 +172,7 @@ static long _mtell( void* p_void )
 	return pom->pos;
 }
 
-static int _mclose_dummy( void* p_void )
+static pxogg_int32_t _mclose_dummy( void* p_void )
 {
 	OVMEM* pom = (OVMEM*)p_void;
 	if( !pom ) return -1;
@@ -305,7 +311,7 @@ pxtnERR pxtnPulse_Oggv::Decode( pxtnPulse_PCM * p_pcm ) const
 	vorbis_info*   vi;
 	ov_callbacks   oc;
 
-	int current_section;
+	pxogg_int32_t current_section;
 	char    pcmout[ 4096 ] = {0};
 
 	OVMEM ovmem;
