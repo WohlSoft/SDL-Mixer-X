@@ -909,8 +909,7 @@ Mix_Chunk * MIXCALLCC Mix_LoadWAV_RW(SDL_RWops *src, int freesrc)
             if(!chunk->abuf) {
                 chunk->abuf = wavecvt.buf;
             }
-        }
-        else {
+        } else {
             chunk->abuf = wavecvt.buf;
         }
 
