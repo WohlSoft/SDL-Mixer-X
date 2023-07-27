@@ -137,9 +137,9 @@ static size_t _mread( void *p, size_t size, size_t nmemb, void* p_void )
 	return nmemb;
 }
 
-static int32_t _mseek( void* p_void, ogg_int64_t offset, int32_t mode )
+static int _mseek( void* p_void, ogg_int64_t offset, int mode )
 {
-	int32_t newpos;
+	int newpos;
 	OVMEM *pom = (OVMEM*)p_void;
 
 	if( !pom || pom->pos < 0 )       return -1;
@@ -147,9 +147,9 @@ static int32_t _mseek( void* p_void, ogg_int64_t offset, int32_t mode )
 
 	switch( mode )
 	{
-	case SEEK_SET: newpos =             (int32_t)offset; break;
-	case SEEK_CUR: newpos = pom->pos  + (int32_t)offset; break;
-	case SEEK_END: newpos = pom->size + (int32_t)offset; break;
+	case SEEK_SET: newpos =             (int)offset; break;
+	case SEEK_CUR: newpos = pom->pos  + (int)offset; break;
+	case SEEK_END: newpos = pom->size + (int)offset; break;
 	default: return -1;
 	}
 	if( newpos < 0 ) return -1;
@@ -166,7 +166,7 @@ static long _mtell( void* p_void )
 	return pom->pos;
 }
 
-static int32_t _mclose_dummy( void* p_void )
+static int _mclose_dummy( void* p_void )
 {
 	OVMEM* pom = (OVMEM*)p_void;
 	if( !pom ) return -1;
@@ -305,7 +305,7 @@ pxtnERR pxtnPulse_Oggv::Decode( pxtnPulse_PCM * p_pcm ) const
 	vorbis_info*   vi;
 	ov_callbacks   oc;
 
-	int32_t current_section;
+	int current_section;
 	char    pcmout[ 4096 ] = {0};
 
 	OVMEM ovmem;
