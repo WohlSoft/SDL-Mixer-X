@@ -25,7 +25,6 @@
 
 #include "music_wav.h"
 #include "mp3utils.h"
-#include "SDL_assert.h"
 
 typedef struct ADPCM_DecoderState
 {
@@ -567,7 +566,7 @@ static int MS_ADPCM_Init(ADPCM_DecoderState *state, const Uint8 *chunk_data, Uin
 
     state->output.read = 0;
     state->output.pos = 0;
-    state->output.size = state->samplesperblock;
+    state->output.size = state->samplesperblock * state->channels;
     state->output.data = (Sint16 *)SDL_malloc(state->output.size * sizeof(Sint16));
     if (!state->output.data) {
         return Mix_OutOfMemory();
@@ -705,7 +704,6 @@ static int MS_ADPCM_DecodeBlockData(ADPCM_DecoderState *state)
             sample2 = state->output.data[outpos - channels * 2];
 
             sample1 = MS_ADPCM_ProcessNibble(cstate + c, sample1, sample2, (nybble >> 4) & 0x0f);
-            SDL_assert(outpos < state->output.size);
             state->output.data[outpos++] = sample1;
         }
 
@@ -798,7 +796,7 @@ static int IMA_ADPCM_Init(ADPCM_DecoderState *state, const Uint8 *chunk_data, Ui
 
     state->output.read = 0;
     state->output.pos = 0;
-    state->output.size = state->samplesperblock;
+    state->output.size = state->samplesperblock * state->channels;
     state->output.data = (Sint16 *)SDL_malloc(state->output.size * sizeof(Sint16));
     if (!state->output.data) {
         return Mix_OutOfMemory();
