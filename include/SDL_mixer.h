@@ -263,11 +263,7 @@ extern DECLSPEC void MIXCALL Mix_Quit(void);
 
 /* Good default values for a PC soundcard */
 #define MIX_DEFAULT_FREQUENCY   44100
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN
-#define MIX_DEFAULT_FORMAT  AUDIO_S16LSB
-#else
-#define MIX_DEFAULT_FORMAT  AUDIO_S16MSB
-#endif
+#define MIX_DEFAULT_FORMAT  AUDIO_S16SYS
 #define MIX_DEFAULT_CHANNELS    2
 #define MIX_MAX_VOLUME          SDL_MIX_MAXVOLUME /* Volume of a chunk */
 
@@ -3901,6 +3897,7 @@ extern DECLSPEC int  MIXCALL Mix_SetMidiDevice(int player);/*MixerX*/
 #ifdef __cplusplus
 }
 #endif
+
 #include "close_code.h"
 
 #endif /* SDL_MIXER_H_ */
