@@ -1460,8 +1460,8 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
     size_t readlen = 0;
 
     SDL_memset(magic, 0, 100);
-    if (SDL_RWread(src, magic, 1, 99) != 99) {
-        Mix_SetError("Couldn't read first 24 bytes of audio data");
+    if (SDL_RWread(src, magic, 1, 99) < 24) {
+        Mix_SetError("Couldn't read any first 24 bytes of audio data");
         return MUS_NONE;
     }
     SDL_RWseek(src, start, RW_SEEK_SET);
