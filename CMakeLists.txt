@@ -185,6 +185,14 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER_ID ST
     endif()
 endif()
 
+if(MSVC)
+    check_c_compiler_flag("/utf-8" HAVE_CL_UTF8_FLAG)
+    if(HAVE_CL_UTF8_FLAG)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /utf-8")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8")
+    endif()
+endif()
+
 set(SDL_MIXER_DEFINITIONS)
 set(SDL_MIXER_INCLUDE_PATHS)
 
