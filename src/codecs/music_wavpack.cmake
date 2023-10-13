@@ -1,6 +1,7 @@
 option(USE_WAVPACK      "Build with WAVPACK codec" ON)
 if(USE_WAVPACK)
     option(USE_WAVPACK_DYNAMIC "Use dynamical loading of WAVPACK" OFF)
+    option(USE_WAVPACK_DSD "Enable WavPack DSD music support" OFF)
 
     if(USE_SYSTEM_AUDIO_LIBRARIES)
         find_package(WavPack QUIET)
@@ -40,6 +41,9 @@ if(USE_WAVPACK)
             set_source_files_properties("${CMAKE_CURRENT_LIST_DIR}/music_wavpack.c"
                 COMPILE_FLAGS ${FLAG_C99}
             )
+        endif()
+        if(USE_WAVPACK_DSD)
+            list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_WAVPACK_DSD)
         endif()
         appendPcmFormats("WV")
     else()

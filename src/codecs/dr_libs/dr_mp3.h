@@ -1,6 +1,6 @@
 /*
 MP3 audio decoder. Choice of public domain or MIT-0. See license statements at the end of this file.
-dr_mp3 - v0.6.34 - 2022-09-17
+dr_mp3 - v0.6.36 - 2023-06-17
 
 David Reid - mackron@gmail.com
 
@@ -95,7 +95,7 @@ extern "C" {
 
 #define DRMP3_VERSION_MAJOR     0
 #define DRMP3_VERSION_MINOR     6
-#define DRMP3_VERSION_REVISION  34
+#define DRMP3_VERSION_REVISION  36
 #define DRMP3_VERSION_STRING    DRMP3_XSTRINGIFY(DRMP3_VERSION_MAJOR) "." DRMP3_XSTRINGIFY(DRMP3_VERSION_MINOR) "." DRMP3_XSTRINGIFY(DRMP3_VERSION_REVISION)
 
 #include <stddef.h> /* For size_t. */
@@ -133,6 +133,8 @@ typedef drmp3_uint8             drmp3_bool8;
 typedef drmp3_uint32            drmp3_bool32;
 #define DRMP3_TRUE              1
 #define DRMP3_FALSE             0
+/* End Sized Types */
+
 
 #if !defined(DRMP3_API)
     #if defined(DRMP3_DLL)
@@ -164,6 +166,8 @@ typedef drmp3_uint32            drmp3_bool32;
     #endif
 #endif
 
+
+/* Result Codes */
 typedef drmp3_int32 drmp3_result;
 #define DRMP3_SUCCESS                        0
 #define DRMP3_ERROR                         -1   /* A generic error. */
@@ -224,6 +228,7 @@ typedef drmp3_int32 drmp3_result;
 #define DRMP3_MAX_PCM_FRAMES_PER_MP3_FRAME  1152
 #define DRMP3_MAX_SAMPLES_PER_FRAME         (DRMP3_MAX_PCM_FRAMES_PER_MP3_FRAME*2)
 
+/* Inline */
 #ifdef _MSC_VER
     #define DRMP3_INLINE __forceinline
 #elif defined(__GNUC__)
@@ -252,8 +257,20 @@ typedef drmp3_int32 drmp3_result;
 #endif
 
 
+
 DRMP3_API void drmp3_version(drmp3_uint32* pMajor, drmp3_uint32* pMinor, drmp3_uint32* pRevision);
 DRMP3_API const char* drmp3_version_string(void);
+
+
+/* Allocation Callbacks */
+typedef struct
+{
+    void* pUserData;
+    void* (* onMalloc)(size_t sz, void* pUserData);
+    void* (* onRealloc)(void* p, size_t sz, void* pUserData);
+    void  (* onFree)(void* p, void* pUserData);
+} drmp3_allocation_callbacks;
+/* End Allocation Callbacks */
 
 
 /*
@@ -328,14 +345,6 @@ Whether or not it is relative to the beginning or current position is determined
 will be either drmp3_seek_origin_start or drmp3_seek_origin_current.
 */
 typedef drmp3_bool32 (* drmp3_seek_proc)(void* pUserData, int offset, drmp3_seek_origin origin);
-
-typedef struct
-{
-    void* pUserData;
-    void* (* onMalloc)(size_t sz, void* pUserData);
-    void* (* onRealloc)(void* p, size_t sz, void* pUserData);
-    void  (* onFree)(void* p, void* pUserData);
-} drmp3_allocation_callbacks;
 
 typedef struct
 {
@@ -2415,6 +2424,7 @@ DRMP3_API void drmp3dec_f32_to_s16(const float *in, drmp3_int16 *out, size_t num
  Main Public API
 
  ************************************************************************************************************************************************************/
+/* SIZE_MAX */
 #if defined(SIZE_MAX)
     #define DRMP3_SIZE_MAX  SIZE_MAX
 #else
@@ -2425,6 +2435,7 @@ DRMP3_API void drmp3dec_f32_to_s16(const float *in, drmp3_int16 *out, size_t num
     #endif
 #endif
 
+/* Options. */
 /* Options. */
 #ifndef DRMP3_SEEK_LEADING_MP3_FRAMES
 #define DRMP3_SEEK_LEADING_MP3_FRAMES   2
@@ -2932,6 +2943,7 @@ DRMP3_API drmp3_bool32 drmp3_init_memory(drmp3* pMP3, const void* pData, size_t 
 #include <wchar.h>      /* For wcslen(), wcsrtombs() */
 
 /* drmp3_result_from_errno() is only used inside DR_MP3_NO_STDIO for now. Move this out if it's ever used elsewhere. */
+/* drmp3_result_from_errno() is only used inside DR_MP3_NO_STDIO for now. Move this out if it's ever used elsewhere. */
 #include <errno.h>
 static drmp3_result drmp3_result_from_errno(int e)
 {
@@ -3335,6 +3347,8 @@ static drmp3_result drmp3_result_from_errno(int e)
     }
 }
 
+
+/* fopen */
 static drmp3_result drmp3_fopen(FILE** ppFile, const char* pFilePath, const char* pOpenMode)
 {
 #if defined(_MSC_VER) && _MSC_VER >= 1400
@@ -4476,6 +4490,12 @@ counts rather than sample counts.
 /*
 REVISION HISTORY
 ================
+v0.6.36 - 2023-06-17
+  - Fix an incorrect date in revision history. No functional change.
+
+v0.6.35 - 2023-05-22
+  - Minor code restructure. No functional change.
+
 v0.6.34 - 2022-09-17
   - Fix compilation with DJGPP.
   - Fix compilation when compiling with x86 with no SSE2.
@@ -4777,7 +4797,7 @@ For more information, please refer to <http://unlicense.org/>
 ===============================================================================
 ALTERNATIVE 2 - MIT No Attribution
 ===============================================================================
-Copyright 2020 David Reid
+Copyright 2023 David Reid
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
