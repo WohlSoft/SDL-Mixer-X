@@ -2,6 +2,12 @@ option(USE_XMP         "Build with XMP library (LGPL)" ON)
 if(USE_XMP)
     option(USE_XMP_DYNAMIC "Use dynamical loading of XMP library" OFF)
     option(USE_XMP_LITE "Use the lite version of XMP library" OFF)
+    if(VITA OR NINTENDO_DS OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_SWITCH)
+        set(USE_XMP_MEMORY_ONLY_DEFAULT ON)
+    else()
+        set(USE_XMP_MEMORY_ONLY_DEFAULT OFF)
+    endif()
+    option(USE_XMP_MEMORY_ONLY "Force the memory-based file loading method (preferred for low-end hardware)" ${USE_XMP_MEMORY_ONLY_DEFAULT})
 
     if(NOT MIXERX_LGPL AND NOT MIXERX_GPL)
         set(USE_XMP_LITE_ENFORCE TRUE)
@@ -62,15 +68,23 @@ if(USE_XMP)
                 setLicense(LICENSE_LGPL_2_1p)
             endif()
         endif()
+
         list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_MOD_XMP)
         list(APPEND SDL_MIXER_INCLUDE_PATHS ${XMP_INCLUDE_DIRS})
+
         if(NOT USE_SYSTEM_AUDIO_LIBRARIES OR NOT USE_XMP_DYNAMIC)
             list(APPEND SDLMixerX_LINK_LIBS ${XMP_LIBRARIES})
         endif()
+
         list(APPEND SDLMixerX_SOURCES
             ${CMAKE_CURRENT_LIST_DIR}/music_xmp.c
             ${CMAKE_CURRENT_LIST_DIR}/music_xmp.h
         )
+
+        if(USE_XMP_MEMORY_ONLY)
+            list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_XMP_MEMORY_ONLY)
+        endif()
+
         if(USE_XMP_LITE OR USE_XMP_LITE_ENFORCE)
             appendTrackerFormats("MOD;XM;S3M;IT")
         else()

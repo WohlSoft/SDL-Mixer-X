@@ -51,7 +51,9 @@ typedef struct {
 
     xmp_context (*xmp_create_context)(void);
     int (*xmp_load_module_from_memory)(xmp_context, LIBXMP_CONST void *, long);
+#ifndef MUSIC_XMP_MEMORY_ONLY
     int (*xmp_load_module_from_callbacks)(xmp_context, void *, struct xmp_callbacks);
+#endif
     int (*xmp_start_player)(xmp_context, int, int);
     void (*xmp_end_player)(xmp_context);
     void (*xmp_get_module_info)(xmp_context, struct xmp_module_info *);
@@ -104,10 +106,14 @@ static int XMP_Load(void)
         FUNCTION_LOADER(xmp_release_module, void(*)(xmp_context))
         FUNCTION_LOADER(xmp_free_context, void(*)(xmp_context))
 #if (XMP_VERCODE >= 0x040500) || defined(XMP_DYNAMIC)
+#   ifndef MUSIC_XMP_MEMORY_ONLY
         FUNCTION_LOADER_OPTIONAL(xmp_load_module_from_callbacks, int (*)(xmp_context,void*,struct xmp_callbacks));
+#   endif
         FUNCTION_LOADER_OPTIONAL(xmp_set_tempo_factor, int(*)(xmp_context, double))
 #else
+#   ifndef MUSIC_XMP_MEMORY_ONLY
         libxmp.xmp_load_module_from_callbacks = NULL;
+#   endif
         libxmp.xmp_set_tempo_factor = NULL;
 #endif
         FUNCTION_LOADER(xmp_channel_mute, int(*)(xmp_context, int, int))
@@ -182,6 +188,7 @@ static void libxmp_set_error(int e)
     Mix_SetError("XMP: %s", msg);
 }
 
+#ifndef MUSIC_XMP_MEMORY_ONLY
 static unsigned long xmp_fread(void *dst, unsigned long len, unsigned long nmemb, void *src) {
     return SDL_RWread((SDL_RWops*)src, dst, len, nmemb);
 }
@@ -191,14 +198,17 @@ static int xmp_fseek(void *src, long offset, int whence) {
 static long xmp_ftell(void *src) {
     return SDL_RWtell((SDL_RWops*)src);
 }
+#endif
 
 /* Load a libxmp stream from an SDL_RWops object */
 void *XMP_CreateFromRW(SDL_RWops *src, int freesrc)
 {
     XMP_Music *music;
+#ifndef MUSIC_XMP_MEMORY_ONLY
     struct xmp_callbacks file_callbacks = {
            xmp_fread, xmp_fseek, xmp_ftell, NULL
     };
+#endif
     int err = 0;
 
     music = (XMP_Music *)SDL_calloc(1, sizeof(*music));
@@ -220,9 +230,13 @@ void *XMP_CreateFromRW(SDL_RWops *src, int freesrc)
         goto e1;
     }
 
+#ifndef MUSIC_XMP_MEMORY_ONLY
     if (libxmp.xmp_load_module_from_callbacks) {
         err = libxmp.xmp_load_module_from_callbacks(music->ctx, src, file_callbacks);
     } else {
+#else
+    {
+#endif
         size_t size;
         void *mem = SDL_LoadFile_RW(src, &size, SDL_FALSE);
         if (!mem) {
