@@ -146,24 +146,27 @@ static void SDLCALL _Eff_position_u8(int chan, void *stream, int len, void *udat
         len--;
     }
 
-    if (((position_args *)udata)->room_angle == 180)
-    for (i = 0; i < len; i += sizeof (Uint8) * 2) {
-        /* must adjust the sample so that 0 is the center */
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * right_f) * dist_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * left_f) * dist_f) + 128);
-        ptr++;
+    if (((position_args *)udata)->room_angle == 180) {
+        for (i = 0; i < len; i += sizeof (Uint8) * 2) {
+            /* must adjust the sample so that 0 is the center */
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * right_f) * dist_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * left_f) * dist_f) + 128);
+            ptr++;
+        }
     }
-    else for (i = 0; i < len; i += sizeof (Uint8) * 2) {
-        /* must adjust the sample so that 0 is the center */
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * left_f) * dist_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * right_f) * dist_f) + 128);
-        ptr++;
+    else {
+        for (i = 0; i < len; i += sizeof (Uint8) * 2) {
+            /* must adjust the sample so that 0 is the center */
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * left_f) * dist_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * right_f) * dist_f) + 128);
+            ptr++;
+        }
     }
 }
 
@@ -186,69 +189,73 @@ static void SDLCALL _Eff_position_u8_c4(int chan, void *stream, int len, void *u
         len--;
     }
 
-    if (args->room_angle == 0)
-    for (i = 0; i < len; i += sizeof (Uint8) * 4) {
-        /* must adjust the sample so that 0 is the center */
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->left_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->right_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->left_rear_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->right_rear_f) * args->distance_f) + 128);
-        ptr++;
+    if (args->room_angle == 0) {
+        for (i = 0; i < len; i += sizeof (Uint8) * 4) {
+            /* must adjust the sample so that 0 is the center */
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->left_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->right_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->left_rear_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->right_rear_f) * args->distance_f) + 128);
+            ptr++;
+        }
     }
-    else if (args->room_angle == 90)
-    for (i = 0; i < len; i += sizeof (Uint8) * 4) {
-        /* must adjust the sample so that 0 is the center */
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->right_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->right_rear_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->left_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->left_rear_f) * args->distance_f) + 128);
-        ptr++;
+    else if (args->room_angle == 90) {
+        for (i = 0; i < len; i += sizeof (Uint8) * 4) {
+            /* must adjust the sample so that 0 is the center */
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->right_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->right_rear_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->left_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->left_rear_f) * args->distance_f) + 128);
+            ptr++;
+        }
     }
-    else if (args->room_angle == 180)
-    for (i = 0; i < len; i += sizeof (Uint8) * 4) {
-        /* must adjust the sample so that 0 is the center */
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->right_rear_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->left_rear_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->right_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->left_f) * args->distance_f) + 128);
-        ptr++;
+    else if (args->room_angle == 180) {
+        for (i = 0; i < len; i += sizeof (Uint8) * 4) {
+            /* must adjust the sample so that 0 is the center */
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->right_rear_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->left_rear_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->right_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->left_f) * args->distance_f) + 128);
+            ptr++;
+        }
     }
-    else if (args->room_angle == 270)
-    for (i = 0; i < len; i += sizeof (Uint8) * 4) {
-        /* must adjust the sample so that 0 is the center */
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->left_rear_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->left_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->right_rear_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->right_f) * args->distance_f) + 128);
-        ptr++;
+    else if (args->room_angle == 270) {
+        for (i = 0; i < len; i += sizeof (Uint8) * 4) {
+            /* must adjust the sample so that 0 is the center */
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->left_rear_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->left_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->right_rear_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->right_f) * args->distance_f) + 128);
+            ptr++;
+        }
     }
 }
 
@@ -272,99 +279,103 @@ static void SDLCALL _Eff_position_u8_c6(int chan, void *stream, int len, void *u
         len--;
     }
 
-    if (args->room_angle == 0)
-    for (i = 0; i < len; i += sizeof (Uint8) * 6) {
-        /* must adjust the sample so that 0 is the center */
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->left_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->right_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->left_rear_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->right_rear_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->center_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->lfe_f) * args->distance_f) + 128);
-        ptr++;
+    if (args->room_angle == 0) {
+        for (i = 0; i < len; i += sizeof (Uint8) * 6) {
+            /* must adjust the sample so that 0 is the center */
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->left_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->right_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->left_rear_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->right_rear_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->center_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->lfe_f) * args->distance_f) + 128);
+            ptr++;
+        }
     }
-    else if (args->room_angle == 90)
-    for (i = 0; i < len; i += sizeof (Uint8) * 6) {
-        /* must adjust the sample so that 0 is the center */
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->right_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->right_rear_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->left_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->left_rear_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->right_rear_f) * args->distance_f/2) + 128)
-            + (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->right_f) * args->distance_f/2) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->lfe_f) * args->distance_f) + 128);
-        ptr++;
+    else if (args->room_angle == 90) {
+        for (i = 0; i < len; i += sizeof (Uint8) * 6) {
+            /* must adjust the sample so that 0 is the center */
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->right_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->right_rear_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->left_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->left_rear_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->right_rear_f) * args->distance_f/2) + 128)
+                + (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->right_f) * args->distance_f/2) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->lfe_f) * args->distance_f) + 128);
+            ptr++;
+        }
     }
-    else if (args->room_angle == 180)
-    for (i = 0; i < len; i += sizeof (Uint8) * 6) {
-        /* must adjust the sample so that 0 is the center */
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->right_rear_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->left_rear_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->right_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->left_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->right_rear_f) * args->distance_f/2) + 128)
-            + (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->left_rear_f) * args->distance_f/2) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->lfe_f) * args->distance_f) + 128);
-        ptr++;
+    else if (args->room_angle == 180) {
+        for (i = 0; i < len; i += sizeof (Uint8) * 6) {
+            /* must adjust the sample so that 0 is the center */
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->right_rear_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->left_rear_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->right_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->left_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->right_rear_f) * args->distance_f/2) + 128)
+                + (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->left_rear_f) * args->distance_f/2) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->lfe_f) * args->distance_f) + 128);
+            ptr++;
+        }
     }
-    else if (args->room_angle == 270)
-    for (i = 0; i < len; i += sizeof (Uint8) * 6) {
-        /* must adjust the sample so that 0 is the center */
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->left_rear_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->left_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->right_rear_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->right_f) * args->distance_f) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->left_f) * args->distance_f/2) + 128)
-            + (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->left_rear_f) * args->distance_f/2) + 128);
-        ptr++;
-        *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
-            * args->lfe_f) * args->distance_f) + 128);
-        ptr++;
+    else if (args->room_angle == 270) {
+        for (i = 0; i < len; i += sizeof (Uint8) * 6) {
+            /* must adjust the sample so that 0 is the center */
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->left_rear_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->left_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->right_rear_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->right_f) * args->distance_f) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->left_f) * args->distance_f/2) + 128)
+                + (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->left_rear_f) * args->distance_f/2) + 128);
+            ptr++;
+            *ptr = (Uint8) ((Sint8) ((((float) (Sint8) (*ptr - 128))
+                * args->lfe_f) * args->distance_f) + 128);
+            ptr++;
+        }
     }
 }
 
@@ -449,19 +460,21 @@ static void SDLCALL _Eff_position_s8(int chan, void *stream, int len, void *udat
         len--;
     }
 
-    if (((position_args *)udata)->room_angle == 180)
-    for (i = 0; i < len; i += sizeof (Sint8) * 2) {
-        *ptr = (Sint8)((((float) *ptr) * right_f) * dist_f);
-        ptr++;
-        *ptr = (Sint8)((((float) *ptr) * left_f) * dist_f);
-        ptr++;
+    if (((position_args *)udata)->room_angle == 180) {
+        for (i = 0; i < len; i += sizeof (Sint8) * 2) {
+            *ptr = (Sint8)((((float) *ptr) * right_f) * dist_f);
+            ptr++;
+            *ptr = (Sint8)((((float) *ptr) * left_f) * dist_f);
+            ptr++;
+        }
     }
-    else
-    for (i = 0; i < len; i += sizeof (Sint8) * 2) {
-        *ptr = (Sint8)((((float) *ptr) * left_f) * dist_f);
-        ptr++;
-        *ptr = (Sint8)((((float) *ptr) * right_f) * dist_f);
-        ptr++;
+    else {
+        for (i = 0; i < len; i += sizeof (Sint8) * 2) {
+            *ptr = (Sint8)((((float) *ptr) * left_f) * dist_f);
+            ptr++;
+            *ptr = (Sint8)((((float) *ptr) * right_f) * dist_f);
+            ptr++;
+        }
     }
 }
 static void SDLCALL _Eff_position_s8_c4(int chan, void *stream, int len, void *udata)
@@ -2337,8 +2350,7 @@ int MIXCALLCC Mix_SetPosition(int channel, Sint16 angle, Uint8 distance)
         }
     }
 
-    if (channels == 2)
-    {
+    if (channels == 2) {
 #if 0 /* Buggy code, makes position play at right speaker only. Gets been fixed when room_angle is always 0 */
         if (angle > 180)
             room_angle = 180; /* exchange left and right channels */
@@ -2348,8 +2360,7 @@ int MIXCALLCC Mix_SetPosition(int channel, Sint16 angle, Uint8 distance)
         room_angle = 0;
     }
 
-    if (channels == 4 || channels == 6)
-    {
+    if (channels == 4 || channels == 6) {
         if (angle > 315) room_angle = 0;
         else if (angle > 225) room_angle = 270;
         else if (angle > 135) room_angle = 180;
@@ -2510,8 +2521,9 @@ int MIXCALLCC Mix_SetMusicEffectPosition(Mix_Music *mus, Sint16 angle, Uint8 dis
 
     Mix_QuerySpec(NULL, &format, &channels);
     f = get_music_position_effect_func(format, channels);
-    if (f == NULL)
+    if (f == NULL) {
         return(0);
+    }
 
     /* make angle between 0 and 359. */
     angle %= 360;
@@ -2536,8 +2548,7 @@ int MIXCALLCC Mix_SetMusicEffectPosition(Mix_Music *mus, Sint16 angle, Uint8 dis
         }
     }
 
-    if (channels == 2)
-    {
+    if (channels == 2) {
 #if 0 /* Buggy code, makes position play at right speaker only. Gets been fixed when room_angle is always 0 */
         if (angle > 180)
             room_angle = 180; /* exchange left and right channels */
@@ -2547,8 +2558,7 @@ int MIXCALLCC Mix_SetMusicEffectPosition(Mix_Music *mus, Sint16 angle, Uint8 dis
         room_angle = 0;
     }
 
-    if (channels == 4 || channels == 6)
-    {
+    if (channels == 4 || channels == 6) {
         if (angle > 315) room_angle = 0;
         else if (angle > 225) room_angle = 270;
         else if (angle > 135) room_angle = 180;
