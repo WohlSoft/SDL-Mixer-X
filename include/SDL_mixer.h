@@ -429,7 +429,7 @@ typedef struct _Mix_Music Mix_Music;
  * it to the correct format on demand.
  *
  * That being said, if you have control of your audio data and you know its
- * format ahead of time, you can save CPU time by opening the audio device in
+ * format ahead of time, you may save CPU time by opening the audio device in
  * that exact format so SDL_mixer does not have to spend time converting
  * anything behind the scenes, and can just pass the data straight through to
  * the hardware. On some platforms, where the hardware only supports specific
@@ -1803,7 +1803,8 @@ extern DECLSPEC int MIXCALL Mix_UnregisterEffect(int channel, Mix_EffectFunc_t f
  * zero if there's an error, not on success. We apologize for the API design
  * inconsistency here.
  *
- * \param chan the channel to unregister all effects on, or MIX_CHANNEL_POST.
+ * \param channel the channel to unregister all effects on, or
+ *                MIX_CHANNEL_POST.
  * \returns zero if error (no such channel), nonzero if all effects removed.
  *          Error messages can be retrieved from Mix_GetError().
  *
@@ -1929,7 +1930,7 @@ extern DECLSPEC int MIXCALL Mix_SetPanning(int channel, Uint8 left, Uint8 right)
  * Set the position of a channel.
  *
  * `angle` is an integer from 0 to 360, that specifies the location of the
- * sound in relation to the listener. `angle` will be reduced as neccesary
+ * sound in relation to the listener. `angle` will be reduced as necessary
  * (540 becomes 180 degrees, -100 becomes 260). Angle 0 is due north, and
  * rotates clockwise as the value increases. For efficiency, the precision of
  * this effect may be limited (angles 1 through 7 might all produce the same
@@ -2318,8 +2319,8 @@ extern DECLSPEC int MIXCALL Mix_GroupNewer(int tag);
  *
  * \param channel the channel on which to play the new chunk.
  * \param chunk the new chunk to play.
- * \param loop the number of times the chunk should loop, -1 to loop (not
- *             actually) infinitely.
+ * \param loops the number of times the chunk should loop, -1 to loop (not
+ *              actually) infinitely.
  * \returns which channel was used to play the sound, or -1 if sound could not
  *          be played.
  *
@@ -2350,8 +2351,8 @@ extern DECLSPEC int MIXCALL Mix_PlayChannel(int channel, Mix_Chunk *chunk, int l
  *
  * \param channel the channel on which to play the new chunk.
  * \param chunk the new chunk to play.
- * \param loop the number of times the chunk should loop, -1 to loop (not
- *             actually) infinitely.
+ * \param loops the number of times the chunk should loop, -1 to loop (not
+ *              actually) infinitely.
  * \param ticks the maximum number of milliseconds of this chunk to mix for
  *              playback.
  * \returns which channel was used to play the sound, or -1 if sound could not
@@ -2443,8 +2444,8 @@ extern DECLSPEC Mix_CommonMixer_t MIXCALL Mix_GetGeneralMixer(void);
  * Mix_VolumeMusic() on fading music).
  *
  * \param music the new music object to play.
- * \param loop the number of times the chunk should loop, -1 to loop (not
- *             actually) infinitely.
+ * \param loops the number of times the chunk should loop, -1 to loop (not
+ *              actually) infinitely.
  * \param ms the number of milliseconds to spend fading in.
  * \returns zero on success, -1 on error.
  *
@@ -2480,8 +2481,8 @@ extern DECLSPEC int MIXCALL Mix_FadeInMusic(Mix_Music *music, int loops, int ms)
  * To convert from milliseconds, divide by 1000.0.
  *
  * \param music the new music object to play.
- * \param loop the number of times the chunk should loop, -1 to loop (not
- *             actually) infinitely.
+ * \param loops the number of times the chunk should loop, -1 to loop (not
+ *              actually) infinitely.
  * \param ms the number of milliseconds to spend fading in.
  * \param position the start position within the music, in seconds, where
  *                 playback should start.
@@ -2521,8 +2522,8 @@ extern DECLSPEC int MIXCALL Mix_FadeInMusicPos(Mix_Music *music, int loops, int 
  * \param channel the channel on which to play the new chunk, or -1 to find
  *                any available.
  * \param chunk the new chunk to play.
- * \param loop the number of times the chunk should loop, -1 to loop (not
- *             actually) infinitely.
+ * \param loops the number of times the chunk should loop, -1 to loop (not
+ *              actually) infinitely.
  * \param ms the number of milliseconds to spend fading in.
  * \returns which channel was used to play the sound, or -1 if sound could not
  *          be played.
@@ -2564,8 +2565,8 @@ extern DECLSPEC int MIXCALL Mix_FadeInChannel(int channel, Mix_Chunk *chunk, int
  * \param channel the channel on which to play the new chunk, or -1 to find
  *                any available.
  * \param chunk the new chunk to play.
- * \param loop the number of times the chunk should loop, -1 to loop (not
- *             actually) infinitely.
+ * \param loops the number of times the chunk should loop, -1 to loop (not
+ *              actually) infinitely.
  * \param ms the number of milliseconds to spend fading in.
  * \param ticks the maximum number of milliseconds of this chunk to mix for
  *              playback.
@@ -2807,8 +2808,8 @@ extern DECLSPEC int MIXCALL Mix_HaltChannel(int channel);
  * This will stop further playback on all channels with a specific tag, until
  * a new chunk is started there.
  *
- * A tag is an arbitary number that can be assigned to several mixer channels,
- * to form groups of channels.
+ * A tag is an arbitrary number that can be assigned to several mixer
+ * channels, to form groups of channels.
  *
  * The default tag for a channel is -1.
  *
@@ -2917,8 +2918,8 @@ extern DECLSPEC int MIXCALL Mix_FadeOutChannel(int which, int ms);
  * current volumes to silence over `ms` milliseconds. After that time, those
  * channels are halted.
  *
- * A tag is an arbitary number that can be assigned to several mixer channels,
- * to form groups of channels.
+ * A tag is an arbitrary number that can be assigned to several mixer
+ * channels, to form groups of channels.
  *
  * The default tag for a channel is -1.
  *
@@ -3901,5 +3902,3 @@ extern DECLSPEC int  MIXCALL Mix_SetMidiDevice(int player);/*MixerX*/
 #include "close_code.h"
 
 #endif /* SDL_MIXER_H_ */
-
-/* vi: set ts=4 sw=4 expandtab: */
