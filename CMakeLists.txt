@@ -9,51 +9,6 @@ set(SDLMixerX_VERSION      "${SDLMixerX_VERSION_MAJOR}.${SDLMixerX_VERSION_MINOR
 
 set(SDL_REQUIRED_VERSION 2.0.7)
 
-# =================Library ABI version=======================
-
-# Calculate a libtool-like version number
-math(EXPR BINARY_AGE "${SDLMixerX_VERSION_MINOR} * 100 + ${SDLMixerX_VERSION_PATCH}")
-if(MINOR_VERSION MATCHES "[02468]$")
-    # Stable branch, 2.6.1 -> libSDL2_mixer_ext-2.0.so.0.600.1
-    set(INTERFACE_AGE ${SDLMixerX_VERSION_PATCH})
-else()
-    # Development branch, 2.5.1 -> libSDL2_mixer_ext-2.0.so.0.501.0
-    set(INTERFACE_AGE 0)
-endif()
-
-# Increment this if there is an incompatible change - but if that happens,
-# we should rename the library from SDL2 to SDL3, at which point this would
-# reset to 0 anyway.
-set(LT_MAJOR "0")
-
-math(EXPR LT_AGE "${BINARY_AGE} - ${INTERFACE_AGE}")
-math(EXPR LT_CURRENT "${LT_MAJOR} + ${LT_AGE}")
-set(LT_REVISION "${INTERFACE_AGE}")
-# For historical reasons, the library name redundantly includes the major
-# version twice: libSDL2_mixer-2.0.so.0.
-# TODO: in SDL 3, set the OUTPUT_NAME to plain SDL3_mixer, which will simplify
-# it to libSDL3_mixer.so.0
-set(LT_RELEASE "2.0")
-set(LT_VERSION "${LT_MAJOR}.${LT_AGE}.${LT_REVISION}")
-
-# The following should match the versions in the Xcode project file.
-# Each version is 1 higher than you might expect, for compatibility
-# with libtool: macOS ABI versioning is 1-based, unlike other platforms
-# which are normally 0-based.
-math(EXPR DYLIB_CURRENT_VERSION_MAJOR "${LT_MAJOR} + ${LT_AGE} + 1")
-math(EXPR DYLIB_CURRENT_VERSION_MINOR "${LT_REVISION}")
-math(EXPR DYLIB_COMPAT_VERSION_MAJOR "${LT_MAJOR} + 1")
-set(DYLIB_CURRENT_VERSION "${DYLIB_CURRENT_VERSION_MAJOR}.${DYLIB_CURRENT_VERSION_MINOR}.0")
-# For historical reasons this is 3.0.0 rather than the expected 1.0.0
-set(DYLIB_COMPATIBILITY_VERSION "3.0.0")
-
-# For the static assertions in mixer.c
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DSDL_BUILD_MAJOR_VERSION=${SDLMixerX_VERSION_MAJOR}")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DSDL_BUILD_MINOR_VERSION=${SDLMixerX_VERSION_MINOR}")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DSDL_BUILD_MICRO_VERSION=${SDLMixerX_VERSION_PATCH}")
-
-# ===========================================================
-
 include(GNUInstallDirs)
 include(FindPkgConfig)
 include(CheckIncludeFiles)
@@ -61,51 +16,17 @@ include(CheckSymbolExists)
 include(CheckFunctionExists)
 include(CheckLibraryExists)
 include(CheckCCompilerFlag)
-#include(CheckCSourceRuns)
+include(CheckCXXCompilerFlag)
 
 set(CMAKE_MODULE_PATH "${SDLMixerX_SOURCE_DIR}/cmake;${SDLMixerX_SOURCE_DIR}/cmake/find;${SDLMixerX_SOURCE_DIR}/src/codecs;${CMAKE_MODULE_PATH}")
+
+include(mixerx_setup)
+include(mixerx_libapi)
+include(mixerx_macros)
 
 include(CppNeedCheck)
 include(WhichLicense)
 include(FormatsSupported)
-
-if(NOT CMAKE_VERSION VERSION_LESS 2.8.12)
-    set(CMAKE_MACOSX_RPATH 0)
-endif()
-
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
-    set(EMSCRIPTEN 1 BOOLEAN)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s USE_SDL=0 -s USE_SDL_MIXER=0")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s USE_SDL=0 -s USE_SDL_MIXER=0")
-endif()
-
-if(NOT CMAKE_BUILD_TYPE)
-    message("== Using default build configuration ==")
-endif()
-
-
-string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_LOWER)
-
-if(CMAKE_BUILD_TYPE_LOWER STREQUAL "debug")
-    set(MIX_DEBUG_SUFFIX d)
-else()
-    set(MIX_DEBUG_SUFFIX "")
-endif()
-
-if(WIN32 AND NOT EMSCRIPTEN)
-    set(CMAKE_SHARED_LIBRARY_PREFIX "")
-endif()
-
-if(POLICY CMP0058)
-    cmake_policy(SET CMP0058 NEW)
-endif()
-
-option(SSEMATH             "Allow GCC to use SSE floating point math" ${OPT_DEF_SSEMATH})
-option(MMX                 "Use MMX assembly routines" ${OPT_DEF_ASM})
-option(3DNOW               "Use 3Dnow! MMX assembly routines" ${OPT_DEF_ASM})
-option(SSE                 "Use SSE assembly routines" ${OPT_DEF_ASM})
-option(SSE2                "Use SSE2 assembly routines" ${OPT_DEF_SSEMATH})
-option(SSE3                "Use SSE3 assembly routines" ${OPT_DEF_SSEMATH})
 
 if(NOT EMSCRIPTEN
    AND NOT VITA
@@ -149,6 +70,8 @@ endif()
 
 option(USE_SYSTEM_SDL2   "Use SDL2 from system" OFF)
 
+# ================= Optimizations and setup =======================
+
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     set(FLAG_C99 "-std=c99")
     # Turn on warnings and legacy C/C++ standards to support more compilers
@@ -186,12 +109,11 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER_ID ST
 endif()
 
 if(MSVC)
-    check_c_compiler_flag("/utf-8" HAVE_CL_UTF8_FLAG)
-    if(HAVE_CL_UTF8_FLAG)
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /utf-8")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8")
-    endif()
+    mixer_add_opt_flag("/utf-8" MSVC_UTF8)
 endif()
+
+
+# ================= Audio Codecs =======================
 
 set(SDL_MIXER_DEFINITIONS)
 set(SDL_MIXER_INCLUDE_PATHS)
@@ -210,44 +132,6 @@ if(NOT AUDIO_CODECS_REPO_PATH AND NOT AUDIO_CODECS_INSTALL_PATH)
         set(AUDIO_CODECS_INSTALL_PATH ${AUDIO_CODECS_INSTALL_DIR})
     endif()
 endif()
-
-set(FIND_PREFER_STATIC
-    "-static${MIX_DEBUG_SUFFIX}.a"
-    "-static${MIX_DEBUG_SUFFIX}.lib"
-    "${MIX_DEBUG_SUFFIX}.a"
-    "${MIX_DEBUG_SUFFIX}.lib"
-    "-static.a"
-    "-static.lib"
-    ".a"
-    ".lib"
-    "${MIX_DEBUG_SUFFIX}.dll.a"
-    "${MIX_DEBUG_SUFFIX}.lib"
-    ".dll.a"
-    ".lib"
-    "${MIX_DEBUG_SUFFIX}.so"
-    "${MIX_DEBUG_SUFFIX}.dylib"
-    ".so"
-    ".dylib"
-)
-
-set(FIND_PREFER_SHARED
-    "${MIX_DEBUG_SUFFIX}.dll.a"
-    "${MIX_DEBUG_SUFFIX}.lib"
-    ".dll.a"
-    ".lib"
-    "${MIX_DEBUG_SUFFIX}.so"
-    "${MIX_DEBUG_SUFFIX}.dylib"
-    ".so"
-    ".dylib"
-    "-static${MIX_DEBUG_SUFFIX}.a"
-    "-static${MIX_DEBUG_SUFFIX}.lib"
-    "${MIX_DEBUG_SUFFIX}.a"
-    "${MIX_DEBUG_SUFFIX}.lib"
-    "-static.a"
-    "-static.lib"
-    ".a"
-    ".lib"
-)
 
 if(AUDIO_CODECS_REPO_PATH OR AUDIO_CODECS_INSTALL_PATH)
     set(AUDIO_CODECS_PATH ${AUDIO_CODECS_REPO_PATH})
@@ -375,10 +259,21 @@ if(WIN32 AND NOT EMSCRIPTEN)
         list(APPEND SDLMixerX_LINK_LIBS
                     ${AUDIOCODECS_SDL2_LIB_NAME}
                     uuid winmm ole32 imm32 version oleaut32 user32 gdi32 setupapi)
+
         if(NOT MSVC)
             list(APPEND SDLMixerX_LINK_LIBS stdc++ gcc pthread)
             unset(STDCPP_NEEDED) # stdc++ has been handled, no need to link it twice
         endif()
+
+        mixer_add_opt_flag("-mno-sse" NO_SSE)
+        mixer_add_opt_flag("-mno-sse2" NO_SSE2)
+        mixer_add_opt_flag("-mno-sse3" NO_SSE3)
+        mixer_add_opt_flag("-mno-ssse3" NO_SSSE3)
+        mixer_add_opt_flag("-mno-sse4.1" NO_SSE41)
+        mixer_add_opt_flag("-mno-sse4.2" NO_SSE42)
+        mixer_add_opt_flag("-mno-avx" NO_AVX)
+        mixer_add_opt_flag("-mno-avx2" NO_AVX2)
+        mixer_add_opt_flag("-mno-avx512f" NO_AVX512F)
     endif()
 endif()
 
@@ -440,6 +335,7 @@ if(SDL_MIXER_X_STATIC AND NOT BUILD_AS_VB6_BINDING)
     else()
         set_target_properties(SDL2_mixer_ext_Static PROPERTIES OUTPUT_NAME SDL2_mixer_ext)
     endif()
+
     target_link_libraries(SDL2_mixer_ext_Static PUBLIC ${SDLMixerX_LINK_LIBS})
     target_compile_definitions(SDL2_mixer_ext_Static PRIVATE ${SDL_MIXER_DEFINITIONS})
     target_include_directories(SDL2_mixer_ext_Static PRIVATE
@@ -453,9 +349,11 @@ if(SDL_MIXER_X_STATIC AND NOT BUILD_AS_VB6_BINDING)
         $<BUILD_INTERFACE:${SDLMixerX_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/SDL2>
     )
+
     if(BUILD_AUDIO_CODECS_NEEDED)
         add_dependencies(SDL2_mixer_ext_Static AudioCodecs)
     endif()
+
     if(NOT CMAKE_VERSION VERSION_LESS 3.0.2)
         set_target_properties(SDL2_mixer_ext_Static
             PROPERTIES
@@ -464,9 +362,11 @@ if(SDL_MIXER_X_STATIC AND NOT BUILD_AS_VB6_BINDING)
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<$<CONFIG:Debug>:>"
         )
     endif()
+
     if(ENABLE_ADDRESS_SANITIZER)
         target_compile_options(SDL2_mixer_ext_Static PRIVATE -fsanitize=address)
     endif()
+
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
         add_custom_command(
             TARGET SDL2_mixer_ext_Static POST_BUILD
@@ -499,9 +399,11 @@ if(SDL_MIXER_X_SHARED AND NOT BUILD_AS_VB6_BINDING)
         $<BUILD_INTERFACE:${SDLMixerX_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/SDL2>
     )
+
     if(BUILD_AUDIO_CODECS_NEEDED)
         add_dependencies(SDL2_mixer_ext AudioCodecs)
     endif()
+
     if(NOT CMAKE_VERSION VERSION_LESS 3.0.2)
         set_target_properties(SDL2_mixer_ext
             PROPERTIES
@@ -510,10 +412,12 @@ if(SDL_MIXER_X_SHARED AND NOT BUILD_AS_VB6_BINDING)
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<$<CONFIG:Debug>:>"
         )
     endif()
+
     if(ENABLE_ADDRESS_SANITIZER)
         target_compile_options(SDL2_mixer_ext PRIVATE -fsanitize=address)
         target_link_options(SDL2_mixer_ext PRIVATE -fsanitize=address)
     endif()
+
     if(DOWNLOAD_AUDIO_CODECS_DEPENDENCY)
         add_custom_command(
             TARGET SDL2_mixer_ext POST_BUILD
@@ -535,15 +439,19 @@ if(BUILD_AS_VB6_BINDING)
         ${SDLMixerX_SOURCE_DIR}/src/codecs
         ${AUDIO_CODECS_INSTALL_DIR}/include/SDL2
     )
+
     target_include_directories(SDL2_mixer_ext_VB6 PUBLIC
         ${SDLMixerX_SOURCE_DIR}/include
         ${SDL_MIXER_INCLUDE_PATHS}
     )
+
     set_target_properties(SDL2_mixer_ext_VB6 PROPERTIES LINK_FLAGS
         "-Wl,--add-stdcall-alias -static-libgcc -static-libstdc++ -static -lpthread")
+
     if(BUILD_AUDIO_CODECS_NEEDED)
         add_dependencies(SDL2_mixer_ext_VB6 AudioCodecs)
     endif()
+
     if(NOT CMAKE_VERSION VERSION_LESS 3.0.2)
         set_target_properties(SDL2_mixer_ext_VB6
             PROPERTIES
@@ -552,6 +460,7 @@ if(BUILD_AS_VB6_BINDING)
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/sdl-mixer-vb6/$<$<CONFIG:Debug>:>"
         )
     endif()
+
     add_custom_command(
         TARGET SDL2_mixer_ext_VB6 POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
