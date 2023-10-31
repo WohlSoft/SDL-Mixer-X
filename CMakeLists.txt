@@ -58,6 +58,8 @@ set(AUDIO_CODECS_INSTALL_PATH "" CACHE PATH "Path to installed AudioCodecs prefi
 option(MIXERX_ENABLE_LGPL   "Enable components with LGPL license" OFF)
 option(MIXERX_ENABLE_GPL    "Enable using of components with GPL and LGPL licenses" OFF)
 
+option(MIXERX_DISABLE_SIMD "Disable any SIMD optimizations as possible" OFF)
+
 option(ENABLE_ADDRESS_SANITIZER "Enable the Address Sanitizer GCC feature" OFF)
 
 set(MIXERX_ZLIB TRUE)
@@ -112,6 +114,16 @@ if(MSVC)
     mixer_add_opt_flag("/utf-8" MSVC_UTF8)
 endif()
 
+if(MIXERX_DISABLE_SIMD)
+    mixer_add_opt_flag("-mno-sse2" NO_SSE2)
+    mixer_add_opt_flag("-mno-sse3" NO_SSE3)
+    mixer_add_opt_flag("-mno-ssse3" NO_SSSE3)
+    mixer_add_opt_flag("-mno-sse4.1" NO_SSE41)
+    mixer_add_opt_flag("-mno-sse4.2" NO_SSE42)
+    mixer_add_opt_flag("-mno-avx" NO_AVX)
+    mixer_add_opt_flag("-mno-avx2" NO_AVX2)
+    mixer_add_opt_flag("-mno-avx512f" NO_AVX512F)
+endif()
 
 # ================= Audio Codecs =======================
 
@@ -264,16 +276,6 @@ if(WIN32 AND NOT EMSCRIPTEN)
             list(APPEND SDLMixerX_LINK_LIBS stdc++ gcc pthread)
             unset(STDCPP_NEEDED) # stdc++ has been handled, no need to link it twice
         endif()
-
-        mixer_add_opt_flag("-mno-sse" NO_SSE)
-        mixer_add_opt_flag("-mno-sse2" NO_SSE2)
-        mixer_add_opt_flag("-mno-sse3" NO_SSE3)
-        mixer_add_opt_flag("-mno-ssse3" NO_SSSE3)
-        mixer_add_opt_flag("-mno-sse4.1" NO_SSE41)
-        mixer_add_opt_flag("-mno-sse4.2" NO_SSE42)
-        mixer_add_opt_flag("-mno-avx" NO_AVX)
-        mixer_add_opt_flag("-mno-avx2" NO_AVX2)
-        mixer_add_opt_flag("-mno-avx512f" NO_AVX512F)
     endif()
 endif()
 

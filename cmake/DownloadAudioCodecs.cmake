@@ -71,8 +71,6 @@ option(AUDIOCODECS_BUILD_OPNMIDI "Build libOPNMIDI at AudioCodecs" ON)
 option(AUDIOCODECS_BUILD_EDMIDI "Build libEDMIDI at AudioCodecs" ON)
 option(AUDIOCODECS_BUILD_WAVPACK "Build WAVPACK at AudioCodecs" ON)
 
-option(AUDIOCODECS_DISABLE_SIMD "Disable any SIMD optimizations as possible in AudioCodecs" OFF)
-
 option(AUDIO_CODECS_BUILD_LOCAL_SDL2_SHARED "Build shared version of SDL2 from local AudioCodecs' copy" ON)
 
 ExternalProject_Add(
@@ -89,7 +87,7 @@ ExternalProject_Add(
         "-DDOWNLOAD_SDL2_DEPENDENCY=${AUDIO_CODECS_DOWNLOAD_SDL}"
         "-DUSE_LOCAL_SDL2=${AUDIO_CODECS_BUILD_LOCAL_SDL2}"
         "-DBUILD_SDL2_SHARED=${AUDIO_CODECS_BUILD_LOCAL_SDL2_SHARED}"
-        "-DDISABLE_SIMD=${AUDIOCODECS_DISABLE_SIMD}"
+        "-DDISABLE_SIMD=${MIXERX_DISABLE_SIMD}"
         ${SDL2_WASAPI_FLAG}
         ${SDL2_TAGS}
         ${ADLMIDI_FLAGS}
