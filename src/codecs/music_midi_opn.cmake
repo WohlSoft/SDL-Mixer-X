@@ -81,6 +81,7 @@ if(USE_MIDI_OPNMIDI AND MIXERX_GPL)
         list(APPEND SDLMixerX_SOURCES
             ${CMAKE_CURRENT_LIST_DIR}/music_midi_opn.c
             ${CMAKE_CURRENT_LIST_DIR}/music_midi_opn.h
+            ${CMAKE_CURRENT_LIST_DIR}/OPNMIDI/gm_opn_bank.h
         )
         appendMidiFormats("MIDI;RIFF MIDI;XMI;MUS")
     else()

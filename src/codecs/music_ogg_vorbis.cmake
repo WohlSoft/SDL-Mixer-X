@@ -106,6 +106,7 @@ if(USE_OGG_VORBIS)
     else(USE_OGG_VORBIS_STB)
         list(APPEND SDLMixerX_SOURCES
             ${CMAKE_CURRENT_LIST_DIR}/music_ogg_stb.c
+            ${CMAKE_CURRENT_LIST_DIR}/stb_vorbis/stb_vorbis.h
             ${CMAKE_CURRENT_LIST_DIR}/music_ogg.h
         )
         if(DEFINED FLAG_C99)

@@ -15,6 +15,7 @@ if(USE_MP3_DRMP3 OR USE_MP3_MINIMP3)
     list(APPEND SDLMixerX_SOURCES
         ${CMAKE_CURRENT_LIST_DIR}/music_drmp3.c
         ${CMAKE_CURRENT_LIST_DIR}/music_drmp3.h
+        ${CMAKE_CURRENT_LIST_DIR}/dr_libs/dr_mp3.h
     )
     appendPcmFormats("MP3")
 endif()
