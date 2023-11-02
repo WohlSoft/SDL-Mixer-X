@@ -11,6 +11,7 @@ if(CPP_MIDI_SEQUENCER_NEEDED)
         ${CMAKE_CURRENT_LIST_DIR}/midi_seq/cvt_xmi2mid.hpp
         ${CMAKE_CURRENT_LIST_DIR}/midi_seq/cvt_mus2mid.hpp
     )
+
     set(STDCPP_NEEDED TRUE)
     if(NOT MIXERX_LGPL)
         # Disable MUS and XMI formats as they LGPL-licensed

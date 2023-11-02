@@ -58,6 +58,7 @@ if(USE_GME AND MIXERX_LGPL)
                              HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
             endif()
         endif()
+
         mark_as_advanced(LIBGME_LIB LIBZLIB_LIB)
         set(GME_LIBRARIES ${LIBGME_LIB} ${LIBZLIB_LIB})
         set(GME_FOUND 1)
@@ -80,21 +81,27 @@ if(USE_GME AND MIXERX_LGPL)
         else()
             setLicense(LICENSE_LGPL_2_1p)
         endif()
+
         list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_GME)
         list(APPEND SDL_MIXER_INCLUDE_PATHS ${GME_INCLUDE_DIRS})
+
         if(NOT USE_SYSTEM_AUDIO_LIBRARIES OR NOT USE_GME_DYNAMIC)
             list(APPEND SDLMixerX_LINK_LIBS ${GME_LIBRARIES})
         endif()
+
         list(APPEND SDLMixerX_SOURCES
             ${CMAKE_CURRENT_LIST_DIR}/music_gme.c
             ${CMAKE_CURRENT_LIST_DIR}/music_gme.h
         )
+
         if(GME_HAS_SET_AUTOLOAD_PLAYBACK_LIMIT)
             list(APPEND SDL_MIXER_DEFINITIONS -DGME_HAS_SET_AUTOLOAD_PLAYBACK_LIMIT)
         endif()
+
         if(GME_HAS_DISABLE_ECHO)
             list(APPEND SDL_MIXER_DEFINITIONS -DGME_HAS_DISABLE_ECHO)
         endif()
+
         appendChiptuneFormats("AY;GBS;GYM;HES;KSS;NSF;NSFE;SAP;SPC;VGM;VGZ")
     else()
         message("-- skipping GME --")

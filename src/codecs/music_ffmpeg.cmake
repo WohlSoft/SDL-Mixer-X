@@ -5,6 +5,7 @@ if(USE_FFMPEG AND MIXERX_LGPL)
     if(USE_SYSTEM_AUDIO_LIBRARIES)
         find_package(FFMPEG QUIET)
         message("FFMPEG: [${FFMPEG_avcodec_FOUND}] ${FFMPEG_INCLUDE_DIRS} ${FFMPEG_swresample_LIBRARY} ${FFMPEG_avformat_LIBRARY} ${FFMPEG_avcodec_LIBRARY} ${FFMPEG_avutil_LIBRARY}")
+
         if(USE_FFMPEG_DYNAMIC)
             list(APPEND SDL_MIXER_DEFINITIONS
                 -DFFMPEG_DYNAMIC=ON
@@ -15,6 +16,7 @@ if(USE_FFMPEG AND MIXERX_LGPL)
             )
             message("Dynamic FFMPEG: ${FFMPEG_avutil_DYNAMIC_LIBRARY} ${FFMPEG_avcodec_DYNAMIC_LIBRARY} ${FFMPEG_avformat_DYNAMIC_LIBRARY} ${FFMPEG_swresample_DYNAMIC_LIBRARY}")
         endif()
+
         set(FFMPEG_LINK_LIBRARIES
             ${FFMPEG_swresample_LIBRARY}
             ${FFMPEG_avformat_LIBRARY}
@@ -48,19 +50,23 @@ if(USE_FFMPEG AND MIXERX_LGPL)
     if(FFMPEG_FOUND)
         message("== using FFMPEG (LGPL v2.1) ==")
         list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_FFMPEG)
+
         if(NOT USE_SYSTEM_AUDIO_LIBRARIES OR NOT USE_FFMPEG_DYNAMIC)
             list(APPEND SDLMixerX_LINK_LIBS ${FFMPEG_LINK_LIBRARIES})
         endif()
+
         list(APPEND SDL_MIXER_INCLUDE_PATHS ${FFMPEG_INCLUDE_DIRS})
         list(APPEND SDLMixerX_SOURCES
             ${CMAKE_CURRENT_LIST_DIR}/music_ffmpeg.c
             ${CMAKE_CURRENT_LIST_DIR}/music_ffmpeg.h
         )
+
         if(DEFINED FLAG_C99)
             set_source_files_properties("${CMAKE_CURRENT_LIST_DIR}/music_ffmpeg.c"
                 COMPILE_FLAGS ${FLAG_C99}
             )
         endif()
+
         appendPcmFormats("WMA;AAC;OPUS")
     else()
         message("-- skipping FFMPEG --")

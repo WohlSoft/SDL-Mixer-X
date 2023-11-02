@@ -43,11 +43,14 @@ if(USE_MIDI_FLUIDLITE AND MIXERX_LGPL)
         if(NOT USE_MIDI_FLUIDLITE_DYNAMIC)
             setLicense(LICENSE_LGPL_2_1p)
         endif()
+
         list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_MID_FLUIDSYNTH -DMUSIC_MID_FLUIDLITE)
         list(APPEND SDL_MIXER_INCLUDE_PATHS ${FluidLite_INCLUDE_DIRS})
+
         if(NOT USE_SYSTEM_AUDIO_LIBRARIES OR NOT USE_MIDI_FLUIDLITE_DYNAMIC)
             list(APPEND SDLMixerX_LINK_LIBS ${FluidLite_LIBRARIES})
         endif()
+
         list(APPEND SDLMixerX_SOURCES
             ${CMAKE_CURRENT_LIST_DIR}/music_fluidlite.c
             ${CMAKE_CURRENT_LIST_DIR}/music_fluidsynth.h

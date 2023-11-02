@@ -16,6 +16,7 @@ if(USE_FLAC)
             find_library(FLAC_LIBRARIES NAMES FLAC
                          HINTS "${AUDIO_CODECS_INSTALL_PATH}/lib")
         endif()
+
         set(FLAC_FOUND 1)
         set(FLAC_INCLUDE_DIRS
             ${AUDIO_CODECS_INSTALL_DIR}/include/FLAC
@@ -28,11 +29,13 @@ if(USE_FLAC)
     if(FLAC_FOUND)
         message("== using FLAC (BSD 3-clause) ==")
         list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_FLAC_LIBFLAC -DFLAC__NO_DLL)
+
         if(NOT USE_SYSTEM_AUDIO_LIBRARIES OR NOT USE_FLAC_DYNAMIC)
             set(LIBOGG_NEEDED ON)
             set(LIBMATH_NEEDED ON)
             list(APPEND SDLMixerX_LINK_LIBS ${FLAC_LIBRARIES})
         endif()
+
         list(APPEND SDL_MIXER_INCLUDE_PATHS ${FLAC_INCLUDE_DIRS})
         list(APPEND SDLMixerX_SOURCES
             ${CMAKE_CURRENT_LIST_DIR}/music_flac.c
