@@ -34,11 +34,6 @@ if(USE_XMP)
         endif()
 
     elseif(NOT USE_XMP_LITE AND NOT USE_XMP_LITE_ENFORCE)
-        # AudioCodecs package doesn't include lite version at all
-        if(WIN32)
-            list(APPEND SDL_MIXER_DEFINITIONS -DBUILDING_STATIC -DLIBXMP_STATIC)
-        endif()
-
         if(MSVC)
             set(xmplib libxmp-static)
         else()
@@ -83,6 +78,10 @@ if(USE_XMP)
 
         if(USE_XMP_MEMORY_ONLY)
             list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_XMP_MEMORY_ONLY)
+        endif()
+
+        if(WIN32) # Workaround to fix the broken linking of static library, caused by abuse of `dllimport()`
+            list(APPEND SDL_MIXER_DEFINITIONS -DBUILDING_STATIC -DLIBXMP_STATIC)
         endif()
 
         if(USE_XMP_LITE OR USE_XMP_LITE_ENFORCE)
