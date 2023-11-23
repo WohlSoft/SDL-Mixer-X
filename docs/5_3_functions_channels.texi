@@ -10,6 +10,7 @@ These functions work with sound effect mixer channels.  Music is not affected by
 @b{Setup}
 * Mix_AllocateChannels::   Set the number of channels to mix
 * Mix_Volume::             Set the mix volume of a channel
+* Mix_MasterVolume::       Get/Set the general SFX volume
 
 @b{Playing}
 * Mix_PlayChannel::                 Play loop
@@ -110,7 +111,50 @@ printf("Average volume is %d\n",Mix_Volume(-1,-1));
 @noindent
 @b{See Also}:@*
 @ref{Mix_VolumeChunk},
-@ref{Mix_VolumeMusic}
+@ref{Mix_VolumeMusic},
+@ref{Mix_VolumeMusicStream}
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_MasterVolume
+@subsection Mix_MasterVolume
+@findex Mix_MasterVolume
+
+@noindent
+@code{int @b{Mix_MasterVolume}(int *@var{volume})}
+
+@noindent
+Set the master volume for all channels.
+
+@noindent
+SDL_mixer keeps a per-channel volume, a per-chunk volume, and a master volume, and considers all three when mixing audio. This function sets the master volume, which is applied to all playing channels when mixing.
+
+@noindent
+The volume must be between 0 (silence) and @b{MIX_MAX_VOLUME} (full volume).
+Note that @b{MIX_MAX_VOLUME} is 128. Values greater than @b{MIX_MAX_VOLUME} are clamped to @b{MIX_MAX_VOLUME}.
+
+@noindent
+Specifying a negative volume will not change the current volume; as such, this can be used to query the current volume without making changes, as this function returns the previous (in this case, still-current) value.
+
+@noindent
+@b{Note}: that the master volume does not affect any playing music; it is only applied when mixing chunks. Use @ref{Mix_VolumeMusicStream}() for that.
+
+@table @var
+@item volume
+The new volume, between 0 and @b{MIX_MAX_VOLUME}, or -1 to query.
+@end table
+
+@noindent
+@b{Returns}: The previous volume. If the specified volume is -1, this returns the current volume.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_Volume},
+@ref{Mix_VolumeChunk},
+@ref{Mix_VolumeMusic},
+@ref{Mix_VolumeMusicStream}
+
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page

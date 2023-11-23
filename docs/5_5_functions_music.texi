@@ -54,12 +54,18 @@ There are two different music sub-systems provided:@*
 * Mix_SetMusicPositionStream::      Set position of playback in music @b{[Mixer X]}
 * Mix_GetMusicPosition::            Get the time current position of music stream @b{[Mixer X]}
 * Mix_ModMusicStreamJumpToOrder::   Jump to a given order in mod music. Only for MOD music formats. @b{[Mixer X]}
+* Mix_StartTrack::                  Select a song contained in the music file to play.
+* Mix_GetNumTracks::                Get count of the songs contained inside a music file.
 * Mix_MusicDuration::               Get the total time length of music stream @b{[Mixer X]}
 * Mix_GetMusicLoopStartTime::       Get the loop start time position of music stream @b{[Mixer X]}
 * Mix_GetMusicLoopEndTime::         Get the loop end time position of music stream @b{[Mixer X]}
 * Mix_GetMusicLoopLengthTime::      Get the loop time length of music stream @b{[Mixer X]}
 * Mix_SetMusicTempo::               Set the music tempo factor @b{[Mixer X]}
 * Mix_GetMusicTempo::               Get the music tempo @b{[Mixer X]}
+* Mix_SetMusicSpeed::               Set the music tempo factor @b{[Mixer X]}
+* Mix_GetMusicSpeed::               Get the music tempo @b{[Mixer X]}
+* Mix_SetMusicPitch::               Set the music tempo factor @b{[Mixer X]}
+* Mix_GetMusicPitch::               Get the music tempo @b{[Mixer X]}
 * Mix_GetMusicTracks::              Get the number of tracks (or channels) at the MIDI/Tracker/Chiptune music @b{[Mixer X]}
 * Mix_SetMusicTrackMute::           Mute or unmute the given track (or channel) at the MIDI/Tracker/Chiptune music @b{[Mixer X]}
 * Mix_SetMusicCMD::                 Use external program for music playback
@@ -116,6 +122,10 @@ There are two different music sub-systems provided:@*
 @b{Timidity Extra Settings}
 * Mix_SetTimidityCfg::       Set the custom Timidity config path @b{[Mixer X]}
 * Mix_GetTimidityCfg::       Get the current Timidity config path @b{[Mixer X]}
+
+@b{Game Music EMU Extra Settings}
+* Mix_GME_SetSpcEchoDisabled::     Set the "SPC echo disabled" playing parameter @b{[Mixer X]}
+* Mix_GME_GetSpcEchoDisabled::     Get the current value of the "SPC echo disabled" playing parameter @b{[Mixer X]}
 
 @b{FluidSynth Extra Settings}
 * Mix_SetSoundFonts::        Set global SoundFonts paths to use by supported FluidSynth MIDI backend @b{[Mixer 2.0]}
@@ -1268,6 +1278,7 @@ Get the current general multi-stream music volume.
 @ref{Mix_SetMusicCMD}
 
 
+
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
 @node Mix_PauseMusicStream
@@ -1477,9 +1488,11 @@ if(Mix_SetMusicPositionStream(music, 60.0)==-1) @{
 
 @noindent
 @b{See Also}:@*
-@ref{Mix_FadeInMusicStreamPos}
-@ref{Mix_GetMusicPosition}
-@ref{Mix_MusicDuration}
+@ref{Mix_FadeInMusicStreamPos},
+@ref{Mix_GetMusicPosition},
+@ref{Mix_MusicDuration},
+@ref{Mix_StartTrack},
+@ref{Mix_GetNumTracks}
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1504,9 +1517,11 @@ Get the time current position of music stream. It only works on some of music so
 
 @noindent
 @b{See Also}:@*
-@ref{Mix_FadeInMusicStreamPos}
-@ref{Mix_SetMusicPositionStream}
-@ref{Mix_MusicDuration}
+@ref{Mix_FadeInMusicStreamPos},
+@ref{Mix_SetMusicPositionStream},
+@ref{Mix_MusicDuration},
+@ref{Mix_StartTrack},
+@ref{Mix_GetNumTracks}
 
 
 
@@ -1534,9 +1549,71 @@ Jump to a given order in mod music. Only for MOD music formats.
 
 @noindent
 @b{See Also}:@*
-@ref{Mix_FadeInMusicStreamPos}
-@ref{Mix_SetMusicPositionStream}
-@ref{Mix_MusicDuration}
+@ref{Mix_FadeInMusicStreamPos},
+@ref{Mix_SetMusicPositionStream},
+@ref{Mix_MusicDuration},
+@ref{Mix_StartTrack},
+@ref{Mix_GetNumTracks}
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_StartTrack
+@subsection Mix_StartTrack
+@findex Mix_StartTrack
+
+@noindent
+@code{int @b{Mix_StartTrack}(Mix_Music *@var{music}, int @var{track})}
+
+@table @var
+@item music
+Music to select a sub-song for play.
+@item track
+A song number from 0 to N-1 to play.
+@end table
+
+@noindent
+Starts a sub-song to play. This function works when one music file contains multiple songs, for example, various chiptunes like NSF, HES, or XMI-based MIDI files.
+
+@noindent
+@b{Returns}: 0 if successful, or -1 if failed or isn't implemented.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_FadeInMusicStreamPos},
+@ref{Mix_SetMusicPositionStream},
+@ref{Mix_MusicDuration},
+@ref{Mix_ModMusicStreamJumpToOrder},
+@ref{Mix_GetNumTracks}
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_GetNumTracks
+@subsection Mix_GetNumTracks
+@findex Mix_GetNumTracks
+
+@noindent
+@code{int @b{Mix_GetNumTracks}(Mix_Music *@var{music})}
+
+@table @var
+@item music
+Music to get count of sub-songs inside.
+@end table
+
+@noindent
+Returns a total count of sub-songs inside the given music. This function works when one music file contains multiple songs, for example, various chiptunes like NSF, HES, or XMI-based MIDI files.
+
+@noindent
+@b{Returns}: a total count of sub-songs inside the given music, or -1 if failed or isn't implemented.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_FadeInMusicStreamPos},
+@ref{Mix_SetMusicPositionStream},
+@ref{Mix_MusicDuration},
+@ref{Mix_ModMusicStreamJumpToOrder},
+@ref{Mix_StartTrack}
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1561,9 +1638,11 @@ Get the full duration time of music stream. It only works on some of music sourc
 
 @noindent
 @b{See Also}:@*
-@ref{Mix_FadeInMusicPos}
-@ref{Mix_GetMusicPosition}
-@ref{Mix_SetMusicPosition}
+@ref{Mix_FadeInMusicPos},
+@ref{Mix_GetMusicPosition},
+@ref{Mix_SetMusicPosition},
+@ref{Mix_StartTrack},
+@ref{Mix_GetNumTracks}
 
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1588,7 +1667,7 @@ A part of loop points feature. Get the loop start time position of music stream.
 
 @noindent
 @b{See Also}:@*
-@ref{Mix_GetMusicLoopEndTime}
+@ref{Mix_GetMusicLoopEndTime},
 @ref{Mix_GetMusicLoopLengthTime}
 
 
@@ -1614,7 +1693,7 @@ A part of loop points feature. Get the loop time length of music stream. It only
 
 @noindent
 @b{See Also}:@*
-@ref{Mix_GetMusicLoopStartTime}
+@ref{Mix_GetMusicLoopStartTime},
 @ref{Mix_GetMusicLoopLengthTime}
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1639,7 +1718,7 @@ A part of loop points feature. Get the loop time length of music stream. It only
 
 @noindent
 @b{See Also}:@*
-@ref{Mix_GetMusicLoopStartTime}
+@ref{Mix_GetMusicLoopStartTime},
 @ref{Mix_GetMusicLoopEndTime}
 
 
@@ -1668,9 +1747,11 @@ Set the current tempo multiplier in the music stream.
 
 @noindent
 @b{See Also}:@*
-@ref{Mix_GetMusicTempo}
-@ref{Mix_FadeInMusicStreamPos}
-@ref{Mix_SetMusicPositionStream}
+@ref{Mix_GetMusicTempo},
+@ref{Mix_SetMusicSpeed},
+@ref{Mix_SetMusicPitch},
+@ref{Mix_FadeInMusicStreamPos},
+@ref{Mix_SetMusicPositionStream},
 @ref{Mix_MusicDuration}
 
 
@@ -1696,9 +1777,132 @@ Returns the current tempo multiplier of the music stream.
 
 @noindent
 @b{See Also}:@*
-@ref{Mix_SetMusicTempo}
-@ref{Mix_FadeInMusicStreamPos}
-@ref{Mix_SetMusicPositionStream}
+@ref{Mix_SetMusicTempo},
+@ref{Mix_SetMusicSpeed},
+@ref{Mix_SetMusicPitch},
+@ref{Mix_FadeInMusicStreamPos},
+@ref{Mix_SetMusicPositionStream},
+@ref{Mix_MusicDuration}
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_SetMusicSpeed
+@subsection Mix_SetMusicSpeed
+@findex Mix_SetMusicSpeed
+
+@noindent
+@code{int @b{Mix_SetMusicSpeed}(Mix_Music *@var{music}, double @var{speed})}
+
+@table @var
+@item music
+Music to change the speed.
+@item speed
+Speed multiplier. Setting value into the 1.0 will reset the speed into default.
+@end table
+
+@noindent
+Set the current speed (both tempo and pitch will be changed) multiplier in the music stream.
+
+@noindent
+@b{Returns}: 0 if successful, or -1 if failed or isn't implemented.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_GetMusicTempo},
+@ref{Mix_GetMusicPitch},
+@ref{Mix_FadeInMusicStreamPos},
+@ref{Mix_SetMusicPositionStream},
+@ref{Mix_MusicDuration}
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_GetMusicSpeed
+@subsection Mix_GetMusicSpeed
+@findex Mix_GetMusicSpeed
+
+@noindent
+@code{double @b{Mix_GetMusicSpeed}(Mix_Music *@var{music})}
+
+@table @var
+@item music
+Music to get the speed.
+@end table
+
+@noindent
+Returns the current speed multiplier (both tempo and pitch will be changed) of the music stream.
+
+@noindent
+@b{Returns}: positive value if successful, or -1.0 if failed or isn't implemented.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_SetMusicTempo},
+@ref{Mix_SetMusicPitch},
+@ref{Mix_FadeInMusicStreamPos},
+@ref{Mix_SetMusicPositionStream},
+@ref{Mix_MusicDuration}
+
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_SetMusicPitch
+@subsection Mix_SetMusicPitch
+@findex Mix_SetMusicPitch
+
+@noindent
+@code{int @b{Mix_SetMusicPitch}(Mix_Music *@var{music}, double @var{pitch})}
+
+@table @var
+@item music
+Music to change the pitch.
+@item pitch
+Pitch multiplier. Setting value into the 1.0 will reset the tempo into default.
+@end table
+
+@noindent
+Set the current pitch multiplier in the music stream.
+
+@noindent
+@b{Returns}: 0 if successful, or -1 if failed or isn't implemented.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_GetMusicTempo},
+@ref{Mix_GetMusicSpeed},
+@ref{Mix_FadeInMusicStreamPos},
+@ref{Mix_SetMusicPositionStream},
+@ref{Mix_MusicDuration}
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_GetMusicPitch
+@subsection Mix_GetMusicPitch
+@findex Mix_GetMusicPitch
+
+@noindent
+@code{double @b{Mix_GetMusicPitch}(Mix_Music *@var{music})}
+
+@table @var
+@item music
+Music to get the pitch.
+@end table
+
+@noindent
+Returns the current pitch multiplier of the music stream.
+
+@noindent
+@b{Returns}: positive value if successful, or -1.0 if failed or isn't implemented.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_SetMusicTempo},
+@ref{Mix_SetMusicSpeed},
+@ref{Mix_FadeInMusicStreamPos},
+@ref{Mix_SetMusicPositionStream},
 @ref{Mix_MusicDuration}
 
 
@@ -1725,9 +1929,9 @@ Get the count of concurrently playing tracks at the song (MIDI, Tracker, Chiptun
 
 @noindent
 @b{See Also}:@*
-@ref{Mix_SetMusicTrackMute}
-@ref{Mix_FadeInMusicStreamPos}
-@ref{Mix_SetMusicPositionStream}
+@ref{Mix_SetMusicTrackMute},
+@ref{Mix_FadeInMusicStreamPos},
+@ref{Mix_SetMusicPositionStream},
 @ref{Mix_MusicDuration}
 
 
@@ -1758,9 +1962,9 @@ Mute one of playing tracks (or channels) at the song (MIDI, Tracker, Chiptune, e
 
 @noindent
 @b{See Also}:@*
-@ref{Mix_GetMusicTracks}
-@ref{Mix_FadeInMusicStreamPos}
-@ref{Mix_SetMusicPositionStream}
+@ref{Mix_GetMusicTracks},
+@ref{Mix_FadeInMusicStreamPos},
+@ref{Mix_SetMusicPositionStream},
 @ref{Mix_MusicDuration}
 
 
@@ -3027,6 +3231,62 @@ Reports the full path to the current config file. NULL if no custom config paths
 
 
 
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_GME_SetSpcEchoDisabled
+@subsection Mix_GME_SetSpcEchoDisabled
+@findex Mix_GME_SetSpcEchoDisabled
+
+@noindent
+@code{void @b{Mix_GME_SetSpcEchoDisabled}(Mix_Music *@var{music}, int *@var{disabled})}
+
+@table @var
+@item music
+The music to change the "SPC echo disabled" option
+@item disabled
+The boolean 0 or 1 value
+@end table
+
+@noindent
+This option allows you to disable the built-in echo in SPC files played via libGME (Game Music Emulators) library.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_GME_GetSpcEchoDisabled},
+@ref{Mix_PausedMusicStream},
+@ref{Mix_FadingMusicStream},
+@ref{Mix_PlayMusicStream}
+
+
+@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@page
+@node Mix_GME_GetSpcEchoDisabled
+@subsection Mix_GME_GetSpcEchoDisabled
+@findex Mix_GME_GetSpcEchoDisabled
+
+@noindent
+@code{int @b{Mix_GME_GetSpcEchoDisabled}(Mix_Music *@var{music})}
+
+@table @var
+@item music
+The music to get the value of the "SPC echo disabled" option.
+@end table
+
+@noindent
+@b{Returns}: The value of the "SPC echo disabled" option or -1 when option is unavailable for this music.
+
+@noindent
+This option allows you to disable the built-in echo in SPC files played via libGME (Game Music Emulators) library.
+
+@noindent
+@b{See Also}:@*
+@ref{Mix_GME_SetSpcEchoDisabled},
+@ref{Mix_PausedMusicStream},
+@ref{Mix_FadingMusicStream},
+@ref{Mix_PlayMusicStream}
+
+
+
 
 @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 @page
@@ -3947,11 +4207,12 @@ All arguments are optional. The last argument must be closed with semicolon.@*
 @table @b
 @item s
 @b{Synthesizer type:}@*
-    @code{0} - ADLMIDI, emulated OPL3 (YMF262) synthesizer with loop tags and System Exclusive Messages support. Working by Default. (Recorded examples to listen to are presented here). OPL3 chip was widely used on PC sound cards in 80/90'th years.@*
+    @code{0} - ADLMIDI, emulated OPL3 (YMF262) synthesizer with loop tags and System Exclusive Messages support. Works by Default. OPL3 chip was widely used on PC sound cards in 80/90'th years.@*
     @code{1} - Timidity, requires the set of patches to be properly installed (can be customized with @ref{Mix_SetTimidityCfg} function).@*
     @code{2} - Native MIDI, uses the default operating system MIDI interface.@*
     @code{3} - OPNMIDI, emulated OPN2 (YM2612) synthesizer with loop tags and System Exclusive Messages support. OPN2 chip is used on the Sega MegaDrive / Genesis game console.@*
     @code{4} - FluidSynth, the WaveTable MIDI synthesizer with SoundFont banks support, has the support for loop tags support.@*
+    @code{5} - Emu De Midi, emulated OPLL and SCC synthesizer, has the support for loop tags support.@*
 
     @noindent
     Example:
@@ -3962,7 +4223,7 @@ All arguments are optional. The last argument must be closed with semicolon.@*
 @item General flags:
 @table @b
 @item t=
-    @b{ADLMIDI, OPNMIDI, and FluidSynth}@*
+    @b{ADLMIDI, OPNMIDI, FluidSynth, and Emu De Midi}@*
     Initial tempo factor (1.0 is the default value, accepting positive floating-point number values, for example, @code{t=1.75;}), increase or decrease the initial tempo of the song. Don't confuse with @code{t0} and @code{t1} which is a different setting.
 
     @noindent
@@ -3971,7 +4232,7 @@ All arguments are optional. The last argument must be closed with semicolon.@*
     @code{t=1.4;}
     @end example
 @item g=
-    @b{ADLMIDI, OPNMIDI, and FluidSynth}@*
+    @b{ADLMIDI, OPNMIDI, FluidSynth, and Emu De Midi}@*
     Gain factor (2.0 is the default value, accepting positive floating-point number values, for example, @code{g=1.75;}), increase or decrease the volume level of the song. Use it to increase the volume of too silent songs, or decrease the volume of too loud songs.
 
     @noindent
@@ -4248,6 +4509,30 @@ All arguments are optional. The last argument must be closed with semicolon.@*
 
 @end table
 
+@end table
+
+@item OGG Vorbis
+Available since the 2th of June 2023. This functionality right now is avilable when the library was built with using of @b{stb_vorbis} library.
+
+Turning multi-channel OGG file into multi-track music (will be possible to use the @ref{Mix_GetMusicTracks}() and @ref{Mix_SetMusicTrackMute}() functions):
+@cartouche
+@example
+mymusic.ogg|m1;c2;r1;s=1.0;
+@end example
+@end cartouche
+
+@noindent
+All arguments after the first integer are optional. The leading integer is required, even it's a single-track file. The last argument must be closed with semicolon.@*
+
+@table @b
+@item m
+Enable the multi-track mode: turn multi-channel song into multi-track stream with an ability to mute each separated "track". 0 - disabled, 1 - enabled.
+@item c
+Number of channels for each track. (Max is 8 due to SDL AudioStream)
+@item r
+Total number of available tracks.
+@item s=
+Initial speed factor (1.0 is the default value, accepting positive floating-point number values, for example, `s=1.75;`), increase or decrease the initial speed of the song (i.e. both tempo and pitch gets changed).
 @end table
 
 @end table
