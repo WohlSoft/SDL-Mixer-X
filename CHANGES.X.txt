@@ -2,20 +2,22 @@ Changelog of MixerX-exclusive changes
 -------
 It is an additional changelog file. It extends the CHANGES.txt that lists changes done at the mainstream SDL2_mixer library.
 
-2.6.0: [dev]
- * Added new calls: Mix_ADLMIDI_getAutoArpeggio(), Mix_ADLMIDI_setAutoArpeggio(), Mix_OPNMIDI_getAutoArpeggio(), Mix_OPNMIDI_setAutoArpeggio(), Mix_QuerySpec()
- * Fixed memory damages and crashes while playing XMI files
- * Added support for the experimental libEDMIDI synthesizer
+2.6.0: (2023-11-23)
+ * Added new calls: Mix_ADLMIDI_getAutoArpeggio(), Mix_ADLMIDI_setAutoArpeggio(), Mix_OPNMIDI_getAutoArpeggio(), Mix_OPNMIDI_setAutoArpeggio(), Mix_QuerySpec(), Mix_SetMusicSpeed(), Mix_GetMusicSpeed(), Mix_SetMusicPitch(), Mix_GetMusicPitch(), Mix_GME_SetSpcEchoDisabled(), Mix_GME_GetSpcEchoDisabled()
+ * Fixed memory damages and crashes while playing XMI files.
+ * Added support for the experimental libEDMIDI synthesizer.
  * GPL and LGPL-licensed libraries will be disabled by default (They can be re-enabled using `-DMIXERX_ENABLE_LGPL=ON` and `-DMIXERX_ENABLE_GPL=ON` CMake options).
  * Added the FFMPEG support to play some audio formats supported by it, for example, AAC, WMA, ALAC, and OPUS inside WebM container, etc. (Use `-DUSE_FFMPEG=ON` to enable it)
- * Fixed te detection of EA MUS files
+ * Fixed te detection of EA MUS files.
  * The default bank for the libOPNMIDI has been updated.
  * Added an ability to switch tracks on the fly while playing multi-track music files (such as NSF/HES/GBM/etc. chiptunes and XMI MIDI files)
  * Fixed the confusion of the selected banks and the chips number at ADLMIDI and OPNMIDI.
- * Fixed several issues
  * Stabilized work of the Alternative Native MIDI on Windows.
- * Added the PXTONE library to support playback of .pttune and .ptcop files
+ * Added the PXTONE library to support playback of .pttune and .ptcop files.
  * Fixed detection of FLAC files that starts with an ID3 tag.
+ * Added the MS-ADPCM and IMA-ADPCM WAV files support (Imported from the SDL3 Mixer).
+ * Fixed reading of valid files less than 100 KB.
+ * Fixed several other issues.
 
 2.5.0: (2021-09-21)
  * Added std-vorbis library as an alternative for OGG Vorbis streams
