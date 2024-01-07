@@ -40,7 +40,7 @@
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 #define STB_VORBIS_BIG_ENDIAN 1
 #endif
-#define STBV_CDECL SDLCALL /* for SDL_qsort */
+#define STBV_CDECL SDLCALL /* for SDL_qsort() */
 
 #ifdef assert
 #undef assert
@@ -409,6 +409,14 @@ static void *OGG_CreateFromRWex(SDL_RWops *src, int freesrc, const char *args)
     }
 
     rate = music->vi.sample_rate;
+
+    music->full_length = stb_vorbis_stream_length_in_samples(music->vf);
+    if (music->full_length <= 0) {
+        Mix_SetError("No samples in ogg/vorbis stream.");
+        OGG_Delete(music);
+        return NULL;
+    }
+
     vc = stb_vorbis_get_comment(music->vf);
     if (vc.comment_list != NULL) {
         for (i = 0; i < vc.comment_list_length; i++) {
@@ -461,7 +469,6 @@ static void *OGG_CreateFromRWex(SDL_RWops *src, int freesrc, const char *args)
         }
     }
 
-    music->full_length = stb_vorbis_stream_length_in_samples(music->vf);
     if ((music->loop_end > 0) && (music->loop_end <= music->full_length) &&
         (music->loop_start < music->loop_end)) {
         music->loop = 1;
