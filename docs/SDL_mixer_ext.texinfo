@@ -14,7 +14,7 @@ This is an unofficial document for the SDL_mixer library API
 and official for MixerX.
 
 Copyright @copyright{} 2009 Jonathan Atkins (original documentation)
-Copyright @copyright{} 2017-2021 Vitaliy Novichkov (MixerX specific updates)
+Copyright @copyright{} 2017-2024 Vitaliy Novichkov (MixerX specific updates)
 
 Permission is granted to distribute freely, or in a distribution of any kind.
 All distributions of this file must be in an unaltered state, except for corrections.
@@ -32,7 +32,7 @@ The latest copy of original document can be found at @url{http://www.jonatkins.o
 @page
 @vskip 0pt plus 1filll
 Copyright @copyright{} 2009 Jonathan Atkins (original documentation)
-Copyright @copyright{} 2017-2021 Vitaliy Novichkov (MixerX specific updates)
+Copyright @copyright{} 2017-2024 Vitaliy Novichkov (MixerX specific updates)
 
 Permission is granted to distribute freely, or in a distribution of any kind.
 All distributions of this file must be in an unaltered state, except for corrections.
