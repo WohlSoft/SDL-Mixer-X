@@ -1451,6 +1451,59 @@ readHeader:
     return 1;
 }
 
+static int detect_riff_mp3(SDL_RWops *src, Sint64 start)
+{
+    Uint32 magic;
+    Uint32 chunk_type;
+    Uint32 chunk_length;
+    Uint16 encoding;
+
+    magic = SDL_ReadLE32(src);
+    if (magic != 0x46464952 /*RIFF*/ && magic != 0x45564157 /*WAVE*/) {
+        SDL_RWseek(src, start, RW_SEEK_SET);
+        return 0;
+    }
+
+    /* Skip 8 bytes */
+    SDL_RWseek(src, 8, RW_SEEK_CUR);
+
+    /* Read the chunks */
+    for (; ;) {
+        chunk_type = SDL_ReadLE32(src);
+        chunk_length = SDL_ReadLE32(src);
+
+        if (chunk_length == 0)
+            break;
+
+        switch (chunk_type) {
+        case 0x20746D66: /* Do find only fmt chunk */
+            if (chunk_length < 16) {
+                SDL_RWseek(src, start, RW_SEEK_SET);
+                return 0;
+            }
+
+            encoding = SDL_ReadLE16(src);
+            SDL_RWseek(src, start, RW_SEEK_SET);
+            return encoding == 0x0055; /* If encoding is MPEG Layer 3*/
+
+        default: /* All other chunks just skip until finding a "fmt" */
+            SDL_RWseek(src, chunk_length, RW_SEEK_CUR);
+            break;
+        }
+
+        /* RIFF chunks have a 2-byte alignment. Skip padding byte. */
+        if (chunk_length & 1) {
+            if (SDL_RWseek(src, 1, RW_SEEK_CUR) < 0) {
+                return 0;
+            }
+        }
+    }
+
+    SDL_RWseek(src, start, RW_SEEK_SET);
+
+    return 0;
+}
+
 Mix_MusicType detect_music_type(SDL_RWops *src)
 {
     Uint8 magic[100];
@@ -1526,6 +1579,10 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
            AIFF files have the magic 12 bytes "FORM" XXXX "AIFF" */
     if (((SDL_memcmp(magic, "RIFF", 4) == 0) && (SDL_memcmp((magic + 8), "WAVE", 4) == 0)) ||
        ((SDL_memcmp(magic, "FORM", 4) == 0) && (SDL_memcmp((magic + 8), "XDIR", 4) != 0))) {
+        /* Some WAV files may contain MP3-encoded streams */
+        if (detect_riff_mp3(src, start)) {
+            return MUS_MP3;
+        }
         return MUS_WAV;
     }
 

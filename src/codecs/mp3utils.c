@@ -1061,6 +1061,84 @@ static int probe_lyrics3(struct mp3file_t *fil, Uint8 *buf)
     return TAG_NOT_FOUND;
 }
 
+
+/********************************************************
+ *               RIFF WAV with MP3 data                 *
+ ********************************************************/
+
+static int probe_riff_container(struct mp3file_t *fil, Uint8 *buf)
+{
+    Uint32 magic;
+    Uint32 chunk_type;
+    Uint32 chunk_length;
+    SDL_bool found_DATA = SDL_FALSE;
+    SDL_bool found_FMT = SDL_FALSE;
+    Uint16 encoding;
+    Sint64 data_offset = 0;
+    Sint64 data_size = 0;
+    Uint8 *pos = buf, *end = buf + TAGS_INPUT_BUFFER_SIZE;
+
+    magic = SDL_SwapLE32(*(Uint32*)pos);
+    pos += 12;
+
+    if (magic != 0x46464952 /*RIFF*/ && magic != 0x45564157 /*WAVE*/) {
+        return TAG_NOT_FOUND;
+    }
+
+    while(pos < end - 8) {
+        chunk_type = SDL_SwapLE32(*(Uint32*)pos);
+        pos += 4;
+        chunk_length = SDL_SwapLE32(*(Uint32*)pos);
+        pos += 4;
+
+        if (chunk_length == 0)
+            break;
+
+        switch (chunk_type) {
+        case 0x20746D66: /* fmt */
+            found_FMT = SDL_TRUE;
+
+            if (chunk_length < 16 || pos >= end - 8) {
+                return TAG_NOT_FOUND;
+            }
+
+            encoding = SDL_SwapLE16(*(Uint16*)pos);
+            if (encoding != 0x0055) {
+                return TAG_NOT_FOUND; /* It's not an MPEG Layer 3 */
+            }
+
+            pos += chunk_length;
+            break;
+
+        case 0x61746164: /* data */
+            found_DATA = SDL_TRUE;
+            data_offset = pos - buf;
+            data_size = chunk_length;
+            pos += chunk_length;
+            break;
+
+        default: /* Skip all other chunks */
+            pos += chunk_length;
+            break;
+        }
+
+        /* RIFF chunks have a 2-byte alignment. Skip padding byte. */
+        if (chunk_length & 1) {
+            pos++;
+        }
+    }
+
+    if (found_FMT && found_DATA) {
+        fil->start = data_offset;
+        fil->length = data_size;
+        return TAG_FOUND;
+    }
+
+    return TAG_NOT_FOUND;
+}
+
+
+
 int mp3_read_tags(Mix_MusicMetaTags *out_tags, struct mp3file_t *fil, SDL_bool keep_id3v2)
 {
     Uint8 buf[TAGS_INPUT_BUFFER_SIZE];
@@ -1080,6 +1158,11 @@ int mp3_read_tags(Mix_MusicMetaTags *out_tags, struct mp3file_t *fil, SDL_bool k
     MP3_RWseek(fil, 0, RW_SEEK_SET);
     readsize = MP3_RWread(fil, buf, 1, TAGS_INPUT_BUFFER_SIZE);
     if (!readsize) goto fail;
+
+    /* An MP3 file packed into RIFF/WAVE container */
+    if (probe_riff_container(fil, buf)) {
+        goto succ;
+    }
 
     /* ID3v2 tag is at the start */
     if (is_id3v2(buf, readsize)) {
@@ -1137,6 +1220,7 @@ int mp3_read_tags(Mix_MusicMetaTags *out_tags, struct mp3file_t *fil, SDL_bool k
         break;
     } /* for (;;) */
 
+    succ:
     rc = (fil->length > 0)? 0 : -1;
     fail:
     MP3_RWseek(fil, 0, RW_SEEK_SET);

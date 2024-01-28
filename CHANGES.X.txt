@@ -2,6 +2,9 @@ Changelog of MixerX-exclusive changes
 -------
 It is an additional changelog file. It extends the CHANGES.txt that lists changes done at the mainstream SDL2_mixer library.
 
+2.7.0: [dev]
+ * Added support for MP3-encoded WAV files.
+
 2.6.0: (2023-11-23)
  * Added new calls: Mix_ADLMIDI_getAutoArpeggio(), Mix_ADLMIDI_setAutoArpeggio(), Mix_OPNMIDI_getAutoArpeggio(), Mix_OPNMIDI_setAutoArpeggio(), Mix_QuerySpec(), Mix_SetMusicSpeed(), Mix_GetMusicSpeed(), Mix_SetMusicPitch(), Mix_GetMusicPitch(), Mix_GME_SetSpcEchoDisabled(), Mix_GME_GetSpcEchoDisabled()
  * Fixed memory damages and crashes while playing XMI files.
