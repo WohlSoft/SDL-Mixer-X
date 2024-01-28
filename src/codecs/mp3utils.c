@@ -1156,7 +1156,7 @@ static int probe_riff_container(Mix_MusicMetaTags *out_tags, struct mp3file_t *f
     Sint64 data_offset = 0;
     Sint64 data_size = 0;
     Uint8 chunk[8];
-    Uint8 *pos = buf, *end = buf + TAGS_INPUT_BUFFER_SIZE;
+    Uint8 *pos = buf;
 
     magic = SDL_SwapLE32(*(Uint32*)pos);
 
@@ -1166,7 +1166,7 @@ static int probe_riff_container(Mix_MusicMetaTags *out_tags, struct mp3file_t *f
 
     MP3_RWseek(fil, 12, RW_SEEK_SET);
 
-    while(pos < end - 8) {
+    while(1) {
         if (MP3_RWread(fil, chunk, 1, 8) < 8) {
             break;
         }
@@ -1186,7 +1186,7 @@ static int probe_riff_container(Mix_MusicMetaTags *out_tags, struct mp3file_t *f
             }
 
             if (MP3_RWread(fil, chunk, 1, 2) < 2) {
-                break;
+                return TAG_NOT_FOUND;
             }
 
             encoding = SDL_SwapLE16(*(Uint16*)chunk);
@@ -1209,8 +1209,9 @@ static int probe_riff_container(Mix_MusicMetaTags *out_tags, struct mp3file_t *f
             break;
 
         case 0x5453494c: /* LIST */
-            if (!riff_parse_LIST(out_tags, fil, chunk_length))
-                return SDL_FALSE;
+            if (!riff_parse_LIST(out_tags, fil, chunk_length)) {
+                return TAG_NOT_FOUND;
+            }
             break;
 
         default: /* Skip all other chunks */
