@@ -1101,7 +1101,6 @@ static SDL_bool riff_parse_LIST(Mix_MusicMetaTags *out_tags, struct mp3file_t *w
     got = (Uint32)MP3_RWread(wave, data, 1, chunk_length);
 
     if (got == 0) {
-        Mix_SetError("Couldn't read %u bytes from WAV file", (unsigned)chunk_length);
         SDL_free(data);
         return SDL_FALSE;
     } else if (got < chunk_length) {
@@ -1111,7 +1110,6 @@ static SDL_bool riff_parse_LIST(Mix_MusicMetaTags *out_tags, struct mp3file_t *w
         pos = wave->pos;
 
         if (got < chunk_length && file_size != pos) {
-            Mix_SetError("Couldn't read %u bytes from WAV file", (unsigned)chunk_length);
             SDL_free(data);
             return SDL_FALSE;
         }
