@@ -1156,9 +1156,8 @@ static int probe_riff_container(Mix_MusicMetaTags *out_tags, struct mp3file_t *f
     Sint64 data_offset = 0;
     Sint64 data_size = 0;
     Uint8 chunk[8];
-    Uint8 *pos = buf;
 
-    magic = SDL_SwapLE32(*(Uint32*)pos);
+    magic = SDL_SwapLE32(*(Uint32*)buf);
 
     if (magic != 0x46464952 /*RIFF*/ && magic != 0x45564157 /*WAVE*/) {
         return TAG_NOT_FOUND;
@@ -1201,7 +1200,7 @@ static int probe_riff_container(Mix_MusicMetaTags *out_tags, struct mp3file_t *f
 
         case 0x61746164: /* data */
             found_DATA = SDL_TRUE;
-            data_offset = pos - buf;
+            data_offset = fil->pos;
             data_size = chunk_length;
             if (MP3_RWseek(fil, chunk_length, RW_SEEK_CUR) < chunk_length) {
                 return TAG_NOT_FOUND;
