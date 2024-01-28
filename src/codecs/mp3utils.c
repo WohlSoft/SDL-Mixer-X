@@ -1245,7 +1245,7 @@ int mp3_read_tags(Mix_MusicMetaTags *out_tags, struct mp3file_t *fil, SDL_bool k
 {
     Uint8 buf[TAGS_INPUT_BUFFER_SIZE];
     long len; size_t readsize;
-    int c_id3, c_ape, c_lyr, c_mm;
+    int c_ape, c_lyr, c_mm;
     int rc = -1;
     SDL_bool tag_handled = SDL_FALSE;
 
@@ -1295,7 +1295,7 @@ int mp3_read_tags(Mix_MusicMetaTags *out_tags, struct mp3file_t *fil, SDL_bool k
         goto fail;
     }
     /* ID3v1 tag is at the end */
-    if ((c_id3 = probe_id3v1(out_tags, fil, buf, tag_handled, !c_mm)) < 0) {
+    if (probe_id3v1(out_tags, fil, buf, tag_handled, !c_mm) < 0) {
         goto fail;
     }
     /* we do not know the order of ape or lyrics3
