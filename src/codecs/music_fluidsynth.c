@@ -141,6 +141,7 @@ typedef struct {
     void *buffer;
     int buffer_size;
     int volume;
+    SDL_bool is_paused;
 } FLUIDSYNTH_Music;
 
 static void FLUIDSYNTH_Delete(void *context);
@@ -284,6 +285,7 @@ static int FLUIDSYNTH_Play(void *context, int play_count)
     fluidsynth.fluid_player_seek(music->player, 0);
 #endif
     fluidsynth.fluid_player_play(music->player);
+    music->is_paused = SDL_FALSE;
     return 0;
 }
 
@@ -291,12 +293,13 @@ static void FLUIDSYNTH_Resume(void *context)
 {
     FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music*)context;
     fluidsynth.fluid_player_play(music->player);
+    music->is_paused = SDL_FALSE;
 }
 
 static SDL_bool FLUIDSYNTH_IsPlaying(void *context)
 {
     FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
-    return fluidsynth.fluid_player_get_status(music->player) == FLUID_PLAYER_PLAYING ? SDL_TRUE : SDL_FALSE;
+    return music->is_paused || fluidsynth.fluid_player_get_status(music->player) == FLUID_PLAYER_PLAYING ? SDL_TRUE : SDL_FALSE;
 }
 
 static int FLUIDSYNTH_GetSome(void *context, void *data, int bytes, SDL_bool *done)
@@ -332,12 +335,14 @@ static void FLUIDSYNTH_Stop(void *context)
 #if (FLUIDSYNTH_VERSION_MAJOR >= 2)
     fluidsynth.fluid_player_seek(music->player, 0);
 #endif
+    music->is_paused = SDL_FALSE;
 }
 
 static void FLUIDSYNTH_Pause(void *context)
 {
     FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music*)context;
     fluidsynth.fluid_player_stop(music->player);
+    music->is_paused = SDL_TRUE;
 }
 
 static void FLUIDSYNTH_Delete(void *context)
