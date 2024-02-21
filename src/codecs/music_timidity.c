@@ -27,6 +27,10 @@
 
 #include <timidity.h>
 
+#ifdef USE_CUSTOM_AUDIO_STREAM
+#   include "stream_custom.h"
+#endif
+
 
 typedef struct
 {

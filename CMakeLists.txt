@@ -62,6 +62,8 @@ option(MIXERX_DISABLE_SIMD "Disable any SIMD optimizations as possible" OFF)
 
 option(ENABLE_ADDRESS_SANITIZER "Enable the Address Sanitizer GCC feature" OFF)
 
+option(ENABLE_LOWEND_RESAMPLER "Enable the EXPERIMENTAL low-end resampler" OFF)
+
 set(MIXERX_ZLIB TRUE)
 if(MIXERX_ENABLE_LGPL OR MIXERX_ENABLE_GPL)
     set(MIXERX_LGPL TRUE)
@@ -327,6 +329,14 @@ list(APPEND SDLMixerX_SOURCES
     ${SDLMixerX_SOURCE_DIR}/src/utils.c ${SDLMixerX_SOURCE_DIR}/src/utils.h
     ${SDLMixerX_SOURCE_DIR}/src/codecs/mp3utils.c
 )
+
+if(ENABLE_LOWEND_RESAMPLER)
+    list(APPEND SDLMixerX_SOURCES
+        ${SDLMixerX_SOURCE_DIR}/src/stream_custom.c
+        ${SDLMixerX_SOURCE_DIR}/src/stream_custom.h
+    )
+    list(APPEND SDL_MIXER_DEFINITIONS -DUSE_CUSTOM_AUDIO_STREAM)
+endif()
 
 #file(GLOB SDLMixerX_SOURCES ${SDLMixerX_SOURCES})
 

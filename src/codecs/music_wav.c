@@ -25,6 +25,9 @@
 
 #include "music_wav.h"
 #include "mp3utils.h"
+#ifdef USE_CUSTOM_AUDIO_STREAM
+#   include "stream_custom.h"
+#endif
 
 typedef struct ADPCM_DecoderState
 {

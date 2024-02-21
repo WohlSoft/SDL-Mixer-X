@@ -42,6 +42,9 @@
 #include <libavutil/dict.h>
 #include <libswresample/swresample.h>
 
+#ifdef USE_CUSTOM_AUDIO_STREAM
+#   include "stream_custom.h"
+#endif
 
 #define AUDIO_INBUF_SIZE 4096
 

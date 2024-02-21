@@ -31,6 +31,10 @@
 #include <math.h> /* for missing exp() */
 #endif
 
+#ifdef USE_CUSTOM_AUDIO_STREAM
+#   include "stream_custom.h"
+#endif
+
 #define STB_VORBIS_SDL 1 /* for SDL_mixer-specific stuff. */
 #define STB_VORBIS_NO_STDIO 1
 #define STB_VORBIS_NO_CRT 1
