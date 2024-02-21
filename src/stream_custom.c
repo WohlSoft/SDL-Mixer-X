@@ -70,12 +70,21 @@ static int s_reallocBuffer(Mix_AudioStream *stream, int len)
     return 1;
 }
 
-static void s_upSampleS16(Mix_AudioStream *stream, const Uint8 *in, int len)
+
+static void s_upSample8(Mix_AudioStream *stream, const Uint8 *in, int len)
+{}
+
+static void s_downSample8(Mix_AudioStream *stream, const Uint8 *in, int len)
+{}
+
+
+static void s_upSample16(Mix_AudioStream *stream, const Uint8 *in, int len)
 {
-    Sint16 *src = (Sint16 *)in;
-    Sint16 *src_end = (Sint16 *)(in + len);
-    Sint16 *dst = (Sint16 *)stream->local_buffer;
-    Sint16 *dst_end = (Sint16 *)(stream->local_buffer + stream->local_buffer_len);
+    typedef Uint16 Sample;
+    Sample *src = (Sample *)in;
+    Sample *src_end = (Sample *)(in + len);
+    Sample *dst = (Sample *)stream->local_buffer;
+    Sample *dst_end = (Sample *)(stream->local_buffer + stream->local_buffer_len);
     int i;
 
     stream->local_buffer_stored = 0;
@@ -91,16 +100,17 @@ static void s_upSampleS16(Mix_AudioStream *stream, const Uint8 *in, int len)
         for(i = 0; i < stream->src_channels; ++i)
             *(dst++) = *(src + i);
 
-        stream->local_buffer_stored += stream->src_channels * sizeof(Sint16);
+        stream->local_buffer_stored += stream->src_channels * sizeof(Sample);
     }
 }
 
-static void s_downSampleS16(Mix_AudioStream *stream, const Uint8 *in, int len)
+static void s_downSample16(Mix_AudioStream *stream, const Uint8 *in, int len)
 {
-    Sint16 *src = (Sint16 *)in;
-    Sint16 *src_end = (Sint16 *)(in + len);
-    Sint16 *dst = (Sint16 *)stream->local_buffer;
-    Sint16 *dst_end = (Sint16 *)(stream->local_buffer + stream->local_buffer_len);
+    typedef Uint16 Sample;
+    Sample *src = (Sample *)in;
+    Sample *src_end = (Sample *)(in + len);
+    Sample *dst = (Sample *)stream->local_buffer;
+    Sample *dst_end = (Sample *)(stream->local_buffer + stream->local_buffer_len);
     int i;
 
     stream->local_buffer_stored = 0;
@@ -118,9 +128,16 @@ static void s_downSampleS16(Mix_AudioStream *stream, const Uint8 *in, int len)
 
         src += stream->src_channels;
 
-        stream->local_buffer_stored += stream->src_channels * sizeof(Sint16);
+        stream->local_buffer_stored += stream->src_channels * sizeof(Sample);
     } while (src < src_end && dst < dst_end);
 }
+
+
+static void s_upSample32(Mix_AudioStream *stream, const Uint8 *in, int len)
+{}
+
+static void s_downSample32(Mix_AudioStream *stream, const Uint8 *in, int len)
+{}
 
 
 Mix_AudioStream *Mix_NewAudioStream(const SDL_AudioFormat src_format,
@@ -144,11 +161,21 @@ Mix_AudioStream *Mix_NewAudioStream(const SDL_AudioFormat src_format,
 
         switch(stream->src_format)
         {
+        case AUDIO_S8:
+        case AUDIO_U8:
+            stream->filter = src_rate < dst_rate ? s_upSample8 : s_downSample8;
+            break;
         case AUDIO_S16LSB:
         case AUDIO_S16MSB:
         case AUDIO_U16LSB:
         case AUDIO_U16MSB:
-            stream->filter = src_rate < dst_rate ? s_upSampleS16 : s_downSampleS16;
+            stream->filter = src_rate < dst_rate ? s_upSample16 : s_downSample16;
+            break;
+        case AUDIO_S32LSB:
+        case AUDIO_S32MSB:
+        case AUDIO_F32LSB:
+        case AUDIO_F32MSB:
+            stream->filter = src_rate < dst_rate ? s_upSample32 : s_downSample32;
             break;
         }
     }
