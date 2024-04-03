@@ -62,7 +62,7 @@ option(MIXERX_DISABLE_SIMD "Disable any SIMD optimizations as possible" OFF)
 
 option(ENABLE_ADDRESS_SANITIZER "Enable the Address Sanitizer GCC feature" OFF)
 
-if(NINTENDO_DS OR NINTENDO_3DS)
+if(NINTENDO_3DS OR NINTENDO_WII OR VITA)
     set(ENABLE_LOWEND_RESAMPLER_DEFAULT ON)
 else()
     set(ENABLE_LOWEND_RESAMPLER_DEFAULT OFF)
