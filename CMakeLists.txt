@@ -68,7 +68,7 @@ else()
     set(ENABLE_LOWEND_RESAMPLER_DEFAULT OFF)
 endif()
 
-option(ENABLE_LOWEND_RESAMPLER "Enable the low-end resampler" ${ENABLE_LOWEND_RESAMPLER_DEFAULT})
+option(ENABLE_LOWEND_RESAMPLER "Enable the nearest-neighbour resampler for low-end hardware" ${ENABLE_LOWEND_RESAMPLER_DEFAULT})
 
 
 set(MIXERX_ZLIB TRUE)
