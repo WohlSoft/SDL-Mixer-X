@@ -26,7 +26,7 @@
 
 /*
     This is a wrapper over the SDL AudioStream that provides the
-    custom and extremely simple resampler for the very low end hardwre
+    custom and extremely simple resampler for the very low end hardware
  */
 
 #ifndef SDL_audio_h_
