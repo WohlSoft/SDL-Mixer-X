@@ -29,6 +29,10 @@
 #include "music_mpg123.h"
 #include "mp3utils.h"
 
+#ifdef USE_CUSTOM_AUDIO_STREAM
+#   include "stream_custom.h"
+#endif
+
 #include <stdio.h>      /* For SEEK_SET */
 #ifdef MPG123_HEADER
 #include MPG123_HEADER

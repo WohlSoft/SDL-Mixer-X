@@ -44,6 +44,9 @@
 #define DRMP3_FREE(p) SDL_free((p))
 #include "dr_libs/dr_mp3.h"
 
+#ifdef USE_CUSTOM_AUDIO_STREAM
+#   include "stream_custom.h"
+#endif
 
 typedef struct {
     struct mp3file_t file;

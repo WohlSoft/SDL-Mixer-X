@@ -39,6 +39,10 @@
 #endif
 #include <stdio.h>  /* SEEK_SET, ... */
 
+#ifdef USE_CUSTOM_AUDIO_STREAM
+#   include "stream_custom.h"
+#endif
+
 #ifndef OPEN_DSD_NATIVE
 #define OPEN_DSD_NATIVE 0x100
 #define OPEN_DSD_AS_PCM 0x200

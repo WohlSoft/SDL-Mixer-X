@@ -34,6 +34,10 @@
 #include <opus/opusfile.h>
 #endif
 
+#ifdef USE_CUSTOM_AUDIO_STREAM
+#   include "stream_custom.h"
+#endif
+
 typedef struct {
     int loaded;
     void *handle;

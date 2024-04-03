@@ -46,6 +46,9 @@
 #define DRFLAC_FREE(p) SDL_free((p))
 #include "dr_libs/dr_flac.h"
 
+#ifdef USE_CUSTOM_AUDIO_STREAM
+#   include "stream_custom.h"
+#endif
 
 typedef struct {
     struct mp3file_t file;
