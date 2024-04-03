@@ -62,7 +62,14 @@ option(MIXERX_DISABLE_SIMD "Disable any SIMD optimizations as possible" OFF)
 
 option(ENABLE_ADDRESS_SANITIZER "Enable the Address Sanitizer GCC feature" OFF)
 
-option(ENABLE_LOWEND_RESAMPLER "Enable the EXPERIMENTAL low-end resampler" OFF)
+if(NINTENDO_DS OR NINTENDO_3DS)
+    set(ENABLE_LOWEND_RESAMPLER_DEFAULT ON)
+else()
+    set(ENABLE_LOWEND_RESAMPLER_DEFAULT OFF)
+endif()
+
+option(ENABLE_LOWEND_RESAMPLER "Enable the low-end resampler" ${ENABLE_LOWEND_RESAMPLER_DEFAULT})
+
 
 set(MIXERX_ZLIB TRUE)
 if(MIXERX_ENABLE_LGPL OR MIXERX_ENABLE_GPL)
