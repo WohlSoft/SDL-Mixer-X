@@ -2066,6 +2066,7 @@ void MIXCALLCC Mix_FreeMusic(Mix_Music *music)
             }
 
             if (music->is_multimusic) {
+                _Mix_MultiMusic_Remove(music);
                 music_internal_halt(music);
             }
 
