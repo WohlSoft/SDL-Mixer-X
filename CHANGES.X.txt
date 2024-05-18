@@ -5,6 +5,8 @@ It is an additional changelog file. It extends the CHANGES.txt that lists change
 2.7.0: [dev]
  * Added support for MP3-encoded WAV files.
  * Added the custom low-quality nearest-neighbour resampler for the low-end hardware.
+ * Fixed the crash on attempt to free a playing music as a multi-music stream.
+ * Fixed the individual music finish hook not being called on free while playing.
 
 2.6.0: (2023-11-23)
  * Added new calls: Mix_ADLMIDI_getAutoArpeggio(), Mix_ADLMIDI_setAutoArpeggio(), Mix_OPNMIDI_getAutoArpeggio(), Mix_OPNMIDI_setAutoArpeggio(), Mix_QuerySpec(), Mix_SetMusicSpeed(), Mix_GetMusicSpeed(), Mix_SetMusicPitch(), Mix_GetMusicPitch(), Mix_GME_SetSpcEchoDisabled(), Mix_GME_GetSpcEchoDisabled()
