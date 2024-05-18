@@ -2053,6 +2053,8 @@ Mix_Music * MIXCALLCC Mix_LoadMUSType_RW_ARG(SDL_RWops *src, Mix_MusicType type,
 /* Free a music chunk previously loaded */
 void MIXCALLCC Mix_FreeMusic(Mix_Music *music)
 {
+    SDL_bool do_hook = SDL_TRUE;
+
     if (music) {
         /* Stop the music if it's currently playing */
         Mix_LockAudio();
@@ -2060,6 +2062,11 @@ void MIXCALLCC Mix_FreeMusic(Mix_Music *music)
         if (music == music_playing || music->is_multimusic) {
             /* Wait for any fade out to finish */
             while ((music_active || music->is_multimusic) && music->fading == MIX_FADING_OUT) {
+                if (do_hook) {
+                    /* Don't call the hook as it will be already called in
+                       the music_mix_stream(), otherwise, it will be called twice. */
+                    do_hook = SDL_FALSE;
+                }
                 Mix_UnlockAudio();
                 SDL_Delay(100);
                 Mix_LockAudio();
@@ -2072,6 +2079,10 @@ void MIXCALLCC Mix_FreeMusic(Mix_Music *music)
 
             if (music == music_playing) {
                 music_internal_halt(music_playing);
+            }
+
+            if (do_hook && music->music_finished_hook) {
+                music->music_finished_hook(music, music->music_finished_hook_user_data);
             }
         }
         Mix_UnlockAudio();
