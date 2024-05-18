@@ -3770,7 +3770,7 @@ extern DECLSPEC int  MIXCALL Mix_ADLMIDI_getFullRangeBrightness(void);/*MixerX*/
 /* Set full range mode for CC74-Brightness controller */
 extern DECLSPEC void MIXCALL Mix_ADLMIDI_setFullRangeBrightness(int frb);/*MixerX*/
 /* Get the automatic arpeggio enabled or disabled setting */
-extern DECLSPEC int  MIXCALL Mix_ADLMIDI_getAutoArpeggio();/*MixerX*/
+extern DECLSPEC int  MIXCALL Mix_ADLMIDI_getAutoArpeggio(void);/*MixerX*/
 /* Set the automatic arpeggio enabled or disabled */
 extern DECLSPEC void MIXCALL Mix_ADLMIDI_setAutoArpeggio(int aa_en);/*MixerX*/
 /* Get channel allocation mode */
@@ -3806,7 +3806,7 @@ extern DECLSPEC int  MIXCALL Mix_OPNMIDI_getFullRangeBrightness(void);/*MixerX*/
 /* Set full range mode for CC74-Brightness controller */
 extern DECLSPEC void MIXCALL Mix_OPNMIDI_setFullRangeBrightness(int frb);/*MixerX*/
 /* Get the automatic arpeggio enabled or disabled setting */
-extern DECLSPEC int  MIXCALL Mix_OPNMIDI_getAutoArpeggio();/*MixerX*/
+extern DECLSPEC int  MIXCALL Mix_OPNMIDI_getAutoArpeggio(void);/*MixerX*/
 /* Set the automatic arpeggio enabled or disabled */
 extern DECLSPEC void MIXCALL Mix_OPNMIDI_setAutoArpeggio(int aa_en);/*MixerX*/
 /* Get channel allocation mode */
