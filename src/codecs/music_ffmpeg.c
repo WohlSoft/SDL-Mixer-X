@@ -534,6 +534,10 @@ static int FFMPEG_UpdateStream(FFMPEG_Music *music)
             ffmpeg.av_opt_set_sample_fmt(music->swr_ctx, "out_sample_fmt", music->dst_sample_fmt,  0);
             ffmpeg.swr_init(music->swr_ctx);
 
+#if defined(AVCODEC_NEW_CHANNEL_LAYOUT)
+            av_channel_layout_uninit(&layout);
+#endif
+
             music->merge_buffer_size = channels * ffmpeg.av_get_bytes_per_sample(sfmt) * 4096;
             music->merge_buffer = (Uint8*)SDL_calloc(1, music->merge_buffer_size);
             if (!music->merge_buffer) {
