@@ -56,9 +56,17 @@
 #define AVFORMAT_NEW_avcodec_find_decoder
 #endif
 
+#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(60, 12, 100)
+#define AVFORMAT_NEW_avio_alloc_context
+#endif
+
 #if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(59, 0, 100)
 #define AVFORMAT_NEW_avformat_open_input
 #define AVFORMAT_NEW_av_find_best_stream
+#endif
+
+#if LIBSWRESAMPLE_VERSION_INT >= AV_VERSION_INT(4, 14, 100)
+#define AVFORMAT_NEW_swr_convert
 #endif
 
 typedef struct ffmpeg_loader {
@@ -70,7 +78,11 @@ typedef struct ffmpeg_loader {
 
     unsigned (*avformat_version)(void);
     AVFormatContext *(*avformat_alloc_context)(void);
-    AVIOContext *(*avio_alloc_context)(unsigned char *,int,int,void *,int (*)(void *,uint8_t *,int),int (*)(void *, uint8_t *, int),int64_t (*)(void *,int64_t,int));
+#ifdef AVFORMAT_NEW_avio_alloc_context
+    AVIOContext *(*avio_alloc_context)(unsigned char *, int, int, void *, int (*)(void *,uint8_t *,int), int (*)(void *, const uint8_t *, int), int64_t (*)(void *,int64_t,int));
+#else
+    AVIOContext *(*avio_alloc_context)(unsigned char *, int, int, void *, int (*)(void *,uint8_t *,int), int (*)(void *, uint8_t *, int), int64_t (*)(void *,int64_t,int));
+#endif
 #if defined(AVFORMAT_NEW_avformat_open_input)
     int (*avformat_open_input)(AVFormatContext **, const char *,const AVInputFormat *,AVDictionary **);
 #else
@@ -126,7 +138,11 @@ typedef struct ffmpeg_loader {
     struct SwrContext *(*swr_alloc)(void);
     int (*swr_init)(struct SwrContext *s);
     int (*av_get_bytes_per_sample)(enum AVSampleFormat);
+#ifdef AVFORMAT_NEW_swr_convert
+    int (*swr_convert)(struct SwrContext *, uint8_t * const*, int,const uint8_t * const* , int);
+#else
     int (*swr_convert)(struct SwrContext *, uint8_t **, int,const uint8_t ** , int);
+#endif
     void (*swr_free)(struct SwrContext **);
 
 } ffmpeg_loader;
@@ -205,7 +221,11 @@ static int FFMPEG_Load(void)
         /* AVFormat */
         FUNCTION_LOADER(handle_avformat, avformat_version, unsigned (*)(void))
         FUNCTION_LOADER(handle_avformat, avformat_alloc_context, AVFormatContext *(*)(void))
+#ifdef AVFORMAT_NEW_avio_alloc_context
+        FUNCTION_LOADER(handle_avformat, avio_alloc_context, AVIOContext *(*)(unsigned char *,int,int,void *,int (*)(void *,uint8_t *,int),int (*)(void *, const uint8_t *, int),int64_t (*)(void *,int64_t,int)))
+#else
         FUNCTION_LOADER(handle_avformat, avio_alloc_context, AVIOContext *(*)(unsigned char *,int,int,void *,int (*)(void *,uint8_t *,int),int (*)(void *, uint8_t *, int),int64_t (*)(void *,int64_t,int)))
+#endif
 #if defined(AVFORMAT_NEW_avformat_open_input)
         FUNCTION_LOADER(handle_avformat, avformat_open_input, int (*)(AVFormatContext **, const char *,const AVInputFormat *,AVDictionary **))
 #else
@@ -261,7 +281,11 @@ static int FFMPEG_Load(void)
         FUNCTION_LOADER(handle_swresample, swr_alloc, struct SwrContext *(*)(void))
         FUNCTION_LOADER(handle_swresample, swr_init, int (*)(struct SwrContext *s))
         FUNCTION_LOADER(handle_swresample, av_get_bytes_per_sample, int (*)(enum AVSampleFormat))
+#ifdef AVFORMAT_NEW_swr_convert
+        FUNCTION_LOADER(handle_swresample, swr_convert, int (*)(struct SwrContext *, uint8_t * const*, int,const uint8_t * const* , int))
+#else
         FUNCTION_LOADER(handle_swresample, swr_convert, int (*)(struct SwrContext *, uint8_t **, int,const uint8_t ** , int))
+#endif
         FUNCTION_LOADER(handle_swresample, swr_free, void (*)(struct SwrContext **))
 
         ver_avcodec = ffmpeg.avcodec_version();
