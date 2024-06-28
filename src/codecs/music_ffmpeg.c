@@ -110,6 +110,9 @@ typedef struct ffmpeg_loader {
     unsigned (*avutil_version)(void);
     int (*av_opt_set_int)(void *, const char *, int64_t , int);
     int (*av_opt_set_sample_fmt)(void *, const char *, enum AVSampleFormat, int);
+#if defined(AVCODEC_NEW_CHANNEL_LAYOUT)
+    int (*av_opt_set_chlayout)(void *, const char *, const AVChannelLayout *, int);
+#endif
     void *(*av_malloc)(size_t);
     int (*av_strerror)(int, char *, size_t);
     AVFrame *(*av_frame_alloc)(void);
@@ -242,6 +245,9 @@ static int FFMPEG_Load(void)
         FUNCTION_LOADER(handle_avutil, avutil_version,  unsigned (*)(void))
         FUNCTION_LOADER(handle_avutil, av_opt_set_int,  int (*)(void *, const char *, int64_t , int))
         FUNCTION_LOADER(handle_avutil, av_opt_set_sample_fmt,  int (*)(void *, const char *, enum AVSampleFormat, int))
+#if defined(AVCODEC_NEW_CHANNEL_LAYOUT)
+        FUNCTION_LOADER(handle_avutil, av_opt_set_chlayout,  int (*)(void *, const char *, const AVChannelLayout *, int))
+#endif
         FUNCTION_LOADER(handle_avutil, av_malloc,  void *(*)(size_t))
         FUNCTION_LOADER(handle_avutil, av_strerror,  int (*)(int, char *, size_t))
         FUNCTION_LOADER(handle_avutil, av_frame_alloc,  AVFrame *(*)(void))
@@ -380,13 +386,20 @@ static int FFMPEG_UpdateStream(FFMPEG_Music *music)
     SDL_assert(music->audio_stream->codecpar);
     enum AVSampleFormat sfmt = music->audio_stream->codecpar->format;
     int srate = music->audio_stream->codecpar->sample_rate;
+
 #if defined(AVCODEC_NEW_CHANNEL_LAYOUT)
     int channels = music->audio_stream->codecpar->ch_layout.nb_channels;
 #else
     int channels = music->audio_stream->codecpar->channels;
 #endif
+
     int fmt = 0;
+
+#if defined(AVCODEC_NEW_CHANNEL_LAYOUT)
+    AVChannelLayout layout;
+#else
     int layout;
+#endif
 
     if (srate == 0 || channels == 0) {
         return -1;
@@ -457,10 +470,27 @@ static int FFMPEG_UpdateStream(FFMPEG_Music *music)
         if (music->planar) {
             music->swr_ctx = ffmpeg.swr_alloc();
 #if defined(AVCODEC_NEW_CHANNEL_LAYOUT)
-            layout = music->audio_stream->codecpar->ch_layout.u.mask;
+            layout = music->audio_stream->codecpar->ch_layout;
 #else
             layout = music->audio_stream->codecpar->channel_layout;
 #endif
+
+#if defined(AVCODEC_NEW_CHANNEL_LAYOUT)
+            if (layout.u.mask == 0) {
+                layout.order = AV_CHANNEL_ORDER_NATIVE;
+                layout.nb_channels = channels;
+                if(channels > 2) {
+                    layout.u.mask = AV_CH_LAYOUT_SURROUND;
+                } else if(channels == 2) {
+                    layout.u.mask = AV_CH_LAYOUT_STEREO;
+                } else if(channels == 1) {
+                    layout.u.mask = AV_CH_LAYOUT_MONO;
+                }
+            }
+
+            ffmpeg.av_opt_set_chlayout(music->swr_ctx, "in_chlayout",  &layout, 0);
+            ffmpeg.av_opt_set_chlayout(music->swr_ctx, "out_chlayout", &layout, 0);
+#else
             if (layout == 0) {
                 if(channels > 2) {
                     layout = AV_CH_LAYOUT_SURROUND;
@@ -470,8 +500,10 @@ static int FFMPEG_UpdateStream(FFMPEG_Music *music)
                     layout = AV_CH_LAYOUT_MONO;
                 }
             }
+
             ffmpeg.av_opt_set_int(music->swr_ctx, "in_channel_layout",  layout, 0);
             ffmpeg.av_opt_set_int(music->swr_ctx, "out_channel_layout", layout, 0);
+#endif
             ffmpeg.av_opt_set_int(music->swr_ctx, "in_sample_rate",     srate, 0);
             ffmpeg.av_opt_set_int(music->swr_ctx, "out_sample_rate",    srate, 0);
             ffmpeg.av_opt_set_sample_fmt(music->swr_ctx, "in_sample_fmt",  sfmt, 0);
@@ -537,6 +569,7 @@ static void *FFMPEG_NewRW(struct SDL_RWops *src, int freesrc)
 {
     FFMPEG_Music *music = NULL;
     const AVDictionaryEntry *tag = NULL;
+    char proto[] = "file:///sdl_rwops";
     int ret;
 
     music = (FFMPEG_Music *)SDL_calloc(1, sizeof *music);
@@ -578,6 +611,7 @@ static void *FFMPEG_NewRW(struct SDL_RWops *src, int freesrc)
     }
 
     music->fmt_ctx->pb = music->avio_in;
+    music->fmt_ctx->url = proto;
 
     ret = ffmpeg.avformat_open_input(&music->fmt_ctx, NULL, NULL, NULL);
     if (ret < 0) {
