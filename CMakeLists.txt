@@ -376,9 +376,9 @@ if(SDL_MIXER_X_STATIC AND NOT BUILD_AS_VB6_BINDING)
     if(NOT CMAKE_VERSION VERSION_LESS 3.0.2)
         set_target_properties(SDL2_mixer_ext_Static
             PROPERTIES
-            ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-            LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+            ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/$<$<CONFIG:Debug>:>"
+            LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/$<$<CONFIG:Debug>:>"
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<$<CONFIG:Debug>:>"
         )
     endif()
 
