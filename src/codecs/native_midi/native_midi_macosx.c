@@ -104,7 +104,11 @@ GetSequenceAudioUnitMatching(MusicSequence sequence, AudioUnit *aunit,
 
     for (i = 0; i < nodecount; i++) {
         AUNode node;
+#if MAC_OS_X_VERSION_MIN_REQUIRED < 1070
+	ComponentDescription desc;
+#else
         AudioComponentDescription desc;
+#endif
 
         if (AUGraphGetIndNode(graph, i, &node) != noErr)
             continue;  /* better luck next time. */
