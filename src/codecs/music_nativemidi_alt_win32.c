@@ -277,8 +277,8 @@ int native_midi_detect(void)
     HMIDIOUT out;
     MMRESULT err = midiOutOpen(&out, 0, 0, 0, CALLBACK_NULL);
 
-    if (err == MMSYSERR_NOERROR) {
-        return -1;
+    if (err != MMSYSERR_NOERROR) {
+        return 0;
     }
 
     midiOutClose(out);
