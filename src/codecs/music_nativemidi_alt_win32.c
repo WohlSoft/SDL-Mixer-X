@@ -224,7 +224,7 @@ static int init_midi_out(NativeMidiSong *seqi)
     if (err != MMSYSERR_NOERROR)
     {
         seqi->out = NULL;
-        return -1;
+        return 1;
     }
 
     for(i = 0; i < 16; i++)
@@ -315,7 +315,10 @@ static int NativeMidiThread(void *context)
         return 1;
     }
 
-    init_midi_out(music);
+    if (init_midi_out(music)) {
+      Mix_SetError("Native MIDI Win32-Alt: midiOutOpen failed (%lu)\n", (unsigned long)GetLastError());
+      return 1;
+    }
 
     midi_seq_set_loop_enabled(music->song, 1);
     midi_seq_set_loop_count(music->song, music->loops < 0 ? -1 : (music->loops + 1));
