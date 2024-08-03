@@ -240,7 +240,7 @@ static void _Mix_MultiMusic_ResumeAll(void)
 
 typedef struct _Eff_positionargs position_args;
 
-struct _Mix_Music {
+struct Mix_Music {
     Mix_MusicInterface *interface;
     void *context;
 
