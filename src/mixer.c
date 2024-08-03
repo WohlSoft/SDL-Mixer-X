@@ -625,6 +625,9 @@ int MIXCALLCC Mix_AllocateChannels(int numchans)
     if (mix_channel_tmp || !numchans) {
         /* Apply the temporary pointer on success */
         mix_channel = mix_channel_tmp;
+        if (num_channels < 0) {
+            num_channels = 0;
+        }
         if (numchans > num_channels) {
             /* Initialize the new channels */
             for (i = num_channels; i < numchans; i++) {
