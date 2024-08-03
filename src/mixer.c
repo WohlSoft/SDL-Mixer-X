@@ -597,34 +597,36 @@ void MIXCALLCC Mix_PauseAudio(int pause_on)
 int MIXCALLCC Mix_AllocateChannels(int numchans)
 {
     struct _Mix_Channel *mix_channel_tmp;
+    int i;
 
-    if (numchans<0 || numchans==num_channels)
+    if (numchans < 0 || numchans == num_channels) {
         return num_channels;
+    }
 
     if (numchans < num_channels) {
         /* Stop the affected channels */
-        int i;
-        for(i=numchans; i < num_channels; i++) {
+        for (i = numchans; i < num_channels; i++) {
             Mix_UnregisterAllEffects(i);
             Mix_HaltChannel(i);
         }
     }
+
     Mix_LockAudio();
     /* Allocate channels into temporary pointer */
     if (numchans) {
-        mix_channel_tmp = (struct _Mix_Channel *) SDL_realloc(mix_channel, numchans * sizeof(struct _Mix_Channel));
+        mix_channel_tmp = (struct _Mix_Channel *)SDL_realloc(mix_channel, numchans * sizeof(struct _Mix_Channel));
     } else {
         /* Handle 0 numchans */
         SDL_free(mix_channel);
         mix_channel_tmp = NULL;
     }
+
     /* Check the allocation */
     if (mix_channel_tmp || !numchans) {
         /* Apply the temporary pointer on success */
         mix_channel = mix_channel_tmp;
         if (numchans > num_channels) {
             /* Initialize the new channels */
-            int i;
             for (i = num_channels; i < numchans; i++) {
                 mix_channel[i].chunk = NULL;
                 mix_channel[i].playing = 0;
@@ -645,6 +647,7 @@ int MIXCALLCC Mix_AllocateChannels(int numchans)
         Mix_SetError("Channel allocation failed");
     }
     Mix_UnlockAudio();
+
     return num_channels; /* If the return value equals numchans the allocation was successful */
 }
 
