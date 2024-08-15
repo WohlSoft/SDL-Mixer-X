@@ -61,6 +61,10 @@ static gme_loader gme;
     if (gme.FUNC == NULL) { Mix_SetError("Missing GME.framework"); return -1; }
 #endif
 
+#ifdef __APPLE__
+    /* Need to turn off optimizations so weak framework load check works */
+    __attribute__ ((optnone))
+#endif
 static int GME_Load(void)
 {
     if (gme.loaded == 0) {

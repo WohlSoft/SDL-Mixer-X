@@ -191,6 +191,10 @@ static inline char *mix_av_make_error_string(char *errbuf, size_t errbuf_size, i
     mix_av_make_error_string((char[AV_ERROR_MAX_STRING_SIZE]){0}, AV_ERROR_MAX_STRING_SIZE, errnum)
 
 
+#ifdef __APPLE__
+    /* Need to turn off optimizations so weak framework load check works */
+    __attribute__ ((optnone))
+#endif
 static int FFMPEG_Load(void)
 {
     unsigned ver_avcodec, ver_avformat, ver_avutil, ver_swresample;

@@ -77,6 +77,10 @@ static vorbis_loader vorbis;
     if (vorbis.FUNC == NULL) { Mix_SetError("Missing vorbis.framework or tremor.framework"); return -1; }
 #endif
 
+#ifdef __APPLE__
+    /* Need to turn off optimizations so weak framework load check works */
+    __attribute__ ((optnone))
+#endif
 static int OGG_Load(void)
 {
     if (vorbis.loaded == 0) {

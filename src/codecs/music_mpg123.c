@@ -85,6 +85,10 @@ static mpg123_loader mpg123;
     if (mpg123.FUNC == NULL) { Mix_SetError("Missing mpg123.framework"); return -1; }
 #endif
 
+#ifdef __APPLE__
+    /* Need to turn off optimizations so weak framework load check works */
+    __attribute__ ((optnone))
+#endif
 static int MPG123_Load(void)
 {
     if (mpg123.loaded == 0) {

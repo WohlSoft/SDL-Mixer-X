@@ -79,6 +79,10 @@ static fluidsynth_loader fluidsynth;
     if (fluidsynth.FUNC == NULL) { Mix_SetError("Missing fluidlite.framework"); return -1; }
 #endif
 
+#ifdef __APPLE__
+    /* Need to turn off optimizations so weak framework load check works */
+    __attribute__ ((optnone))
+#endif
 static int FLUIDSYNTH_Load()
 {
     if (fluidsynth.loaded == 0) {

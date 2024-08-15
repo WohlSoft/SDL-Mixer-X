@@ -72,6 +72,10 @@ static edmidi_loader EDMIDI;
     if (EDMIDI.FUNC == NULL) { Mix_SetError("Missing EDMIDI.framework"); return -1; }
 #endif
 
+#ifdef __APPLE__
+    /* Need to turn off optimizations so weak framework load check works */
+    __attribute__ ((optnone))
+#endif
 static int EDMIDI_Load(void)
 {
     if (EDMIDI.loaded == 0) {

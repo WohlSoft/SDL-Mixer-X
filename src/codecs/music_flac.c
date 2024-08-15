@@ -96,6 +96,10 @@ static flac_loader flac;
     if (flac.FUNC == NULL) { Mix_SetError("Missing FLAC.framework"); return -1; }
 #endif
 
+#ifdef __APPLE__
+    /* Need to turn off optimizations so weak framework load check works */
+    __attribute__ ((optnone))
+#endif
 static int FLAC_Load(void)
 {
     if (flac.loaded == 0) {

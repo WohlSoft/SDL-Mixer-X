@@ -90,6 +90,10 @@ static adlmidi_loader ADLMIDI;
     ADLMIDI.FUNC = FUNC;
 #endif
 
+#ifdef __APPLE__
+    /* Need to turn off optimizations so weak framework load check works */
+    __attribute__ ((optnone))
+#endif
 static int ADLMIDI_Load(void)
 {
     if (ADLMIDI.loaded == 0) {

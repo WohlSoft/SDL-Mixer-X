@@ -86,6 +86,10 @@ static opnmidi_loader OPNMIDI;
     OPNMIDI.FUNC = FUNC;
 #endif
 
+#ifdef __APPLE__
+    /* Need to turn off optimizations so weak framework load check works */
+    __attribute__ ((optnone))
+#endif
 static int OPNMIDI_Load(void)
 {
     if (OPNMIDI.loaded == 0) {
