@@ -110,20 +110,20 @@ extern "C" {
 
 #if SDL_MIXER_MAJOR_VERSION < 3 && SDL_MAJOR_VERSION < 3
 /**
- *  This is the version number macro for the current SDL_mixer version.
+ * This is the version number macro for the current SDL_mixer version.
  *
- *  In versions higher than 2.9.0, the minor version overflows into
- *  the thousands digit: for example, 2.23.0 is encoded as 4300.
- *  This macro will not be available in SDL 3.x or SDL_mixer 3.x.
+ * In versions higher than 2.9.0, the minor version overflows into the
+ * thousands digit: for example, 2.23.0 is encoded as 4300. This macro will
+ * not be available in SDL 3.x or SDL_mixer 3.x.
  *
- *  Deprecated, use SDL_MIXER_VERSION_ATLEAST or SDL_MIXER_VERSION instead.
+ * Deprecated, use SDL_MIXER_VERSION_ATLEAST or SDL_MIXER_VERSION instead.
  */
 #define SDL_MIXER_COMPILEDVERSION \
     SDL_VERSIONNUM(SDL_MIXER_MAJOR_VERSION, SDL_MIXER_MINOR_VERSION, SDL_MIXER_PATCHLEVEL)
 #endif /* SDL_MIXER_MAJOR_VERSION < 3 && SDL_MAJOR_VERSION < 3 */
 
 /**
- *  This macro will evaluate to true if compiled with SDL_mixer at least X.Y.Z.
+ * This macro will evaluate to true if compiled with SDL_mixer at least X.Y.Z.
  */
 #define SDL_MIXER_VERSION_ATLEAST(X, Y, Z) \
     ((SDL_MIXER_MAJOR_VERSION >= X) && \
@@ -148,7 +148,7 @@ extern DECLSPEC const SDL_version * MIXCALL Mix_Linked_Version(void);
 /**
  * Initialization flags
  */
-typedef enum
+typedef enum MIX_InitFlags
 {
     MIX_INIT_FLAC   = 0x00000001,
     MIX_INIT_MOD    = 0x00000002,
@@ -1638,16 +1638,16 @@ typedef void (SDLCALL *Mix_EffectFunc_t)(int chan, void *stream, int len, void *
 /**
  * This is the internal mixer callback format:
  *
- *   mixer(void *stream, int len, void *udata);
+ * mixer(void *stream, int len, void *udata);
  *
- *  (udata) is a user-defined bit of data, which you pass as the last arg of
- *  Mix_RegisterEffect(), and is passed back unmolested to your callback.
- *  Your effect changes the contents of (stream) based on whatever parameters
- *  are significant, or just leaves it be, if you prefer. You can do whatever
- *  you like to the buffer, though, and it will continue in its changed state
- *  down the mixing pipeline, through any other effect functions, then finally
- *  to be mixed with the rest of the channels and music for the final output
- *  stream.
+ * (udata) is a user-defined bit of data, which you pass as the last arg of
+ * Mix_RegisterEffect(), and is passed back unmolested to your callback.
+ * Your effect changes the contents of (stream) based on whatever parameters
+ * are significant, or just leaves it be, if you prefer. You can do whatever
+ * you like to the buffer, though, and it will continue in its changed state
+ * down the mixing pipeline, through any other effect functions, then finally
+ * o be mixed with the rest of the channels and music for the final output
+ * stream.
  *
  * DO NOT EVER call SDL_LockAudio() from your callback function!
  */
@@ -1655,10 +1655,10 @@ typedef void (SDLCALL *Mix_CommonMixer_t)(void *udata, Uint8 *stream, int len);
 
 /**
  * This is a callback that signifies that a channel has finished all its
- *  loops and has completed playback. This gets called if the buffer
- *  plays out normally, or if you call Mix_HaltChannel(), implicitly stop
- *  a channel via Mix_AllocateChannels(), or unregister a callback while
- *  it's still playing.
+ * loops and has completed playback. This gets called if the buffer
+ * plays out normally, or if you call Mix_HaltChannel(), implicitly stop
+ * a channel via Mix_AllocateChannels(), or unregister a callback while
+ * it's still playing.
  *
  * DO NOT EVER call SDL_LockAudio() from your callback function!
  */
@@ -1752,8 +1752,8 @@ typedef void (SDLCALL *Mix_MusicEffectDone_t)(Mix_Music *mus, void *udata); /*MI
  * \param chan the channel to register an effect to, or MIX_CHANNEL_POST.
  * \param f effect the callback to run when more of this channel is to be
  *          mixed.
- * \param d effect done callback
- * \param arg argument
+ * \param d effect done callback.
+ * \param arg argument.
  * \returns zero if error (no such channel), nonzero if added. Error messages
  *          can be retrieved from Mix_GetError().
  *
@@ -3228,7 +3228,7 @@ extern DECLSPEC int MIXCALL Mix_PausedMusic(void);
  *
  * This only applies to MOD music formats.
  *
- * \param order order
+ * \param order order.
  * \returns 0 if successful, or -1 if failed or isn't implemented.
  *
  * \since This function is available since SDL_mixer 2.6.0.
@@ -3236,13 +3236,42 @@ extern DECLSPEC int MIXCALL Mix_PausedMusic(void);
 extern DECLSPEC int MIXCALL Mix_ModMusicJumpToOrder(int order);
 
 /**
- * TODO: Describe this
- * This is the MixerX fork exclusive function.
+ * Jump to a given order in mod music by music context directly.
+ *
+ * This only applies to MOD music formats.
+ *
+ * \param music Loaded music context.
+ * \param order order.
+ * \returns 0 if successful, or -1 if failed or isn't implemented.
+ *
+ * \since This function is exclusive for the MixerX fork
  */
 extern DECLSPEC int MIXCALL Mix_ModMusicStreamJumpToOrder(Mix_Music *music, int order);/*MixerX*/
 
-/* Tracks */
+/**
+ * Start a track in music object.
+ *
+ * This only applies to GME music formats.
+ *
+ * \param music the music object.
+ * \param track the track number to play. 0 is the first track.
+ * \returns 0 if successful, or -1 if failed or isn't implemented.
+ *
+ * \since This function is available since SDL_mixer 2.8.0.
+ */
 extern DECLSPEC int MIXCALL Mix_StartTrack(Mix_Music *music, int track);
+
+/**
+ * Get number of tracks in music object.
+ *
+ * This only applies to GME music formats.
+ *
+ * \param music the music object.
+ * \returns number of tracks if successful, or -1 if failed or isn't
+ *          implemented.
+ *
+ * \since This function is available since SDL_mixer 2.8.0.
+ */
 extern DECLSPEC int MIXCALL Mix_GetNumTracks(Mix_Music *music);
 
 /**
