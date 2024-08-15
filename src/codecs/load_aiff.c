@@ -79,12 +79,12 @@ static Uint32 SANE_to_Uint32 (Uint8 *sanebuf)
 SDL_AudioSpec *Mix_LoadAIFF_RW (SDL_RWops *src, int freesrc,
     SDL_AudioSpec *spec, Uint8 **audio_buf, Uint32 *audio_len)
 {
-    int was_error;
     int found_SSND;
     int found_COMM;
     int found_FVER;
     int found_VHDR;
     int found_BODY;
+    int was_error = 0;
     Sint64 start = 0;
 
     Uint32 chunk_type;
@@ -302,7 +302,7 @@ done:
     if (was_error) {
         spec = NULL;
     }
-    return(spec);
+    return spec;
 }
 
 /* vi: set ts=4 sw=4 expandtab: */

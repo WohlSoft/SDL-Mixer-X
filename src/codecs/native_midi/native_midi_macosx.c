@@ -21,7 +21,7 @@
 
 #include "SDL_config.h"
 
-#if __MACOSX__
+#ifdef __MACOSX__
 
 /* Mac OS X 10.6+, using Core MIDI. */
 
@@ -105,7 +105,7 @@ GetSequenceAudioUnitMatching(MusicSequence sequence, AudioUnit *aunit,
     for (i = 0; i < nodecount; i++) {
         AUNode node;
 #if MAC_OS_X_VERSION_MIN_REQUIRED < 1070
-	ComponentDescription desc;
+        ComponentDescription desc;
 #else
         AudioComponentDescription desc;
 #endif

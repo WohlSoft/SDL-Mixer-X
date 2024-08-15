@@ -1320,7 +1320,7 @@ int mp3_read_tags(Mix_MusicMetaTags *out_tags, struct mp3file_t *fil, SDL_bool k
         break;
     } /* for (;;) */
 
-    succ:
+succ:
     rc = (fil->length > 0)? 0 : -1;
     fail:
     MP3_RWseek(fil, 0, RW_SEEK_SET);

@@ -43,7 +43,7 @@ typedef struct {
 #if (FLUIDSYNTH_VERSION_MAJOR >= 2)
     void (*delete_fluid_player)(fluid_player_t*);
     void (*delete_fluid_synth)(fluid_synth_t*);
-    int (*fluid_player_seek)(fluid_player_t*, int);
+    int (*fluid_player_seek)(fluid_player_t *, int);
 #else
     int (*delete_fluid_player)(fluid_player_t*);
     int (*delete_fluid_synth)(fluid_synth_t*);
@@ -94,7 +94,7 @@ static int FLUIDSYNTH_Load()
 #if (FLUIDSYNTH_VERSION_MAJOR >= 2)
         FUNCTION_LOADER(delete_fluid_player, void (*)(fluid_player_t*))
         FUNCTION_LOADER(delete_fluid_synth, void (*)(fluid_synth_t*))
-        FUNCTION_LOADER(fluid_player_seek, int (*)(fluid_player_t*, int))
+        FUNCTION_LOADER(fluid_player_seek, int (*)(fluid_player_t *, int))
 #else
         FUNCTION_LOADER(delete_fluid_player, int (*)(fluid_player_t*))
         FUNCTION_LOADER(delete_fluid_synth, int (*)(fluid_synth_t*))
@@ -295,7 +295,7 @@ static int FLUIDSYNTH_Play(void *context, int play_count)
 
 static void FLUIDSYNTH_Resume(void *context)
 {
-    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music*)context;
+    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
     fluidsynth.fluid_player_play(music->player);
     music->is_paused = SDL_FALSE;
 }
@@ -319,8 +319,7 @@ static int FLUIDSYNTH_GetSome(void *context, void *data, int bytes, SDL_bool *do
     }
 
     if (music->synth_write(music->synth, music_spec.samples, music->buffer, 0, 2, music->buffer, 1, 2) != FLUID_OK) {
-        Mix_SetError("Error generating FluidSynth audio");
-        return -1;
+        return Mix_SetError("Error generating FluidSynth audio");
     }
     if (SDL_AudioStreamPut(music->stream, music->buffer, music->buffer_size) < 0) {
         return -1;
@@ -344,7 +343,7 @@ static void FLUIDSYNTH_Stop(void *context)
 
 static void FLUIDSYNTH_Pause(void *context)
 {
-    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music*)context;
+    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
     fluidsynth.fluid_player_stop(music->player);
     music->is_paused = SDL_TRUE;
 }
