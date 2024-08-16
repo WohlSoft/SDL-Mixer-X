@@ -322,7 +322,7 @@ static void *WAVPACK_CreateFromFile(const char *file)
     size_t len;
     char *file2;
 
-    src1 = SDL_RWFromFile(file, "rb");
+    src1 = _Mix_RWFromFile(file, "rb");
     if (!src1) {
         Mix_SetError("Couldn't open '%s'", file);
         return NULL;
@@ -335,7 +335,7 @@ static void *WAVPACK_CreateFromFile(const char *file)
         SDL_memcpy(file2, file, len);
         file2[len] =  'c';
         file2[len + 1] = '\0';
-        src2 = SDL_RWFromFile(file2, "rb");
+        src2 = _Mix_RWFromFile(file2, "rb");
 #if WAVPACK_DBG
         if (src2) {
             SDL_Log("Loaded WavPack correction file %s", file2);

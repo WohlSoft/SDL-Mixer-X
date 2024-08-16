@@ -1887,7 +1887,7 @@ Mix_Music * MIXCALLCC Mix_LoadMUS(const char *file)
         }
     }
 
-    src = SDL_RWFromFile(file, "rb");
+    src = _Mix_RWFromFile(file, "rb");
     if (src == NULL) {
         Mix_SetError("Couldn't open '%s'", file);
         SDL_free(music_file);
@@ -3435,7 +3435,7 @@ const char* MIXCALLCC Mix_GetSoundFonts(void)
         unsigned i;
 
         for (i = 0; i < SDL_arraysize(s_soundfont_paths); ++i) {
-            SDL_RWops *rwops = SDL_RWFromFile(s_soundfont_paths[i], "rb");
+            SDL_RWops *rwops = _Mix_RWFromFile(s_soundfont_paths[i], "rb");
             if (rwops) {
                 SDL_RWclose(rwops);
                 return s_soundfont_paths[i];

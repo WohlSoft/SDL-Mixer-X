@@ -21,11 +21,15 @@
 #ifndef MIXER_H_
 #define MIXER_H_
 
+typedef SDL_RWops* (*Mix_RWFromFile_cb)(const char *file, const char *mode);
+
 /* Locking wrapper functions */
 extern void Mix_LockAudio(void);
 extern void Mix_UnlockAudio(void);
 
 extern void add_chunk_decoder(const char *decoder);
+
+extern Mix_RWFromFile_cb _Mix_RWFromFile;
 
 #endif /* MIXER_H_ */
 
