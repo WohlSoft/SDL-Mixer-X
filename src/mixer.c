@@ -1521,8 +1521,7 @@ void MIXCALLCC Mix_SetRWFromFile(Mix_RWFromFile_cb cb)
 {
     if (cb) {
         _Mix_RWFromFile = cb;
-    }
-    else {
+    } else {
         _Mix_RWFromFile = SDL_RWFromFile;
     }
 }
