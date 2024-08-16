@@ -328,7 +328,7 @@ static void FLUIDSYNTH_Delete(void *context);
 #if 0
 static int SDLCALL fluidsynth_check_soundfont(const char *path, void *data)
 {
-    SDL_RWops *rw = SDL_RWFromFile(path, "rb");
+    SDL_RWops *rw = _Mix_RWFromFile(path, "rb");
 
     (void)data;
     if (rw) {

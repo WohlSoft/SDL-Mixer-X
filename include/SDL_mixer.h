@@ -403,6 +403,11 @@ typedef enum {
 typedef struct Mix_Music Mix_Music;
 
 /**
+ * The type of a RWFromFile callback
+ */
+typedef SDL_RWops* (*Mix_RWFromFile_cb)(const char *file, const char *mode);
+
+/**
  * Open the default audio device for playback.
  *
  * An audio device is what generates sound, so the app must open one to make
@@ -3715,6 +3720,14 @@ extern DECLSPEC int MIXCALL Mix_InitMixer(const SDL_AudioSpec *spec, SDL_bool sk
  * This is the MixerX fork exclusive function.
  */
 extern DECLSPEC void MIXCALL Mix_FreeMixer(void);/*MixerX*/
+
+/**
+ * Set a function that MixerX will use to open RWops handles from file paths,
+ * or pass NULL to use the default SDL_RWFromFile.
+ *
+ * This is the MixerX fork exclusive function.
+ */
+extern DECLSPEC void MIXCALL Mix_SetRWFromFile(Mix_RWFromFile_cb cb);/*MixerX*/
 
 /**
  * Close the mixer, halting all playing audio.

@@ -59,6 +59,8 @@ SDL_COMPILE_TIME_ASSERT(SDL_MIXER_PATCHLEVEL_min, SDL_MIXER_PATCHLEVEL >= 0);
 SDL_COMPILE_TIME_ASSERT(SDL_MIXER_PATCHLEVEL_max, SDL_MIXER_PATCHLEVEL <= 99);
 #endif
 
+Mix_RWFromFile_cb _Mix_RWFromFile = SDL_RWFromFile;
+
 static int audio_opened = 0;
 static SDL_AudioSpec mixer;
 static SDL_AudioDeviceID audio_device;
@@ -949,7 +951,7 @@ Mix_Chunk * MIXCALLCC Mix_LoadWAV_RW(SDL_RWops *src, int freesrc)
 
 Mix_Chunk * MIXCALLCC Mix_LoadWAV(const char *file)
 {
-    return Mix_LoadWAV_RW(SDL_RWFromFile(file, "rb"), 1);
+    return Mix_LoadWAV_RW(_Mix_RWFromFile(file, "rb"), 1);
 }
 
 /* Load a wave file of the mixer format from a memory buffer */
@@ -1506,6 +1508,22 @@ void MIXCALLCC Mix_FreeMixer(void)
             num_decoders = 0;
         }
         --audio_opened;
+    }
+}
+
+/**
+ * Set a function that MixerX will use to open RWops handles from file paths,
+ * or pass NULL to use the default SDL_RWFromFile.
+ *
+ * This is the MixerX fork exclusive function.
+ */
+void MIXCALLCC Mix_SetRWFromFile(Mix_RWFromFile_cb cb)
+{
+    if (cb) {
+        _Mix_RWFromFile = cb;
+    }
+    else {
+        _Mix_RWFromFile = SDL_RWFromFile;
     }
 }
 
