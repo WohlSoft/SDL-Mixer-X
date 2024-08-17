@@ -1412,8 +1412,8 @@ static int detect_mp3(Uint8 *magic, SDL_RWops *src, Sint64 start, Sint64 offset)
 {
     const Uint32 null = 0;
     Uint8 mp3_magic[4];
+    Uint8 mp3_read_buffer[2048];
     const size_t mp3_read_buffer_size = 2048;
-    Uint8 mp3_read_buffer[mp3_read_buffer_size];
     size_t i = 0, got;
     SDL_bool found;
     Sint64 end_file_pos = 0;
