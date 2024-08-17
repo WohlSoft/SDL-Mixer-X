@@ -1381,8 +1381,13 @@ static int detect_mp3(Uint8 *magic, SDL_RWops *src, Sint64 start, Sint64 offset)
 {
     const Uint32 null = 0;
     Uint8 mp3_magic[4];
+    const size_t mp3_read_buffer_size = 2048;
+    Uint8 mp3_read_buffer[mp3_read_buffer_size];
+    size_t i = 0, got;
+    SDL_bool found;
     Sint64 end_file_pos = 0;
     const int max_search = 10240;
+    int bytes_read = 0;
 
     SDL_memcpy(mp3_magic, magic, 4);
 
@@ -1407,14 +1412,30 @@ static int detect_mp3(Uint8 *magic, SDL_RWops *src, Sint64 start, Sint64 offset)
 
 digMoreBytes:
     /* Find the nearest 0xFF byte */
-    while ((SDL_RWread(src, mp3_magic, 1, 1) == 1) &&
-           (mp3_magic[0] != 0xFF) &&
-           (SDL_RWtell(src) < (start + offset + max_search)) &&
-           (SDL_RWtell(src) < (end_file_pos - 1)) )
-    {}
+    found = SDL_FALSE;
+    do
+    {
+        SDL_memset(mp3_read_buffer, 0, mp3_read_buffer_size);
+        got = SDL_RWread(src, mp3_read_buffer, 1, mp3_read_buffer_size);
+
+        if (got == 0) {
+            SDL_RWseek(src, start, RW_SEEK_SET); /* Reached the end of the file */
+            return 0;
+        }
+
+        bytes_read += got;
+
+        for (i = 0; i < got; ++i) {
+            if (mp3_read_buffer[i] == 0xFF) {
+                found = SDL_TRUE;
+                SDL_RWseek(src, -(Sint64)(got - i), RW_SEEK_CUR);
+                break;
+            }
+        }
+    } while(!found && bytes_read < max_search);
 
     /* Can't read last 3 bytes of the frame header */
-    if (SDL_RWread(src, mp3_magic + 1, 1, 3) != 3) {
+    if (SDL_RWread(src, mp3_magic, 1, 4) != 4) {
         SDL_RWseek(src, start, RW_SEEK_SET);
         return 0;
     }
@@ -1423,7 +1444,7 @@ digMoreBytes:
     SDL_RWseek(src, -3, RW_SEEK_CUR);
 
     /* Got the end of search zone, however, found nothing */
-    if (SDL_RWtell(src) >= (start + offset + max_search)) {
+    if (bytes_read > max_search) {
         SDL_RWseek(src, start, RW_SEEK_SET);
         return 0;
     }
