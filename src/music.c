@@ -1377,6 +1377,37 @@ static int detect_ea_rsxx(SDL_RWops *in, Sint64 start, Uint8 magic_byte)
     return res;
 }
 
+static int detect_mod(SDL_RWops *in, Sint64 start)
+{
+    int res = SDL_FALSE;
+    int i;
+    Uint8 mod_magic[4];
+    const char * const mod_known_magics[] = {
+        "M.K.", "M!K!", "M&K!", "N.T.", "6CHN", "8CHN",
+        "CD61", "CD81", "TDZ1", "TDZ2", "TDZ3", "TDZ4",
+        "FA04", "FA06", "FA08", "LARD", "NSMS",
+        NULL
+    };
+
+    if (SDL_RWseek(in, start + 1080, RW_SEEK_SET) < 0) {
+        goto fail;
+    }
+    if (SDL_RWread(in, mod_magic, 1, 4) != 4) {
+        goto fail;
+    }
+
+    for (i = 0; mod_known_magics[i] ; ++i) {
+        if(SDL_memcmp(mod_magic, mod_known_magics[i], 4) == 0) {
+            res = SDL_TRUE;
+            break;
+        }
+    }
+
+fail:
+    SDL_RWseek(in, start, RW_SEEK_SET);
+    return res;
+}
+
 static int detect_mp3(Uint8 *magic, SDL_RWops *src, Sint64 start, Sint64 offset)
 {
     const Uint32 null = 0;
@@ -1752,6 +1783,10 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
         }
     }
 
+    if (detect_mod(src, start)) {
+        return MUS_MOD;
+    }
+
     /* Detect MP3 format by frame header [needs scanning of bigger part of the file] */
     if (detect_mp3(submagic, src, start, id3len)) {
         return MUS_MP3;
@@ -1922,7 +1957,6 @@ Mix_Music * MIXCALLCC Mix_LoadMUS(const char *file)
     if (ext) {
         ++ext; /* skip the dot in the extension */
         if (SDL_strcasecmp(ext, "AMS") == 0 ||
-            SDL_strcasecmp(ext, "MOD") == 0 ||
             SDL_strcasecmp(ext, "MOL") == 0 ||
             SDL_strcasecmp(ext, "NST") == 0 ||
             SDL_strcasecmp(ext, "STM") == 0 ||
