@@ -1416,6 +1416,7 @@ static int detect_mp3(Uint8 *magic, SDL_RWops *src, Sint64 start, Sint64 offset)
     const size_t mp3_read_buffer_size = 2048;
     size_t i = 0, got;
     SDL_bool found;
+    SDL_bool at_end = SDL_FALSE;
     Sint64 end_file_pos = 0;
     const int max_search = 10240;
     int bytes_read = 0;
@@ -1448,6 +1449,8 @@ digMoreBytes:
     {
         SDL_memset(mp3_read_buffer, 0, mp3_read_buffer_size);
         got = SDL_RWread(src, mp3_read_buffer, 1, mp3_read_buffer_size);
+
+        at_end = got < mp3_read_buffer_size;
 
         if (got == 0) {
             SDL_RWseek(src, start, RW_SEEK_SET); /* Reached the end of the file */
@@ -1488,14 +1491,18 @@ digMoreBytes:
 
 readHeader:
     if (
-        ((mp3_magic[0] & 0xff) != 0xff) || ((mp3_magic[1] & 0xf0) != 0xf0) || /*  No sync bits */
-        ((mp3_magic[1] & 0xe6) != 0xe2) ||
+        ((mp3_magic[0] & 0xff) != 0xff) || ((mp3_magic[1] & 0xe6) != 0xe2) || /*  No sync bits */
         ((mp3_magic[2] & 0xf0) == 0x00) || /*  Bitrate is 0 */
         ((mp3_magic[2] & 0xf0) == 0xf0) || /*  Bitrate is 15 */
         ((mp3_magic[2] & 0x0c) == 0x0c) || /*  Frequency is 3 */
         ((mp3_magic[1] & 0x06) == 0x00)    /*  Layer is 4 */
     ) {
         /* printf("WRONG BITS\n"); */
+        if (at_end) {
+            SDL_RWseek(src, start, RW_SEEK_SET); /* Reached the end of the file */
+            return 0;
+        }
+
         goto digMoreBytes;
     }
 
