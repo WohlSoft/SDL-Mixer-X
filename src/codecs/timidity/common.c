@@ -44,7 +44,7 @@ SDL_RWops *timi_openfile(const char *name)
   /* First try the given name */
 
   SNDDBG(("Trying to open %s\n", name));
-  if ((rw = _Mix_RWFromFile(name, "rb")) != NULL)
+  if ((rw = SDL_RWFromFile(name, "rb")) != NULL)
     return rw;
 
   if (!is_abspath(name))
@@ -69,7 +69,7 @@ SDL_RWops *timi_openfile(const char *name)
 	  }
 	SDL_strlcpy(p, name, sizeof(current_filename) - l);
 	SNDDBG(("Trying to open %s\n", current_filename));
-	if ((rw = _Mix_RWFromFile(current_filename, "rb")))
+	if ((rw = SDL_RWFromFile(current_filename, "rb")))
 	  return rw;
 	plp = plp->next;
       }
