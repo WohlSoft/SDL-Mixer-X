@@ -163,6 +163,7 @@ static void *PXTONE_NewRWex(struct SDL_RWops *src, int freesrc, const char *args
     int32_t comment_len;
     pxtnERR ret;
     PXTONE_Setup setup = pxtone_setup;
+    Uint8 src_channels = music_spec.channels;
 
     music = (PXTONE_Music *)SDL_calloc(1, sizeof *music);
     if (!music) {
@@ -185,7 +186,11 @@ static void *PXTONE_NewRWex(struct SDL_RWops *src, int freesrc, const char *args
         return NULL;
     }
 
-    if (!music->pxtn->set_destination_quality(music_spec.channels, music_spec.freq)) {
+    if (src_channels > 2) {
+        src_channels = 2; /* PXTone can't output more than two channels */
+    }
+
+    if (!music->pxtn->set_destination_quality(src_channels, music_spec.freq)) {
         PXTONE_Delete(music);
         Mix_SetError("PXTONE: Failed to set the destination quality");
         return NULL;
@@ -223,7 +228,7 @@ static void *PXTONE_NewRWex(struct SDL_RWops *src, int freesrc, const char *args
         return NULL;
     }
 
-    music->stream = SDL_NewAudioStream(AUDIO_S16SYS, music_spec.channels, music_spec.freq,
+    music->stream = SDL_NewAudioStream(AUDIO_S16SYS, src_channels, music_spec.freq,
                                        music_spec.format, music_spec.channels, music_spec.freq);
 
     if (!music->stream) {
