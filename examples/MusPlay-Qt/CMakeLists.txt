@@ -99,6 +99,28 @@ list(APPEND PGE_MUSPLAY_LINK_LIBS
     ${SDL_MIXER_X_LIB}
 )
 
+if(APPLE)
+    set_target_properties(sdlmixer_musplay PROPERTIES
+        OUTPUT_NAME "MixerX Music Player"
+        MACOSX_BUNDLE TRUE
+        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/_resources/musplay.plist.in"
+        MACOSX_BUNDLE_EXECUTABLE_NAME "sdlmixer_musplay"
+        MACOSX_BUNDLE_GUI_IDENTIFIER "ru.wohlsoft.sdlmixer-musplay"
+        MACOSX_BUNDLE_SHORT_VERSION_STRING "${MUSPLAY_VERSION_1}.${MUSPLAY_VERSION_2}.${MUSPLAY_VERSION_3}"
+        MACOSX_BUNDLE_LONG_VERSION_STRING "${MUSPLAY_VERSION_1}.${MUSPLAY_VERSION_2}.${MUSPLAY_VERSION_3}"
+        MACOSX_BUNDLE_ICON_FILE "cat_musplay.icns"
+        CPACK_BUNDLE_NAME "MixerX Music Player"
+        MACOSX_BUNDLE_INFO_STRING "A simple looped music player working on SDL Mixer X"
+    )
+    set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/_resources/cat_musplay.icns" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+    set_source_files_properties(${PGE_FILE_ICONS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+
+    find_library(COREFOUNDATION_LIBRARY CoreFoundation)
+    list(APPEND PGE_MUSPLAY_LINK_LIBS ${COREFOUNDATION_LIBRARY})
+
+    list(APPEND PGE_MUSPLAY_LINK_LIBS iconv)
+endif()
+
 if(WIN32)
     target_link_libraries(sdlmixer_musplay version ${PGE_MUSPLAY_LINK_LIBS} comctl32)
 elseif(APPLE)
@@ -121,4 +143,5 @@ qt5_use_modules(sdlmixer_musplay Widgets Network)
 
 install(TARGETS sdlmixer_musplay
     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+    BUNDLE DESTINATION "${CMAKE_INSTALL_BINDIR}"
 )
