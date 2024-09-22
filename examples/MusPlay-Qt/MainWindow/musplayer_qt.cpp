@@ -281,7 +281,8 @@ void MusPlayer_Qt::contextMenu(const QPoint &pos)
     version->setEnabled(false);
     QAction *license     = about->addAction("Licensed under GNU GPLv3 license");
     about->addSeparator();
-    QAction *source      = about->addAction("Get source code");
+    QAction *sourceMoondust = about->addAction("Get source code for Moondust Project");
+    QAction *sourceMixerX = about->addAction("Get source code for MixerX library");
     QAction *ret = x.exec(this->mapToGlobal(pos));
 
     if(open == ret)
@@ -322,8 +323,10 @@ void MusPlayer_Qt::contextMenu(const QPoint &pos)
 #endif
     else if(ret == license)
         on_actionHelpLicense_triggered();
-    else if(ret == source)
+    else if(ret == sourceMoondust)
         on_actionHelpGitHub_triggered();
+    else if(ret == sourceMixerX)
+        on_actionHelpGitHubMixerX_triggered();
 }
 
 void MusPlayer_Qt::openMusicByArg(QString musPath)
@@ -845,7 +848,12 @@ void MusPlayer_Qt::on_actionHelpAbout_triggered()
 
 void MusPlayer_Qt::on_actionHelpGitHub_triggered()
 {
-    QDesktopServices::openUrl(QUrl("https://github.com/WohlSoft/PGE-Project"));
+    QDesktopServices::openUrl(QUrl("https://github.com/WohlSoft/Moondust-Project/"));
+}
+
+void MusPlayer_Qt::on_actionHelpGitHubMixerX_triggered()
+{
+    QDesktopServices::openUrl(QUrl("https://github.com/WohlSoft/SDL-Mixer-X/"));
 }
 
 void MusPlayer_Qt::on_actionMidiSetup_triggered()

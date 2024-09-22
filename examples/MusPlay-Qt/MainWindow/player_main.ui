@@ -721,6 +721,7 @@ border-bottom-color: rgb(0, 120, 0);
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="actionHelpGitHubMixerX"/>
     <addaction name="actionHelpGitHub"/>
     <addaction name="actionHelpLicense"/>
     <addaction name="separator"/>
@@ -757,7 +758,7 @@ border-bottom-color: rgb(0, 120, 0);
   </action>
   <action name="actionHelpGitHub">
    <property name="text">
-    <string>Visit Github page...</string>
+    <string>Visit Github page of Moondust Project...</string>
    </property>
   </action>
   <action name="actionSfxTesting">
@@ -862,6 +863,11 @@ border-bottom-color: rgb(0, 120, 0);
   <action name="actionMultiSFXTesting">
    <property name="text">
     <string>Multi-SFX testing</string>
+   </property>
+  </action>
+  <action name="actionHelpGitHubMixerX">
+   <property name="text">
+    <string>Visit GitHub page of MixerX...</string>
    </property>
   </action>
  </widget>

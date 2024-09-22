@@ -100,6 +100,7 @@ private slots:
     void on_actionHelpLicense_triggered();
     void on_actionHelpAbout_triggered();
     void on_actionHelpGitHub_triggered();
+    void on_actionHelpGitHubMixerX_triggered();
     void on_actionMidiSetup_triggered();
     void on_actionSfxTesting_triggered();
     void on_actionMultiMusicTesting_triggered();
