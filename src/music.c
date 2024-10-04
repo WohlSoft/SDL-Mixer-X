@@ -1385,7 +1385,7 @@ static int detect_mod(SDL_RWops *in, Sint64 start)
     const char * const mod_known_magics[] = {
         "M.K.", "M!K!", "M&K!", "N.T.", "6CHN", "8CHN",
         "CD61", "CD81", "TDZ1", "TDZ2", "TDZ3", "TDZ4",
-        "FA04", "FA06", "FA08", "LARD", "NSMS",
+        "FA04", "FA06", "FA08", "LARD", "NSMS", "FLT4",
         NULL
     };
 
