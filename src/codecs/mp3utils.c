@@ -231,7 +231,7 @@ static SDL_INLINE Sint32 id3v2_synchsafe_decode(const Uint8 *data)
 static long get_id3v2_len(const Uint8 *data, long length)
 {
     /* size is a 'synchsafe' integer (see above) */
-    long size = id3v2_synchsafe_decode(data + 6);
+    long size = id3v2_synchsafe_decode(data + ID3v2_FIELD_TAG_LENGTH);
     size += ID3v2_HEADER_SIZE; /* header size */
     /* ID3v2 header[5] is flags (bits 4-7 only, 0-3 are zero).
      * bit 4 set: footer is present (a copy of the header but
