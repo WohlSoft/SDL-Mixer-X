@@ -1462,13 +1462,14 @@ digMoreBytes:
         for (i = 0; i < got; ++i) {
             if (mp3_read_buffer[i] == 0xFF) {
                 found = SDL_TRUE;
+                bytes_read -= (Sint64)(got - i);
                 SDL_RWseek(src, -(Sint64)(got - i), RW_SEEK_CUR);
                 break;
             }
         }
     } while(!found && bytes_read < max_search);
 
-    /* Can't read last 3 bytes of the frame header */
+    /* Can't read 4 bytes of the frame header */
     if (SDL_RWread(src, mp3_magic, 1, 4) != 4) {
         SDL_RWseek(src, start, RW_SEEK_SET);
         return 0;
