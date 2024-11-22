@@ -35,6 +35,7 @@
 #   include "stream_custom.h"
 #endif
 
+extern Mix_RWFromFile_cb _Mix_RWFromFile;
 
 typedef struct {
     int loaded;
