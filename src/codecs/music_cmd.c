@@ -283,6 +283,8 @@ Mix_MusicInterface Mix_MusicInterface_CMD =
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     NULL,   /* SetVolume */
     NULL,   /* GetVolume */
+    NULL,   /* SetGain [MIXER-X]*/
+    NULL,   /* GetGain [MIXER-X]*/
     MusicCMD_Play,
     MusicCMD_IsPlaying,
     NULL,   /* GetAudio */

@@ -254,9 +254,11 @@ void MusPlayer_Qt::contextMenu(const QPoint &pos)
     QAction *echo         = x.addAction("Echo");
     QAction *echoTuner    = x.addAction("Echo tuner...");
     QAction *musicFX      = x.addAction("Music FX...");
+    QAction *resetGain   = x.addAction("Reset gain");
     QAction *resetTempo   = x.addAction("Reset tempo");
     QAction *resetSpeed   = x.addAction("Reset speed");
     QAction *resetPitch   = x.addAction("Reset pitch");
+    resetGain->setEnabled(ui->gainFrame->isEnabled());
     resetTempo->setEnabled(ui->tempoFrame->isEnabled());
     resetSpeed->setEnabled(ui->speedFrame->isEnabled());
     resetPitch->setEnabled(ui->pitchFrame->isEnabled());
@@ -307,6 +309,8 @@ void MusPlayer_Qt::contextMenu(const QPoint &pos)
         on_actionTuneEcho_triggered();
     else if(musicFX == ret)
         on_actionMusicFX_triggered();
+    else if(resetGain == ret)
+        ui->gain->setValue(m_setupMidi->getGainDefault());
     else if(resetTempo == ret)
         ui->tempo->setValue(0);
     else if(resetSpeed == ret)
@@ -445,20 +449,34 @@ void MusPlayer_Qt::on_play_clicked()
 
     if(PGE_MusicPlayer::openFile(musicPath))
     {
+        float gain = Mix_GetMusicGain(PGE_MusicPlayer::s_playMus);
+        int gainDefault = gain >= 0.0f ? static_cast<int>(gain * 100): 100;
+        double tempo = Mix_GetMusicTempo(PGE_MusicPlayer::s_playMus);
+        double speed = Mix_GetMusicSpeed(PGE_MusicPlayer::s_playMus);
+        double pitch = Mix_GetMusicPitch(PGE_MusicPlayer::s_playMus);
+
+        m_setupMidi->setGainDefault(gainDefault);
+        m_setupMidi->setGain(gainDefault);
+
+        ui->gain->blockSignals(true);
+        ui->gain->setValue(gainDefault);
+        ui->gain->blockSignals(false);
+        ui->gainFrame->setEnabled(gain >= 0.0f);
+
         ui->tempo->blockSignals(true);
         ui->tempo->setValue(0);
         ui->tempo->blockSignals(false);
-        ui->tempoFrame->setEnabled(Mix_GetMusicTempo(PGE_MusicPlayer::s_playMus) >= 0.0);
+        ui->tempoFrame->setEnabled(tempo >= 0.0);
 
         ui->speed->blockSignals(true);
         ui->speed->setValue(0);
         ui->speed->blockSignals(false);
-        ui->speedFrame->setEnabled(Mix_GetMusicSpeed(PGE_MusicPlayer::s_playMus) >= 0.0);
+        ui->speedFrame->setEnabled(speed >= 0.0);
 
         ui->pitch->blockSignals(true);
         ui->pitch->setValue(0);
         ui->pitch->blockSignals(false);
-        ui->pitchFrame->setEnabled(Mix_GetMusicPitch(PGE_MusicPlayer::s_playMus) >= 0.0);
+        ui->pitchFrame->setEnabled(pitch >= 0.0);
 
         PGE_MusicPlayer::changeVolume(ui->volume->value());
         playSuccess = PGE_MusicPlayer::playMusic();
@@ -596,6 +614,22 @@ void MusPlayer_Qt::on_trackNext_clicked()
 void MusPlayer_Qt::on_disableSpcEcho_clicked(bool checked)
 {
     Mix_GME_SetSpcEchoDisabled(PGE_MusicPlayer::s_playMus, checked ? 1 : 0);
+}
+
+void MusPlayer_Qt::on_gain_valueChanged(int gain)
+{
+#ifdef SDL_MIXER_X
+    if(Mix_PlayingMusicStream(PGE_MusicPlayer::s_playMus))
+    {
+        float gainFactor = 0.01 * float(gain);
+        Mix_SetMusicGain(PGE_MusicPlayer::s_playMus, gainFactor);
+        qDebug() << "Changed gain factor: " << gainFactor;
+        QToolTip::showText(QCursor::pos(), QString("%1").arg(gainFactor), this);
+        m_setupMidi->setGain(gain);
+    }
+#else
+    Q_UNUSED(gain);
+#endif
 }
 
 void MusPlayer_Qt::on_tempo_valueChanged(int tempo)

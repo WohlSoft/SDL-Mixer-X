@@ -744,6 +744,8 @@ Mix_MusicInterface Mix_MusicInterface_WAVPACK =
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     WAVPACK_SetVolume,
     WAVPACK_GetVolume,
+    NULL,   /* SetGain [MIXER-X]*/
+    NULL,   /* GetGain [MIXER-X]*/
     WAVPACK_Play,
     NULL,   /* IsPlaying */
     WAVPACK_GetAudio,

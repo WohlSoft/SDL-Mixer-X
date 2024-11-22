@@ -21,6 +21,9 @@
 #ifdef MUSIC_PXTONE
 
 #include "music_pxtone.h"
+extern "C" {
+#include "utils.h"
+}
 
 #include "./pxtone/pxtnService.h"
 #include "./pxtone/pxtnError.h"
@@ -49,6 +52,7 @@ typedef struct
     int freesrc;
 
     int volume;
+    int volume_real;
     double tempo;
     float gain;
 
@@ -176,6 +180,7 @@ static void *PXTONE_NewRWex(struct SDL_RWops *src, int freesrc, const char *args
     music->tempo = setup.tempo;
     music->gain = setup.gain;
     music->volume = MIX_MAX_VOLUME;
+    music->volume_real = _Mix_MakeGainedVolume(MIX_MAX_VOLUME, music->gain);
 
     music->pxtn = new pxtnService(_pxtn_r, _pxtn_w, _pxtn_s, _pxtn_p);
 
@@ -354,7 +359,7 @@ static int PXTONE_GetSome(void *context, void *data, int bytes, SDL_bool *done)
 static int PXTONE_PlayAudio(void *music_p, void *data, int bytes)
 {
     PXTONE_Music *music = (PXTONE_Music*)music_p;
-    return music_pcm_getaudio(music_p, data, bytes, music->volume, PXTONE_GetSome);
+    return music_pcm_getaudio(music_p, data, bytes, music->volume_real, PXTONE_GetSome);
 }
 
 static const char* PXTONE_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
@@ -363,20 +368,34 @@ static const char* PXTONE_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
     return meta_tags_get(&music->tags, tag_type);
 }
 
-/* Set the volume for a PXTONE stream */
+/* Set the volume_real for a PXTONE stream */
 static void PXTONE_SetVolume(void *music_p, int volume)
 {
     PXTONE_Music *music = (PXTONE_Music *)music_p;
-    float v = SDL_floorf(((float)(volume) * music->gain) + 0.5f);
-    music->volume = (int)v;
+    music->volume = volume;
+    music->volume_real = _Mix_MakeGainedVolume(volume, music->gain);
 }
 
 /* Get the volume for a PXTONE stream */
 static int PXTONE_GetVolume(void *music_p)
 {
     PXTONE_Music *music = (PXTONE_Music *)music_p;
-    float v = SDL_floorf(((float)(music->volume) / music->gain) + 0.5f);
-    return (int)v;
+    return music->volume;
+}
+
+/* Set the gaining factor for a PXTONE stream */
+static void PXTONE_SetGain(void *music_p, float gain)
+{
+    PXTONE_Music *music = (PXTONE_Music *)music_p;
+    music->gain = gain;
+    music->volume_real = _Mix_MakeGainedVolume(music->volume, gain);
+}
+
+/* Get the gaining factor for a PXTONE stream */
+static float PXTONE_GetGain(void *music_p)
+{
+    PXTONE_Music *music = (PXTONE_Music *)music_p;
+    return music->gain;
 }
 
 /* Jump (seek) to a given position (time is in seconds) */
@@ -497,6 +516,8 @@ Mix_MusicInterface Mix_MusicInterface_PXTONE =
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     PXTONE_SetVolume,
     PXTONE_GetVolume,
+    PXTONE_SetGain,   /* SetGain [MIXER-X]*/
+    PXTONE_GetGain,   /* GetGain [MIXER-X]*/
     PXTONE_Play,
     NULL,   /* IsPlaying */
     PXTONE_PlayAudio,

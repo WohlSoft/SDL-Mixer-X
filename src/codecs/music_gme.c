@@ -22,6 +22,7 @@
 #ifdef MUSIC_GME
 
 #include "SDL_loadso.h"
+#include "utils.h"
 
 #include "music_gme.h"
 
@@ -157,6 +158,7 @@ typedef struct
     int intro_length;
     int loop_length;
     int volume;
+    int volume_real;
     double tempo;
     float gain;
     SDL_AudioStream *stream;
@@ -189,20 +191,34 @@ int  _Mix_GME_GetSpcEchoDisabled(void *music_p)
 
 static void GME_Delete(void *context);
 
-/* Set the volume for a GME stream */
+/* Set the volume_real for a GME stream */
 static void GME_SetVolume(void *music_p, int volume)
 {
     GME_Music *music = (GME_Music*)music_p;
-    float v = SDL_floorf(((float)(volume) * music->gain) + 0.5f);
-    music->volume = (int)v;
+    music->volume = volume;
+    music->volume_real = _Mix_MakeGainedVolume(volume, music->gain);
 }
 
 /* Get the volume for a GME stream */
 static int GME_GetVolume(void *music_p)
 {
     GME_Music *music = (GME_Music*)music_p;
-    float v = SDL_floorf(((float)(music->volume) / music->gain) + 0.5f);
-    return (int)v;
+    return music->volume;
+}
+
+/* Set the gaining factor for a GME stream */
+static void GME_SetGain(void *music_p, float gain)
+{
+    GME_Music *music = (GME_Music *)music_p;
+    music->gain = gain;
+    music->volume_real = _Mix_MakeGainedVolume(music->volume, gain);
+}
+
+/* Get the gaining factor for a GME stream */
+static float GME_GetGain(void *music_p)
+{
+    GME_Music *music = (GME_Music *)music_p;
+    return music->gain;
 }
 
 static void process_args(const char *args, Gme_Setup *setup)
@@ -401,6 +417,7 @@ static GME_Music *GME_CreateFromRW(SDL_RWops *src, const char *args)
     gme.gme_set_tempo(music->game_emu, music->tempo);
 
     music->volume = MIX_MAX_VOLUME;
+    music->volume_real = _Mix_MakeGainedVolume(MIX_MAX_VOLUME, music->gain);
 
     if (initialize_from_track_info(music, setup.track_number) == -1) {
         GME_Delete(music);
@@ -479,7 +496,7 @@ static int GME_GetSome(void *context, void *data, int bytes, SDL_bool *done)
 static int GME_PlayAudio(void *music_p, void *data, int bytes)
 {
     GME_Music *music = (GME_Music*)music_p;
-    return music_pcm_getaudio(music_p, data, bytes, music->volume, GME_GetSome);
+    return music_pcm_getaudio(music_p, data, bytes, music->volume_real, GME_GetSome);
 }
 
 /* Close the given Game Music Emulators stream */
@@ -619,6 +636,8 @@ Mix_MusicInterface Mix_MusicInterface_GME =
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     GME_SetVolume,
     GME_GetVolume,   /* GetVolume [MIXER-X]*/
+    GME_SetGain,   /* SetGain [MIXER-X]*/
+    GME_GetGain,   /* GetGain [MIXER-X]*/
     GME_Play,
     NULL,   /* IsPlaying */
     GME_PlayAudio,

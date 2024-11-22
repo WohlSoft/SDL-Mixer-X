@@ -298,6 +298,7 @@ typedef struct
     struct OPN2_MIDIPlayer *opnmidi;
     int playing;
     int volume;
+    int volume_real;
     double tempo;
     float gain;
 
@@ -310,20 +311,34 @@ typedef struct
 } OpnMIDI_Music;
 
 
-/* Set the volume for a OPNMIDI stream */
+/* Set the volume_real for a OPNMIDI stream */
 static void OPNMIDI_setvolume(void *music_p, int volume)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music*)music_p;
-    float v = SDL_floorf(((float)(volume) * music->gain) + 0.5f);
-    music->volume = (int)v;
+    music->volume = volume;
+    music->volume_real = _Mix_MakeGainedVolume(volume, music->gain);
 }
 
 /* Get the volume for a OPNMIDI stream */
 static int OPNMIDI_getvolume(void *music_p)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music*)music_p;
-    float v = SDL_floor(((float)(music->volume) / music->gain) + 0.5f);
-    return (int)v;
+    return music->volume;
+}
+
+/* Set the gaining factor for an OPNMIDI stream */
+static void OPNMIDI_setgain(void *music_p, float gain)
+{
+    OpnMIDI_Music *music = (OpnMIDI_Music *)music_p;
+    music->gain = gain;
+    music->volume_real = _Mix_MakeGainedVolume(music->volume, gain);
+}
+
+/* Get the gaining factor for an OPNMIDI stream */
+static float OPNMIDI_getgain(void *music_p)
+{
+    OpnMIDI_Music *music = (OpnMIDI_Music *)music_p;
+    return music->gain;
 }
 
 static void process_args(const char *args, OpnMidi_Setup *setup)
@@ -443,6 +458,7 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
     music->tempo = setup.tempo;
     music->gain = setup.gain;
     music->volume = MIX_MAX_VOLUME;
+    music->volume_real = _Mix_MakeGainedVolume(MIX_MAX_VOLUME, setup.gain);
 
     switch (music_spec.format) {
     case AUDIO_U8:
@@ -642,7 +658,7 @@ static int OPNMIDI_playSome(void *context, void *data, int bytes, SDL_bool *done
 static int OPNMIDI_playAudio(void *music_p, void *stream, int len)
 {
     OpnMIDI_Music *music = (OpnMIDI_Music*)music_p;
-    return music_pcm_getaudio(music_p, stream, len, music->volume, OPNMIDI_playSome);
+    return music_pcm_getaudio(music_p, stream, len, music->volume_real, OPNMIDI_playSome);
 }
 
 /* Close the given Game Music Emulators stream */
@@ -795,6 +811,8 @@ Mix_MusicInterface Mix_MusicInterface_OPNMIDI =
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     OPNMIDI_setvolume,
     OPNMIDI_getvolume,   /* GetVolume [MIXER-X]*/
+    OPNMIDI_setgain,   /* SetGain [MIXER-X]*/
+    OPNMIDI_getgain,   /* GetGain [MIXER-X]*/
     OPNMIDI_play,
     NULL,   /* IsPlaying */
     OPNMIDI_playAudio,
@@ -841,6 +859,8 @@ Mix_MusicInterface Mix_MusicInterface_OPNXMI =
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     OPNMIDI_setvolume,
     OPNMIDI_getvolume,   /* GetVolume [MIXER-X]*/
+    OPNMIDI_setgain,   /* SetGain [MIXER-X]*/
+    OPNMIDI_getgain,   /* GetGain [MIXER-X]*/
     OPNMIDI_play,
     NULL,   /* IsPlaying */
     OPNMIDI_playAudio,

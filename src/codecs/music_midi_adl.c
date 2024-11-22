@@ -385,6 +385,7 @@ typedef struct
 {
     int play_count;
     struct ADL_MIDIPlayer *adlmidi;
+    int volume_real;
     int volume;
     double tempo;
     float gain;
@@ -397,20 +398,35 @@ typedef struct
     struct ADLMIDI_AudioFormat sample_format;
 } AdlMIDI_Music;
 
-/* Set the volume for a ADLMIDI stream */
+
+/* Set the volume_real for an ADLMIDI stream */
 static void ADLMIDI_setvolume(void *music_p, int volume)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
-    float v = SDL_floorf(((float)(volume) * music->gain) + 0.5f);
-    music->volume = (int)v;
+    music->volume = volume;
+    music->volume_real = _Mix_MakeGainedVolume(volume, music->gain);
 }
 
-/* Get the volume for a ADLMIDI stream */
+/* Get the volume for an ADLMIDI stream */
 static int ADLMIDI_getvolume(void *music_p)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
-    float v = SDL_floorf(((float)(music->volume) / music->gain) + 0.5f);
-    return (int)v;
+    return music->volume;
+}
+
+/* Set the gaining factor for an ADLMIDI stream */
+static void ADLMIDI_setgain(void *music_p, float gain)
+{
+    AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
+    music->gain = gain;
+    music->volume_real = _Mix_MakeGainedVolume(music->volume, gain);
+}
+
+/* Get the gaining factor for an ADLMIDI stream */
+static float ADLMIDI_getgain(void *music_p)
+{
+    AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
+    return music->gain;
 }
 
 static void process_args(const char *args, AdlMidi_Setup *setup)
@@ -544,6 +560,7 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
     music->tempo = setup.tempo;
     music->gain = setup.gain;
     music->volume = MIX_MAX_VOLUME;
+    music->volume_real = _Mix_MakeGainedVolume(MIX_MAX_VOLUME, setup.gain);
 
     switch (music_spec.format) {
     case AUDIO_U8:
@@ -746,7 +763,7 @@ static int ADLMIDI_playSome(void *context, void *data, int bytes, SDL_bool *done
 static int ADLMIDI_playAudio(void *music_p, void *stream, int len)
 {
     AdlMIDI_Music *music = (AdlMIDI_Music *)music_p;
-    return music_pcm_getaudio(music_p, stream, len, music->volume, ADLMIDI_playSome);
+    return music_pcm_getaudio(music_p, stream, len, music->volume_real, ADLMIDI_playSome);
 }
 
 /* Close the given Game Music Emulators stream */
@@ -910,6 +927,8 @@ Mix_MusicInterface Mix_MusicInterface_ADLMIDI =
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     ADLMIDI_setvolume,
     ADLMIDI_getvolume,
+    ADLMIDI_setgain,   /* SetGain [MIXER-X]*/
+    ADLMIDI_getgain,   /* GetGain [MIXER-X]*/
     ADLMIDI_play,
     NULL,   /* IsPlaying */
     ADLMIDI_playAudio,
@@ -956,6 +975,8 @@ Mix_MusicInterface Mix_MusicInterface_ADLIMF =
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     ADLMIDI_setvolume,
     ADLMIDI_getvolume, /* GetVolume [MIXER-X]*/
+    ADLMIDI_setgain,   /* SetGain [MIXER-X]*/
+    ADLMIDI_getgain,   /* GetGain [MIXER-X]*/
     ADLMIDI_play,
     NULL,   /* IsPlaying */
     ADLMIDI_playAudio,

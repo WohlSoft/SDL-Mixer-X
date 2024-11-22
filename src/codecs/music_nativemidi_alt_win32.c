@@ -736,6 +736,8 @@ Mix_MusicInterface Mix_MusicInterface_NATIVEMIDI =
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     NATIVEMIDI_SetVolume,
     NATIVEMIDI_GetVolume,   /* GetVolume [MIXER-X]*/
+    NULL,   /* SetGain [MIXER-X]*/
+    NULL,   /* GetGain [MIXER-X]*/
     NATIVEMIDI_Play,
     NATIVEMIDI_IsPlaying,
     NULL,   /* GetAudio */
@@ -782,6 +784,8 @@ Mix_MusicInterface Mix_MusicInterface_NATIVEXMI =
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     NATIVEMIDI_SetVolume,
     NATIVEMIDI_GetVolume,   /* GetVolume [MIXER-X]*/
+    NULL,   /* SetGain [MIXER-X]*/
+    NULL,   /* GetGain [MIXER-X]*/
     NATIVEMIDI_Play,
     NATIVEMIDI_IsPlaying,
     NULL,   /* GetAudio */

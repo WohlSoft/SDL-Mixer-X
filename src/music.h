@@ -119,6 +119,12 @@ typedef struct
     /* Get the volume */
     int (*GetVolume)(void *music);
 
+    /* Set the gaining factor */
+    void (*SetGain)(void *music, float gain);
+
+    /* Get the gaining factor */
+    float (*GetGain)(void *music);
+
     /* Start playing music from the beginning with an optional loop count */
     int (*Play)(void *music, int play_count);
 

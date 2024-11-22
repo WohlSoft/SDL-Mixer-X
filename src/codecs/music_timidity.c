@@ -299,6 +299,8 @@ Mix_MusicInterface Mix_MusicInterface_TIMIDITY =
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     TIMIDITY_SetVolume,
     TIMIDITY_GetVolume,
+    NULL,   /* SetGain [MIXER-X]*/
+    NULL,   /* GetGain [MIXER-X]*/
     TIMIDITY_Play,
     TIMIDITY_IsPlaying,
     TIMIDITY_GetAudio,

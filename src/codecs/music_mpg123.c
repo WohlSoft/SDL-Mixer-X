@@ -530,6 +530,8 @@ Mix_MusicInterface Mix_MusicInterface_MPG123 =
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     MPG123_SetVolume,
     MPG123_GetVolume,
+    NULL,   /* SetGain [MIXER-X]*/
+    NULL,   /* GetGain [MIXER-X]*/
     MPG123_Play,
     NULL,   /* IsPlaying */
     MPG123_GetAudio,

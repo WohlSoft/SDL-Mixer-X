@@ -3046,6 +3046,37 @@ int MIXCALLCC Mix_GetVolumeMusicGeneral(void)
     return music_general_volume;
 }
 
+int MIXCALLCC Mix_SetMusicGain(Mix_Music *music, float gain)
+{
+    int ret = -1;
+
+    if (gain < 0.0f) {
+        gain = 0.0f;
+    }
+
+    Mix_LockAudio();
+    if (music && music->interface && music->interface->SetGain) {
+        music->interface->SetGain(music->context, gain);
+        ret = 0;
+    }
+    Mix_UnlockAudio();
+
+    return ret;
+}
+
+float MIXCALLCC Mix_GetMusicGain(Mix_Music *music)
+{
+    float ret = -1.0f;
+
+    Mix_LockAudio();
+    if (music && music->interface && music->interface->GetGain) {
+        ret = music->interface->GetGain(music->context);
+    }
+    Mix_UnlockAudio();
+
+    return ret;
+}
+
 /* Halt playing of music */
 static void music_internal_halt(Mix_Music *music)
 {

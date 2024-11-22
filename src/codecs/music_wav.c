@@ -2037,6 +2037,8 @@ Mix_MusicInterface Mix_MusicInterface_WAV =
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     WAV_SetVolume,
     WAV_GetVolume,
+    NULL,   /* SetGain [MIXER-X]*/
+    NULL,   /* GetGain [MIXER-X]*/
     WAV_Play,
     NULL,   /* IsPlaying */
     WAV_GetAudio,

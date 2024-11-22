@@ -146,6 +146,7 @@ typedef struct {
     void *buffer;
     int buffer_size;
     int volume;
+    float gain;
     SDL_bool is_paused;
 } FLUIDSYNTH_Music;
 
@@ -197,6 +198,7 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusic(void *data)
         return NULL;
     }
 
+    music->gain = 1.0f;
     music->volume = MIX_MAX_VOLUME;
     music->buffer_size = music_spec.samples * sizeof(Sint16) * channels;
     music->synth_write = fluidsynth.fluid_synth_write_s16;
@@ -273,13 +275,27 @@ static void FLUIDSYNTH_SetVolume(void *context, int volume)
     FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
     /* FluidSynth's default gain is 0.2. Make 1.0 the maximum gain value to avoid sound overload. */
     music->volume = volume;
-    fluidsynth.fluid_synth_set_gain(music->synth, volume * 1.0f / MIX_MAX_VOLUME);
+    fluidsynth.fluid_synth_set_gain(music->synth, (volume * music->gain) / MIX_MAX_VOLUME);
 }
 
 static int FLUIDSYNTH_GetVolume(void *context)
 {
     FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
     return music->volume;
+}
+
+static void FLUIDSYNTH_SetGain(void *context, float gain)
+{
+    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
+    /* FluidSynth's default gain is 0.2. Make 1.0 the maximum gain value to avoid sound overload. */
+    music->gain = gain;
+    fluidsynth.fluid_synth_set_gain(music->synth, (music->volume * music->gain) / MIX_MAX_VOLUME);
+}
+
+static float FLUIDSYNTH_GetGain(void *context)
+{
+    FLUIDSYNTH_Music *music = (FLUIDSYNTH_Music *)context;
+    return music->gain;
 }
 
 static int FLUIDSYNTH_Play(void *context, int play_count)
@@ -387,6 +403,8 @@ Mix_MusicInterface Mix_MusicInterface_FLUIDSYNTH =
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     FLUIDSYNTH_SetVolume,
     FLUIDSYNTH_GetVolume,
+    FLUIDSYNTH_SetGain,   /* SetGain [MIXER-X]*/
+    FLUIDSYNTH_GetGain,   /* GetGain [MIXER-X]*/
     FLUIDSYNTH_Play,
     FLUIDSYNTH_IsPlaying,
     FLUIDSYNTH_GetAudio,

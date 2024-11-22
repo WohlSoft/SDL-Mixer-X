@@ -1046,6 +1046,8 @@ Mix_MusicInterface Mix_MusicInterface_FFMPEG =
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     FFMPEG_SetVolume,
     FFMPEG_GetVolume,   /* GetVolume [MIXER-X]*/
+    NULL,   /* SetGain [MIXER-X]*/
+    NULL,   /* GetGain [MIXER-X]*/
     FFMPEG_Play,
     NULL,   /* IsPlaying */
     FFMPEG_PlayAudio,

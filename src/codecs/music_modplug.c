@@ -365,6 +365,8 @@ Mix_MusicInterface Mix_MusicInterface_MODPLUG =
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     MODPLUG_SetVolume,
     MODPLUG_GetVolume,
+    NULL,   /* SetGain [MIXER-X]*/
+    NULL,   /* GetGain [MIXER-X]*/
     MODPLUG_Play,
     NULL,   /* IsPlaying */
     MODPLUG_GetAudio,

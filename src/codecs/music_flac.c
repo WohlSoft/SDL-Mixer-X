@@ -788,6 +788,8 @@ Mix_MusicInterface Mix_MusicInterface_FLAC =
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     FLAC_SetVolume,
     FLAC_GetVolume,
+    NULL,   /* SetGain [MIXER-X]*/
+    NULL,   /* GetGain [MIXER-X]*/
     FLAC_Play,
     NULL,   /* IsPlaying */
     FLAC_GetAudio,

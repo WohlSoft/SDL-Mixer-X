@@ -545,6 +545,8 @@ Mix_MusicInterface Mix_MusicInterface_OGG =
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     OGG_SetVolume,
     OGG_GetVolume,
+    NULL,   /* SetGain [MIXER-X]*/
+    NULL,   /* GetGain [MIXER-X]*/
     OGG_Play,
     NULL,   /* IsPlaying */
     OGG_GetAudio,

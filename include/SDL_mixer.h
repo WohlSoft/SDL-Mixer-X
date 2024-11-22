@@ -2786,6 +2786,28 @@ extern DECLSPEC int MIXCALL Mix_GetVolumeMusicGeneral(void);/*MixerX*/
 extern DECLSPEC int MIXCALL Mix_MasterVolume(int volume);
 
 /**
+ * Sets the gaining factor which is used independently from the volume in order
+ * to adjust the volume of too quite or too loud sources.
+ *
+ * \param music Context of the opened music file
+ * \param gain gaining factor where 1.0f means "no gain".
+ * \return 0 on success, and -1 on error
+ *
+ * \since This function is available since MixerX 2.8.0.
+ */
+extern DECLSPEC int MIXCALL Mix_SetMusicGain(Mix_Music *music, float gain);/*MixerX*/
+
+/**
+ * Returns current gain factor of the music
+ *
+ * \param music Context of the opened music file
+ * \return Gaining factor >= 0.0f or <0.0f on error
+ *
+ * \since This function is available since MixerX 2.8.0.
+ */
+extern DECLSPEC float MIXCALL Mix_GetMusicGain(Mix_Music *music);/*MixerX*/
+
+/**
  * Halt playing of a particular channel.
  *
  * This will stop further playback on that channel until a new chunk is

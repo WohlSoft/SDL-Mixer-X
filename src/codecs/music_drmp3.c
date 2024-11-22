@@ -276,6 +276,8 @@ Mix_MusicInterface Mix_MusicInterface_DRMP3 =
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     DRMP3_SetVolume,
     DRMP3_GetVolume,
+    NULL,   /* SetGain [MIXER-X]*/
+    NULL,   /* GetGain [MIXER-X]*/
     DRMP3_Play,
     NULL,   /* IsPlaying */
     DRMP3_GetAudio,

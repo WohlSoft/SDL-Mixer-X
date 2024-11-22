@@ -402,6 +402,8 @@ Mix_MusicInterface Mix_MusicInterface_DRFLAC =
     NULL,   /* CreateFromFileEx [MIXER-X]*/
     DRFLAC_SetVolume,
     DRFLAC_GetVolume,
+    NULL,   /* SetGain [MIXER-X]*/
+    NULL,   /* GetGain [MIXER-X]*/
     DRFLAC_Play,
     NULL,   /* IsPlaying */
     DRFLAC_GetAudio,

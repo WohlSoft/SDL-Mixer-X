@@ -174,3 +174,8 @@ Sint64 _Mix_ParseTime(char *time, long samplerate_hz)
     if ((val = SDL_atoi(num_start)) < 0) return -1;
     return (result * 60 + val) * samplerate_hz;
 }
+
+int _Mix_MakeGainedVolume(int volume, float gain)
+{
+    return (int)SDL_floorf(((float)(volume) * (gain)) + 0.5f);
+}
