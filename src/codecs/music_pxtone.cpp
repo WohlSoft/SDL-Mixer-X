@@ -47,10 +47,6 @@ static void PXTONE_SetDefault(PXTONE_Setup *setup)
 /* This file supports PXTONE music streams */
 typedef struct
 {
-    SDL_RWops *src;
-    Sint64 src_start;
-    int freesrc;
-
     int volume;
     int volume_real;
     double tempo;
@@ -251,7 +247,6 @@ static void *PXTONE_NewRWex(struct SDL_RWops *src, int freesrc, const char *args
     }
 
     /* Attempt to load metadata */
-    music->freesrc = freesrc;
 
     name = music->pxtn->text->get_name_buf(&name_len);
     if (name) {
@@ -265,6 +260,11 @@ static void *PXTONE_NewRWex(struct SDL_RWops *src, int freesrc, const char *args
         temp_string = SDL_iconv_string("UTF-8", "Shift-JIS", comment, comment_len + 1);
         meta_tags_set(&music->tags, MIX_META_COPYRIGHT, temp_string);
         SDL_free(temp_string);
+    }
+
+    /* release RWops now, since it's already fully loaded to pxtn */
+    if (freesrc) {
+        SDL_RWclose(src);
     }
 
     return music;
@@ -298,9 +298,6 @@ static void PXTONE_Delete(void *context)
             SDL_free(music->buffer);
         }
 
-        if (music->src && music->freesrc) {
-            SDL_RWclose(music->src);
-        }
         SDL_free(music);
     }
 }
