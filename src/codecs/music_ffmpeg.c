@@ -124,6 +124,7 @@ typedef struct ffmpeg_loader {
     int (*av_opt_set_sample_fmt)(void *, const char *, enum AVSampleFormat, int);
 #if defined(AVCODEC_NEW_CHANNEL_LAYOUT)
     int (*av_opt_set_chlayout)(void *, const char *, const AVChannelLayout *, int);
+    void (*av_channel_layout_uninit)(AVChannelLayout *channel_layout);
 #endif
     void *(*av_malloc)(size_t);
     int (*av_strerror)(int, char *, size_t);
@@ -271,6 +272,7 @@ static int FFMPEG_Load(void)
         FUNCTION_LOADER(handle_avutil, av_opt_set_sample_fmt,  int (*)(void *, const char *, enum AVSampleFormat, int))
 #if defined(AVCODEC_NEW_CHANNEL_LAYOUT)
         FUNCTION_LOADER(handle_avutil, av_opt_set_chlayout,  int (*)(void *, const char *, const AVChannelLayout *, int))
+        FUNCTION_LOADER(handle_avutil, av_channel_layout_uninit,  void (*)(AVChannelLayout *))
 #endif
         FUNCTION_LOADER(handle_avutil, av_malloc,  void *(*)(size_t))
         FUNCTION_LOADER(handle_avutil, av_strerror,  int (*)(int, char *, size_t))
@@ -539,7 +541,7 @@ static int FFMPEG_UpdateStream(FFMPEG_Music *music)
             ffmpeg.swr_init(music->swr_ctx);
 
 #if defined(AVCODEC_NEW_CHANNEL_LAYOUT)
-            av_channel_layout_uninit(&layout);
+            ffmpeg.av_channel_layout_uninit(&layout);
 #endif
 
             music->merge_buffer_size = channels * ffmpeg.av_get_bytes_per_sample(sfmt) * 4096;
