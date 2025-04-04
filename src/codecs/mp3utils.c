@@ -704,7 +704,7 @@ static SDL_bool parse_ape(Mix_MusicMetaTags *out_tags, struct mp3file_t *src, Si
     /*flags = (Uint32)read_sint32be(buffer + APE_HEAD_FIELD_FLAGS);*/ /* global flags, unused */
 
     /* reserved bits : */
-    if (SDL_memcmp(buffer + APE_HEAD_FIELD_RESERVED, zero8, 8) != 0) {
+    if (SDL_memcmp(buffer + APE_HEAD_FIELD_RESERVED, zero8, sizeof(zero8)) != 0) {
         return SDL_FALSE;
     }
 
