@@ -1,6 +1,6 @@
 /*
   SDL_mixer:  An audio mixer library based on the SDL library
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -551,10 +551,14 @@ static double GME_Duration(void *music_p)
     GME_Music *music = (GME_Music*)music_p;
     if (music->has_track_length) {
         return (double)(music->track_length) / 1000.0;
-    } else {
-
-        return -1.0;
     }
+    return -1.0;
+}
+
+static int GME_GetNumTracks(void *music_p)
+{
+    GME_Music *music = (GME_Music *)music_p;
+    return gme.gme_track_count(music->game_emu);
 }
 
 static int GME_StartTrack(void *music_p, int track)
@@ -568,23 +572,12 @@ static int GME_StartTrack(void *music_p, int track)
 
     err = gme.gme_start_track(music->game_emu, track);
     if (err != 0) {
-        Mix_SetError("GME: %s", err);
-        return -1;
+        return Mix_SetError("GME: %s", err);
     }
 
     GME_Play(music, music->play_count);
 
-    if (initialize_from_track_info(music, track) == -1) {
-        return -1;
-    }
-
-    return 0;
-}
-
-static int GME_GetNumTracks(void *music_p)
-{
-    GME_Music *music = (GME_Music *)music_p;
-    return gme.gme_track_count(music->game_emu);
+    return initialize_from_track_info(music, track);
 }
 
 static int GME_SetTempo(void *music_p, double tempo)

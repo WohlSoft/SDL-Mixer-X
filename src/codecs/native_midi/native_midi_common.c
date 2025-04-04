@@ -152,7 +152,7 @@ static MIDIEvent *MIDITracktoStream(MIDITrack *track)
             }
         } else {
             a = event;
-            if (a & 0x80) { /* It's a status byte */ 
+            if (a & 0x80) { /* It's a status byte */
                 /* Extract channel and status information */
                 lastchan = a & 0x0F;
                 laststatus = (a>>4) & 0x0F;

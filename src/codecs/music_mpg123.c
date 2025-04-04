@@ -1,6 +1,6 @@
 /*
   SDL_mixer:    An audio mixer library based on the SDL library
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.    In no event will the authors be held liable for any damages
@@ -34,6 +34,7 @@
 #endif
 
 #include <stdio.h>      /* For SEEK_SET */
+#define MPG123_NO_LARGENAME /* disable the _FILE_OFFSET_BITS suffixes. */
 #ifdef MPG123_HEADER
 #include MPG123_HEADER
 #else

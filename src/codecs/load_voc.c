@@ -1,6 +1,6 @@
 /*
   SDL_mixer:  An audio mixer library based on the SDL library
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -97,7 +97,7 @@ static int voc_check_header(SDL_RWops *src)
         return 0;
     }
 
-        /* get the offset where the first datablock is located */
+    /* get the offset where the first datablock is located */
     if (SDL_RWread(src, &datablockofs, sizeof(Uint16), 1) != 1) {
         return 0;
     }
@@ -291,9 +291,8 @@ static int voc_get_block(SDL_RWops *src, vs_t *v, SDL_AudioSpec *spec)
                     return 0;
                 }
 
-                if (uc) {
-                    spec->channels = 2;  /* Stereo */
-                }
+                if (uc) /* Stereo */
+                     spec->channels = 2;
                 /* VOC_EXTENDED may be read before spec->channels inited: */
                 else spec->channels = 1;
                 /* Needed number of channels before finishing
@@ -351,7 +350,8 @@ static Uint32 voc_read(SDL_RWops *src, vs_t *v, Uint8 *buf, SDL_AudioSpec *spec)
         SDL_memset(buf, silence, v->rest);
         done = v->rest;
         v->rest = 0;
-    } else {
+    }
+    else {
         done = (Uint32)SDL_RWread(src, buf, 1, v->rest);
         v->rest -= done;
         if (v->size == ST_SIZE_WORD) {
@@ -456,8 +456,8 @@ done:
     if (was_error) {
         spec = NULL;
     }
-
     return spec;
+
 } /* Mix_LoadVOC_RW */
 
 /* end of load_voc.c ... */

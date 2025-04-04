@@ -1,6 +1,6 @@
 /*
   SDL_mixer:  An audio mixer library based on the SDL library
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -54,16 +54,16 @@ typedef struct {
                         FLAC__StreamDecoderErrorCallback error_callback,
                         void *client_data);
     FLAC__StreamDecoderInitStatus (*FLAC__stream_decoder_init_ogg_stream)(
-                            FLAC__StreamDecoder *decoder,
-                            FLAC__StreamDecoderReadCallback read_callback,
-                            FLAC__StreamDecoderSeekCallback seek_callback,
-                            FLAC__StreamDecoderTellCallback tell_callback,
-                            FLAC__StreamDecoderLengthCallback length_callback,
-                            FLAC__StreamDecoderEofCallback eof_callback,
-                            FLAC__StreamDecoderWriteCallback write_callback,
-                            FLAC__StreamDecoderMetadataCallback metadata_callback,
-                            FLAC__StreamDecoderErrorCallback error_callback,
-                            void *client_data);
+                        FLAC__StreamDecoder *decoder,
+                        FLAC__StreamDecoderReadCallback read_callback,
+                        FLAC__StreamDecoderSeekCallback seek_callback,
+                        FLAC__StreamDecoderTellCallback tell_callback,
+                        FLAC__StreamDecoderLengthCallback length_callback,
+                        FLAC__StreamDecoderEofCallback eof_callback,
+                        FLAC__StreamDecoderWriteCallback write_callback,
+                        FLAC__StreamDecoderMetadataCallback metadata_callback,
+                        FLAC__StreamDecoderErrorCallback error_callback,
+                        void *client_data);
     FLAC__bool (*FLAC__stream_decoder_finish)(FLAC__StreamDecoder *decoder);
     FLAC__bool (*FLAC__stream_decoder_flush)(FLAC__StreamDecoder *decoder);
     FLAC__bool (*FLAC__stream_decoder_process_single)(
