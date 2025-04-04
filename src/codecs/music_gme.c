@@ -130,18 +130,20 @@ static void GME_Unload(void)
 typedef struct {
     int track_number;
     int echo_disable;
+    int echo_const;
     double tempo;
     float gain;
 } Gme_Setup;
 
 static Gme_Setup gme_setup = {
-    0, 0, 1.0, 1.0
+    0, 0, 0, 1.0, 1.0
 };
 
 static void GME_SetDefault(Gme_Setup *setup)
 {
     setup->track_number = 0;
     setup->echo_disable = 0;
+    setup->echo_const = 0;
     setup->tempo = 1.0;
     setup->gain = 1.0f;
 }
@@ -154,6 +156,7 @@ typedef struct
     Music_Emu* game_emu;
     SDL_bool has_track_length;
     int echo_disabled;
+    int echo_const;
     int track_length;
     int intro_length;
     int loop_length;
@@ -171,7 +174,7 @@ void _Mix_GME_SetSpcEchoDisabled(void *music_p, int disabled)
 {
     GME_Music *music = (GME_Music*)music_p;
 
-    if (music && gme.gme_disable_echo) {
+    if (music && gme.gme_disable_echo && !music->echo_const) {
         gme.gme_disable_echo(music->game_emu, disabled);
         music->echo_disabled = disabled;
     }
@@ -256,6 +259,9 @@ static void process_args(const char *args, Gme_Setup *setup)
                     break;
                 case 'e':
                     setup->echo_disable = value;
+                    break;
+                case 'c':
+                    setup->echo_const = value;
                     break;
                 case 't':
                     if (arg[0] == '=') {
@@ -403,8 +409,9 @@ static GME_Music *GME_CreateFromRW(SDL_RWops *src, const char *args)
 
     music->echo_disabled = -1;
     if (gme.gme_disable_echo) {
-        gme.gme_disable_echo(music->game_emu, setup.echo_disable);
         music->echo_disabled = setup.echo_disable;
+        music->echo_const = setup.echo_const;
+        gme.gme_disable_echo(music->game_emu, music->echo_disabled);
     }
 
     err = gme.gme_start_track(music->game_emu, setup.track_number);
