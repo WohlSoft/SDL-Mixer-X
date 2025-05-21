@@ -358,8 +358,18 @@ typedef enum Mix_ADLMIDI_Emulator {
     ADLMIDI_OPL3_EMU_NUKED = 0,
     ADLMIDI_OPL3_EMU_NUKED_1_7_4,
     ADLMIDI_OPL3_EMU_DOSBOX,
+    /* Since libADLMIDI 1.5.0 */
     ADLMIDI_OPL3_EMU_OPAL,
-    ADLMIDI_OPL3_EMU_JAVA
+    ADLMIDI_OPL3_EMU_JAVA,
+    /* Since libADLMIDI 1.5.2 */
+    ADLMIDI_OPL3_EMU_ESFMu,
+    ADLMIDI_OPL3_EMU_MAME_OPL2,
+    ADLMIDI_OPL3_EMU_YMFM_OPL2,
+    ADLMIDI_OPL3_EMU_YMFM_OPL3,
+    /* Extra heavy emulators are usually disabled by default */
+    ADLMIDI_OPL3_EMU_NUKED_OPL2LLE,
+    ADLMIDI_OPL3_EMU_NUKED_OPL3LLE
+    /* ------------------------------------------------------ */
 } Mix_ADLMIDI_Emulator;
 
 /* Volume model type in the OPNMIDI */
