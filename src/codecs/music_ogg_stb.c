@@ -199,18 +199,13 @@ static int OGG_UpdateSpeed(OGG_music *music)
         return 0;
     }
 
-    if (music->stream) {
-        SDL_AudioStreamFlush(music->stream);
-        if (SDL_AudioStreamAvailable(music->stream) > 0) {
-            return -1;
-        }
-        SDL_FreeAudioStream(music->stream);
-        music->stream = NULL;
-    }
-
     music->computed_src_rate = music->vi.sample_rate * music->speed;
     if (music->computed_src_rate < 1000) {
         music->computed_src_rate = 1000;
+    }
+
+    if (music->stream) {
+        SDL_FreeAudioStream(music->stream);
     }
 
     music->stream = SDL_NewAudioStream(AUDIO_F32SYS, (Uint8)(music->multitrack ? music->multitrack_channels : music->vi.channels), music->computed_src_rate,
@@ -527,13 +522,14 @@ static void OGG_Stop(void *context)
 static int OGG_GetSome(void *context, void *data, int bytes, SDL_bool *done)
 {
     OGG_music *music = (OGG_music *)context;
-    SDL_bool looped = SDL_FALSE;
+    SDL_bool looped = SDL_FALSE, retry_get = SDL_FALSE;;
     int filled, amount, channels, result, i, j, k;
     int section;
     Sint64 pcmPos;
     float *cur;
     float *cur_src[STB_VORBIS_MAX_CHANNELS];
 
+try_get:
     filled = SDL_AudioStreamGet(music->stream, data, bytes);
     if (filled != 0) {
         return filled;
@@ -543,6 +539,14 @@ static int OGG_GetSome(void *context, void *data, int bytes, SDL_bool *done)
         /* All done */
         *done = SDL_TRUE;
         return 0;
+    }
+
+    if (music->computed_src_rate < 0) {
+        result = OGG_UpdateSpeed(music);
+        if (result < 0) {
+            return -1; /* Error has occured */
+        }
+        retry_get = SDL_TRUE;
     }
 
     section = music->section;
@@ -588,15 +592,6 @@ static int OGG_GetSome(void *context, void *data, int bytes, SDL_bool *done)
         }
     }
 
-    if (music->computed_src_rate < 0) {
-        result = OGG_UpdateSpeed(music);
-        if (result == -1) {
-            return 0; /* Has data to be flush */
-        } else if (result == -2) {
-            return -1; /* Error has occured */
-        }
-    }
-
     pcmPos = stb_vorbis_get_playback_sample_offset(music->vf);
     if (music->loop && (music->play_count != 1) && (pcmPos >= music->loop_end)) {
         amount -= (int)((pcmPos - music->loop_end) * channels) * (int)sizeof(float);
@@ -632,6 +627,11 @@ static int OGG_GetSome(void *context, void *data, int bytes, SDL_bool *done)
             }
         }
     }
+
+    if (retry_get) {
+        goto try_get; /* Prevent the false-positive "too many zero loop cycles" break condition match */
+    }
+
     return 0;
 }
 static int OGG_GetAudio(void *context, void *data, int bytes)
