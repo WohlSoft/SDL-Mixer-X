@@ -522,8 +522,8 @@ static void OGG_Stop(void *context)
 static int OGG_GetSome(void *context, void *data, int bytes, SDL_bool *done)
 {
     OGG_music *music = (OGG_music *)context;
-    SDL_bool looped = SDL_FALSE, retry_get = SDL_FALSE;;
-    int filled, amount, channels, result, i, j, k;
+    SDL_bool looped = SDL_FALSE, retry_get = SDL_FALSE;
+    int filled, amount, channels, result, div_chans, i, j, k;
     int section;
     Sint64 pcmPos;
     float *cur;
@@ -553,6 +553,7 @@ try_get:
 
     if (music->multitrack) {
         channels = music->multitrack_channels;
+        div_chans = (music->vi.channels / music->multitrack_channels);
         amount = stb_vorbis_get_samples_float(music->vf,
                                               music->multitrack_channels * music->multitrack_tracks,
                                               music->multitrack_buffer,
@@ -569,7 +570,7 @@ try_get:
                 }
 
                 for (k = 0; k < music->multitrack_channels; ++k) {
-                    cur[k] += *(cur_src[(j * music->multitrack_channels) + k]++);
+                    cur[k] += *(cur_src[(j * music->multitrack_channels) + k]++) / div_chans;
                 }
             }
 
