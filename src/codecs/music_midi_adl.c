@@ -30,6 +30,8 @@
 
 #include <adlmidi.h>
 
+extern Mix_RWFromFile_cb _Mix_RWFromFile;
+
 typedef struct {
     int loaded;
     void *handle;
@@ -41,6 +43,7 @@ typedef struct {
     void (*adl_setHVibrato)(struct ADL_MIDIPlayer *device, int hvibro);
     void (*adl_setHTremolo)(struct ADL_MIDIPlayer *device, int htremo);
     int (*adl_openBankFile)(struct ADL_MIDIPlayer *device, const char *filePath);
+    int (*adl_openBankData)(struct ADL_MIDIPlayer *device, const void *mem, unsigned long size);
     int (*adl_setBank)(struct ADL_MIDIPlayer *device, int bank);
     const char *(*adl_errorInfo)(struct ADL_MIDIPlayer *device);
     int (*adl_switchEmulator)(struct ADL_MIDIPlayer *device, int emulator);
@@ -110,6 +113,7 @@ static int ADLMIDI_Load(void)
         FUNCTION_LOADER(adl_setHVibrato, void(*)(struct ADL_MIDIPlayer*,int))
         FUNCTION_LOADER(adl_setHTremolo, void(*)(struct ADL_MIDIPlayer*,int))
         FUNCTION_LOADER(adl_openBankFile, int(*)(struct ADL_MIDIPlayer*,const char*))
+        FUNCTION_LOADER(adl_openBankData, int(*)(struct ADL_MIDIPlayer*,const void*,unsigned long))
         FUNCTION_LOADER(adl_setBank, int(*)(struct ADL_MIDIPlayer *, int))
         FUNCTION_LOADER(adl_errorInfo, const char *(*)(struct ADL_MIDIPlayer*))
         FUNCTION_LOADER(adl_switchEmulator, int(*)(struct ADL_MIDIPlayer*,int))
@@ -542,12 +546,14 @@ static void ADLMIDI_delete(void *music_p);
 
 static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
 {
-    void *bytes = 0;
+    void *bytes = 0, *bytes2 = 0;
     int err = 0;
     size_t length = 0;
     AdlMIDI_Music *music = NULL;
     AdlMidi_Setup setup = adlmidi_setup;
     unsigned short src_format = music_spec.format;
+    SDL_RWops *rw_bank;
+    size_t rw_bank_size;
 
     if (src == NULL) {
         return NULL;
@@ -639,7 +645,18 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
     ADLMIDI.adl_setHTremolo(music->adlmidi, setup.tremolo);
 
     if (setup.custom_bank_path[0] != '\0') {
-        err = ADLMIDI.adl_openBankFile(music->adlmidi, (char*)setup.custom_bank_path);
+        rw_bank = _Mix_RWFromFile((char*)setup.custom_bank_path, "rb");
+        if (rw_bank) {
+            bytes2 = SDL_LoadFile_RW(rw_bank, &rw_bank_size, SDL_TRUE);
+            if (!bytes2) {
+                SDL_OutOfMemory();
+                SDL_free(bytes);
+                ADLMIDI_delete(music);
+                return NULL;
+            }
+            err = ADLMIDI.adl_openBankData(music->adlmidi, bytes2, rw_bank_size);
+            SDL_free(bytes2);
+        }
     } else {
         err = ADLMIDI.adl_setBank(music->adlmidi, setup.bank);
     }

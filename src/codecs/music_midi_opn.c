@@ -31,6 +31,8 @@
 #include <opnmidi.h>
 #include "OPNMIDI/gm_opn_bank.h"
 
+extern Mix_RWFromFile_cb _Mix_RWFromFile;
+
 typedef struct {
     int loaded;
     void *handle;
@@ -440,12 +442,14 @@ static void OPNMIDI_delete(void *music_p);
 
 static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
 {
-    void *bytes = 0;
+    void *bytes = 0, *bytes2 = 0;
     int err = 0;
     size_t length = 0;
     OpnMIDI_Music *music = NULL;
     OpnMidi_Setup setup = opnmidi_setup;
     unsigned short src_format = music_spec.format;
+    SDL_RWops *rw_bank;
+    size_t rw_bank_size;
 
     if (src == NULL) {
         return NULL;
@@ -534,7 +538,18 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
     }
 
     if (setup.custom_bank_path[0] != '\0') {
-        err = OPNMIDI.opn2_openBankFile(music->opnmidi, (char*)setup.custom_bank_path);
+        rw_bank = _Mix_RWFromFile((char*)setup.custom_bank_path, "rb");
+        if (rw_bank) {
+            bytes2 = SDL_LoadFile_RW(rw_bank, &rw_bank_size, SDL_TRUE);
+            if (!bytes2) {
+                SDL_OutOfMemory();
+                SDL_free(bytes);
+                OPNMIDI_delete(music);
+                return NULL;
+            }
+            err = OPNMIDI.opn2_openBankData(music->opnmidi, bytes2, rw_bank_size);
+            SDL_free(bytes2);
+        }
     } else {
         err = OPNMIDI.opn2_openBankData(music->opnmidi, g_gm_opn2_bank, sizeof(g_gm_opn2_bank));
     }
