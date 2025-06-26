@@ -47,6 +47,7 @@
 #include "music_midi_edmidi.h"
 #include "music_ffmpeg.h"
 #include "music_pxtone.h"
+#include "music_qoa.h"
 
 #include "utils.h"
 #include "mp3utils.h"
@@ -610,6 +611,9 @@ static Mix_MusicInterface *s_music_interfaces[] =
 #endif
 #ifdef MUSIC_PXTONE
     &Mix_MusicInterface_PXTONE,
+#endif
+#ifdef MUSIC_QOA
+    &Mix_MusicInterface_QOA,
 #endif
 #ifdef MUSIC_MOD_XMP
     &Mix_MusicInterface_XMP,
@@ -1684,6 +1688,12 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
         return MUS_PXTONE;
     if (SDL_memcmp(magic, "PTCOLLAGE", 9) == 0)
         return MUS_PXTONE;
+
+    /* Quite OK Audio files */
+    if (SDL_memcmp(magic, "qoaf", 4) == 0)
+        return MUS_QOA; /* Official files */
+    if (SDL_memcmp(magic, "XQOA", 4) == 0)
+        return MUS_QOA; /* Files with custom headers that supports loop points */
 
     /* Detect some module files */
     if (SDL_memcmp(magic, "Extended Module", 15) == 0)

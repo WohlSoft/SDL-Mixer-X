@@ -47,6 +47,7 @@ typedef enum
     MIX_MUSIC_EDMIDI,/*MIXER-X*/
     MIX_MUSIC_FFMPEG,/*MIXER-X*/
     MIX_MUSIC_PXTONE,/*MIXER-X*/
+    MIX_MUSIC_QOA,/*MIXER-X*/
     MIX_MUSIC_LAST
 } Mix_MusicAPI;
 

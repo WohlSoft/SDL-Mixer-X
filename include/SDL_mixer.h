@@ -308,6 +308,7 @@ typedef enum Mix_MusicType {
     , /*Comma was placed here to simplfy the comparison to mainstream part of this enumeration */
     MUS_FFMPEG = 100,
     MUS_PXTONE,
+    MUS_QOA,
     /* Special cases to play formats IMF, MUS, or XMI are can't be played without specific MIDI libraries */
     MUS_ADLMIDI = 200,
     MUS_OPNMIDI,
