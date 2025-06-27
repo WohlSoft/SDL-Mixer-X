@@ -134,7 +134,7 @@ static SDL_bool _XQOA_ReadMetaTag(QOA_Music *music, const char *tag_name, Mix_Mu
     tag_size = SDL_SwapBE32(*(Uint32*)read_buf);
 
     if (tag_size > 0) {
-        tag_data = (char *)SDL_malloc(tag_size);
+        tag_data = (char *)SDL_calloc(1, tag_size + 1);
         if (!tag_data) {
             SDL_OutOfMemory();
             return SDL_FALSE;
