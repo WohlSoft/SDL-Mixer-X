@@ -1,0 +1,49 @@
+========================= XQOA =========================
+It's an extra UNOFFICIAL header that follows the normal
+QOA audio data whoch adds meta-tags, loop points, and
+the multitrack setup:
+========================================================
+
+Header size is a kind of offset to the actual QOA file data that can be parsed like
+a normal QOA file like XQOA header is stripped.
+
+The size field should match the actual data size. If the sum of header size
+and the normal QOA data size is not match to the actual file size, the file
+will be treated as invalid.
+
+Loop points: they define the position of loop start and loop end.
+When they are non-zero and valid, player should jump from the loop end sample position
+to the loop start sample position and do that seamlessly and very precice.
+Loop end should not go above file end, loop start should not follow or be equal
+to the loop end. If both loop points are zero or invalid, the loop will be disabled,
+and the whole file will be looped.
+
+Multi-track mode: when channels and tracks are non-zero, the multi-track mode
+gets enabled: different groups of channels encoded into the file will be treated
+as concurrent tracks which can be muted or tuned independently during playback.
+Product of channels and tracks should not be larger than total number of encoded
+channels, otherwise file will be treated as invalid.
+
+
+  Offset       |  Title                                                     |  Allowed values
+----------------------------------------------------------------------------------------------
+   0x00        | Magic number 4 bytes                                       | "XQOA"
+   0x04        | Size of the whole XQOA header, including magic number      | BE-INT32
+   0x08        | Size of normal QOA file data that follows the header       | BE-INT32
+   0x0C        | The loop start position (absolute sample)                  | BE-INT32
+   0x10        | The loop end position (absolute sample)                    | BE-INT32
+   0x14        | Number of multi-track channels (0 = disable)               | BE-INT32
+   0x18        | Number of multi-track tracks (0 = disable)                 | BE-INT32
+----------------------------------------------------------------------------------------------
+---------------Dynamic-Size meta-tag-strings-starting at 0x18---------------------------------
+----------------------------------------------------------------------------------------------
+   TISIZE      | Size of the non-null-terminated TITLE meta tag string      | BE-INT32
+   TISIZE + 4  | The data of the TITLE meta-tag of size defined above       | UTF-8 string
+   ARSIZE      | Size of the non-null-terminated ARTIST meta tag string     | BE-INT32
+   ARSIZE + 4  | The data of the ARTIST meta-tag of size defined above      | UTF-8 string
+   ALSIZE      | Size of the non-null-terminated ALBUM meta tag string      | BE-INT32
+   ALSIZE + 4  | The data of the ALBUM meta-tag of size defined above       | UTF-8 string
+   COSIZE      | Size of the non-null-terminated COPYRIGHT meta tag string  | BE-INT32
+   COSIZE + 4  | The data of the COPYRIGHT meta-tag of size defined above   | UTF-8 string
+----------------------------------------------------------------------------------------------
+...After everything above, the normal QOA data goes.
