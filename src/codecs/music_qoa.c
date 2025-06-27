@@ -39,7 +39,10 @@ typedef struct
     int play_count;
 
     qoa_desc info;
+    Uint32 xqoa_data_offset;
+    Uint32 xqoa_data_size;
     Uint32 first_frame_pos;
+    SDL_bool at_end;
     Uint32 sample_pos;
     Uint32 sample_data_pos;
     Uint32 sample_data_len;
@@ -63,6 +66,12 @@ typedef struct
     Uint32 loop_start;
     Uint32 loop_end;
     Uint32 loop_len;
+
+    SDL_bool multitrack;
+    Uint32 multitrack_mute[256];
+    Uint32 multitrack_channels;
+    Uint32 multitrack_tracks;
+
     Mix_MusicMetaTags tags;
 } QOA_Music;
 
@@ -71,11 +80,46 @@ static int QOA_Seek(void *ctx, double pos);
 static void QOA_Delete(void *ctx);
 static void QOA_CleanUp(SDL_RWops *src, QOA_Music *music);
 
+static SDL_bool _XQOA_ReadMetaTag(QOA_Music *music, const char *tag_name, Mix_MusicMetaTag tag_type)
+{
+    Uint8 read_buf[4];
+    char *tag_data = NULL;
+    Uint32 tag_size = 0;
+
+    if (SDL_RWread(music->src, read_buf, 1, 4) != 4) {
+        Mix_SetError("XQOA: Can't read %s meta-tag size.", tag_name);
+        return SDL_FALSE;
+    }
+    tag_size = SDL_SwapBE32(*(Uint32*)read_buf);
+
+    if (tag_size > 0) {
+        tag_data = (char *)SDL_malloc(tag_size);
+        if (!tag_data) {
+            SDL_OutOfMemory();
+            return SDL_FALSE;
+        }
+
+        if (SDL_RWread(music->src, tag_data, 1, tag_size) != tag_size) {
+            Mix_SetError("XQOA: Can't read the %s meta-tag data.", tag_name);
+            SDL_free(tag_data);
+            return SDL_FALSE;
+        }
+
+        meta_tags_set(&music->tags, tag_type, tag_data);
+        SDL_free(tag_data);
+    }
+
+    return SDL_TRUE;
+}
+
 /* Load a libxmp stream from an SDL_RWops object */
 void *QOA_CreateFromRW(SDL_RWops *src, int freesrc)
 {
     QOA_Music *music;
-    unsigned char header[QOA_MIN_FILESIZE];
+    Uint8 header[QOA_MIN_FILESIZE];
+    Uint8 read_buf[4];
+    Uint32 xqoa_head_size;
+    Uint32 xqoa_data_size;
 
     music = (QOA_Music *)SDL_calloc(1, sizeof(*music));
     if (!music) {
@@ -84,9 +128,8 @@ void *QOA_CreateFromRW(SDL_RWops *src, int freesrc)
     }
 
     music->src = src;
-    music->freesrc = freesrc;
-
-    /*TODO: Implement the support of XQOA with loop points and meta-tags. */
+    music->xqoa_data_offset = 0;
+    music->xqoa_data_size = SDL_RWsize(src);
 
     if (SDL_RWread(src, header, 1, QOA_MIN_FILESIZE) != QOA_MIN_FILESIZE) {
         Mix_SetError("QOA: Can't read header.");
@@ -94,11 +137,115 @@ void *QOA_CreateFromRW(SDL_RWops *src, int freesrc)
         return NULL;
     }
 
+    /* Extra header that supports more features */
+    if (SDL_memcmp(header, "XQOA", 4) == 0) {
+        SDL_RWseek(src, 4, SEEK_SET);
+
+        if (SDL_RWread(src, read_buf, 1, 4) != 4) {
+            Mix_SetError("XQOA: Can't read header size field.");
+            QOA_CleanUp(src, music);
+            return NULL;
+        }
+        xqoa_head_size = SDL_SwapBE32(*(Uint32*)read_buf);
+
+        if((Sint64)xqoa_head_size >= music->xqoa_data_size)
+        {
+            Mix_SetError("XQOA: Header size is larger than the file!");
+            QOA_CleanUp(src, music);
+            return NULL;
+        }
+
+        if (SDL_RWread(src, read_buf, 1, 4) != 4) {
+            Mix_SetError("XQOA: Can't read data size field.");
+            QOA_CleanUp(src, music);
+            return NULL;
+        }
+        xqoa_data_size = SDL_SwapBE32(*(Uint32*)read_buf);
+
+        if (xqoa_data_size + xqoa_head_size != music->xqoa_data_size) {
+            Mix_SetError("XQOA: Sum of header size (%u) and the data size (%u) doesn't match the file size (%u).",
+                         xqoa_head_size, xqoa_data_size, music->xqoa_data_size);
+            QOA_CleanUp(src, music);
+            return NULL;
+        }
+
+        music->xqoa_data_offset = xqoa_head_size;
+        music->xqoa_data_size = xqoa_data_size;
+
+        if (SDL_RWread(src, read_buf, 1, 4) != 4) {
+            Mix_SetError("XQOA: Can't read loop start field.");
+            QOA_CleanUp(src, music);
+            return NULL;
+        }
+        music->loop_start = SDL_SwapBE32(*(Uint32*)read_buf);
+
+        if (SDL_RWread(src, read_buf, 1, 4) != 4) {
+            Mix_SetError("XQOA: Can't read loop end field.");
+            QOA_CleanUp(src, music);
+            return NULL;
+        }
+        music->loop_end = SDL_SwapBE32(*(Uint32*)read_buf);
+
+        music->loop_len = music->loop_end - music->loop_start;
+
+
+        if (SDL_RWread(src, read_buf, 1, 4) != 4) {
+            Mix_SetError("XQOA: Can't read multitrack channels field.");
+            QOA_CleanUp(src, music);
+            return NULL;
+        }
+        music->multitrack_channels = SDL_SwapBE32(*(Uint32*)read_buf);
+
+        if (SDL_RWread(src, read_buf, 1, 4) != 4) {
+            Mix_SetError("XQOA: Can't read multitrack tracks field.");
+            QOA_CleanUp(src, music);
+            return NULL;
+        }
+        music->multitrack_tracks = SDL_SwapBE32(*(Uint32*)read_buf);
+
+
+        meta_tags_init(&music->tags);
+
+        if(!_XQOA_ReadMetaTag(music, "TITLE", MIX_META_TITLE)) {
+            QOA_CleanUp(src, music);
+            return NULL;
+        }
+
+        if(!_XQOA_ReadMetaTag(music, "ARTIST", MIX_META_ARTIST)) {
+            QOA_CleanUp(src, music);
+            return NULL;
+        }
+
+        if(!_XQOA_ReadMetaTag(music, "ALBUM", MIX_META_ALBUM)) {
+            QOA_CleanUp(src, music);
+            return NULL;
+        }
+
+        if(!_XQOA_ReadMetaTag(music, "COPYRIGHT", MIX_META_COPYRIGHT)) {
+            QOA_CleanUp(src, music);
+            return NULL;
+        }
+
+
+        SDL_RWseek(src, music->xqoa_data_offset, SEEK_SET);
+
+        /* Read the normal QOA header */
+        if (SDL_RWread(src, header, 1, QOA_MIN_FILESIZE) != QOA_MIN_FILESIZE) {
+            Mix_SetError("QOA: Can't read header.");
+            QOA_CleanUp(src, music);
+            return NULL;
+        }
+    }
+
     music->first_frame_pos = qoa_decode_header(header, QOA_MIN_FILESIZE, &music->info);
     if (!music->first_frame_pos) {
         Mix_SetError("QOA: Can't parse header.");
         QOA_CleanUp(src, music);
         return NULL;
+    }
+
+    if (music->xqoa_data_offset > 0) {
+        music->first_frame_pos += music->xqoa_data_offset;
     }
 
     music->volume = MIX_MAX_VOLUME;
@@ -141,6 +288,12 @@ void *QOA_CreateFromRW(SDL_RWops *src, int freesrc)
         return NULL;
     }
 
+    if ((music->loop_end > 0) && (music->loop_end <= music->info.samples) &&
+        (music->loop_start < music->loop_end)) {
+        music->loop = 1;
+    }
+
+    music->freesrc = freesrc;
     return music;
 }
 
@@ -167,6 +320,7 @@ static int QOA_Play(void *context, int play_count)
     music->sample_pos = 0;
     music->sample_data_len = 0;
     music->sample_data_pos = 0;
+    music->at_end = SDL_FALSE;
     return 0;
 }
 
@@ -177,7 +331,7 @@ static void QOA_Stop(void *context)
     SDL_AudioStreamClear(music->stream);
 }
 
-static unsigned int qoaplay_decode_frame(QOA_Music *music)
+static unsigned int _QOA_DecodeFrame(QOA_Music *music)
 {
     unsigned int samples_decoded = 0;
     size_t got_bytes, encoded_frame_size;
@@ -185,6 +339,9 @@ static unsigned int qoaplay_decode_frame(QOA_Music *music)
     encoded_frame_size = qoa_max_frame_size(&music->info);
 
     got_bytes = SDL_RWread(music->src, music->decode_buffer, 1, encoded_frame_size);
+    if (got_bytes == 0) {
+        return 0;
+    }
 
     qoa_decode_frame(music->decode_buffer, got_bytes, &music->info, music->sample_data, &samples_decoded);
 
@@ -197,7 +354,7 @@ static unsigned int qoaplay_decode_frame(QOA_Music *music)
     return samples_decoded;
 }
 
-static int qoaplay_decode(QOA_Music *music, Sint16 *out_samples, int num_samples)
+static int _QOA_ReadSamples(QOA_Music *music, Sint16 *out_samples, int num_samples)
 {
     int src_index = music->sample_data_pos * music->info.channels;
     int frame_size = (sizeof(Sint16) * music->num_channels);
@@ -207,7 +364,12 @@ static int qoaplay_decode(QOA_Music *music, Sint16 *out_samples, int num_samples
     for (i = 0; i < num_samples; ) {
         /* Do we have to decode more samples? */
         if (music->sample_data_len - music->sample_data_pos == 0) {
-            if (!qoaplay_decode_frame(music)) {
+            if (music->at_end) {
+                break;
+            }
+            if (!_QOA_DecodeFrame(music)) {
+                music->sample_pos += 1;
+                music->at_end = SDL_TRUE;
                 break; /* Reached end of file */
             }
             src_index = 0;
@@ -246,12 +408,41 @@ static int qoaplay_decode(QOA_Music *music, Sint16 *out_samples, int num_samples
     return samples_written;
 }
 
+static int QOA_SeekToSample(QOA_Music *music, Uint32 dst_pos)
+{
+    int dst_frame;
+    Sint64 offset;
+
+    if (dst_pos > music->info.samples) {
+        music->sample_pos = music->info.samples + 1;
+        music->at_end = SDL_TRUE;
+        return -1;
+    }
+
+    dst_frame = dst_pos / QOA_FRAME_LEN;
+
+    music->sample_pos = dst_frame * QOA_FRAME_LEN;
+    music->sample_data_len = 0;
+    music->sample_data_pos = 0;
+
+    offset = music->first_frame_pos + dst_frame * qoa_max_frame_size(&music->info);
+
+    SDL_RWseek(music->src, offset, SEEK_SET);
+
+    music->skip_samples = dst_pos - (dst_frame * QOA_FRAME_LEN);
+    music->at_end = SDL_FALSE;
+
+    return 0;
+}
+
 /* Play some of a stream previously started with xmp_play() */
 static int QOA_GetSome(void *context, void *data, int bytes, SDL_bool *done)
 {
     QOA_Music *music = (QOA_Music *)context;
-    int filled, amount;
+    SDL_bool looped = SDL_FALSE;
+    int filled, amount, channels, result;
     int frame_size = (sizeof(Sint16) * music->num_channels);
+    Uint32 pcmPos;
 
     filled = SDL_AudioStreamGet(music->stream, data, bytes);
     if (filled != 0) {
@@ -264,14 +455,32 @@ static int QOA_GetSome(void *context, void *data, int bytes, SDL_bool *done)
         return 0;
     }
 
-    amount = qoaplay_decode(music, (Sint16*)music->buffer, music->buffer_size / frame_size);
+    amount = _QOA_ReadSamples(music, (Sint16*)music->buffer, music->buffer_size / frame_size);
     amount *= frame_size;
+
+    channels = music->info.channels;
+    pcmPos = music->sample_pos;
+
+    if (music->loop && (music->play_count != 1) && (pcmPos >= music->loop_end)) {
+        amount -= (int)((pcmPos - music->loop_end) * channels) * (int)sizeof(Sint16);
+        result = QOA_SeekToSample(music, music->loop_start);
+        if (result < 0) {
+            return Mix_SetError("XQOA: Failed to seek via qoa_seek_to_sample");
+        } else {
+            int play_count = -1;
+            if (music->play_count > 0) {
+                play_count = (music->play_count - 1);
+            }
+            music->play_count = play_count;
+        }
+        looped = SDL_TRUE;
+    }
 
     if (amount > 0) {
         if (SDL_AudioStreamPut(music->stream, music->buffer, amount) < 0) {
             return -1;
         }
-    } else {
+    } else if (!looped) {
         if (music->play_count == 1) {
             music->play_count = 0;
             SDL_AudioStreamFlush(music->stream);
@@ -298,32 +507,15 @@ static int QOA_GetAudio(void *context, void *data, int bytes)
 static int QOA_Seek(void *context, double pos)
 {
     QOA_Music *music = (QOA_Music *)context;
-    int dst_pos, dst_frame;
-    Sint64 offset;
+    Uint32 dst_pos;
+
+    if (pos < 0.0) {
+        pos = 0.0;
+    }
 
     dst_pos = (int)(pos * music->info.samplerate);
 
-    if (dst_pos < 0) {
-        dst_pos = 0;
-    }
-
-    if (dst_pos > (int)music->info.samples) {
-        dst_pos = 0;
-    }
-
-    dst_frame = dst_pos / QOA_FRAME_LEN;
-
-    music->sample_pos = dst_frame * QOA_FRAME_LEN;
-    music->sample_data_len = 0;
-    music->sample_data_pos = 0;
-
-    offset = music->first_frame_pos + dst_frame * qoa_max_frame_size(&music->info);
-
-    SDL_RWseek(music->src, offset, SEEK_SET);
-
-    music->skip_samples = dst_pos - (dst_frame * QOA_FRAME_LEN);
-
-    return -1;
+    return QOA_SeekToSample(music, dst_pos);
 }
 
 static double QOA_Tell(void *context)
@@ -336,6 +528,33 @@ static double QOA_Duration(void *context)
 {
     QOA_Music *music = (QOA_Music *)context;
     return (double)music->info.samples / (double)music->info.samplerate;
+}
+
+static double QOA_LoopStart(void *music_p)
+{
+    QOA_Music *music = (QOA_Music *)music_p;
+    if (music->loop > 0) {
+        return (double)music->loop_start / music->info.samplerate;
+    }
+    return -1.0;
+}
+
+static double QOA_LoopEnd(void *music_p)
+{
+    QOA_Music *music = (QOA_Music *)music_p;
+    if (music->loop > 0) {
+        return (double)music->loop_end / music->info.samplerate;
+    }
+    return -1.0;
+}
+
+static double QOA_LoopLength(void *music_p)
+{
+    QOA_Music *music = (QOA_Music *)music_p;
+    if (music->loop > 0) {
+        return (double)music->loop_len / music->info.samplerate;
+    }
+    return -1.0;
 }
 
 static const char* QOA_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
@@ -414,9 +633,9 @@ Mix_MusicInterface Mix_MusicInterface_QOA =
     NULL,   /* GetPitch [MIXER-X] */
     NULL,   /* GetTracksCount [MIXER-X] */
     NULL,   /* SetTrackMute [MIXER-X] */
-    NULL,   /* LoopStart */
-    NULL,   /* LoopEnd */
-    NULL,   /* LoopLength */
+    QOA_LoopStart,
+    QOA_LoopEnd,
+    QOA_LoopLength,
     QOA_GetMetaTag,
     NULL,   /* GetNumTracks */
     NULL,   /* StartTrack */
