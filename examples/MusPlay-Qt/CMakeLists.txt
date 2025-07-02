@@ -145,3 +145,37 @@ install(TARGETS sdlmixer_musplay
     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
     BUNDLE DESTINATION "${CMAKE_INSTALL_BINDIR}"
 )
+
+if(UNIX AND NOT APPLE AND NOT ANDROID AND NOT EMSCRIPTEN AND NOT HAIKU)
+    set(DESKTOP_EXEC sdlmixer_musplay)
+    set(DESKTOP_ICON sdlmixer_musplay)
+
+    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/_resources/MixerXPlayer.desktop.in"
+                   "${CMAKE_CURRENT_BINARY_DIR}/share/applications/sdlmixer_musplay.desktop")
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/share/applications/sdlmixer_musplay.desktop"
+            DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/applications)
+
+    # application icons
+    set(MIXERXPLAYER_ICON_PATH "${CMAKE_CURRENT_SOURCE_DIR}/_resources/cat_musplay/")
+
+    install(FILES "${MIXERXPLAYER_ICON_PATH}/cat_musplay_16x16.png"
+            DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/16x16/apps/" RENAME "sdlmixer_musplay.png")
+    install(FILES "${MIXERXPLAYER_ICON_PATH}/cat_musplay_32x32.png"
+            DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/32x32/apps/" RENAME "sdlmixer_musplay.png")
+    install(FILES "${MIXERXPLAYER_ICON_PATH}/cat_musplay_48x48.png"
+            DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/48x48/apps/" RENAME "sdlmixer_musplay.png")
+    install(FILES "${MIXERXPLAYER_ICON_PATH}/cat_musplay_256x256.png"
+            DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/256x256/apps/" RENAME "sdlmixer_musplay.png")
+
+    set(MIXERXFILE_ICON_PATH "${CMAKE_CURRENT_SOURCE_DIR}/_resources/file_musplay/")
+
+    install(FILES "${MIXERXFILE_ICON_PATH}/file_musplay_16x16.png"
+            DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/16x16/apps/" RENAME "sdlmixer_musplay_file.png")
+    install(FILES "${MIXERXFILE_ICON_PATH}/file_musplay_32x32.png"
+            DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/32x32/apps/" RENAME "sdlmixer_musplay_file.png")
+    install(FILES "${MIXERXFILE_ICON_PATH}/file_musplay_48x48.png"
+            DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/48x48/apps/" RENAME "sdlmixer_musplay_file.png")
+    install(FILES "${MIXERXFILE_ICON_PATH}/file_musplay_256x256.png"
+            DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/256x256/apps/" RENAME "sdlmixer_musplay_file.png")
+endif()
+
