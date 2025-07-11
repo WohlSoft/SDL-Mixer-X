@@ -243,7 +243,7 @@ void *QOA_CreateFromRWex(SDL_RWops *src, int freesrc, const char *args)
 
     /* Extra header that supports more features */
     if (SDL_memcmp(header, "XQOA", 4) == 0) {
-        SDL_RWseek(src, 4, SEEK_SET);
+        SDL_RWseek(src, 4, RW_SEEK_SET);
 
         if (SDL_RWread(src, read_buf, 1, 4) != 4) {
             Mix_SetError("XQOA: Can't read header size field.");
@@ -331,7 +331,7 @@ void *QOA_CreateFromRWex(SDL_RWops *src, int freesrc, const char *args)
         }
 
 
-        SDL_RWseek(src, music->xqoa_data_offset, SEEK_SET);
+        SDL_RWseek(src, music->xqoa_data_offset, RW_SEEK_SET);
 
         /* Read the normal QOA header */
         if (SDL_RWread(src, header, 1, QOA_MIN_FILESIZE) != QOA_MIN_FILESIZE) {
@@ -360,7 +360,7 @@ void *QOA_CreateFromRWex(SDL_RWops *src, int freesrc, const char *args)
 
     music->num_channels = music->info.channels;
 
-    SDL_RWseek(src, music->first_frame_pos, SEEK_SET);
+    SDL_RWseek(src, music->first_frame_pos, RW_SEEK_SET);
     music->sample_pos = 0;
     music->sample_data_len = 0;
     music->sample_data_pos = 0;
@@ -450,7 +450,7 @@ static int QOA_Play(void *context, int play_count)
 {
     QOA_Music *music = (QOA_Music *)context;
     music->play_count = play_count;
-    SDL_RWseek(music->src, music->first_frame_pos, SEEK_SET);
+    SDL_RWseek(music->src, music->first_frame_pos, RW_SEEK_SET);
     music->sample_pos = 0;
     music->sample_data_len = 0;
     music->sample_data_pos = 0;
@@ -561,7 +561,7 @@ static int QOA_SeekToSample(QOA_Music *music, Uint32 dst_pos)
 
     offset = music->first_frame_pos + dst_frame * qoa_max_frame_size(&music->info);
 
-    SDL_RWseek(music->src, offset, SEEK_SET);
+    SDL_RWseek(music->src, offset, RW_SEEK_SET);
 
     music->skip_samples = dst_pos - (dst_frame * QOA_FRAME_LEN);
     music->at_end = SDL_FALSE;
@@ -801,7 +801,7 @@ static void QOA_CleanUp(SDL_RWops *src, QOA_Music *music)
         SDL_free(music);
     }
 
-    SDL_RWseek(src, 0, SEEK_SET);
+    SDL_RWseek(src, 0, RW_SEEK_SET);
 }
 
 /* Close the given libxmp stream */
