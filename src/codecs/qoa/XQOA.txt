@@ -35,7 +35,7 @@ channels, otherwise file will be treated as invalid.
    0x14        | Number of multi-track channels (0 = disable)               | BE-INT32
    0x18        | Number of multi-track tracks (0 = disable)                 | BE-INT32
 ----------------------------------------------------------------------------------------------
----------------Dynamic-Size meta-tag-strings-starting at 0x18---------------------------------
+---------------Dynamic-Size meta-tag-strings-starting at 0x1C---------------------------------
 ----------------------------------------------------------------------------------------------
    TISIZE      | Size of the non-null-terminated TITLE meta tag string      | BE-INT32
    TISIZE + 4  | The data of the TITLE meta-tag of size defined above       | UTF-8 string
