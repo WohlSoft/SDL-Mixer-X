@@ -28,6 +28,14 @@
 #define QOA_MALLOC  SDL_malloc
 #define QOA_FREE    SDL_free
 #define inline      SDL_INLINE
+/*Workaround to avoid conflicts*/
+#define qoa_encode_header   mixerx_private_qoa_encode_header
+#define qoa_encode_frame    mixerx_private_qoa_encode_frame
+#define qoa_encode          mixerx_private_qoa_encode
+#define qoa_max_frame_size  mixerx_private_qoa_max_frame_size
+#define qoa_decode_header   mixerx_private_qoa_decode_header
+#define qoa_decode_frame    mixerx_private_qoa_decode_frame
+#define qoa_decode          mixerx_private_qoa_decode
 #include "qoa/qoa.h"
 #undef inline
 
