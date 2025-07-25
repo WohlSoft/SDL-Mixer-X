@@ -75,13 +75,13 @@ static drmp3_bool32 DRMP3_SeekCB(void *context, int offset, drmp3_seek_origin or
     DRMP3_Music *music = (DRMP3_Music *)context;
     int whence;
     switch (origin) {
-    case drmp3_seek_origin_start:
+    case DRMP3_SEEK_SET:
         whence = RW_SEEK_SET;
         break;
-    case drmp3_seek_origin_current:
+    case DRMP3_SEEK_CUR:
         whence = RW_SEEK_CUR;
         break;
-    case drmp3_seek_origin_end:
+    case DRMP3_SEEK_END:
         whence = RW_SEEK_END;
         break;
     default:
