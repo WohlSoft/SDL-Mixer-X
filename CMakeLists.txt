@@ -119,6 +119,11 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER_ID ST
     endif()
 endif()
 
+# Ensure the Windows XP compatibility
+if(WIN32)
+    add_definitions(-DWINVER=0x0501 -D_WIN32_WINNT=0x0501)
+endif()
+
 if(MSVC)
     mixer_add_opt_flag("/utf-8" MSVC_UTF8)
 endif()
