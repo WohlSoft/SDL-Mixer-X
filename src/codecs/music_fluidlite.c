@@ -52,6 +52,7 @@ typedef struct {
     int (*fluid_synth_write_float)(fluid_synth_t*, int, void*, int, int, void*, int, int);
     fluid_settings_t* (*new_fluid_settings)(void);
     fluid_synth_t* (*new_fluid_synth)(fluid_settings_t*);
+    /* Real-Time MIDI API */
     int (*fluid_synth_noteon)(fluid_synth_t*, int, int, int);
     int (*fluid_synth_noteoff)(fluid_synth_t*, int, int);
     int (*fluid_synth_cc)(fluid_synth_t*, int, int, int);
@@ -103,6 +104,7 @@ static int FLUIDSYNTH_Load()
         FUNCTION_LOADER(fluid_synth_write_float, int(*)(fluid_synth_t*, int, void*, int, int, void*, int, int))
         FUNCTION_LOADER(new_fluid_settings, fluid_settings_t* (*)(void))
         FUNCTION_LOADER(new_fluid_synth, fluid_synth_t* (*)(fluid_settings_t*))
+        /* Real-Time MIDI API */
         FUNCTION_LOADER(fluid_synth_noteon, int (*)(fluid_synth_t*, int, int, int))
         FUNCTION_LOADER(fluid_synth_noteoff, int (*)(fluid_synth_t*, int, int))
         FUNCTION_LOADER(fluid_synth_cc, int (*)(fluid_synth_t*, int, int, int))
@@ -135,7 +137,7 @@ static void FLUIDSYNTH_Unload()
     --fluidsynth.loaded;
 }
 
-/* Global OPNMIDI flags which are applying on initializing of MIDI player with a file */
+/* Global FluidSynth flags which are applying on initializing of MIDI player with a file */
 typedef struct {
     char custom_soundfonts[2048];
     double tempo;
