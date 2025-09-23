@@ -39,6 +39,9 @@
 #include "qoa/qoa.h"
 #undef inline
 
+#ifndef PRIu32
+#   define PRIu32 "u"
+#endif
 
 /* Global flags which are applying on initializing of Vorbis player with a file */
 typedef struct {
@@ -275,7 +278,7 @@ void *QOA_CreateFromRWex(SDL_RWops *src, int freesrc, const char *args)
         xqoa_data_size = SDL_SwapBE32(*(Uint32*)read_buf);
 
         if (xqoa_data_size + xqoa_head_size != music->xqoa_data_size) {
-            Mix_SetError("XQOA: Sum of header size (%u) and the data size (%u) doesn't match the file size (%u).",
+            Mix_SetError("XQOA: Sum of header size (%" PRIu32 ") and the data size (%" PRIu32 ") doesn't match the file size (%" PRIu32 ").",
                          xqoa_head_size, xqoa_data_size, music->xqoa_data_size);
             QOA_CleanUp(src, music);
             return NULL;
