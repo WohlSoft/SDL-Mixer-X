@@ -102,7 +102,7 @@
 
 #include "./pxtnPulse_Oggv.h"
 
-#if defined(__3DS__)
+#if defined(__3DS__) || defined(__PSP__)
 typedef int pxogg_int32_t;
 #else
 typedef int32_t pxogg_int32_t;
