@@ -423,7 +423,7 @@ static double PXTONE_Duration(void *music_p)
 {
     PXTONE_Music *music = (PXTONE_Music*)music_p;
     int32_t ret = music->pxtn->moo_get_total_sample();
-    return ret > 0 ? ((double)ret / music_spec.freq) * music->tempo : -1.0;
+    return ret > 0 ? ((double)ret / music_spec.freq) : -1.0;
 }
 
 static int PXTONE_SetTempo(void *music_p, double tempo)
@@ -488,7 +488,7 @@ static double PXTONE_LoopLength(void *music_p)
     if (music) {
         int32_t start_i = music->pxtn->moo_get_sampling_repeat();
         int32_t end_i = music->pxtn->moo_get_sampling_end();
-        double start = ((double)start_i / music_spec.freq) * music->tempo;;
+        double start = ((double)start_i / music_spec.freq) * music->tempo;
         double end = ((double)end_i / music_spec.freq) * music->tempo;
         if (start >= 0 && end >= 0) {
             return (end - start);
