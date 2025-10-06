@@ -223,7 +223,7 @@ static void *PXTONE_NewRWex(struct SDL_RWops *src, int freesrc, const char *args
     prep.start_pos_float = 0;
     prep.master_volume   = 1.0f;
 
-    if (!music->pxtn->moo_preparation(&prep)) {
+    if (!music->pxtn->moo_preparation(&prep, music->tempo)) {
         PXTONE_Delete(music);
         Mix_SetError("PXTONE: Failed to initialize the output (Moo)");
         return NULL;
