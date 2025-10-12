@@ -1192,7 +1192,7 @@ static int WAV_GetSome(void *context, void *data, int bytes, SDL_bool *done)
     for (i = 0; i < music->numloops; ++i) {
         loop = &music->loops[i];
         if (loop->active) {
-            const int bytes_per_sample = (SDL_AUDIO_BITSIZE(music->spec.format) / 8) * music->spec.channels;
+            const int bytes_per_sample = music->samplesize;
             loop_start = music->start + loop->start * (Uint32)bytes_per_sample;
             loop_stop = music->start + (loop->stop + 1) * (Uint32)bytes_per_sample;
             if (pos >= loop_start && pos < loop_stop) {
