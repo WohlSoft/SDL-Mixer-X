@@ -98,6 +98,10 @@ typedef struct {
     Mix_MusicMetaTags tags;
     Uint16 encoding;
     int (*decode)(void *music, int length);
+    /* For player indication */
+    double loop_start_time;
+    double loop_end_time;
+    double loop_length_time;
 } WAV_Music;
 
 /*
@@ -245,6 +249,10 @@ static void *WAV_CreateFromRW(SDL_RWops *src, int freesrc)
     /* Default decoder is PCM */
     music->decode = fetch_pcm;
     music->encoding = PCM_CODE;
+
+    music->loop_start_time = -1;
+    music->loop_end_time = -1;
+    music->loop_length_time = -1;
 
     magic = SDL_ReadLE32(src);
     if (magic == RIFF || magic == WAVE) {
@@ -1325,6 +1333,24 @@ static const char* WAV_GetMetaTag(void *context, Mix_MusicMetaTag tag_type)
     return meta_tags_get(&music->tags, tag_type);
 }
 
+static double WAV_LoopStart(void *music_p)
+{
+    WAV_Music *music = (WAV_Music *)music_p;
+    return music->loop_start_time;
+}
+
+static double WAV_LoopEnd(void *music_p)
+{
+    WAV_Music *music = (WAV_Music *)music_p;
+    return music->loop_end_time;
+}
+
+static double WAV_LoopLength(void *music_p)
+{
+    WAV_Music *music = (WAV_Music *)music_p;
+    return music->loop_length_time;
+}
+
 /* Close the given WAV stream */
 static void WAV_Delete(void *context)
 {
@@ -1498,6 +1524,8 @@ static SDL_bool AddLoopPoint(WAV_Music *wave, Uint32 play_count, Uint32 start, U
 {
     WAVLoopPoint *loop;
     WAVLoopPoint *loops = SDL_realloc(wave->loops, (wave->numloops + 1) * sizeof(*wave->loops));
+    double time_start, time_stop;
+
     if (!loops) {
         Mix_OutOfMemory();
         return SDL_FALSE;
@@ -1511,6 +1539,19 @@ static SDL_bool AddLoopPoint(WAV_Music *wave, Uint32 play_count, Uint32 start, U
 
     wave->loops = loops;
     ++wave->numloops;
+
+    time_start = (double)start / wave->spec.freq;
+    time_stop = (double)stop / wave->spec.freq;
+
+    if(wave->loop_start_time < 0.0 || wave->loop_start_time > time_start)
+        wave->loop_start_time = time_start;
+
+    if(wave->loop_end_time < 0.0 || wave->loop_end_time < time_stop)
+        wave->loop_end_time = time_stop;
+
+    if(wave->loop_start_time >= 0.0 && wave->loop_end_time >= 0.0 && time_stop > time_start)
+        wave->loop_length_time = time_stop - time_start;
+
     return SDL_TRUE;
 }
 
@@ -2054,9 +2095,9 @@ Mix_MusicInterface Mix_MusicInterface_WAV =
     NULL,   /* GetPitch [MIXER-X] */
     NULL,   /* GetTracksCount [MIXER-X] */
     NULL,   /* SetTrackMute [MIXER-X] */
-    NULL,   /* LoopStart */
-    NULL,   /* LoopEnd */
-    NULL,   /* LoopLength */
+    WAV_LoopStart,
+    WAV_LoopEnd,
+    WAV_LoopLength,
     WAV_GetMetaTag,   /* GetMetaTag */
     NULL,   /* GetNumTracks */
     NULL,   /* StartTrack */
