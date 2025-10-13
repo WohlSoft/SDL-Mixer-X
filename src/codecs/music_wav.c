@@ -1652,7 +1652,7 @@ static SDL_bool ParseLIST(WAV_Music *wave, Uint32 chunk_length)
             } else if(SDL_strncmp((char *)(data + i), "IART", 4) == 0) {
                 read_meta_field(&wave->tags, MIX_META_ARTIST, &i, got, data, 4);
                 continue;
-            } else if(SDL_strncmp((char *)(data + i), "IALB", 4) == 0) {
+            } else if(SDL_strncmp((char *)(data + i), "IALB", 4) == 0 || SDL_strncmp((char *)(data + i), "IPRD", 4) == 0) {
                 read_meta_field(&wave->tags, MIX_META_ALBUM, &i, got, data, 4);
                 continue;
             } else if (SDL_strncmp((char *)(data + i), "BCPR", 4) == 0) {
