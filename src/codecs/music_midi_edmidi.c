@@ -379,7 +379,7 @@ static EDMIDI_Music *EDMIDI_LoadSongRW(SDL_RWops *src, const char *args)
     SDL_free(bytes);
 
     if (err != 0) {
-        Mix_SetError("ADL-MIDI: %s", EDMIDI.edmidi_errorInfo(music->edmidi));
+        Mix_SetError("EDMIDI: %s", EDMIDI.edmidi_errorInfo(music->edmidi));
         EDMIDI_delete(music);
         return NULL;
     }
