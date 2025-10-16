@@ -1898,6 +1898,8 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
         return MUS_FFMPEG;
     if (SDL_memcmp(magic + 4, "\x66\x74\x79\x70\x6D\x70\x34\x32", 8) == 0) /* AAC */
         return MUS_FFMPEG;
+    if (SDL_memcmp(magic + 4, "\x66\x74\x79\x70\x64\x61\x73\x68", 8) == 0) /* AAC */
+        return MUS_FFMPEG;
     if (SDL_memcmp(magic + 4, "ftypM4A ", 8) == 0) /* AAC */
         return MUS_FFMPEG;
 #endif
