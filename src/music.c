@@ -1756,6 +1756,14 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
 #endif
     }
 
+    if ((SDL_memcmp(magic, "HMIMIDIP", 8) == 0) || (SDL_memcmp(magic, "HMI-MIDISONG061595", 19) == 0)) {
+#if defined(MUSIC_HAS_XMI_SUPPORT)
+        return xmi_compatible_midi_player();
+#else
+        return MUS_NONE;
+#endif
+    }
+
     /* WAVE files have the magic four bytes "RIFF"
            AIFF files have the magic 12 bytes "FORM" XXXX "AIFF" */
     if (((SDL_memcmp(magic, "RIFF", 4) == 0) && (SDL_memcmp((magic + 8), "WAVE", 4) == 0)) ||
