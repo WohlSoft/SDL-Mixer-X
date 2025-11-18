@@ -63,6 +63,9 @@ option(MIXERX_DISABLE_SIMD "Disable any SIMD optimizations as possible" OFF)
 
 option(ENABLE_ADDRESS_SANITIZER "Enable the Address Sanitizer GCC feature" OFF)
 
+option(MIXERX_DISABLE_SO_VERSION "Disable building shared library with SO versioning" OFF)
+mark_as_advanced(MIXERX_DISABLE_SO_VERSION)
+
 if(NINTENDO_3DS OR NINTENDO_WII OR VITA OR PSP)
     set(ENABLE_LOWEND_RESAMPLER_DEFAULT ON)
 else()
@@ -408,10 +411,12 @@ endif()
 
 if(SDL_MIXER_X_SHARED AND NOT BUILD_AS_VB6_BINDING)
     add_library(SDL2_mixer_ext SHARED ${SDLMixerX_SOURCES})
-    set_target_properties(SDL2_mixer_ext PROPERTIES
-        VERSION ${SDLMixerX_VERSION}
-        SOVERSION ${SDLMixerX_VERSION_MAJOR}
-    )
+    if(NOT MIXERX_DISABLE_SO_VERSION)
+        set_target_properties(SDL2_mixer_ext PROPERTIES
+            VERSION ${SDLMixerX_VERSION}
+            SOVERSION ${SDLMixerX_VERSION_MAJOR}
+        )
+    endif()
     target_link_libraries(SDL2_mixer_ext PRIVATE ${SDLMixerX_LINK_LIBS})
     target_compile_definitions(SDL2_mixer_ext PRIVATE ${SDL_MIXER_DEFINITIONS} -DDLL_EXPORT)
     target_include_directories(SDL2_mixer_ext PRIVATE
