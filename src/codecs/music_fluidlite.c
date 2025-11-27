@@ -24,7 +24,9 @@
 
 #ifdef MUSIC_MID_FLUIDSYNTH
 
-#include "SDL_loadso.h"
+#ifdef FLUIDSYNTH_DYNAMIC
+#   include "SDL_loadso.h"
+#endif
 #include "SDL_rwops.h"
 
 #include "utils.h"
@@ -602,6 +604,8 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusicArg(void *data, const char *args)
         SDL_OutOfMemory();
         goto fail;
     }
+
+    midi_seq_set_device_mask(music->player, DEFAULT_MASK_GM);
 
     ret = midi_seq_openData(music->player, rw_mem, rw_size);
     SDL_free(rw_mem);

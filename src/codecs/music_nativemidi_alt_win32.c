@@ -465,6 +465,7 @@ static void *NATIVEMIDI_CreateFromRW(SDL_RWops *src, int freesrc)
         return NULL;
     }
 
+    midi_seq_set_device_mask(music->song, DEFAULT_MASK_GM);
 
     if (midi_seq_openData(music->song, bytes, filesize) < 0) {
         Mix_SetError("NativeMIDI: %s", midi_seq_get_error(music->song));

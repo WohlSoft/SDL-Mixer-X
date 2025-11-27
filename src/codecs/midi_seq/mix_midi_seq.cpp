@@ -91,19 +91,26 @@ int midi_seq_openFile(void *seq, const char *path)
 const char *midi_seq_meta_title(void *seq)
 {
     MixerSeqInternal *seqi = reinterpret_cast<MixerSeqInternal*>(seq);
-    return seqi->seq.getMusicTitle().c_str();
+    return seqi->seq.getMusicTitle();
 }
 
 const char *midi_seq_meta_copyright(void *seq)
 {
     MixerSeqInternal *seqi = reinterpret_cast<MixerSeqInternal*>(seq);
-    return seqi->seq.getMusicCopyright().c_str();
+    return seqi->seq.getMusicCopyright();
 }
 
 const char *midi_seq_get_error(void *seq)
 {
     MixerSeqInternal *seqi = reinterpret_cast<MixerSeqInternal*>(seq);
-    return seqi->seq.getErrorString().c_str();
+    return seqi->seq.getErrorString();
+}
+
+
+void midi_seq_set_device_mask(void *seq, uint32_t device)
+{
+    MixerSeqInternal *seqi = reinterpret_cast<MixerSeqInternal*>(seq);
+    seqi->seq.setDeviceMask(device);
 }
 
 void midi_seq_rewind(void *seq)

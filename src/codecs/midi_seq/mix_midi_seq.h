@@ -30,6 +30,42 @@
 extern "C" {
 #endif
 
+/**
+ * @brief Device types to filter incompatible MIDI tracks, primarily used by HMI/HMP and EMIDI.
+ * Can be combined to enable more tracks.
+ */
+enum DeviceFilter
+{
+    Device_GeneralMidi      = 0x0001, /* MPU-401 counted as here */
+    Device_OPL2             = 0x0002,
+    Device_OPL3             = 0x0004,
+    Device_MT32             = 0x0008,
+    Device_AWE32            = 0x0010,
+    Device_WaveBlaster      = 0x0020,
+    Device_ProAudioSpectrum = 0x0040,
+    Device_SoundMan16       = 0x0080,
+    Device_DIGI             = 0x0100, /* Digital samples controlled by MIDI */
+    Device_SoundScape       = 0x0200,
+    Device_WaveTable        = 0x0400,
+    Device_GravisUltrasound = 0x0800,
+    Device_PCSpeaker        = 0x1000,
+    Device_Callback         = 0x2000,
+    Device_SoundMasterII    = 0x4000,
+
+    Device_FM               = Device_OPL2|Device_OPL3|Device_ProAudioSpectrum|Device_SoundMan16,
+    Device_AdLib            = Device_OPL2,
+    Device_SoundBlaster     = Device_OPL2|Device_OPL3,
+    Device_ANY              = 0xFFFF
+};
+
+#define DEFAULT_MASK_GM \
+    Device_GeneralMidi |\
+    Device_GravisUltrasound |\
+    Device_SoundMasterII | \
+    Device_AWE32 |\
+    Device_WaveBlaster |\
+    Device_SoundScape
+
 extern void *midi_seq_init_interface(BW_MidiRtInterface *iface);
 extern void midi_seq_free(void *seq);
 
@@ -40,6 +76,8 @@ extern const char *midi_seq_meta_title(void *seq);
 extern const char *midi_seq_meta_copyright(void *seq);
 
 extern const char *midi_seq_get_error(void *seq);
+
+extern void midi_seq_set_device_mask(void *seq, uint32_t device);
 
 extern void midi_seq_rewind(void *seq);
 extern void midi_seq_seek(void *seq, double pos);
