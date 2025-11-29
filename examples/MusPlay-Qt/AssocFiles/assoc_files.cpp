@@ -101,6 +101,9 @@ void AssocFiles::on_reset_clicked()
     defaultFormats["xmi"] = true;
     defaultFormats["mus"] = true;
     defaultFormats["cmf"] = true;
+    defaultFormats["hmi"] = true;
+    defaultFormats["hmp"] = true;
+    defaultFormats["hmq"] = true;
 
     defaultFormats["voc"] = true;
     defaultFormats["ay"]  = true;
@@ -340,6 +343,12 @@ void AssocFiles::on_AssocFiles_accepted()
         },
         {
             "hmp",
+            "        <magic priority=\"60\">\n"
+            "            <match type=\"string\" offset=\"0\" value=\"HMIMIDIP\"/>\n"
+            "        </magic>\n"
+        },
+        {
+            "hmq",
             "        <magic priority=\"60\">\n"
             "            <match type=\"string\" offset=\"0\" value=\"HMIMIDIP\"/>\n"
             "        </magic>\n"
