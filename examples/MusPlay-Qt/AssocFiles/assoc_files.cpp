@@ -331,6 +331,18 @@ void AssocFiles::on_AssocFiles_accepted()
             "        <magic priority=\"60\">\n"
             "            <match type=\"string\" offset=\"0\" value=\"PTTUNE\"/>\n"
             "        </magic>\n"
+        },
+        {
+            "hmi",
+            "        <magic priority=\"60\">\n"
+            "            <match type=\"string\" offset=\"0\" value=\"HMI-MIDISONG061595\"/>\n"
+            "        </magic>\n"
+        },
+        {
+            "hmp",
+            "        <magic priority=\"60\">\n"
+            "            <match type=\"string\" offset=\"0\" value=\"HMIMIDIP\"/>\n"
+            "        </magic>\n"
         }
     };
 
