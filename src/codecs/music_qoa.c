@@ -39,6 +39,10 @@
 #include "qoa/qoa.h"
 #undef inline
 
+#ifdef USE_CUSTOM_AUDIO_STREAM
+#   include "stream_custom.h"
+#endif
+
 #ifndef PRIu32
 #   define PRIu32 "u"
 #endif
