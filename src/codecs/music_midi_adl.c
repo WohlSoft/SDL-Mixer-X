@@ -622,9 +622,8 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
 
     src_rate = setup.low_quality ? SDL_min(11025, music_spec.freq) : music_spec.freq;
 
-    num_chips = setup.max_chips_count > 0 ?
-                    SDL_min(setup.max_chips_count, setup.chips_count) :
-                    (setup.chips_count >= 0 ? setup.chips_count : ADLMIDI_DEFAULT_CHIPS_COUNT);
+    num_chips = (setup.chips_count >= 0 ? setup.chips_count : ADLMIDI_DEFAULT_CHIPS_COUNT);
+    num_chips = setup.max_chips_count > 0 ? SDL_min(setup.max_chips_count, num_chips) : num_chips;
 
     switch (music_spec.format) {
     case AUDIO_U8:
