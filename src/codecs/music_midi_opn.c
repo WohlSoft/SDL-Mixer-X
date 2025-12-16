@@ -25,7 +25,9 @@
 
 #ifdef MUSIC_MID_OPNMIDI
 
+#ifdef OPNMIDI_DYNAMIC
 #include "SDL_loadso.h"
+#endif
 #include "utils.h"
 
 #include <opnmidi.h>
@@ -178,7 +180,11 @@ typedef struct {
     float gain;
 } OpnMidi_Setup;
 
-#define OPNMIDI_DEFAULT_CHIPS_COUNT     6
+#if defined(__3DS__) || defined(__PSP__)
+#   define OPNMIDI_DEFAULT_CHIPS_COUNT     2
+#else
+#   define OPNMIDI_DEFAULT_CHIPS_COUNT     6
+#endif
 
 static OpnMidi_Setup opnmidi_setup = {
     OPNMIDI_VolumeModel_AUTO,

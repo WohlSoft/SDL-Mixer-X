@@ -65,6 +65,15 @@ extern void _Mix_ADLMIDI_setEmulator(int emu);
 extern int _Mix_ADLMIDI_getChipsCount(void);
 extern void _Mix_ADLMIDI_setChipsCount(int chips);
 
+extern int _Mix_ADLMIDI_getMaxChipsCount(void);
+extern void _Mix_ADLMIDI_setMaxChipsCount(int maxChips);
+
+extern int _Mix_ADLMIDI_getRunAtPcmRate(void);
+extern void _Mix_ADLMIDI_setRunAtPcmRate(int en);
+
+extern int _Mix_ADLMIDI_getLowQualityMode(void);
+extern void _Mix_ADLMIDI_setLowQualityMode(int en);
+
 extern void _Mix_ADLMIDI_setSetDefaults(void);
 
 extern void _Mix_ADLMIDI_setCustomBankFile(const char *bank_wonl_path);

@@ -3868,6 +3868,18 @@ extern DECLSPEC void MIXCALL Mix_ADLMIDI_setEmulator(int emu);/*MixerX*/
 extern DECLSPEC int  MIXCALL Mix_ADLMIDI_getChipsCount(void);/*MixerX*/
 /* Set count of virtual chips (integer between 1 and 100, or -1 to restore default setup) */
 extern DECLSPEC void MIXCALL Mix_ADLMIDI_setChipsCount(int chips);/*MixerX*/
+/* Get the setup of maximum count of virtual chips (0 is unlimited, i.e. limited to 100) */
+extern DECLSPEC int  MIXCALL Mix_ADLMIDI_getMaxChipsCount(void);/*MixerX*/
+/* Set maximum count of virtual chips (integer between 1 and 100, or 0 to restore default setup) */
+extern DECLSPEC void MIXCALL Mix_ADLMIDI_setMaxChipsCount(int chips);/*MixerX*/
+/* Get the setup of the running at PCM rate (0 the chip runs at native rate, and 1 runs at PCM) */
+extern DECLSPEC int  MIXCALL Mix_ADLMIDI_getRunAtPcmRate(void);/*MixerX*/
+/* Let chip emulator run at PCM rate to reduce CPU load (1 enable, 0 disable) */
+extern DECLSPEC void MIXCALL Mix_ADLMIDI_setRunAtPcmRate(int en);/*MixerX*/
+/* Get the setup of low quality setup (1 enabled or 0 disabled) */
+extern DECLSPEC int  MIXCALL Mix_ADLMIDI_getLowQualityMode(void);/*MixerX*/
+/* Sets the low quality of the generator's output to reduce the CPU load (1 enable, 0 disable) */
+extern DECLSPEC void MIXCALL Mix_ADLMIDI_setLowQualityMode(int en);/*MixerX*/
 /* Reset all ADLMIDI properties to default state */
 extern DECLSPEC void MIXCALL Mix_ADLMIDI_setSetDefaults(void);/*MixerX*/
 
