@@ -3989,6 +3989,60 @@ void MIXCALLCC Mix_ADLMIDI_setChipsCount(int chips)
 #endif
 }
 
+int MIXCALLCC Mix_ADLMIDI_getMaxChipsCount(void)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    return _Mix_ADLMIDI_getMaxChipsCount();
+#else
+    return -1;
+#endif
+}
+
+void MIXCALLCC Mix_ADLMIDI_setMaxChipsCount(int chips)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    _Mix_ADLMIDI_setMaxChipsCount(chips);
+#else
+    (void)chips;
+#endif
+}
+
+int MIXCALLCC Mix_ADLMIDI_getRunAtPcmRate(void)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    return _Mix_ADLMIDI_getRunAtPcmRate();
+#else
+    return -1;
+#endif
+}
+
+void MIXCALLCC Mix_ADLMIDI_setRunAtPcmRate(int en)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    _Mix_ADLMIDI_setRunAtPcmRate(en);
+#else
+    (void)chips;
+#endif
+}
+
+int MIXCALLCC Mix_ADLMIDI_getLowQualityMode(void)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    return _Mix_ADLMIDI_getLowQualityMode();
+#else
+    return -1;
+#endif
+}
+
+void MIXCALLCC Mix_ADLMIDI_setLowQualityMode(int en)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    _Mix_ADLMIDI_setLowQualityMode(en);
+#else
+    (void)chips;
+#endif
+}
+
 void MIXCALLCC Mix_ADLMIDI_setSetDefaults(void)
 {
 #ifdef MUSIC_MID_ADLMIDI
@@ -4130,6 +4184,60 @@ void MIXCALLCC Mix_OPNMIDI_setChipsCount(int chips)
 {
 #ifdef MUSIC_MID_OPNMIDI
     _Mix_OPNMIDI_setChipsCount(chips);
+#else
+    (void)chips;
+#endif
+}
+
+int MIXCALLCC Mix_OPNMIDI_getMaxChipsCount(void)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    return _Mix_OPNMIDI_getMaxChipsCount();
+#else
+    return -1;
+#endif
+}
+
+void MIXCALLCC Mix_OPNMIDI_setMaxChipsCount(int chips)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    _Mix_OPNMIDI_setMaxChipsCount(chips);
+#else
+    (void)chips;
+#endif
+}
+
+int MIXCALLCC Mix_OPNMIDI_getRunAtPcmRate(void)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    return _Mix_OPNMIDI_getRunAtPcmRate();
+#else
+    return -1;
+#endif
+}
+
+void MIXCALLCC Mix_OPNMIDI_setRunAtPcmRate(int en)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    _Mix_OPNMIDI_setRunAtPcmRate(en);
+#else
+    (void)chips;
+#endif
+}
+
+int MIXCALLCC Mix_OPNMIDI_getLowQualityMode(void)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    return _Mix_OPNMIDI_getLowQualityMode();
+#else
+    return -1;
+#endif
+}
+
+void MIXCALLCC Mix_OPNMIDI_setLowQualityMode(int en)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    _Mix_OPNMIDI_setLowQualityMode(en);
 #else
     (void)chips;
 #endif

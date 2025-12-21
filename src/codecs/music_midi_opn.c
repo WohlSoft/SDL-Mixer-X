@@ -25,7 +25,9 @@
 
 #ifdef MUSIC_MID_OPNMIDI
 
+#ifdef OPNMIDI_DYNAMIC
 #include "SDL_loadso.h"
+#endif
 #include "utils.h"
 
 #include <opnmidi.h>
@@ -43,6 +45,7 @@ typedef struct {
     int (*opn2_openBankData)(struct OPN2_MIDIPlayer *device, const void *mem, long size);
     const char *(*opn2_errorInfo)(struct OPN2_MIDIPlayer *device);
     int (*opn2_switchEmulator)(struct OPN2_MIDIPlayer *device, int emulator);
+    int (*opn2_setRunAtPcmRate)(struct OPN2_MIDIPlayer *device, int enabled);
     void (*opn2_setScaleModulators)(struct OPN2_MIDIPlayer *device, int smod);
     void (*opn2_setVolumeRangeModel)(struct OPN2_MIDIPlayer *device, int volumeModel);
     void (*opn2_setChannelAllocMode)(struct OPN2_MIDIPlayer *device, int chanalloc);
@@ -107,6 +110,7 @@ static int OPNMIDI_Load(void)
         FUNCTION_LOADER(opn2_openBankData, int(*)(struct OPN2_MIDIPlayer*,const void*,long))
         FUNCTION_LOADER(opn2_errorInfo, const char *(*)(struct OPN2_MIDIPlayer*))
         FUNCTION_LOADER(opn2_switchEmulator, int(*)(struct OPN2_MIDIPlayer*,int))
+        FUNCTION_LOADER(opn2_setRunAtPcmRate, int(*)(struct OPN2_MIDIPlayer*,int))
         FUNCTION_LOADER(opn2_setScaleModulators, void(*)(struct OPN2_MIDIPlayer*,int))
         FUNCTION_LOADER(opn2_setVolumeRangeModel, void(*)(struct OPN2_MIDIPlayer*,int))
 #if defined(OPNMIDI_HAS_CHANNEL_ALLOC_MODE)
@@ -176,14 +180,24 @@ typedef struct {
     char custom_bank_path[2048];
     double tempo;
     float gain;
+    int max_chips_count;
+    int run_at_pcm_rate;
+    int low_quality;
 } OpnMidi_Setup;
 
-#define OPNMIDI_DEFAULT_CHIPS_COUNT     6
+#if defined(__3DS__) || defined(__PSP__)
+#   define OPNMIDI_DEFAULT_CHIPS_COUNT     2
+#else
+#   define OPNMIDI_DEFAULT_CHIPS_COUNT     6
+#endif
 
 static OpnMidi_Setup opnmidi_setup = {
     OPNMIDI_VolumeModel_AUTO,
     OPNMIDI_ChanAlloc_AUTO,
-    -1, 0, 0, 1, -1, "", 1.0, 2.0
+    -1, 0, 0, 1, -1, "", 1.0, 2.0,
+    0,
+    0,
+    0
 };
 
 static void OPNMIDI_SetDefaultMin(OpnMidi_Setup *setup)
@@ -203,6 +217,9 @@ static void OPNMIDI_SetDefault(OpnMidi_Setup *setup)
     setup->chips_count = -1;
     setup->emulator = -1;
     setup->custom_bank_path[0] = '\0';
+    setup->max_chips_count = 0;
+    setup->run_at_pcm_rate = 0;
+    setup->low_quality = 0;
 }
 
 int _Mix_OPNMIDI_getVolumeModel(void)
@@ -276,6 +293,36 @@ int _Mix_OPNMIDI_getChipsCount(void)
 void _Mix_OPNMIDI_setChipsCount(int chips)
 {
     opnmidi_setup.chips_count = chips;
+}
+
+int _Mix_OPNMIDI_getMaxChipsCount()
+{
+    return opnmidi_setup.max_chips_count;
+}
+
+void _Mix_OPNMIDI_setMaxChipsCount(int maxChips)
+{
+    opnmidi_setup.max_chips_count = maxChips >= 0 ? maxChips : 0;
+}
+
+int _Mix_OPNMIDI_getRunAtPcmRate()
+{
+    return opnmidi_setup.run_at_pcm_rate;
+}
+
+void _Mix_OPNMIDI_setRunAtPcmRate(int en)
+{
+    opnmidi_setup.run_at_pcm_rate = en != 0 ? 1 : 0;
+}
+
+int _Mix_OPNMIDI_getLowQualityMode()
+{
+    return opnmidi_setup.low_quality;
+}
+
+void _Mix_OPNMIDI_setLowQualityMode(int en)
+{
+    opnmidi_setup.low_quality = en != 0 ? 1 : 0;;
 }
 
 void _Mix_OPNMIDI_setSetDefaults(void)
@@ -443,7 +490,7 @@ static void OPNMIDI_delete(void *music_p);
 static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
 {
     void *bytes = 0, *bytes2 = 0;
-    int err = 0;
+    int err = 0, src_rate, num_chips;
     size_t length = 0;
     OpnMIDI_Music *music = NULL;
     OpnMidi_Setup setup = opnmidi_setup;
@@ -463,6 +510,11 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
     music->gain = setup.gain;
     music->volume = MIX_MAX_VOLUME;
     music->volume_real = _Mix_MakeGainedVolume(MIX_MAX_VOLUME, setup.gain);
+
+    src_rate = setup.low_quality ? SDL_min(11025, music_spec.freq) : music_spec.freq;
+
+    num_chips = (setup.chips_count >= 0 ? setup.chips_count : OPNMIDI_DEFAULT_CHIPS_COUNT);
+    num_chips = setup.max_chips_count > 0 ? SDL_min(setup.max_chips_count, num_chips) : num_chips;
 
     switch (music_spec.format) {
     case AUDIO_U8:
@@ -505,7 +557,7 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
         src_format = AUDIO_F32SYS;
     }
 
-    music->stream = SDL_NewAudioStream(src_format, 2, music_spec.freq,
+    music->stream = SDL_NewAudioStream(src_format, 2, src_rate,
                                        music_spec.format, music_spec.channels, music_spec.freq);
 
     if (!music->stream) {
@@ -529,7 +581,7 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
         return NULL;
     }
 
-    music->opnmidi = OPNMIDI.opn2_init(music_spec.freq);
+    music->opnmidi = OPNMIDI.opn2_init(src_rate);
     if (!music->opnmidi) {
         SDL_free(bytes);
         SDL_OutOfMemory();
@@ -561,20 +613,25 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
         return NULL;
     }
 
+    OPNMIDI.opn2_setRunAtPcmRate(music->opnmidi, setup.run_at_pcm_rate);
+
     if (setup.emulator >= 0) {
         if(setup.emulator >= OPNMIDI_VGM_DUMPER) {
             setup.emulator++; /* Always skip the VGM Dumper */
         }
         OPNMIDI.opn2_switchEmulator(music->opnmidi, setup.emulator);
     }
+
     OPNMIDI.opn2_setVolumeRangeModel(music->opnmidi, setup.volume_model);
     OPNMIDI.opn2_setFullRangeBrightness(music->opnmidi, setup.full_brightness_range);
     OPNMIDI.opn2_setSoftPanEnabled(music->opnmidi, setup.soft_pan);
     OPNMIDI.opn2_setAutoArpeggio(music->opnmidi, setup.auto_arpeggio);
+
     if (OPNMIDI.opn2_setChannelAllocMode) {
         OPNMIDI.opn2_setChannelAllocMode(music->opnmidi, setup.alloc_mode);
     }
-    OPNMIDI.opn2_setNumChips(music->opnmidi, (setup.chips_count >= 0) ? setup.chips_count : OPNMIDI_DEFAULT_CHIPS_COUNT);
+
+    OPNMIDI.opn2_setNumChips(music->opnmidi, num_chips);
     OPNMIDI.opn2_setTempo(music->opnmidi, music->tempo);
 
     err = OPNMIDI.opn2_openData( music->opnmidi, bytes, (unsigned long)length);

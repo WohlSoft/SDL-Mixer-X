@@ -49,6 +49,15 @@ extern void _Mix_OPNMIDI_setEmulator(int emu);
 extern int _Mix_OPNMIDI_getChipsCount(void);
 extern void _Mix_OPNMIDI_setChipsCount(int chips);
 
+extern int _Mix_OPNMIDI_getMaxChipsCount(void);
+extern void _Mix_OPNMIDI_setMaxChipsCount(int maxChips);
+
+extern int _Mix_OPNMIDI_getRunAtPcmRate(void);
+extern void _Mix_OPNMIDI_setRunAtPcmRate(int en);
+
+extern int _Mix_OPNMIDI_getLowQualityMode(void);
+extern void _Mix_OPNMIDI_setLowQualityMode(int en);
+
 extern void _Mix_OPNMIDI_setSetDefaults(void);
 extern void _Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path);
 
