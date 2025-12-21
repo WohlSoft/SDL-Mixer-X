@@ -245,9 +245,9 @@ static void ADLMIDI_SetDefault(AdlMidi_Setup *setup)
 {
     ADLMIDI_SetDefaultMin(setup);
     setup->bank        = 58;
-    setup->custom_bank_path[0] = '\0';
     setup->chips_count = -1;
     setup->emulator = -1;
+    setup->custom_bank_path[0] = '\0';
     setup->max_chips_count = 0;
     setup->run_at_pcm_rate = 0;
     setup->low_quality = 0;

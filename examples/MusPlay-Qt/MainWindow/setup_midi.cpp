@@ -85,6 +85,8 @@ void SetupMidi::loadSetup()
     ui->opn_bank->setText(setup.value("OPNMIDI-Bank", QString()).toString());
     ui->opn_use_custom->setChecked(setup.value("OPNMIDI-Bank-UseCustom", true).toBool());
     ui->opnSoftPan->setChecked(setup.value("OPNMIDI-SoftPan", true).toBool());
+    ui->opnRunAtPcmRate->setChecked(setup.value("OPNMIDI-RunAtPcmRate", false).toBool());
+    ui->opnLowQuality->setChecked(setup.value("OPNMIDI-LowQuality", false).toBool());
 
     ui->timidityCfgPath->setText(setup.value("Timidity-Config-Path", QString()).toString());
     ui->fluidSynthSF2Paths->setText(setup.value("FluidSynth-SoundFonts", QString()).toString());
@@ -127,6 +129,8 @@ void SetupMidi::saveSetup()
     setup.setValue("OPNMIDI-ChanAlloc", ui->opnChanAlloc->currentIndex());
     setup.setValue("OPNMIDI-AutoArpeggio", ui->opn_autoArpeggio->checkState());
     setup.setValue("OPNMIDI-SoftPan", ui->opnSoftPan->checkState());
+    setup.setValue("OPNMIDI-RunAtPcmRate", ui->opnRunAtPcmRate->checkState());
+    setup.setValue("OPNMIDI-LowQuality", ui->opnLowQuality->checkState());
 
     setup.setValue("OPNMIDI-Bank", ui->opn_bank->text());
     setup.setValue("OPNMIDI-Bank-UseCustom", ui->opn_use_custom->isChecked());
@@ -613,6 +617,17 @@ void SetupMidi::on_adlLowQuality_clicked()
 #endif
 }
 
+void SetupMidi::on_opnLowQuality_clicked()
+{
+#ifdef SDL_MIXER_X
+    if(m_setupLock)
+        return;
+    Mix_OPNMIDI_setLowQualityMode(ui->opnLowQuality->isChecked());
+    restartForOpn();
+    updateAutoArgs();
+#endif
+}
+
 void SetupMidi::on_adlRunAtPcmRate_clicked()
 {
 #ifdef SDL_MIXER_X
@@ -620,6 +635,17 @@ void SetupMidi::on_adlRunAtPcmRate_clicked()
         return;
     Mix_ADLMIDI_setRunAtPcmRate(ui->adlRunAtPcmRate->isChecked());
     restartForAdl();
+    updateAutoArgs();
+#endif
+}
+
+void SetupMidi::on_opnRunAtPcmRate_clicked()
+{
+#ifdef SDL_MIXER_X
+    if(m_setupLock)
+        return;
+    Mix_OPNMIDI_setRunAtPcmRate(ui->opnRunAtPcmRate->isChecked());
+    restartForOpn();
     updateAutoArgs();
 #endif
 }
