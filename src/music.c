@@ -4021,7 +4021,7 @@ void MIXCALLCC Mix_ADLMIDI_setRunAtPcmRate(int en)
 #ifdef MUSIC_MID_ADLMIDI
     _Mix_ADLMIDI_setRunAtPcmRate(en);
 #else
-    (void)chips;
+    (void)en;
 #endif
 }
 
@@ -4039,7 +4039,7 @@ void MIXCALLCC Mix_ADLMIDI_setLowQualityMode(int en)
 #ifdef MUSIC_MID_ADLMIDI
     _Mix_ADLMIDI_setLowQualityMode(en);
 #else
-    (void)chips;
+    (void)en;
 #endif
 }
 
@@ -4221,7 +4221,7 @@ void MIXCALLCC Mix_OPNMIDI_setRunAtPcmRate(int en)
 #ifdef MUSIC_MID_OPNMIDI
     _Mix_OPNMIDI_setRunAtPcmRate(en);
 #else
-    (void)chips;
+    (void)en;
 #endif
 }
 
@@ -4239,7 +4239,7 @@ void MIXCALLCC Mix_OPNMIDI_setLowQualityMode(int en)
 #ifdef MUSIC_MID_OPNMIDI
     _Mix_OPNMIDI_setLowQualityMode(en);
 #else
-    (void)chips;
+    (void)en;
 #endif
 }
 
