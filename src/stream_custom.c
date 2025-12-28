@@ -22,10 +22,9 @@
 #define STREAM_CUSTOM_INTERNAL
 #include "stream_custom.h"
 #include "SDL_audio.h"
-#include "SDL_assert.h"
 
 
-typedef struct _Mix_AudioStream
+struct _Mix_AudioStream
 {
     SDL_bool resampler_needed;
     Uint8* local_buffer;
@@ -47,7 +46,7 @@ typedef struct _Mix_AudioStream
     size_t sample_size;
 
     SDL_AudioStream *stream;
-} Mix_AudioStream;
+};
 
 
 static int s_reallocBuffer(Mix_AudioStream *stream, int len)
