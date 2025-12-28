@@ -239,7 +239,7 @@ int Mix_AudioStreamPut(Mix_AudioStream *stream, const void *buf, int len)
     int out_len = len;
 
     if (stream->resampler_needed) {
-        if (!stream->local_buffer || SDL_min((int)stream->local_buffer_len, stream->local_buffer_len_src) < len) {
+        if (!stream->local_buffer || stream->local_buffer_len_src < len) {
             if (!s_reallocBuffer(stream, len)) {
                 return -1;
             }
