@@ -29,6 +29,7 @@ typedef struct _Mix_AudioStream
 {
     SDL_bool resampler_needed;
     Uint8* local_buffer;
+    int    local_buffer_len_src;
     size_t local_buffer_len;
     size_t local_buffer_stored;
 
@@ -51,6 +52,8 @@ typedef struct _Mix_AudioStream
 
 static int s_reallocBuffer(Mix_AudioStream *stream, int len)
 {
+    stream->local_buffer_len_src = len;
+
     if (stream->ratio > 0.0) {
         stream->local_buffer_len = (size_t)SDL_ceil(len * stream->ratio) + 32;
     } else {
@@ -237,7 +240,7 @@ int Mix_AudioStreamPut(Mix_AudioStream *stream, const void *buf, int len)
     int out_len = len;
 
     if (stream->resampler_needed) {
-        if (!stream->local_buffer || stream->local_buffer_len < (size_t)len) {
+        if (!stream->local_buffer || SDL_min((int)stream->local_buffer_len, stream->local_buffer_len_src) < len) {
             if (!s_reallocBuffer(stream, len)) {
                 return -1;
             }
