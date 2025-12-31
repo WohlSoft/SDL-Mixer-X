@@ -1,6 +1,6 @@
 /*
   SDL_mixer_ext:  An extended audio mixer library, forked from SDL_mixer
-  Copyright (C) 2014-2025 Vitaly Novichkov <admin@wohlnet.ru>
+  Copyright (C) 2014-2026 Vitaly Novichkov <admin@wohlnet.ru>
 
   SDL_mixer:  An audio mixer library based on the SDL library
   Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
