@@ -369,7 +369,9 @@ typedef enum Mix_ADLMIDI_Emulator {
     ADLMIDI_OPL3_EMU_YMFM_OPL3,
     /* Extra heavy emulators are usually disabled by default */
     ADLMIDI_OPL3_EMU_NUKED_OPL2LLE,
-    ADLMIDI_OPL3_EMU_NUKED_OPL3LLE
+    ADLMIDI_OPL3_EMU_NUKED_OPL3LLE,
+    /* Since libADLMIDI 1.5.3: OPL2 emulator based on Nuked OPL3 */
+    ADLMIDI_OPL3_EMU_NUKED_OPL2_LITE,
     /* ------------------------------------------------------ */
 } Mix_ADLMIDI_Emulator;
 
