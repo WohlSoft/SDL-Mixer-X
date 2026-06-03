@@ -371,7 +371,9 @@ typedef enum Mix_ADLMIDI_Emulator {
     ADLMIDI_OPL3_EMU_NUKED_OPL2LLE,
     ADLMIDI_OPL3_EMU_NUKED_OPL3LLE,
     /* Since libADLMIDI 1.5.3: OPL2 emulator based on Nuked OPL3 */
-    ADLMIDI_OPL3_EMU_NUKED_OPL2_LITE
+    ADLMIDI_OPL3_EMU_NUKED_OPL2_LITE,
+    /* Since libADLMIDI 1.6.2: Emulator of the OPL3 clone by Creative */
+    ADLMIDI_OPL3_EMU_NUKED_CQM
     /* ------------------------------------------------------ */
 } Mix_ADLMIDI_Emulator;
 
