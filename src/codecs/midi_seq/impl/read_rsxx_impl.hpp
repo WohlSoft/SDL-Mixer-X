@@ -41,7 +41,7 @@ bool BW_MidiSequencer::parseRSXX(FileAndMemReader &fr)
     LoopPointParseState loopState;
     char start;
 
-    std::vector<TempoEvent> temposList;
+    TemposList temposList;
 
     std::memset(&loopState, 0, sizeof(loopState));
 
@@ -105,6 +105,10 @@ bool BW_MidiSequencer::parseRSXX(FileAndMemReader &fr)
     m_loop.stackLevel   = -1;
 
     buildSmfSetupReset(1);
+
+    // Attempt to rougly reserve the events bank
+    m_eventBank.reserve((trackLength / sizeof(MidiEvent)));
+    m_dataBank.reserve(1000);
 
     // Build new MIDI events table
     if(!smf_buildOneTrack(fr, 0, trackLength, temposList, loopState))

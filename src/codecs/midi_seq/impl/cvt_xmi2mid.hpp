@@ -31,7 +31,7 @@
 #include <stdint.h>
 #include <assert.h>
 
-#include <vector>
+#include "../midi_sequencer.hpp"
 
 #ifdef __DJGPP__
 typedef signed char     int8_t;
@@ -105,8 +105,8 @@ struct xmi2mid_xmi_ctx {
     int16_t *timing;
     midi_event *list;
     midi_event *current;
-    std::vector<std::vector<uint8_t > > *dyn_out;
-    std::vector<uint8_t > *dyn_out_cur;
+    miditrack_arr<miditrack_arr<uint8_t>, true> *dyn_out;
+    miditrack_arr<uint8_t> *dyn_out_cur;
 };
 
 typedef struct {
@@ -180,11 +180,14 @@ static void xmi2mid_copy(struct xmi2mid_xmi_ctx *ctx, char *b, uint32_t len)
 #define DST_CHUNK 8192
 static void xmi2mid_resize_dst(struct xmi2mid_xmi_ctx *ctx) {
     uint32_t pos = (uint32_t)(ctx->dst_ptr - ctx->dst);
-    if (ctx->dyn_out && ctx->dyn_out_cur) {
-        ctx->dyn_out_cur->resize(ctx->dstsize + DST_CHUNK);
-        ctx->dst = ctx->dyn_out_cur->data();
-    } else
-        ctx->dst = (uint8_t *)realloc(ctx->dst, ctx->dstsize + DST_CHUNK);
+
+    assert(ctx->dyn_out && ctx->dyn_out_cur);
+
+    // if (ctx->dyn_out && ctx->dyn_out_cur) {
+    ctx->dyn_out_cur->resize(ctx->dstsize + DST_CHUNK);
+    ctx->dst = ctx->dyn_out_cur->data;
+    // } else
+    //     ctx->dst = (uint8_t *)realloc(ctx->dst, ctx->dstsize + DST_CHUNK);
     ctx->dstsize += DST_CHUNK;
     ctx->dstrem += DST_CHUNK;
     ctx->dst_ptr = ctx->dst + pos;
@@ -523,6 +526,7 @@ static const char xmi2mid_mt32asgs[256] = {
     121, 0  /* 127 Jungle Tune set to Breath Noise */
 };
 
+#if 0
 static int Convert_xmi2midi(uint8_t *in, uint32_t insize,
                             uint8_t **out, uint32_t *outsize,
                             uint32_t convert_type, int32_t trackNumber = -1)
@@ -597,10 +601,11 @@ _end:   /* cleanup */
 
     return (ret);
 }
+#endif
 
-static int Convert_xmi2midi_multi(uint8_t *in, uint32_t insize,
-                                  std::vector<std::vector<uint8_t > > &out,
-                                  uint32_t convert_type)
+int BW_MidiSequencer::Convert_xmi2midi_multi(uint8_t *in, uint32_t insize,
+                                             RawSongsList &out,
+                                             uint32_t convert_type)
 {
     struct xmi2mid_xmi_ctx ctx;
     unsigned int i;
@@ -628,12 +633,13 @@ static int Convert_xmi2midi_multi(uint8_t *in, uint32_t insize,
         goto _end;
     }
 
+    out.resize(ctx.info.tracks);
+
     for (i = 0; i < ctx.info.tracks; i++)
     {
-        out.push_back(std::vector<uint8_t>());
-        ctx.dyn_out_cur = &out.back();
+        ctx.dyn_out_cur = &out[i];
         ctx.dyn_out_cur->resize(DST_CHUNK);
-        ctx.dst = ctx.dyn_out_cur->data();
+        ctx.dst = ctx.dyn_out_cur->data;
         ctx.dst_ptr = ctx.dst;
         ctx.dstsize = DST_CHUNK;
         ctx.dstrem = DST_CHUNK;

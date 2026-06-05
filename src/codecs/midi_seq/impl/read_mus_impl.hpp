@@ -57,8 +57,8 @@ bool BW_MidiSequencer::parseMUS(FileAndMemReader &fr)
     uint8_t channel_cur = 0;
     uint64_t abs_position = 0;
     int32_t delay = 0;
-    std::vector<uint16_t> mus_instrs;
-    std::vector<TempoEvent> temposList;
+    miditrack_arr<uint16_t> mus_instrs;
+    TemposList temposList;
 
     const uint8_t controller_map[15] =
     {
@@ -125,6 +125,10 @@ bool BW_MidiSequencer::parseMUS(FileAndMemReader &fr)
 
     buildSmfSetupReset(1);
 
+    // Attempt to rougly reserve the events bank
+    m_eventBank.reserve((mus_lenSong / sizeof(MidiEvent)));
+    m_dataBank.reserve(1000);
+
     m_invDeltaTicks.nom = 1;
     m_invDeltaTicks.denom = 1000000l * 0x101;
     tempo_mul(&m_tempo, &m_invDeltaTicks, 0x101 * 2); // MUS has the fixed tempo
@@ -139,6 +143,7 @@ bool BW_MidiSequencer::parseMUS(FileAndMemReader &fr)
 
     MidiTrackRow evtPos;
     MidiEvent event;
+    std::memset(&evtPos, 0, sizeof(MidiTrackRow));
     std::memset(&event, 0, sizeof(event));
     event.isValid = 1;
     event.type = MidiEvent::T_SPECIAL;
@@ -309,7 +314,7 @@ bool BW_MidiSequencer::parseMUS(FileAndMemReader &fr)
                 size_t j = 0;
                 event.type = MidiEvent::T_PATCHCHANGE;
 
-                for( ; j < mus_instrs.size(); ++j)
+                for( ; j < mus_instrs.size; ++j)
                 {
                     if((bytes[1] & 0x7F) == mus_instrs[j])
                         break;
@@ -371,7 +376,7 @@ bool BW_MidiSequencer::parseMUS(FileAndMemReader &fr)
             evtPos.absPos = abs_position;
             abs_position += evtPos.delay;
             m_trackData[0].push_back(evtPos);
-            evtPos.clear();
+            std::memset(&evtPos, 0, sizeof(MidiTrackRow));
         }
     }
 

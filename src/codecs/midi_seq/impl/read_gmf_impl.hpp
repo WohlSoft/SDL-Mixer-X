@@ -37,7 +37,7 @@ bool BW_MidiSequencer::parseGMF(FileAndMemReader &fr)
     size_t fsize = 0, deltaTicks = 192, totalGotten, trackLength, trackPos;
     LoopPointParseState loopState;
 
-    std::vector<TempoEvent> temposList;
+    TemposList temposList;
 
     std::memset(&loopState, 0, sizeof(loopState));
 
@@ -82,6 +82,10 @@ bool BW_MidiSequencer::parseGMF(FileAndMemReader &fr)
     }
 
     buildSmfSetupReset(1);
+
+    // Attempt to rougly reserve the events bank
+    m_eventBank.reserve((trackLength / sizeof(MidiEvent)));
+    m_dataBank.reserve(1000);
 
     // Build new MIDI events table
     if(!smf_buildOneTrack(fr, 0, trackLength, temposList, loopState))

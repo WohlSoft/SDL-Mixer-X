@@ -45,14 +45,18 @@ bool BW_MidiSequencer::parseIMF(FileAndMemReader &fr)
     MidiTrackRow    evtPos;
     MidiEvent       event;
 
+    std::memset(&evtPos, 0, sizeof(MidiTrackRow));
     std::memset(&event, 0, sizeof(event));
     event.isValid = 1;
 
-    std::vector<TempoEvent> temposList;
+    TemposList temposList;
 
     m_format = Format_IMF;
 
     buildSmfSetupReset(trackCount);
+
+    // Attempt to rougly reserve the events bank
+    m_eventBank.reserve(fr.fileSize() / 4);
 
     m_invDeltaTicks.nom = 1;
     m_invDeltaTicks.denom = 1000000l * deltaTicks;
@@ -106,7 +110,7 @@ bool BW_MidiSequencer::parseIMF(FileAndMemReader &fr)
             evtPos.absPos = abs_position;
             abs_position += evtPos.delay;
             m_trackData[0].push_back(evtPos);
-            evtPos.clear();
+            std::memset(&evtPos, 0, sizeof(MidiTrackRow));
         }
     }
 

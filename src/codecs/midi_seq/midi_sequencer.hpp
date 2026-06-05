@@ -26,17 +26,21 @@
 #ifndef BW_MIDI_SEQUENCER_HHHHPPP
 #define BW_MIDI_SEQUENCER_HHHHPPP
 
-#include <list>
-#include <vector>
-
 #include "file_reader.hpp"
 #include "midi_sequencer.h"
+
+#include "impl/miditrack_list.hpp"
+#include "impl/miditrack_arr.hpp"
 
 //! Helper for unused values
 #define BW_MidiSequencer_UNUSED(x) (void)x;
 
 class BW_MidiSequencer
 {
+#if defined(__DJGPP__)
+    void dpmi_lock_begin() {}
+#endif
+
 public:
     /**********************************************************************************
      *                   Public structures and types definitions                      *
@@ -112,7 +116,7 @@ public:
      */
     inline const uint8_t *getData(const DataBlock &b) const
     {
-        return m_dataBank.data() + b.offset;
+        return m_dataBank.data + b.offset;
     };
 
     /**
@@ -142,6 +146,15 @@ public:
         Device_SoundBlaster     = Device_OPL2|Device_OPL3,
         Device_ANY              = 0xFFFF
     };
+
+    /* Public typedefs */
+    typedef miditrack_arr<DataBlock>            MusTrackTitlesList;
+    typedef miditrack_arr<MIDI_MarkerEntry>     MusMarkersList;
+
+    typedef miditrack_arr<uint8_t>              RawSongEntry;
+    typedef miditrack_arr<RawSongEntry, true>   RawSongsList;
+
+    typedef miditrack_arr<CmfInstrument>        CmfInstrumentsList;
 
 private:
     /**********************************************************************************
@@ -372,6 +385,8 @@ private:
         DataBlock data_block;
     };
 
+    typedef miditrack_arr<MidiEvent> MidiEventsList;
+
     /*!
      * \brief Individual tempo value used for the timeline calculation
      */
@@ -387,16 +402,8 @@ private:
      * Created with purpose to sort events by type in the same position
      * (for example, to keep controllers always first than note on events or lower than note-off events)
      */
-    class MidiTrackRow
+    struct MidiTrackRow
     {
-    public:
-        MidiTrackRow();
-
-        /*!
-         * \brief Clear MIDI row data
-         */
-        void clear();
-
         //! Absolute time position in seconds
         double time;
         //! Delay to next event in ticks
@@ -409,14 +416,14 @@ private:
         size_t events_begin;
         //! End of the events row stored in the bank
         size_t events_end;
-
-        static int typePriority(const MidiEvent &evt);
-        /**
-         * @brief Sort events in this position
-         * @param noteStates Buffer of currently pressed/released note keys in the track
-         */
-        void sortEvents(std::vector<MidiEvent> &eventsBank, bool *noteStates = NULL);
     };
+
+    static int typePriority(const MidiEvent &evt);
+    /**
+     * @brief Sort events in this position
+     * @param noteStates Buffer of currently pressed/released note keys in the track
+     */
+    static void sortEvents(MidiTrackRow &row, MidiEventsList &eventsBank, bool *noteStates = NULL);
 
     /**
      * @brief Tempo change point entry. Used in the MIDI data building function only.
@@ -428,7 +435,7 @@ private:
     };
     //P.S. I declared it here instead of local in-function because C++98 can't process templates with locally-declared structures
 
-    typedef std::list<MidiTrackRow> MidiTrackQueue;
+    typedef TrackQueueList_t<MidiTrackRow> MidiTrackQueue;
 
     /**
      * @brief The print left by the Note-On event with a duration supplied. Once it expires, the Note-Off event should be sent.
@@ -499,19 +506,13 @@ private:
         struct TrackInfo
         {
             //! MIDI Events queue position iterator
-            MidiTrackQueue::iterator pos;
+            MidiTrackQueue::Leaf_t *pos;
             //! Delay to next event in a track
             uint64_t delay;
             //! Last handled event type
             int32_t lastHandledEvent;
             //! Track's local state
             TrackStateSaved state;
-
-            TrackInfo();
-
-            TrackInfo(const TrackInfo &o);
-
-            TrackInfo &operator=(const TrackInfo &o);
         };
 
         //! Waiting time before next event in seconds
@@ -523,9 +524,16 @@ private:
         //! Was track began playing
         bool began;
         //! Per-track info remembered by the position state
-        std::vector<TrackInfo> track;
+        TrackInfo *track;
+        size_t track_size;
+
+        void tracks_resize(size_t size);
+        static void tracks_init_one(TrackInfo &t);
 
         Position();
+        ~Position();
+        Position(const Position &o);
+        Position &operator=(const Position &o);
         void clear();
         void assignOneTrack(const Position *o, size_t tk);
     };
@@ -736,11 +744,13 @@ private:
     //! MIDI Output interface context
     const BW_MidiRtInterface *m_interface;
 
+    typedef miditrack_arr<uint8_t> U8List;
+
     //! Storage of data block refered in tracks
-    std::vector<uint8_t> m_dataBank;
+    U8List m_dataBank;
 
     //! Array of all MIDI events across all tracks
-    std::vector<MidiEvent> m_eventBank;
+    MidiEventsList m_eventBank;
 
     //! The number of track of multi-track file (for exmaple, XMI) to load
     int m_loadTrackNumber;
@@ -763,6 +773,8 @@ private:
 
     //! Current position
     Position m_currentPosition;
+    //! A snapshot of the current position before events processing
+    Position m_currentPositionBegin;
     //! Track begin position
     Position m_trackBeginPosition;
     //! Loop start point
@@ -783,14 +795,17 @@ private:
     //! Global loop end time
     double m_loopEndTime;
 
+    typedef miditrack_arr<MidiTrackQueue, true> TrackDataList;
     //! Pre-processed track data storage
-    std::vector<MidiTrackQueue> m_trackData;
+    TrackDataList m_trackData;
 
+    typedef miditrack_arr<MidiTrackState, true> MidiTrackStateList;
     //! State of every MIDI track
-    std::vector<MidiTrackState> m_trackState;
+    MidiTrackStateList m_trackState;
 
+    typedef miditrack_arr<BranchEntry> BranchesList;
     //! List of available branches
-    std::vector<BranchEntry> m_branches;
+    BranchesList m_branches;
 
     //! Song-wide on-loop state restore setup
     uint32_t m_stateRestoreSetup;
@@ -799,16 +814,18 @@ private:
     size_t m_tracksCount;
 
     //! CMF instruments
-    std::vector<CmfInstrument> m_cmfInstruments;
+    CmfInstrumentsList m_cmfInstruments;
 
     //! Title of music
     DataBlock m_musTitle;
     //! Copyright notice of music
     DataBlock m_musCopyright;
+
     //! List of track titles
-    std::vector<DataBlock> m_musTrackTitles;
+    MusTrackTitlesList m_musTrackTitles;
+
     //! List of MIDI markers
-    std::vector<MIDI_MarkerEntry> m_musMarkers;
+    MusMarkersList m_musMarkers;
 
     //! Time of one tick
     Tempo_t m_invDeltaTicks;
@@ -826,9 +843,8 @@ private:
     //! Complete mask that includes all supported devices by loaded files (if 0xFFFF, then file doesn't use track filtering)
     uint32_t m_deviceMaskAvailable;
 
-
     //! The XMI-specific list of raw songs, converted into SMF format
-    std::vector<std::vector<uint8_t > > m_rawSongsData;
+    RawSongsList m_rawSongsData;
 
     //! The state of the loop
     LoopState m_loop;
@@ -928,13 +944,12 @@ private:
     /**********************************************************************************
      *                                 Data bank                                      *
      **********************************************************************************/
-
-    static void insertDataToBank(MidiEvent &evt, std::vector<uint8_t> &bank, const uint8_t *data, size_t length);
-    static void insertDataToBank(MidiEvent &evt, std::vector<uint8_t> &bank, FileAndMemReader &fr, size_t length);
-    static void insertDataToBankWithByte(MidiEvent &evt, std::vector<uint8_t> &bank, uint8_t begin_byte, const uint8_t *data, size_t length);
-    static void insertDataToBankWithByte(MidiEvent &evt, std::vector<uint8_t> &bank, uint8_t begin_byte, FileAndMemReader &fr, size_t length);
-    static void insertDataToBankWithTerm(MidiEvent &evt, std::vector<uint8_t> &bank, const uint8_t *data, size_t length);
-    static void insertDataToBankWithTerm(MidiEvent &evt, std::vector<uint8_t> &bank, FileAndMemReader &fr, size_t length);
+    static void insertDataToBank(MidiEvent &evt, U8List &bank, const uint8_t *data, size_t length);
+    static void insertDataToBank(MidiEvent &evt, U8List &bank, FileAndMemReader &fr, size_t length);
+    static void insertDataToBankWithByte(MidiEvent &evt, U8List &bank, uint8_t begin_byte, const uint8_t *data, size_t length);
+    static void insertDataToBankWithByte(MidiEvent &evt, U8List &bank, uint8_t begin_byte, FileAndMemReader &fr, size_t length);
+    static void insertDataToBankWithTerm(MidiEvent &evt, U8List &bank, const uint8_t *data, size_t length);
+    static void insertDataToBankWithTerm(MidiEvent &evt, U8List &bank, FileAndMemReader &fr, size_t length);
     void addEventToBank(MidiTrackRow &row, const MidiEvent &evt);
 
 
@@ -956,6 +971,7 @@ private:
      */
     void initTracksBegin(size_t track);
 
+    typedef miditrack_arr<TempoEvent> TemposList;
     /**
      * @brief Build the time line from off loaded events
      * @param tempos Pre-collected list of tempo events
@@ -964,7 +980,7 @@ private:
      *
      * IMPORTANT: This function MUST be called after parsing any file format!
      */
-    void buildTimeLine(const std::vector<TempoEvent> &tempos,
+    void buildTimeLine(const TemposList &tempos,
                        uint64_t loopStartTicks = 0,
                        uint64_t loopEndTicks = 0);
 
@@ -1075,7 +1091,7 @@ private:
      * @return true if everything successfully processed, or false on any error
      */
     bool smf_buildOneTrack(FileAndMemReader &fr, const size_t track_idx, const size_t track_size,
-                           std::vector<TempoEvent> &temposList, LoopPointParseState &loopState);
+                           TemposList &temposList, LoopPointParseState &loopState);
 
     /**
      * @brief Parse one event from raw MIDI track stream
@@ -1219,6 +1235,12 @@ private:
      * @return true on successful load
      */
     bool parseXMI(FileAndMemReader &fr);
+
+public:
+    static int Convert_xmi2midi_multi(uint8_t *in, uint32_t insize,
+                                      RawSongsList &out,
+                                      uint32_t convert_type);
+private:
 #endif
 
 
@@ -1349,7 +1371,7 @@ public:
      * @brief Get the list of CMF instruments (CMF only)
      * @return Array of raw CMF instruments entries
      */
-    const std::vector<CmfInstrument> getRawCmfInstruments();
+    const CmfInstrumentsList &getRawCmfInstruments();
 
     /**
      * @brief Get string that describes reason of error
@@ -1403,13 +1425,13 @@ public:
      * @brief Get list of track titles
      * @return array of track title strings
      */
-    const std::vector<DataBlock> &getTrackTitles();
+    const MusTrackTitlesList &getTrackTitles();
 
     /**
      * @brief Get list of MIDI markers
      * @return Array of MIDI marker structures
      */
-    const std::vector<MIDI_MarkerEntry> &getMarkers();
+    const MusMarkersList &getMarkers();
 
 
     /**********************************************************************************
@@ -1524,6 +1546,11 @@ public:
      * @param tempo Tempo multiplier: 1.0 - original tempo. >1 - faster, <1 - slower
      */
     void   setTempo(double tempo);
+
+#if defined(__DJGPP__)
+private:
+    void dpmi_lock_end() {}
+#endif
 };
 
 #endif /* BW_MIDI_SEQUENCER_HHHHPPP */

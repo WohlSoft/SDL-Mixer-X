@@ -523,7 +523,7 @@ static int OGG_GetSome(void *context, void *data, int bytes, SDL_bool *done)
 {
     OGG_music *music = (OGG_music *)context;
     SDL_bool looped = SDL_FALSE, retry_get = SDL_FALSE;
-    int filled, amount, samples, channels, result, div_chans, i, j, k;
+    int filled, amount, channels, result, div_chans, i, j, k;
     int section;
     int has_deferred;
     Sint64 pcmPos;

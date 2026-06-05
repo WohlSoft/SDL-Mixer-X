@@ -122,10 +122,54 @@ BW_MidiSequencer::BW_MidiSequencer() :
     m_tempo.denom = 1;
     m_invDeltaTicks.nom = 0;
     m_invDeltaTicks.denom = 1;
+
+#if defined(__DJGPP__)
+    dpmi_allocator_impl::dpmi_lock_memory(this, sizeof(BW_MidiSequencer));
+
+    void (BW_MidiSequencer::* lock_begin)() = &BW_MidiSequencer::dpmi_lock_begin;
+    void (BW_MidiSequencer::* lock_end)() = &BW_MidiSequencer::dpmi_lock_end;
+
+    dpmi_allocator_impl::dpmi_lock_region((void*&)lock_begin, (void*&)lock_end);
+    midi_dpmi_lock_class_code<MusTrackTitlesList>();
+    midi_dpmi_lock_class_code<MusMarkersList>();
+    midi_dpmi_lock_class_code<RawSongEntry>();
+    midi_dpmi_lock_class_code<RawSongsList>();
+    midi_dpmi_lock_class_code<CmfInstrumentsList>();
+    midi_dpmi_lock_class_code<MidiEventsList>();
+    midi_dpmi_lock_class_code<U8List>();
+    midi_dpmi_lock_class_code<TrackDataList>();
+    midi_dpmi_lock_class_code<MidiTrackStateList>();
+    midi_dpmi_lock_class_code<BranchesList>();
+    midi_dpmi_lock_class_code<TemposList>();
+
+    midi_dpmi_lock_class_code<MidiTrackQueue>();
+#endif
 }
 
 BW_MidiSequencer::~BW_MidiSequencer()
-{}
+{
+#if defined(__DJGPP__)
+    dpmi_allocator_impl::dpmi_unlock_memory(this, sizeof(BW_MidiSequencer));
+
+    void (BW_MidiSequencer::* lock_begin)() = &BW_MidiSequencer::dpmi_lock_begin;
+    void (BW_MidiSequencer::* lock_end)() = &BW_MidiSequencer::dpmi_lock_end;
+
+    dpmi_allocator_impl::dpmi_unlock_region((void*&)lock_begin, (void*&)lock_end);
+    midi_dpmi_unlock_class_code<MusTrackTitlesList>();
+    midi_dpmi_unlock_class_code<MusMarkersList>();
+    midi_dpmi_unlock_class_code<RawSongEntry>();
+    midi_dpmi_unlock_class_code<RawSongsList>();
+    midi_dpmi_unlock_class_code<CmfInstrumentsList>();
+    midi_dpmi_unlock_class_code<MidiEventsList>();
+    midi_dpmi_unlock_class_code<U8List>();
+    midi_dpmi_unlock_class_code<TrackDataList>();
+    midi_dpmi_unlock_class_code<MidiTrackStateList>();
+    midi_dpmi_unlock_class_code<BranchesList>();
+    midi_dpmi_unlock_class_code<TemposList>();
+
+    midi_dpmi_unlock_class_code<MidiTrackQueue>();
+#endif
+}
 
 
 void BW_MidiSequencer::setInterface(const BW_MidiRtInterface *intrf)
@@ -167,12 +211,12 @@ BW_MidiSequencer::FileFormat BW_MidiSequencer::getFormat()
 
 size_t BW_MidiSequencer::getTrackCount() const
 {
-    return m_trackData.size();
+    return m_trackData.size;
 }
 
 bool BW_MidiSequencer::setTrackEnabled(size_t track, bool enable)
 {
-    size_t trackCount = m_trackData.size();
+    size_t trackCount = m_trackData.size;
     if(track >= trackCount)
         return false;
 
@@ -218,8 +262,8 @@ void BW_MidiSequencer::setSongNum(int track)
 
     if(!m_rawSongsData.empty() && m_format == Format_XMIDI) // Reload the song
     {
-        if(m_loadTrackNumber >= (int)m_rawSongsData.size())
-            m_loadTrackNumber = m_rawSongsData.size() - 1;
+        if(m_loadTrackNumber >= (int)m_rawSongsData.size)
+            m_loadTrackNumber = m_rawSongsData.size - 1;
 
         if(m_interface && m_interface->rt_controllerChange)
         {
@@ -234,8 +278,8 @@ void BW_MidiSequencer::setSongNum(int track)
         m_smfFormat = 0;
 
         FileAndMemReader fr;
-        fr.openData(m_rawSongsData[m_loadTrackNumber].data(),
-                    m_rawSongsData[m_loadTrackNumber].size());
+        fr.openData(m_rawSongsData[m_loadTrackNumber].data,
+                    m_rawSongsData[m_loadTrackNumber].size);
         parseSMF(fr);
 
         m_format = Format_XMIDI;
@@ -320,7 +364,7 @@ void BW_MidiSequencer::debugPrintDevices()
 
 int BW_MidiSequencer::getSongsCount()
 {
-    return (int)m_rawSongsData.size();
+    return (int)m_rawSongsData.size;
 }
 
 
@@ -330,7 +374,7 @@ void BW_MidiSequencer::setTriggerHandler(TriggerHandler handler, void *userData)
     m_triggerUserData = userData;
 }
 
-const std::vector<BW_MidiSequencer::CmfInstrument> BW_MidiSequencer::getRawCmfInstruments()
+const BW_MidiSequencer::CmfInstrumentsList &BW_MidiSequencer::getRawCmfInstruments()
 {
     return m_cmfInstruments;
 }
@@ -383,12 +427,12 @@ const char *BW_MidiSequencer::getMusicCopyright() const
         return reinterpret_cast<const char*>(getData(m_musCopyright));
 }
 
-const std::vector<BW_MidiSequencer::DataBlock> &BW_MidiSequencer::getTrackTitles()
+const BW_MidiSequencer::MusTrackTitlesList &BW_MidiSequencer::getTrackTitles()
 {
     return m_musTrackTitles;
 }
 
-const std::vector<BW_MidiSequencer::MIDI_MarkerEntry> &BW_MidiSequencer::getMarkers()
+const BW_MidiSequencer::MusMarkersList &BW_MidiSequencer::getMarkers()
 {
     return m_musMarkers;
 }
