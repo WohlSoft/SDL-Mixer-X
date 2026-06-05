@@ -523,8 +523,9 @@ static int OGG_GetSome(void *context, void *data, int bytes, SDL_bool *done)
 {
     OGG_music *music = (OGG_music *)context;
     SDL_bool looped = SDL_FALSE, retry_get = SDL_FALSE;
-    int filled, amount, channels, result, div_chans, i, j, k;
+    int filled, amount, samples, channels, result, div_chans, i, j, k;
     int section;
+    int has_deferred;
     Sint64 pcmPos;
     float *cur;
     float *cur_src[STB_VORBIS_MAX_CHANNELS];
@@ -554,10 +555,13 @@ try_get:
     if (music->multitrack) {
         channels = music->multitrack_channels;
         div_chans = (music->vi.channels / music->multitrack_channels);
-        amount = stb_vorbis_get_samples_float(music->vf,
-                                              music->multitrack_channels * music->multitrack_tracks,
-                                              music->multitrack_buffer,
-                                              music_spec.samples);
+        do {
+            has_deferred = music->vf->discard_samples_deferred > 0;
+            amount = stb_vorbis_get_samples_float(music->vf,
+                                                  music->multitrack_channels * music->multitrack_tracks,
+                                                  music->multitrack_buffer,
+                                                  music_spec.samples);
+        } while ((amount == 0) && has_deferred);  /* if it's still flushing out garbage at the start of the stream, keep trying. */
 
         cur = (float *)music->buffer;
         SDL_memcpy(cur_src, music->multitrack_buffer, sizeof(float *) * STB_VORBIS_MAX_CHANNELS);
@@ -578,10 +582,13 @@ try_get:
         }
     } else {
         channels = music->vi.channels;
-        amount = stb_vorbis_get_samples_float_interleaved(music->vf,
-                                                          music->vi.channels,
-                                                          (float *)music->buffer,
-                                                          music_spec.samples * music->vi.channels);
+        do {
+            has_deferred = music->vf->discard_samples_deferred > 0;
+            amount = stb_vorbis_get_samples_float_interleaved(music->vf,
+                                                              music->vi.channels,
+                                                              (float *)music->buffer,
+                                                              music_spec.samples * music->vi.channels);
+        } while ((amount == 0) && has_deferred);  /* if it's still flushing out garbage at the start of the stream, keep trying. */
     }
 
     amount *= channels * sizeof(float);
