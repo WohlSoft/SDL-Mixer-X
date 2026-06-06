@@ -17,7 +17,7 @@ private:
 	int32_t _meas_num   ;
 	int32_t _repeat_meas;
 	int32_t _last_meas  ;
-	int32_t _volume_    ;
+	// int32_t _volume_    ; /* field is unused! */
 
 public :
 	 pxtnMaster( pxtnIO_r io_read, pxtnIO_w io_write, pxtnIO_seek io_seek, pxtnIO_pos io_pos );
