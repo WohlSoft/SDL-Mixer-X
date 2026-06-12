@@ -18,6 +18,14 @@ if(USE_MIDI_EDMIDI)
                 "${EDMIDI_LIBRARIES};${M_LIBRARY}"
                 STDCPP_NEEDED
             )
+
+            try_compile(EDMIDI_HAS_SET_MODE_EMIDI
+                ${CMAKE_BINARY_DIR}/compile_tests
+                ${SDLMixerX_SOURCE_DIR}/cmake/tests/edmidi_set_mode_emidi.c
+                LINK_LIBRARIES ${EDMIDI_LIBRARIES} ${STDCPP_LIBRARY} ${M_LIBRARY}
+                CMAKE_FLAGS "-DINCLUDE_DIRECTORIES=${ADLMIDI_INCLUDE_DIRS}"
+                OUTPUT_VARIABLE EDMIDI_HAS_SET_MODE_EMIDI_RESULT
+            )
         endif()
 
     else()
@@ -28,6 +36,7 @@ if(USE_MIDI_EDMIDI)
         endif()
         if(EDMIDI_LIBRARIES)
             set(EDMIDI_FOUND 1)
+            set(ADLMIDI_HAS_SET_MODE_EMIDI TRUE)
             set(STDCPP_NEEDED 1) # Statically linking EDMIDI which is C++ library
         endif()
         set(EDMIDI_INCLUDE_DIRS "${AUDIO_CODECS_PATH}/libEDMIDI/include")
@@ -39,9 +48,15 @@ if(USE_MIDI_EDMIDI)
         list(APPEND SDL_MIXER_DEFINITIONS -DMUSIC_MID_EDMIDI)
         set(LIBMATH_NEEDED 1)
         list(APPEND SDL_MIXER_INCLUDE_PATHS ${EDMIDI_INCLUDE_DIRS})
+
         if(NOT USE_SYSTEM_AUDIO_LIBRARIES OR NOT USE_MIDI_EDMIDI_DYNAMIC)
             list(APPEND SDLMixerX_LINK_LIBS ${EDMIDI_LIBRARIES})
         endif()
+
+        if(EDMIDI_HAS_SET_MODE_EMIDI)
+            list(APPEND SDL_MIXER_DEFINITIONS -DEDMIDI_HAS_SET_MODE_EMIDI)
+        endif()
+
         list(APPEND SDLMixerX_SOURCES
             ${CMAKE_CURRENT_LIST_DIR}/music_midi_edmidi.c
             ${CMAKE_CURRENT_LIST_DIR}/music_midi_edmidi.h

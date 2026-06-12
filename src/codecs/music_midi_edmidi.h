@@ -25,4 +25,12 @@
 
 extern Mix_MusicInterface Mix_MusicInterface_EDMIDI;
 
+extern int _Mix_EDMIDI_getModulesNum(void);
+extern void _Mix_EDMIDI_setModulesNum(int num);
+
+extern int _Mix_EDMIDI_getModeEMIDI(void);
+extern void _Mix_EDMIDI_setModeEMIDI(int en);
+
+extern void _Mix_EDMIDI_setSetDefaults(void);
+
 /* vi: set ts=4 sw=4 expandtab: */

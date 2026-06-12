@@ -3884,6 +3884,10 @@ extern DECLSPEC void MIXCALL Mix_ADLMIDI_setRunAtPcmRate(int en);/*MixerX*/
 extern DECLSPEC int  MIXCALL Mix_ADLMIDI_getLowQualityMode(void);/*MixerX*/
 /* Sets the low quality of the generator's output to reduce the CPU load (1 enable, 0 disable) */
 extern DECLSPEC void MIXCALL Mix_ADLMIDI_setLowQualityMode(int en);/*MixerX*/
+/* Get the setup of the EMIDI mode enabling */
+extern DECLSPEC int  MIXCALL Mix_ADLMIDI_getModeEMIDI(void);/*MixerX*/
+/* Sets the EMIDI mode to play music files for Apogee Sound System correctly (1 enable, 0 disable) */
+extern DECLSPEC void MIXCALL Mix_ADLMIDI_setModeEMIDI(int en);/*MixerX*/
 /* Reset all ADLMIDI properties to default state */
 extern DECLSPEC void MIXCALL Mix_ADLMIDI_setSetDefaults(void);/*MixerX*/
 
@@ -3932,8 +3936,30 @@ extern DECLSPEC void MIXCALL Mix_OPNMIDI_setRunAtPcmRate(int en);/*MixerX*/
 extern DECLSPEC int  MIXCALL Mix_OPNMIDI_getLowQualityMode(void);/*MixerX*/
 /* Sets the low quality of the generator's output to reduce the CPU load (1 enable, 0 disable) */
 extern DECLSPEC void MIXCALL Mix_OPNMIDI_setLowQualityMode(int en);/*MixerX*/
+/* Get the setup of the EMIDI mode enabling */
+extern DECLSPEC int  MIXCALL Mix_OPNMIDI_getModeEMIDI(void);/*MixerX*/
+/* Sets the EMIDI mode to play music files for Apogee Sound System correctly (1 enable, 0 disable) */
+extern DECLSPEC void MIXCALL Mix_OPNMIDI_setModeEMIDI(int en);/*MixerX*/
 /* Sets WOPN bank file for OPNMIDI playing device, affects on MIDI file reopen */
 extern DECLSPEC void MIXCALL Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path);/*MixerX*/
+
+/* Get number of modules running by the Emu De Midi */
+extern DECLSPEC int MIXCALL Mix_EDMIDI_getModulesNum(void);/*MixerX*/
+/* Set the number of modules running by the Emu De Midi, this may increase or decrease the polyphony and CPU load */
+extern DECLSPEC void MIXCALL Mix_EDMIDI_setModulesNum(int num);/*MixerX*/
+/* Get the setup of the EMIDI mode enabling */
+extern DECLSPEC int MIXCALL Mix_EDMIDI_getModeEMIDI(void);/*MixerX*/
+/* Sets the EMIDI mode to play music files for Apogee Sound System correctly (1 enable, 0 disable) */
+extern DECLSPEC void MIXCALL Mix_EDMIDI_setModeEMIDI(int en);/*MixerX*/
+/* Reset all Emu De Midi properties to default state */
+extern DECLSPEC void MIXCALL Mix_EDMIDI_setSetDefaults(void);/*MixerX*/
+
+/* Get the setup of the EMIDI mode enabling */
+extern DECLSPEC int MIXCALL Mix_FLUIDSYNTH_getModeEMIDI(void);/*MixerX*/
+/* Sets the EMIDI mode to play music files for Apogee Sound System correctly (1 enable, 0 disable) */
+extern DECLSPEC void MIXCALL Mix_FLUIDSYNTH_setModeEMIDI(int en);/*MixerX*/
+/* Reset all Emu De Midi properties to default state */
+extern DECLSPEC void MIXCALL Mix_FLUIDSYNTH_setSetDefaults(void);/*MixerX*/
 
 /* Disables/enables built-in echo effect for playing SPC files */
 extern DECLSPEC void MIXCALL Mix_GME_SetSpcEchoDisabled(Mix_Music *music, int disabled);/*MixerX*/

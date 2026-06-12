@@ -65,6 +65,7 @@ typedef struct {
     void (*opn2_positionRewind)(struct OPN2_MIDIPlayer *device);
     void (*opn2_setLoopEnabled)(struct OPN2_MIDIPlayer *device, int loopEn);
     void (*opn2_setLoopCount)(struct OPN2_MIDIPlayer *device, int loopCount);
+    void (*opn2_setModeEMIDI)(struct OPN2_MIDIPlayer *device, int emidiEn);
     int  (*opn2_playFormat)(struct OPN2_MIDIPlayer *device, int sampleCount,
                            OPN2_UInt8 *left, OPN2_UInt8 *right,
                            const struct OPNMIDI_AudioFormat *format);
@@ -142,6 +143,11 @@ static int OPNMIDI_Load(void)
         FUNCTION_LOADER(opn2_positionRewind, void (*)(struct OPN2_MIDIPlayer*))
         FUNCTION_LOADER(opn2_setLoopEnabled, void(*)(struct OPN2_MIDIPlayer*,int))
         FUNCTION_LOADER(opn2_setLoopCount, void(*)(struct OPN2_MIDIPlayer*,int))
+#if defined(ADLMIDI_HAS_SET_MODE_EMIDI)
+        FUNCTION_LOADER(opn2_setModeEMIDI, void(*)(struct OPN2_MIDIPlayer*,int))
+#else
+        OPNMIDI.opn2_setModeEMIDI = NULL;
+#endif
         FUNCTION_LOADER(opn2_playFormat, int(*)(struct OPN2_MIDIPlayer *,int,
                                OPN2_UInt8*,OPN2_UInt8*,const struct OPNMIDI_AudioFormat*))
         FUNCTION_LOADER(opn2_positionSeek, void(*)(struct OPN2_MIDIPlayer*,double))
@@ -183,6 +189,7 @@ typedef struct {
     int max_chips_count;
     int run_at_pcm_rate;
     int low_quality;
+    int mode_emidi;
 } OpnMidi_Setup;
 
 #if defined(__3DS__) || defined(__PSP__)
@@ -195,6 +202,7 @@ static OpnMidi_Setup opnmidi_setup = {
     OPNMIDI_VolumeModel_AUTO,
     OPNMIDI_ChanAlloc_AUTO,
     -1, 0, 0, 1, -1, "", 1.0, 2.0,
+    0,
     0,
     0,
     0
@@ -220,6 +228,7 @@ static void OPNMIDI_SetDefault(OpnMidi_Setup *setup)
     setup->max_chips_count = 0;
     setup->run_at_pcm_rate = 0;
     setup->low_quality = 0;
+    setup->mode_emidi = 0;
 }
 
 int _Mix_OPNMIDI_getVolumeModel(void)
@@ -330,6 +339,17 @@ void _Mix_OPNMIDI_setSetDefaults(void)
     OPNMIDI_SetDefault(&opnmidi_setup);
 }
 
+int _Mix_OPNMIDI_getModeEMIDI(void)
+{
+    return opnmidi_setup.mode_emidi;
+}
+
+void _Mix_OPNMIDI_setModeEMIDI(int en)
+{
+    opnmidi_setup.mode_emidi = en;
+}
+
+
 void _Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path)
 {
     if (bank_wonp_path) {
@@ -422,6 +442,9 @@ static void process_args(const char *args, OpnMidi_Setup *setup)
                 {
                 case 'c':
                     setup->chips_count = value;
+                    break;
+                case 'i':
+                    setup->mode_emidi = value;
                     break;
                 case 'j':
                     setup->auto_arpeggio = value;
@@ -633,6 +656,10 @@ static OpnMIDI_Music *OPNMIDI_LoadSongRW(SDL_RWops *src, const char *args)
 
     OPNMIDI.opn2_setNumChips(music->opnmidi, num_chips);
     OPNMIDI.opn2_setTempo(music->opnmidi, music->tempo);
+
+    if (OPNMIDI.opn2_setModeEMIDI) {
+        OPNMIDI.opn2_setModeEMIDI(music->opnmidi, setup.mode_emidi);
+    }
 
     err = OPNMIDI.opn2_openData( music->opnmidi, bytes, (unsigned long)length);
     SDL_free(bytes);

@@ -74,6 +74,9 @@ extern void _Mix_ADLMIDI_setRunAtPcmRate(int en);
 extern int _Mix_ADLMIDI_getLowQualityMode(void);
 extern void _Mix_ADLMIDI_setLowQualityMode(int en);
 
+extern int _Mix_ADLMIDI_getModeEMIDI(void);
+extern void _Mix_ADLMIDI_setModeEMIDI(int en);
+
 extern void _Mix_ADLMIDI_setSetDefaults(void);
 
 extern void _Mix_ADLMIDI_setCustomBankFile(const char *bank_wonl_path);

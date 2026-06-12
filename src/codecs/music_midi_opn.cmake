@@ -43,6 +43,14 @@ if(USE_MIDI_OPNMIDI AND MIXERX_GPL)
                 CMAKE_FLAGS "-DINCLUDE_DIRECTORIES=${OPNMIDI_INCLUDE_DIRS}"
                 OUTPUT_VARIABLE OPNMIDI_HAS_SELECT_SONG_NUM_RESULT
             )
+
+            try_compile(OPNMIDI_HAS_SET_MODE_EMIDI
+                ${CMAKE_BINARY_DIR}/compile_tests
+                ${SDLMixerX_SOURCE_DIR}/cmake/tests/opnmidi_set_mode_emidi.c
+                LINK_LIBRARIES ${OPNMIDI_LIBRARIES} ${STDCPP_LIBRARY} ${M_LIBRARY}
+                CMAKE_FLAGS "-DINCLUDE_DIRECTORIES=${OPNMIDI_INCLUDE_DIRS}"
+                OUTPUT_VARIABLE OPNMIDI_HAS_SET_MODE_EMIDI_RESULT
+            )
         endif()
 
     else()
@@ -84,6 +92,10 @@ if(USE_MIDI_OPNMIDI AND MIXERX_GPL)
 
         if(OPNMIDI_HAS_SELECT_SONG_NUM)
             list(APPEND SDL_MIXER_DEFINITIONS -DOPNMIDI_HAS_SELECT_SONG_NUM)
+        endif()
+
+        if(OPNMIDI_HAS_SET_MODE_EMIDI)
+            list(APPEND SDL_MIXER_DEFINITIONS -DOPNMIDI_HAS_SET_MODE_EMIDI)
         endif()
 
         list(APPEND SDLMixerX_SOURCES

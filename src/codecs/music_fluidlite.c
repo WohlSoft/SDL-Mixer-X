@@ -159,6 +159,7 @@ typedef struct {
     double   reverb_level;
 
     int polyphony;
+    int mode_emidi;
 } FluidSynth_Setup;
 
 static FluidSynth_Setup fluidsynth_setup = {
@@ -167,10 +168,11 @@ static FluidSynth_Setup fluidsynth_setup = {
     FLUID_CHORUS_DEFAULT_SPEED, FLUID_CHORUS_DEFAULT_DEPTH, FLUID_CHORUS_DEFAULT_TYPE,
     SDL_TRUE, FLUID_REVERB_DEFAULT_ROOMSIZE, FLUID_REVERB_DEFAULT_DAMP,
     FLUID_REVERB_DEFAULT_WIDTH, FLUID_REVERB_DEFAULT_LEVEL,
-    256
+    256,
+    0
 };
 
-static void FLUIDSYNTH_SetDefault(FluidSynth_Setup *setup)
+static void FLUIDSYNTH_SetDefaultMin(FluidSynth_Setup *setup)
 {
     setup->custom_soundfonts[0] = '\0';
     setup->tempo = 1.0;
@@ -190,6 +192,31 @@ static void FLUIDSYNTH_SetDefault(FluidSynth_Setup *setup)
     setup->reverb_level = FLUID_REVERB_DEFAULT_LEVEL;
     setup->polyphony = 256;
 }
+
+static void FLUIDSYNTH_SetDefault(FluidSynth_Setup *setup)
+{
+    FLUIDSYNTH_SetDefaultMin(setup);
+    setup->mode_emidi = 0;
+}
+
+int _Mix_FLUIDSYNTH_getModeEMIDI(void)
+{
+    return fluidsynth_setup.mode_emidi;
+}
+
+void _Mix_FLUIDSYNTH_setModeEMIDI(int en)
+{
+    fluidsynth_setup.mode_emidi = en;
+}
+
+
+void _Mix_FLUIDSYNTH_setSetDefaults(void)
+{
+    FLUIDSYNTH_SetDefault(&fluidsynth_setup);
+}
+
+
+
 
 typedef struct {
     fluid_synth_t *synth;
@@ -384,7 +411,7 @@ static void process_args(const char *args, FluidSynth_Setup *setup)
     size_t i, j = 0;
     int value_opened = 0;
 
-    FLUIDSYNTH_SetDefault(setup);
+    FLUIDSYNTH_SetDefaultMin(setup);
 
     if (args == NULL) {
         return;
@@ -477,6 +504,9 @@ static void process_args(const char *args, FluidSynth_Setup *setup)
                         setup->reverb = (value != 0);
                         break;
                     }
+                    break;
+                case 'i':
+                    setup->mode_emidi = value;
                     break;
                 case 'p':
                     setup->polyphony = value;
@@ -606,6 +636,7 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusicArg(void *data, const char *args)
     }
 
     midi_seq_set_device_mask(music->player, DEFAULT_MASK_GM);
+    midi_seq_set_mode_emidi(music->player, setup.mode_emidi);
 
     ret = midi_seq_openData(music->player, rw_mem, rw_size);
     SDL_free(rw_mem);

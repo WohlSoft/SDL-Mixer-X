@@ -4043,6 +4043,24 @@ void MIXCALLCC Mix_ADLMIDI_setLowQualityMode(int en)
 #endif
 }
 
+int MIXCALLCC Mix_ADLMIDI_getModeEMIDI(void)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    return _Mix_ADLMIDI_getModeEMIDI();
+#else
+    return -1;
+#endif
+}
+
+void MIXCALLCC Mix_ADLMIDI_setModeEMIDI(int en)
+{
+#ifdef MUSIC_MID_ADLMIDI
+    _Mix_ADLMIDI_setModeEMIDI(en);
+#else
+    (void)en;
+#endif
+}
+
 void MIXCALLCC Mix_ADLMIDI_setSetDefaults(void)
 {
 #ifdef MUSIC_MID_ADLMIDI
@@ -4243,6 +4261,24 @@ void MIXCALLCC Mix_OPNMIDI_setLowQualityMode(int en)
 #endif
 }
 
+int MIXCALLCC Mix_OPNMIDI_getModeEMIDI(void)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    return _Mix_OPNMIDI_getModeEMIDI();
+#else
+    return -1;
+#endif
+}
+
+void MIXCALLCC Mix_OPNMIDI_setModeEMIDI(int en)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    _Mix_OPNMIDI_setModeEMIDI(en);
+#else
+    (void)en;
+#endif
+}
+
 void MIXCALLCC Mix_OPNMIDI_setSetDefaults(void)
 {
 #ifdef MUSIC_MID_OPNMIDI
@@ -4258,6 +4294,78 @@ void MIXCALLCC Mix_OPNMIDI_setCustomBankFile(const char *bank_wonp_path)
     (void)bank_wonp_path;
 #endif
 }
+
+
+int MIXCALLCC Mix_EDMIDI_getModulesNum(void)
+{
+#ifdef MUSIC_MID_EDMIDI
+    return _Mix_EDMIDI_getModulesNum();
+#else
+    return -1;
+#endif
+}
+
+void MIXCALLCC Mix_EDMIDI_setModulesNum(int num)
+{
+#ifdef MUSIC_MID_EDMIDI
+    _Mix_EDMIDI_setModulesNum(num);
+#else
+    (void)en;
+#endif
+}
+
+int MIXCALLCC Mix_EDMIDI_getModeEMIDI(void)
+{
+#ifdef MUSIC_MID_EDMIDI
+    return _Mix_EDMIDI_getModeEMIDI();
+#else
+    return -1;
+#endif
+}
+
+void MIXCALLCC Mix_EDMIDI_setModeEMIDI(int en)
+{
+#ifdef MUSIC_MID_EDMIDI
+    _Mix_EDMIDI_setModeEMIDI(en);
+#else
+    (void)en;
+#endif
+}
+
+void MIXCALLCC Mix_EDMIDI_setSetDefaults(void)
+{
+#ifdef MUSIC_MID_OPNMIDI
+    _Mix_EDMIDI_setSetDefaults();
+#endif
+}
+
+
+int MIXCALLCC Mix_FLUIDSYNTH_getModeEMIDI(void)
+{
+#ifdef MUSIC_MID_FLUIDLITE
+    return _Mix_FLUIDSYNTH_getModeEMIDI();
+#else
+    return -1;
+#endif
+}
+
+void MIXCALLCC Mix_FLUIDSYNTH_setModeEMIDI(int en)
+{
+#ifdef MUSIC_MID_FLUIDLITE
+    _Mix_FLUIDSYNTH_setModeEMIDI(en);
+#else
+    (void)en;
+#endif
+}
+
+void MIXCALLCC Mix_FLUIDSYNTH_setSetDefaults(void)
+{
+#ifdef MUSIC_MID_FLUIDLITE
+    _Mix_FLUIDSYNTH_setSetDefaults();
+#endif
+}
+
+
 
 void MIXCALLCC Mix_GME_SetSpcEchoDisabled(Mix_Music *music, int disabled)
 {

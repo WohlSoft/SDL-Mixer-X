@@ -181,6 +181,12 @@ void midi_seq_set_loop_count(void *seq, int loops)
     seqi->seq.setLoopsCount(loops);
 }
 
+void midi_seq_set_mode_emidi(void *seq, int emidiEn)
+{
+    MixerSeqInternal *seqi = reinterpret_cast<MixerSeqInternal*>(seq);
+    seqi->seq.setModeEMIDI(emidiEn);
+}
+
 double midi_seq_tick(void *seq, double s, double granularity)
 {
     MixerSeqInternal *seqi = reinterpret_cast<MixerSeqInternal*>(seq);

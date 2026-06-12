@@ -74,6 +74,7 @@ typedef struct {
     void (*adl_positionRewind)(struct ADL_MIDIPlayer *device);
     void (*adl_setLoopEnabled)(struct ADL_MIDIPlayer *device, int loopEn);
     void (*adl_setLoopCount)(struct ADL_MIDIPlayer *device, int loopCount);
+    void (*adl_setModeEMIDI)(struct ADL_MIDIPlayer *device, int emidiEn);
     int  (*adl_playFormat)(struct ADL_MIDIPlayer *device, int sampleCount,
                            ADL_UInt8 *left, ADL_UInt8 *right,
                            const struct ADLMIDI_AudioFormat *format);
@@ -157,6 +158,11 @@ static int ADLMIDI_Load(void)
         FUNCTION_LOADER(adl_positionRewind, void (*)(struct ADL_MIDIPlayer*))
         FUNCTION_LOADER(adl_setLoopEnabled, void(*)(struct ADL_MIDIPlayer*,int))
         FUNCTION_LOADER(adl_setLoopCount, void(*)(struct ADL_MIDIPlayer*,int))
+#if defined(ADLMIDI_HAS_SET_MODE_EMIDI)
+        FUNCTION_LOADER_OPTIONAL(adl_setModeEMIDI, void(*)(struct ADL_MIDIPlayer*,int))
+#else
+        ADLMIDI.adl_setModeEMIDI = NULL;
+#endif
         FUNCTION_LOADER(adl_playFormat, int(*)(struct ADL_MIDIPlayer *,int,
                                ADL_UInt8*,ADL_UInt8*,const struct ADLMIDI_AudioFormat*))
         FUNCTION_LOADER(adl_positionSeek, void(*)(struct ADL_MIDIPlayer*,double))
@@ -204,6 +210,7 @@ typedef struct {
     int max_chips_count;
     int run_at_pcm_rate;
     int low_quality;
+    int mode_emidi;
 } AdlMidi_Setup;
 
 #if defined(__3DS__) || defined(__PSP__)
@@ -221,9 +228,10 @@ static AdlMidi_Setup adlmidi_setup = {
     0, 0, 1,
     ADLMIDI_EMU_DOSBOX, "",
     1.0, 2.0,
-    0,
-    0,
-    0
+    0,   /* max_chips_count */
+    0,   /* run_at_pcm_rate */
+    0,   /* low_quality */
+    0    /* mode_emidi */
 };
 
 static void ADLMIDI_SetDefaultMin(AdlMidi_Setup *setup)
@@ -251,6 +259,7 @@ static void ADLMIDI_SetDefault(AdlMidi_Setup *setup)
     setup->max_chips_count = 0;
     setup->run_at_pcm_rate = 0;
     setup->low_quality = 0;
+    setup->mode_emidi = 0;
 }
 
 int _Mix_ADLMIDI_getTotalBanks(void)
@@ -280,7 +289,7 @@ const char *const * _Mix_ADLMIDI_getBankNames()
     return empty;
 }
 
-int _Mix_ADLMIDI_getBankID()
+int _Mix_ADLMIDI_getBankID(void)
 {
     return adlmidi_setup.bank;
 }
@@ -290,7 +299,7 @@ void _Mix_ADLMIDI_setBankID(int bnk)
     adlmidi_setup.bank = bnk;
 }
 
-int _Mix_ADLMIDI_getTremolo()
+int _Mix_ADLMIDI_getTremolo(void)
 {
     return adlmidi_setup.tremolo;
 }
@@ -299,7 +308,7 @@ void _Mix_ADLMIDI_setTremolo(int tr)
     adlmidi_setup.tremolo = tr;
 }
 
-int _Mix_ADLMIDI_getVibrato()
+int _Mix_ADLMIDI_getVibrato(void)
 {
     return adlmidi_setup.vibrato;
 }
@@ -309,7 +318,7 @@ void _Mix_ADLMIDI_setVibrato(int vib)
     adlmidi_setup.vibrato = vib;
 }
 
-int _Mix_ADLMIDI_getScaleMod()
+int _Mix_ADLMIDI_getScaleMod(void)
 {
     return adlmidi_setup.scalemod;
 }
@@ -319,7 +328,7 @@ void _Mix_ADLMIDI_setScaleMod(int sc)
     adlmidi_setup.scalemod = sc;
 }
 
-int _Mix_ADLMIDI_getVolumeModel()
+int _Mix_ADLMIDI_getVolumeModel(void)
 {
     return adlmidi_setup.volume_model;
 }
@@ -332,7 +341,7 @@ void _Mix_ADLMIDI_setVolumeModel(int vm)
     }
 }
 
-int _Mix_ADLMIDI_getFullRangeBrightness()
+int _Mix_ADLMIDI_getFullRangeBrightness(void)
 {
     return adlmidi_setup.full_brightness_range;
 }
@@ -342,7 +351,7 @@ void _Mix_ADLMIDI_setFullRangeBrightness(int frb)
     adlmidi_setup.full_brightness_range = frb;
 }
 
-int _Mix_ADLMIDI_getAutoArpeggio()
+int _Mix_ADLMIDI_getAutoArpeggio(void)
 {
     return adlmidi_setup.auto_arpeggio;
 }
@@ -352,7 +361,7 @@ void _Mix_ADLMIDI_setAutoArpeggio(int aa_en)
     adlmidi_setup.auto_arpeggio = aa_en;
 }
 
-int _Mix_ADLMIDI_getChannelAllocMode()
+int _Mix_ADLMIDI_getChannelAllocMode(void)
 {
     return adlmidi_setup.alloc_mode;
 }
@@ -362,7 +371,7 @@ void _Mix_ADLMIDI_setChannelAllocMode(int ch_alloc)
     adlmidi_setup.alloc_mode = ch_alloc;
 }
 
-int _Mix_ADLMIDI_getFullPanStereo()
+int _Mix_ADLMIDI_getFullPanStereo(void)
 {
     return adlmidi_setup.soft_pan;
 }
@@ -372,7 +381,7 @@ void _Mix_ADLMIDI_setFullPanStereo(int fp)
     adlmidi_setup.soft_pan = fp;
 }
 
-int _Mix_ADLMIDI_getEmulator()
+int _Mix_ADLMIDI_getEmulator(void)
 {
     return adlmidi_setup.emulator;
 }
@@ -382,7 +391,7 @@ void _Mix_ADLMIDI_setEmulator(int emu)
     adlmidi_setup.emulator = emu;
 }
 
-int _Mix_ADLMIDI_getChipsCount()
+int _Mix_ADLMIDI_getChipsCount(void)
 {
     return adlmidi_setup.chips_count;
 }
@@ -392,7 +401,7 @@ void _Mix_ADLMIDI_setChipsCount(int chips)
     adlmidi_setup.chips_count = chips;
 }
 
-int _Mix_ADLMIDI_getMaxChipsCount()
+int _Mix_ADLMIDI_getMaxChipsCount(void)
 {
     return adlmidi_setup.max_chips_count;
 }
@@ -402,7 +411,7 @@ void _Mix_ADLMIDI_setMaxChipsCount(int maxChips)
     adlmidi_setup.max_chips_count = maxChips >= 0 ? maxChips : 0;
 }
 
-int _Mix_ADLMIDI_getRunAtPcmRate()
+int _Mix_ADLMIDI_getRunAtPcmRate(void)
 {
     return adlmidi_setup.run_at_pcm_rate;
 }
@@ -412,7 +421,7 @@ void _Mix_ADLMIDI_setRunAtPcmRate(int en)
     adlmidi_setup.run_at_pcm_rate = en != 0 ? 1 : 0;
 }
 
-int _Mix_ADLMIDI_getLowQualityMode()
+int _Mix_ADLMIDI_getLowQualityMode(void)
 {
     return adlmidi_setup.low_quality;
 }
@@ -421,6 +430,17 @@ void _Mix_ADLMIDI_setLowQualityMode(int en)
 {
     adlmidi_setup.low_quality = en != 0 ? 1 : 0;;
 }
+
+int _Mix_ADLMIDI_getModeEMIDI(void)
+{
+    return adlmidi_setup.mode_emidi;
+}
+
+void _Mix_ADLMIDI_setModeEMIDI(int en)
+{
+    adlmidi_setup.mode_emidi = en;
+}
+
 
 void _Mix_ADLMIDI_setSetDefaults()
 {
@@ -547,6 +567,9 @@ static void process_args(const char *args, AdlMidi_Setup *setup)
                     break;
                 case 'a':
                     /* Deprecated and useless */
+                    break;
+                case 'i':
+                    setup->mode_emidi = value;
                     break;
                 case 'j':
                     setup->auto_arpeggio = value;
@@ -744,6 +767,10 @@ static AdlMIDI_Music *ADLMIDI_LoadSongRW(SDL_RWops *src, const char *args)
     }
 
     ADLMIDI.adl_setTempo(music->adlmidi, music->tempo);
+
+    if (ADLMIDI.adl_setModeEMIDI) {
+        ADLMIDI.adl_setModeEMIDI(music->adlmidi, setup.mode_emidi);
+    }
 
     err = ADLMIDI.adl_openData(music->adlmidi, bytes, (unsigned long)length);
     SDL_free(bytes);

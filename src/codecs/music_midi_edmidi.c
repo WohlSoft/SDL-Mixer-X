@@ -50,6 +50,7 @@ typedef struct {
     void (*edmidi_positionRewind)(struct EDMIDIPlayer *device);
     void (*edmidi_setLoopEnabled)(struct EDMIDIPlayer *device, int loopEn);
     void (*edmidi_setLoopCount)(struct EDMIDIPlayer *device, int loopCount);
+    void (*edmidi_setModeEMIDI)(struct EDMIDIPlayer *device, int emidiEn);
     int  (*edmidi_playFormat)(struct EDMIDIPlayer *device, int sampleCount,
                            EDMIDI_UInt8 *left, EDMIDI_UInt8 *right,
                            const struct EDMIDI_AudioFormat *format);
@@ -66,10 +67,14 @@ static edmidi_loader EDMIDI;
 #define FUNCTION_LOADER(FUNC, SIG) \
     EDMIDI.FUNC = (SIG) SDL_LoadFunction(EDMIDI.handle, #FUNC); \
     if (EDMIDI.FUNC == NULL) { SDL_UnloadObject(EDMIDI.handle); return -1; }
+#define FUNCTION_LOADER_OPTIONAL(FUNC, SIG) \
+    EDMIDI.FUNC = (SIG) SDL_LoadFunction(EDMIDI.handle, #FUNC);
 #else
 #define FUNCTION_LOADER(FUNC, SIG) \
     EDMIDI.FUNC = FUNC; \
     if (EDMIDI.FUNC == NULL) { Mix_SetError("Missing EDMIDI.framework"); return -1; }
+#define FUNCTION_LOADER_OPTIONAL(FUNC, SIG) \
+    EDMIDI.FUNC = FUNC;
 #endif
 
 #ifdef __APPLE__
@@ -101,6 +106,11 @@ static int EDMIDI_Load(void)
         FUNCTION_LOADER(edmidi_positionRewind, void (*)(struct EDMIDIPlayer*))
         FUNCTION_LOADER(edmidi_setLoopEnabled, void(*)(struct EDMIDIPlayer*,int))
         FUNCTION_LOADER(edmidi_setLoopCount, void(*)(struct EDMIDIPlayer*,int))
+#if defined(EDMIDI_HAS_SET_MODE_EMIDI)
+        FUNCTION_LOADER_OPTIONAL(edmidi_setModeEMIDI, void(*)(struct EDMIDIPlayer*,int))
+#else
+        EDMIDI.edmidi_setModeEMIDI = NULL;
+#endif
         FUNCTION_LOADER(edmidi_playFormat, int(*)(struct EDMIDIPlayer *,int,
                                EDMIDI_UInt8*,EDMIDI_UInt8*,const struct EDMIDI_AudioFormat*))
         FUNCTION_LOADER(edmidi_positionSeek, void(*)(struct EDMIDIPlayer*,double))
@@ -133,12 +143,13 @@ typedef struct {
     int mods_num;
     double tempo;
     float gain;
+    int mode_emidi;
 } EDMidi_Setup;
 
 #define EDMIDI_DEFAULT_MODS_COUNT     2
 
 static EDMidi_Setup edmidi_setup = {
-    EDMIDI_DEFAULT_MODS_COUNT, 1.0, 2.0
+    EDMIDI_DEFAULT_MODS_COUNT, 1.0, 2.0, 0
 };
 
 static void EDMIDI_SetDefault(EDMidi_Setup *setup)
@@ -146,9 +157,32 @@ static void EDMIDI_SetDefault(EDMidi_Setup *setup)
     setup->mods_num = EDMIDI_DEFAULT_MODS_COUNT;
     setup->tempo = 1.0;
     setup->gain = 2.0f;
+    setup->mode_emidi = 0;
 }
 
-void _Mix_EDMIDI_setSetDefaults()
+int _Mix_EDMIDI_getModulesNum(void)
+{
+    return edmidi_setup.mods_num;
+}
+
+void _Mix_EDMIDI_setModulesNum(int num)
+{
+    edmidi_setup.mods_num = num;
+}
+
+
+int _Mix_EDMIDI_getModeEMIDI(void)
+{
+    return edmidi_setup.mode_emidi;
+}
+
+void _Mix_EDMIDI_setModeEMIDI(int en)
+{
+    edmidi_setup.mode_emidi = en;
+}
+
+
+void _Mix_EDMIDI_setSetDefaults(void)
 {
     EDMIDI_SetDefault(&edmidi_setup);
 }
@@ -232,6 +266,9 @@ static void process_args(const char *args, EDMidi_Setup *setup)
                 {
                 case 'm':
                     setup->mods_num = value;
+                    break;
+                case 'i':
+                    setup->mode_emidi = value;
                     break;
                 case 't':
                     if (arg[0] == '=') {
@@ -374,6 +411,10 @@ static EDMIDI_Music *EDMIDI_LoadSongRW(SDL_RWops *src, const char *args)
     }
 
     EDMIDI.edmidi_setTempo(music->edmidi, music->tempo);
+
+    if (EDMIDI.edmidi_setModeEMIDI) {
+        EDMIDI.edmidi_setModeEMIDI(music->edmidi, setup.mode_emidi);
+    }
 
     err = EDMIDI.edmidi_openData(music->edmidi, bytes, (unsigned long)length);
     SDL_free(bytes);
