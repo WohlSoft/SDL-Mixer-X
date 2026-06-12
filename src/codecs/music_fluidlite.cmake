@@ -56,6 +56,7 @@ if(USE_MIDI_FLUIDLITE AND MIXERX_LGPL)
             ${CMAKE_CURRENT_LIST_DIR}/music_fluidsynth.h
         )
         set(CPP_MIDI_SEQUENCER_NEEDED TRUE)
+        appendMidiFormats("MIDI;RIFF MIDI")
     else()
         message("-- skipping FluidLite --")
     endif()

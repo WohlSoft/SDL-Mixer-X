@@ -27,11 +27,10 @@
 #include "music.h"
 
 extern Mix_MusicInterface Mix_MusicInterface_FLUIDSYNTH;
-#if defined(MUSIC_MID_FLUIDLITE)
 extern Mix_MusicInterface Mix_MusicInterface_FLUIDXMI;
+
 extern int _Mix_FLUIDSYNTH_getModeEMIDI(void);
 extern void _Mix_FLUIDSYNTH_setModeEMIDI(int en);
 extern void _Mix_FLUIDSYNTH_setSetDefaults(void);
-#endif
 
 /* vi: set ts=4 sw=4 expandtab: */

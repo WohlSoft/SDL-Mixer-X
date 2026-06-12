@@ -1237,7 +1237,7 @@ SDL_bool has_music(Mix_MusicType type)
     return SDL_FALSE;
 }
 
-#if defined(MUSIC_MID_ADLMIDI) || defined(MUSIC_MID_OPNMIDI) || defined(MUSIC_MID_NATIVE_ALT) || defined(MUSIC_MID_FLUIDLITE) || defined(MUSIC_MID_EDMIDI)
+#if defined(MUSIC_MID_ADLMIDI) || defined(MUSIC_MID_OPNMIDI) || defined(MUSIC_MID_NATIVE_ALT) || defined(MUSIC_MID_FLUIDSYNTH) || defined(MUSIC_MID_EDMIDI)
 #define MUSIC_HAS_XMI_SUPPORT
 #endif
 
@@ -1267,7 +1267,7 @@ static Mix_MusicType xmi_compatible_midi_player()
     }
 #endif
 
-#if defined(MUSIC_MID_FLUIDLITE)
+#if defined(MUSIC_MID_FLUIDSYNTH)
     if (midiplayer_current == MIDI_Fluidsynth) {
         is_compatible |= 1;
     }
@@ -1286,7 +1286,7 @@ static Mix_MusicType xmi_compatible_midi_player()
         return MUS_ADLMIDI;
 #elif defined(MUSIC_MID_OPNMIDI)
         return MUS_OPNMIDI;
-#elif defined(MUSIC_MID_FLUIDLITE)
+#elif defined(MUSIC_MID_FLUIDSYNTH)
         return MUS_FLUIDLITE;
 #elif defined(MUSIC_MID_EDMIDI)
         return MUS_EDMIDI;
@@ -4342,7 +4342,7 @@ void MIXCALLCC Mix_EDMIDI_setSetDefaults(void)
 
 int MIXCALLCC Mix_FLUIDSYNTH_getModeEMIDI(void)
 {
-#ifdef MUSIC_MID_FLUIDLITE
+#ifdef MUSIC_MID_FLUIDSYNTH
     return _Mix_FLUIDSYNTH_getModeEMIDI();
 #else
     return -1;
@@ -4351,7 +4351,7 @@ int MIXCALLCC Mix_FLUIDSYNTH_getModeEMIDI(void)
 
 void MIXCALLCC Mix_FLUIDSYNTH_setModeEMIDI(int en)
 {
-#ifdef MUSIC_MID_FLUIDLITE
+#ifdef MUSIC_MID_FLUIDSYNTH
     _Mix_FLUIDSYNTH_setModeEMIDI(en);
 #else
     (void)en;
@@ -4360,7 +4360,7 @@ void MIXCALLCC Mix_FLUIDSYNTH_setModeEMIDI(int en)
 
 void MIXCALLCC Mix_FLUIDSYNTH_setSetDefaults(void)
 {
-#ifdef MUSIC_MID_FLUIDLITE
+#ifdef MUSIC_MID_FLUIDSYNTH
     _Mix_FLUIDSYNTH_setSetDefaults();
 #endif
 }

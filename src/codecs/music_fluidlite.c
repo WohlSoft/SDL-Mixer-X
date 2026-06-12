@@ -33,7 +33,48 @@
 #include "music_fluidsynth.h"
 #include "midi_seq/mix_midi_seq.h"
 
+#if defined(MUSIC_MID_FLUIDLITE)
 #include <fluidlite.h>
+#else
+#include <fluidsynth.h>
+#endif
+
+#ifndef FLUID_CHORUS_DEFAULT_N
+#   define FLUID_CHORUS_DEFAULT_N 3
+#endif
+
+#ifndef FLUID_CHORUS_DEFAULT_LEVEL
+#   define FLUID_CHORUS_DEFAULT_LEVEL 2.0f
+#endif
+
+#ifndef FLUID_CHORUS_DEFAULT_SPEED
+#   define FLUID_CHORUS_DEFAULT_SPEED 0.3f
+#endif
+
+#ifndef FLUID_CHORUS_DEFAULT_DEPTH
+#   define FLUID_CHORUS_DEFAULT_DEPTH 8.0f
+#endif
+
+#ifndef FLUID_CHORUS_DEFAULT_TYPE
+#   define FLUID_CHORUS_DEFAULT_TYPE 0
+#endif
+
+#ifndef FLUID_REVERB_DEFAULT_ROOMSIZE
+#   define FLUID_REVERB_DEFAULT_ROOMSIZE 0.2f
+#endif
+
+#ifndef FLUID_REVERB_DEFAULT_DAMP
+#   define FLUID_REVERB_DEFAULT_DAMP 0.0f
+#endif
+
+#ifndef FLUID_REVERB_DEFAULT_WIDTH
+#   define FLUID_REVERB_DEFAULT_WIDTH 0.5f
+#endif
+
+#ifndef FLUID_REVERB_DEFAULT_LEVEL
+#   define FLUID_REVERB_DEFAULT_LEVEL 0.9f
+#endif
+
 
 #ifdef USE_CUSTOM_AUDIO_STREAM
 #   include "stream_custom.h"
@@ -43,7 +84,11 @@ typedef struct {
     int loaded;
     void *handle;
 
+#if !defined(MUSIC_MID_FLUIDLITE) && (FLUIDSYNTH_VERSION_MAJOR >= 2)
+    void (*delete_fluid_synth)(fluid_synth_t*);
+#else
     int (*delete_fluid_synth)(fluid_synth_t*);
+#endif
     void (*delete_fluid_settings)(fluid_settings_t*);
     int (*fluid_settings_setnum)(fluid_settings_t*, const char*, double);
     int (*fluid_settings_getnum)(fluid_settings_t*, const char*, double*);
@@ -63,10 +108,27 @@ typedef struct {
     int (*fluid_synth_channel_pressure)(fluid_synth_t*, int, int);
     int (*fluid_synth_program_change)(fluid_synth_t*, int, int);
     int (*fluid_synth_sysex)(fluid_synth_t *, const char *, int, char *, int *, int *, int);
+#if !defined(MUSIC_MID_FLUIDLITE) && (FLUIDSYNTH_VERSION_MAJOR >= 2)
+    int (*fluid_synth_reverb_on)(fluid_synth_t*, int, int);
+    int (*fluid_synth_set_reverb_group_roomsize)(fluid_synth_t *, int, double);
+    int (*fluid_synth_set_reverb_group_damp)(fluid_synth_t *, int, double);
+    int (*fluid_synth_set_reverb_group_width)(fluid_synth_t *, int, double);
+    int (*fluid_synth_set_reverb_group_level)(fluid_synth_t *, int, double);
+#else
     void (*fluid_synth_set_reverb_on)(fluid_synth_t*, int);
     void (*fluid_synth_set_reverb)(fluid_synth_t*, double, double, double, double);
+#endif
+#if !defined(MUSIC_MID_FLUIDLITE) && (FLUIDSYNTH_VERSION_MAJOR >= 2)
+    int (*fluid_synth_chorus_on)(fluid_synth_t*, int, int);
+    int (*fluid_synth_set_chorus_group_nr)(fluid_synth_t *, int, int);
+    int (*fluid_synth_set_chorus_group_level)(fluid_synth_t *, int, double);
+    int (*fluid_synth_set_chorus_group_speed)(fluid_synth_t *, int, double);
+    int (*fluid_synth_set_chorus_group_depth)(fluid_synth_t *, int, double);
+    int (*fluid_synth_set_chorus_group_type)(fluid_synth_t *, int, int);
+#else
     void (*fluid_synth_set_chorus_on)(fluid_synth_t*, int);
     void (*fluid_synth_set_chorus)(fluid_synth_t*, int, double, double, double, int);
+#endif
     int (*fluid_synth_set_polyphony)(fluid_synth_t*, int);
 } fluidsynth_loader;
 
@@ -95,7 +157,11 @@ static int FLUIDSYNTH_Load()
             return -1;
         }
 #endif
+#if !defined(MUSIC_MID_FLUIDLITE) && (FLUIDSYNTH_VERSION_MAJOR >= 2)
+        FUNCTION_LOADER(delete_fluid_synth, void (*)(fluid_synth_t*))
+#else
         FUNCTION_LOADER(delete_fluid_synth, int (*)(fluid_synth_t*))
+#endif
         FUNCTION_LOADER(delete_fluid_settings, void (*)(fluid_settings_t*))
         FUNCTION_LOADER(fluid_settings_setnum, int (*)(fluid_settings_t*, const char*, double))
         FUNCTION_LOADER(fluid_settings_getnum, int (*)(fluid_settings_t*, const char*, double*))
@@ -115,10 +181,27 @@ static int FLUIDSYNTH_Load()
         FUNCTION_LOADER(fluid_synth_channel_pressure, int (*)(fluid_synth_t*, int, int))
         FUNCTION_LOADER(fluid_synth_program_change, int (*)(fluid_synth_t*, int, int))
         FUNCTION_LOADER(fluid_synth_sysex, int (*)(fluid_synth_t *, const char *, int, char *, int *, int *, int))
+#if !defined(MUSIC_MID_FLUIDLITE) && (FLUIDSYNTH_VERSION_MAJOR >= 2)
+        FUNCTION_LOADER(fluid_synth_reverb_on, void (*)(fluid_synth_t*, int))
+        FUNCTION_LOADER(fluid_synth_set_reverb_group_roomsize, int (*)(fluid_synth_t*, int, double))
+        FUNCTION_LOADER(fluid_synth_set_reverb_group_damp, int (*)(fluid_synth_t*, int, double))
+        FUNCTION_LOADER(fluid_synth_set_reverb_group_width, int (*)(fluid_synth_t*, int, double))
+        FUNCTION_LOADER(fluid_synth_set_reverb_group_level, int (*)(fluid_synth_t*, int, double))
+#else
         FUNCTION_LOADER(fluid_synth_set_reverb_on, void (*)(fluid_synth_t*, int))
         FUNCTION_LOADER(fluid_synth_set_reverb, void (*)(fluid_synth_t*, double, double, double, double))
+#endif
+#if !defined(MUSIC_MID_FLUIDLITE) && (FLUIDSYNTH_VERSION_MAJOR >= 2)
+        FUNCTION_LOADER(fluid_synth_chorus_on, void (*)(fluid_synth_t*, int, int))
+        FUNCTION_LOADER(fluid_synth_set_chorus_group_nr, int (*)(fluid_synth_t*, int, int))
+        FUNCTION_LOADER(fluid_synth_set_chorus_group_level, int (*)(fluid_synth_t*, int, double))
+        FUNCTION_LOADER(fluid_synth_set_chorus_group_speed, int (*)(fluid_synth_t*, int, double))
+        FUNCTION_LOADER(fluid_synth_set_chorus_group_depth, int (*)(fluid_synth_t*, int, double))
+        FUNCTION_LOADER(fluid_synth_set_chorus_group_type, int (*)(fluid_synth_t*, int, int))
+#else
         FUNCTION_LOADER(fluid_synth_set_chorus_on, void (*)(fluid_synth_t*, int))
         FUNCTION_LOADER(fluid_synth_set_chorus, void (*)(fluid_synth_t*, int, double, double, double, int))
+#endif
         FUNCTION_LOADER(fluid_synth_set_polyphony, int (*)(fluid_synth_t*, int))
     }
     ++fluidsynth.loaded;
@@ -613,15 +696,31 @@ static FLUIDSYNTH_Music *FLUIDSYNTH_LoadMusicArg(void *data, const char *args)
         goto fail;
     }
 
-
+#if !defined(MUSIC_MID_FLUIDLITE) && (FLUIDSYNTH_VERSION_MAJOR >= 2)
+    fluidsynth.fluid_synth_reverb_on(music->synth, -1, setup.reverb);
+    fluidsynth.fluid_synth_set_reverb_group_roomsize(music->synth, -1, setup.reverb_roomsize);
+    fluidsynth.fluid_synth_set_reverb_group_damp(music->synth, -1, setup.reverb_damping);
+    fluidsynth.fluid_synth_set_reverb_group_width(music->synth, -1, setup.reverb_width);
+    fluidsynth.fluid_synth_set_reverb_group_level(music->synth, -1, setup.reverb_level);
+#else
     fluidsynth.fluid_synth_set_reverb_on(music->synth, setup.reverb);
     fluidsynth.fluid_synth_set_reverb(music->synth,
                                       setup.reverb_roomsize, setup.reverb_damping,
                                       setup.reverb_width, setup.reverb_level);
+#endif
+#if !defined(MUSIC_MID_FLUIDLITE) && (FLUIDSYNTH_VERSION_MAJOR >= 2)
+    fluidsynth.fluid_synth_chorus_on(music->synth, -1, setup.chorus);
+    fluidsynth.fluid_synth_set_chorus_group_nr(music->synth, -1, setup.chorus_nr);
+    fluidsynth.fluid_synth_set_chorus_group_level(music->synth, -1, setup.chorus_level);
+    fluidsynth.fluid_synth_set_chorus_group_speed(music->synth, -1, setup.chorus_speed);
+    fluidsynth.fluid_synth_set_chorus_group_depth(music->synth, -1, setup.chorus_depth);
+    fluidsynth.fluid_synth_set_chorus_group_type(music->synth, -1, setup.chorus_type);
+#else
     fluidsynth.fluid_synth_set_chorus_on(music->synth, setup.chorus);
     fluidsynth.fluid_synth_set_chorus(music->synth,
                                       setup.chorus_nr, setup.chorus_level,
                                       setup.chorus_speed, setup.chorus_depth, setup.chorus_type);
+#endif
     fluidsynth.fluid_synth_set_polyphony(music->synth, setup.polyphony);
 
     if (!(music->player = midi_seq_init_interface(&music->seq_if))) {
