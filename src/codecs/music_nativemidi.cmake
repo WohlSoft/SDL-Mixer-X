@@ -1,5 +1,5 @@
  # Native MIDI correctly works on Windows and macOS only.
-if((WIN32 AND NOT EMSCRIPTEN) OR (APPLE AND CMAKE_HOST_SYSTEM_VERSION VERSION_GREATER 10))
+if((WIN32 AND NOT EMSCRIPTEN) OR (APPLE AND CMAKE_HOST_SYSTEM_VERSION VERSION_GREATER 10) OR LINUX)
     set(NATIVE_MIDI_SUPPORTED ON)
 else()
     set(NATIVE_MIDI_SUPPORTED OFF)
@@ -21,6 +21,18 @@ if(USE_MIDI_NATIVE AND NOT USE_MIDI_NATIVE_ALT)
     if(APPLE)
         list(APPEND SDLMixerX_SOURCES
             ${CMAKE_CURRENT_LIST_DIR}/native_midi/native_midi_macosx.c)
+    endif()
+
+    if(LINUX)
+        list(APPEND SDLMixerX_SOURCES
+            ${CMAKE_CURRENT_LIST_DIR}/native_midi/native_midi_linux_alsa.c)
+        list(APPEND SDLMixerX_LINK_LIBS asound)
+
+        if(DEFINED FLAG_C99)
+            set_source_files_properties("${CMAKE_CURRENT_LIST_DIR}/native_midi/native_midi_linux_alsa.c"
+                COMPILE_FLAGS ${FLAG_C99}
+            )
+        endif()
     endif()
     appendMidiFormats("MIDI;RIFF MIDI")
 endif()
