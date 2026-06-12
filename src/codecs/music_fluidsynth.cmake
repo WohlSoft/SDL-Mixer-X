@@ -27,11 +27,11 @@ if(USE_MIDI_FLUIDSYNTH AND NOT USE_MIDI_FLUIDLITE AND MIXERX_LGPL)
         endif()
 
         list(APPEND SDLMixerX_SOURCES
-            ${CMAKE_CURRENT_LIST_DIR}/music_fluidlite.c
+            ${CMAKE_CURRENT_LIST_DIR}/music_fluidsynth.c
             ${CMAKE_CURRENT_LIST_DIR}/music_fluidsynth.h
         )
         set(CPP_MIDI_SEQUENCER_NEEDED TRUE)
-        appendMidiFormats("MIDI;RIFF MIDI")
+        appendMidiFormats("MIDI;RIFF MIDI;XMI;MUS;HMI;HMP")
     else()
         message("-- skipping FluidSynth --")
     endif()

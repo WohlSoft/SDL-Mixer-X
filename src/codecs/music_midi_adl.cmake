@@ -102,8 +102,8 @@ if(USE_MIDI_ADLMIDI AND MIXERX_GPL)
             ${CMAKE_CURRENT_LIST_DIR}/music_midi_adl.c
             ${CMAKE_CURRENT_LIST_DIR}/music_midi_adl.h
         )
-        appendMidiFormats("MIDI;RIFF MIDI;XMI;MUS")
-        appendChiptuneFormats("IMF(OPL2);CMF")
+        appendMidiFormats("MIDI;RIFF MIDI;XMI;MUS;HMI;HMP")
+        appendChiptuneFormats("IMF(OPL2);CMF;KLM")
     else()
         message("-- skipping ADLMIDI --")
     endif()

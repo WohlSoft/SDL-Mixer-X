@@ -11,14 +11,14 @@ if(CPP_MIDI_SEQUENCER_NEEDED)
 
     set(STDCPP_NEEDED TRUE)
     if(NOT MIXERX_LGPL)
-        # Disable MUS and XMI formats as they LGPL-licensed
-        message("-- !!! MIDI Sequencer will don't support MUS and XMI formats !!!")
-        list(APPEND SDL_MIXER_DEFINITIONS -DBWMIDI_DISABLE_MUS_SUPPORT -DBWMIDI_DISABLE_XMI_SUPPORT)
+        # Disable XMI format as it's LGPL-licensed
+        message("-- !!! MIDI Sequencer will don't support XMI format !!!")
+        list(APPEND SDL_MIXER_DEFINITIONS -DBWMIDI_DISABLE_XMI_SUPPORT)
         setLicense(LICENSE_MIT)
-        appendMidiFormats("MIDI;RIFF MIDI")
+        appendMidiFormats("MIDI;RIFF MIDI;MUS;HMI;HMP")
     else()
-        # LGPL license because of XMI/MUS support modules. Disabling them will give MIT
+        # LGPL license because of XMI support module. Disabling it will give MIT
         setLicense(LICENSE_LGPL_2_1p)
-        appendMidiFormats("MIDI;RIFF MIDI;MUS;XMI")
+        appendMidiFormats("MIDI;RIFF MIDI;MUS;HMI;HMP;XMI")
     endif()
 endif()
