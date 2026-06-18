@@ -1562,10 +1562,15 @@ void MIXCALLCC Mix_SetRWFromFile(Mix_RWFromFile_cb cb)
 void MIXCALLCC Mix_CloseAudio(void)
 {
     if (audio_device) {
+        SDL_PauseAudioDevice(audio_device, 1);
+    }
+
+    Mix_FreeMixer();
+
+    if (audio_device) {
         SDL_CloseAudioDevice(audio_device);
         audio_device = 0;
     }
-    Mix_FreeMixer();
 }
 
 /* Pause a particular channel (or all) */
