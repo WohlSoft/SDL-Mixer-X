@@ -4310,7 +4310,7 @@ void MIXCALLCC Mix_EDMIDI_setModulesNum(int num)
 #ifdef MUSIC_MID_EDMIDI
     _Mix_EDMIDI_setModulesNum(num);
 #else
-    (void)en;
+    (void)num;
 #endif
 }
 
