@@ -8,6 +8,17 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s USE_SDL=0 -s USE_SDL_MIXER=0")
 endif()
 
+# Define iOS platform markers if they are missing (at some old CMake toolchains)
+if(${CMAKE_SYSTEM_NAME} STREQUAL "iOS")
+    if(NOT DEFINED IOS)
+        set(IOS TRUE)
+    endif()
+
+    if(NOT DEFINED PLATFORM_IOS)
+        set(PLATFORM_IOS TRUE)
+    endif()
+endif()
+
 if(NOT CMAKE_BUILD_TYPE)
     message("== Using default build configuration ==")
 endif()

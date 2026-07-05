@@ -31,6 +31,7 @@ include(FormatsSupported)
 if(NOT EMSCRIPTEN
    AND NOT VITA
    AND NOT PSP
+   AND NOT IOS
    AND NOT NINTENDO_3DS
    AND NOT NINTENDO_WII
    AND NOT NINTENDO_WIIU)
@@ -299,28 +300,45 @@ if(WIN32 AND NOT EMSCRIPTEN)
 endif()
 
 if(APPLE)
-    find_library(APPLE_CORE_AUDIO CoreAudio)
-    find_library(APPLE_IOKIT IOKit)
-    find_library(APPLE_COCOA Cocoa)
-    find_library(APPLE_AUDIOTOOLBOX AudioToolbox)
-    find_library(APPLE_CORE_VIDEO CoreVideo)
-    find_library(APPLE_CORE_FOUNDATION CoreFoundation)
-    find_library(APPLE_CARBON Carbon)
-    find_library(APPLE_FORCE_FEEDBACK ForceFeedback)
+    macro(mixerx_add_macos_library LIBRARY_NAME)
+        find_library(MACOS_LIBRARY_${LIBRARY_NAME} ${LIBRARY_NAME})
+        if(MACOS_LIBRARY_${LIBRARY_NAME})
+            list(APPEND SDLMixerX_LINK_LIBS ${MACOS_LIBRARY_${LIBRARY_NAME}})
+            message("-- Library ${LIBRARY_NAME} found")
+        else()
+            message("-- Library ${LIBRARY_NAME} NOT found")
+        endif()
+    endmacro()
+
+    if(NOT IOS)
+        mixerx_add_macos_library(CoreAudio)
+    endif()
+
+    mixerx_add_macos_library(IOKit)
+
+    if(NOT IOS)
+        mixerx_add_macos_library(Carbon)
+    endif()
+
+    mixerx_add_macos_library(AudioToolbox)
+
+    if(NOT IOS)
+        mixerx_add_macos_library(CoreVideo)
+    endif()
+
+    mixerx_add_macos_library(CoreFoundation)
+
+    if(NOT IOS)
+        mixerx_add_macos_library(Carbon)
+        mixerx_add_macos_library(ForceFeedback)
+    endif()
+
     check_library_exists(iconv iconv_open "" HAVE_LIBICONV)
     if(HAVE_LIBICONV)
         set(ICONV_LIB iconv)
     endif()
 
     list(APPEND SDLMixerX_LINK_LIBS
-            ${APPLE_CORE_AUDIO}
-            ${APPLE_COCOA}
-            ${APPLE_CORE_VIDEO}
-            ${APPLE_CORE_FOUNDATION}
-            ${APPLE_FORCE_FEEDBACK}
-            ${APPLE_IOKIT}
-            ${APPLE_CARBON}
-            ${APPLE_AUDIOTOOLBOX}
             ${ICONV_LIB})
     list(APPEND SDLMixerX_LINK_LIBS objc)
 endif()
