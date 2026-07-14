@@ -32,6 +32,9 @@ if(NOT EMSCRIPTEN
    AND NOT VITA
    AND NOT PSP
    AND NOT IOS
+   AND NOT TVOS
+   AND NOT WATCHOS
+   AND NOT VISIONOS
    AND NOT NINTENDO_3DS
    AND NOT NINTENDO_WII
    AND NOT NINTENDO_WIIU)
@@ -310,25 +313,25 @@ if(APPLE)
         endif()
     endmacro()
 
-    if(NOT IOS)
+    if(MACOS)
         mixerx_add_macos_library(CoreAudio)
     endif()
 
     mixerx_add_macos_library(IOKit)
 
-    if(NOT IOS)
+    if(MACOS)
         mixerx_add_macos_library(Carbon)
     endif()
 
     mixerx_add_macos_library(AudioToolbox)
 
-    if(NOT IOS)
+    if(MACOS)
         mixerx_add_macos_library(CoreVideo)
     endif()
 
     mixerx_add_macos_library(CoreFoundation)
 
-    if(NOT IOS)
+    if(MACOS)
         mixerx_add_macos_library(Carbon)
         mixerx_add_macos_library(ForceFeedback)
     endif()
