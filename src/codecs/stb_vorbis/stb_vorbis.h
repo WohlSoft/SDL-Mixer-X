@@ -5193,7 +5193,7 @@ int stb_vorbis_seek(stb_vorbis *f, unsigned int sample_number)
 
 int stb_vorbis_seek64(stb_vorbis *f, stb_vorbis_int64 sample_number)
 {
-   if (!stb_vorbis_seek_frame(f, sample_number)) {
+   if (!stb_vorbis_seek_frame64(f, sample_number)) {
       f->current_playback_loc_valid = FALSE;
       return 0;
    }
