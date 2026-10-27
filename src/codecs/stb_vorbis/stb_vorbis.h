@@ -205,13 +205,15 @@ extern void stb_vorbis_close(stb_vorbis *f);
 // otherwise. after a flush_pushdata() call, this may take a while before
 // it becomes valid again.
 // NOT WORKING YET after a seek with PULLDATA API
-extern stb_vorbis_int64 stb_vorbis_get_sample_offset(stb_vorbis *f);
+extern int stb_vorbis_get_sample_offset(stb_vorbis *f);
+extern stb_vorbis_int64 stb_vorbis_get_sample_offset64(stb_vorbis *f);
 
 //  this function returns the count of returned samples from the beginning of the
 //  file. Functions "stb_vorbis_get_samples_*", "stb_vorbis_seek_*()" will
 //  affect the returned value. Use this call to get the accurate sample position
 //  during playback.
-extern stb_vorbis_int64 stb_vorbis_get_playback_sample_offset(stb_vorbis *f);
+extern int stb_vorbis_get_playback_sample_offset(stb_vorbis *f);
+extern stb_vorbis_int64 stb_vorbis_get_playback_sample_offset64(stb_vorbis *f);
 
 // returns the current seek point within the file, or offset from the beginning
 // of the memory buffer. In pushdata mode it returns 0.
@@ -349,8 +351,10 @@ extern stb_vorbis * stb_vorbis_open_rwops(SDL_RWops *rwops, int close_on_free, i
 #define RWOPS_BUFFER_SIZE 2048
 #endif
 
-extern int stb_vorbis_seek_frame(stb_vorbis *f, stb_vorbis_int64 sample_number);
-extern int stb_vorbis_seek(stb_vorbis *f, stb_vorbis_int64 sample_number);
+extern int stb_vorbis_seek_frame(stb_vorbis *f, unsigned int sample_number);
+extern int stb_vorbis_seek_frame64(stb_vorbis *f, stb_vorbis_int64 sample_number);
+extern int stb_vorbis_seek(stb_vorbis *f, unsigned int sample_number);
+extern int stb_vorbis_seek64(stb_vorbis *f, stb_vorbis_int64 sample_number);
 // these functions seek in the Vorbis file to (approximately) 'sample_number'.
 // after calling seek_frame(), the next call to get_frame_*() will include
 // the specified sample. after calling stb_vorbis_seek(), the next call to
@@ -361,7 +365,8 @@ extern int stb_vorbis_seek(stb_vorbis *f, stb_vorbis_int64 sample_number);
 extern int stb_vorbis_seek_start(stb_vorbis *f);
 // this function is equivalent to stb_vorbis_seek(f,0)
 
-extern stb_vorbis_int64        stb_vorbis_stream_length_in_samples(stb_vorbis *f);
+extern unsigned int     stb_vorbis_stream_length_in_samples(stb_vorbis *f);
+extern stb_vorbis_int64 stb_vorbis_stream_length_in_samples64(stb_vorbis *f);
 extern float        stb_vorbis_stream_length_in_seconds(stb_vorbis *f);
 // these functions return the total length of the vorbis stream
 
@@ -4519,7 +4524,15 @@ static void vorbis_init(stb_vorbis *p, const stb_vorbis_alloc *z)
    #endif
 }
 
-stb_vorbis_int64 stb_vorbis_get_sample_offset(stb_vorbis *f)
+int stb_vorbis_get_sample_offset(stb_vorbis *f)
+{
+   if (f->current_loc_valid && f->current_loc < INT_MAX)
+      return (int)f->current_loc;
+   else
+      return -1;
+}
+
+stb_vorbis_int64 stb_vorbis_get_sample_offset64(stb_vorbis *f)
 {
    if (f->current_loc_valid)
       return f->current_loc;
@@ -4527,13 +4540,22 @@ stb_vorbis_int64 stb_vorbis_get_sample_offset(stb_vorbis *f)
       return -1;
 }
 
-stb_vorbis_int64 stb_vorbis_get_playback_sample_offset(stb_vorbis *f)
+int stb_vorbis_get_playback_sample_offset(stb_vorbis *f)
+{
+   if (f->current_playback_loc_valid && f->current_playback_loc < INT_MAX)
+      return (int)f->current_playback_loc;
+   else
+      return -1;
+}
+
+stb_vorbis_int64 stb_vorbis_get_playback_sample_offset64(stb_vorbis *f)
 {
    if (f->current_playback_loc_valid)
       return f->current_playback_loc;
    else
       return -1;
 }
+
 
 stb_vorbis_info stb_vorbis_get_info(stb_vorbis *f)
 {
@@ -4947,7 +4969,7 @@ static int seek_to_sample_coarse(stb_vorbis *f, stb_vorbis_int64 sample_number)
    int probe = 0;
 
    // find the last page and validate the target sample
-   stream_length = stb_vorbis_stream_length_in_samples(f);
+   stream_length = stb_vorbis_stream_length_in_samples64(f);
    if (stream_length == 0)            return error(f, VORBIS_seek_without_length);
    if (sample_number > stream_length) return error(f, VORBIS_seek_invalid);
 
@@ -5119,7 +5141,12 @@ static int peek_decode_initial(vorb *f, int *p_left_start, int *p_left_end, int 
    return 1;
 }
 
-int stb_vorbis_seek_frame(stb_vorbis *f, stb_vorbis_int64 sample_number)
+int stb_vorbis_seek_frame(stb_vorbis *f, unsigned int sample_number)
+{
+   return stb_vorbis_seek_frame64(f, sample_number);
+}
+
+int stb_vorbis_seek_frame64(stb_vorbis *f, stb_vorbis_int64 sample_number)
 {
    uint32 max_frame_samples;
 
@@ -5159,7 +5186,12 @@ int stb_vorbis_seek_frame(stb_vorbis *f, stb_vorbis_int64 sample_number)
    return 1;
 }
 
-int stb_vorbis_seek(stb_vorbis *f, stb_vorbis_int64 sample_number)
+int stb_vorbis_seek(stb_vorbis *f, unsigned int sample_number)
+{
+   return stb_vorbis_seek64(f, sample_number);
+}
+
+int stb_vorbis_seek64(stb_vorbis *f, stb_vorbis_int64 sample_number)
 {
    if (!stb_vorbis_seek_frame(f, sample_number)) {
       f->current_playback_loc_valid = FALSE;
@@ -5191,7 +5223,14 @@ int stb_vorbis_seek_start(stb_vorbis *f)
    return vorbis_pump_first_frame(f);
 }
 
-stb_vorbis_int64 stb_vorbis_stream_length_in_samples(stb_vorbis *f)
+unsigned int stb_vorbis_stream_length_in_samples(stb_vorbis *f)
+{
+   stb_vorbis_int64 ret = stb_vorbis_stream_length_in_samples64(f);
+   if (ret > UINT_MAX) { return UINT_MAX; }
+   return ret;
+}
+
+stb_vorbis_int64 stb_vorbis_stream_length_in_samples64(stb_vorbis *f)
 {
    unsigned int restore_offset, previous_safe;
    unsigned int end, last_page_loc;
@@ -5265,7 +5304,7 @@ stb_vorbis_int64 stb_vorbis_stream_length_in_samples(stb_vorbis *f)
 
 float stb_vorbis_stream_length_in_seconds(stb_vorbis *f)
 {
-   return stb_vorbis_stream_length_in_samples(f) / (float) f->sample_rate;
+   return stb_vorbis_stream_length_in_samples64(f) / (float) f->sample_rate;
 }
 
 
@@ -5588,7 +5627,7 @@ static stb_vorbis_int64 fixup_current_playback_loc(stb_vorbis *f, stb_vorbis_int
    stb_vorbis_int64 lgs;
 
    f->current_playback_loc += n;
-   lgs = stb_vorbis_stream_length_in_samples(f);
+   lgs = stb_vorbis_stream_length_in_samples64(f);
    if (lgs != 0 && lgs != SAMPLE_unknown && f->current_playback_loc > lgs) {
        stb_vorbis_int64 r = n - (f->current_playback_loc - lgs);
        f->current_playback_loc = lgs;

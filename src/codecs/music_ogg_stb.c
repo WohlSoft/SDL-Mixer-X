@@ -81,7 +81,9 @@
 #define stb_vorbis_get_error _mix_stb_vorbis_get_error
 #define stb_vorbis_close _mix_stb_vorbis_close
 #define stb_vorbis_get_sample_offset _mix_stb_vorbis_get_sample_offset
+#define stb_vorbis_get_sample_offset64 _mix_stb_vorbis_get_sample_offset64
 #define stb_vorbis_get_playback_sample_offset _mix_stb_vorbis_get_playback_sample_offset
+#define stb_vorbis_get_playback_sample_offset64 _mix_stb_vorbis_get_playback_sample_offset64
 #define stb_vorbis_get_file_offset _mix_stb_vorbis_get_file_offset
 #define stb_vorbis_open_pushdata _mix_stb_vorbis_open_pushdata
 #define stb_vorbis_decode_frame_pushdata _mix_stb_vorbis_decode_frame_pushdata
@@ -95,9 +97,12 @@
 #define stb_vorbis_open_rwops_section _mix_stb_vorbis_open_rwops_section
 #define stb_vorbis_open_rwops _mix_stb_vorbis_open_rwops
 #define stb_vorbis_seek_frame _mix_stb_vorbis_seek_frame
+#define stb_vorbis_seek_frame64 _mix_stb_vorbis_seek_frame64
 #define stb_vorbis_seek _mix_stb_vorbis_seek
+#define stb_vorbis_seek64 _mix_stb_vorbis_seek64
 #define stb_vorbis_seek_start _mix_stb_vorbis_seek_start
 #define stb_vorbis_stream_length_in_samples _mix_stb_vorbis_stream_length_in_samples
+#define stb_vorbis_stream_length_in_samples64 _mix_stb_vorbis_stream_length_in_samples64
 #define stb_vorbis_stream_length_in_seconds _mix_stb_vorbis_stream_length_in_seconds
 #define stb_vorbis_get_frame_float _mix_stb_vorbis_get_frame_float
 #define stb_vorbis_get_frame_short_interleaved _mix_stb_vorbis_get_frame_short_interleaved
@@ -409,7 +414,7 @@ static void *OGG_CreateFromRWex(SDL_RWops *src, int freesrc, const char *args)
 
     rate = music->vi.sample_rate;
 
-    music->full_length = stb_vorbis_stream_length_in_samples(music->vf);
+    music->full_length = stb_vorbis_stream_length_in_samples64(music->vf);
     if (music->full_length <= 0) {
         Mix_SetError("No samples in ogg/vorbis stream.");
         OGG_Delete(music);
@@ -600,12 +605,12 @@ try_get:
         }
     }
 
-    pcmPos = stb_vorbis_get_playback_sample_offset(music->vf);
+    pcmPos = stb_vorbis_get_playback_sample_offset64(music->vf);
     if (music->loop && (music->play_count != 1) && (pcmPos >= music->loop_end)) {
         amount -= (int)((pcmPos - music->loop_end) * channels) * (int)sizeof(float);
-        result = stb_vorbis_seek(music->vf, music->loop_start);
+        result = stb_vorbis_seek64(music->vf, music->loop_start);
         if (!result) {
-            set_ov_error("stb_vorbis_seek", stb_vorbis_get_error(music->vf));
+            set_ov_error("stb_vorbis_seek64", stb_vorbis_get_error(music->vf));
             return -1;
         } else {
             int play_count = -1;
@@ -654,9 +659,9 @@ static int OGG_Seek(void *context, double time)
     OGG_music *music = (OGG_music *)context;
     int result;
 
-    result = stb_vorbis_seek(music->vf, (time * music->vi.sample_rate));
+    result = stb_vorbis_seek64(music->vf, (time * music->vi.sample_rate));
     if (!result) {
-        set_ov_error("stb_vorbis_seek", stb_vorbis_get_error(music->vf));
+        set_ov_error("stb_vorbis_seek64", stb_vorbis_get_error(music->vf));
         return -1;
     }
     return 0;
@@ -665,7 +670,7 @@ static int OGG_Seek(void *context, double time)
 static double OGG_Tell(void *context)
 {
     OGG_music *music = (OGG_music *)context;
-    return (double)stb_vorbis_get_playback_sample_offset(music->vf) / music->vi.sample_rate;
+    return (double)stb_vorbis_get_playback_sample_offset64(music->vf) / music->vi.sample_rate;
 }
 
 /* Return music duration in seconds */
