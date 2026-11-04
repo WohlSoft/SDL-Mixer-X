@@ -40,9 +40,12 @@ struct Context
     int   m_is_big_endian;
 };
 
-static void exit_with_error(const char *str)
+static void exit_with_error(const char *str, const char *file)
 {
-    fprintf(stderr, "WAVE Writer Error: %s\n", str);
+    if(file)
+        fprintf(stderr, "WAVE Writer Error: %s (file: %s)\n", str, file);
+    else
+        fprintf(stderr, "WAVE Writer Error: %s\n", str);
     fflush(stderr);
 }
 
@@ -72,7 +75,7 @@ void *ctx_wave_open(int chans_count,
     struct Context *ctx = (struct Context*)malloc(sizeof(struct Context));
     if(!ctx)
     {
-        exit_with_error("Out of memory");
+        exit_with_error("Out of memory", filename);
         return NULL;
     }
 
@@ -88,7 +91,7 @@ void *ctx_wave_open(int chans_count,
     ctx->m_buf = (unsigned char *) malloc(buf_size);
     if(!ctx->m_buf)
     {
-        exit_with_error("Out of memory");
+        exit_with_error("Out of memory", filename);
         free(ctx);
         return NULL;
     }
@@ -103,7 +106,7 @@ void *ctx_wave_open(int chans_count,
 #endif
     if(!ctx->m_file)
     {
-        exit_with_error("Couldn't open WAVE file for writing");
+        exit_with_error("Couldn't open WAVE file for writing", filename);
         free(ctx);
         return NULL;
     }
@@ -153,7 +156,7 @@ static void format_U16LE_to_S16LE(unsigned char *buff, long size)
 static void flush_(struct Context *ctx)
 {
     if(ctx->m_buf_pos && !fwrite(ctx->m_buf, (size_t)ctx->m_buf_pos, 1, ctx->m_file))
-        exit_with_error("Couldn't write WAVE data");
+        exit_with_error("Couldn't write WAVE data", NULL);
     ctx->m_buf_pos = 0;
 }
 
