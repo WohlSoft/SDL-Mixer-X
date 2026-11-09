@@ -1009,8 +1009,13 @@ static int error(vorb *f, enum STBVorbisError e)
 
 #define array_size_required(count,size)  (count*(sizeof(void *)+(size)))
 
+#ifdef STB_VORBIS_SDL
+#define temp_alloc(f,size)              (f->alloc.alloc_buffer ? setup_temp_malloc(f,size) : SDL_stack_alloc(char, size))
+#define temp_free(f,p)                  SDL_stack_free(p)
+#else
 #define temp_alloc(f,size)              (f->alloc.alloc_buffer ? setup_temp_malloc(f,size) : alloca(size))
 #define temp_free(f,p)                  (void)0
+#endif
 #define temp_alloc_save(f)              ((f)->temp_offset)
 #define temp_alloc_restore(f,p)         ((f)->temp_offset = (p))
 
