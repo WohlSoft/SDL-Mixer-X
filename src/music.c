@@ -4334,7 +4334,7 @@ void MIXCALLCC Mix_EDMIDI_setModeEMIDI(int en)
 
 void MIXCALLCC Mix_EDMIDI_setSetDefaults(void)
 {
-#ifdef MUSIC_MID_OPNMIDI
+#ifdef MUSIC_MID_EDMIDI
     _Mix_EDMIDI_setSetDefaults();
 #endif
 }
