@@ -1,4 +1,4 @@
-// Ogg Vorbis audio decoder - v1.22 - public domain
+// Ogg Vorbis audio decoder - v1.23 - public domain
 // http://nothings.org/stb_vorbis/
 //
 // Original version written by Sean Barrett in 2007.
@@ -38,6 +38,7 @@
 //    Alice Rowan
 //
 // Partial history:
+//    1.23    - 2026-11-08 - many fixes, support for 64-bit seek/offsets
 //    1.22    - 2021-07-11 - various small fixes
 //    1.21    - 2021-07-02 - fix bug for files with no comments
 //    1.20    - 2020-07-11 - several small fixes
@@ -627,6 +628,27 @@ enum STBVorbisError
 #endif // STB_VORBIS_NO_CRT
 
 #include <limits.h>
+
+#ifdef __MINGW32__
+   // eff you mingw:
+   //     "fixed":
+   //         http://sourceforge.net/p/mingw-w64/mailman/message/32882927/
+   //     "no that broke the build, reverted, who cares about C":
+   //         http://sourceforge.net/p/mingw-w64/mailman/message/32890381/
+   #ifdef __forceinline
+   #undef __forceinline
+   #endif
+   #define __forceinline
+   #ifndef alloca
+   #define alloca __builtin_alloca
+   #endif
+#elif !defined(_MSC_VER)
+   #if __GNUC__
+      #define __forceinline inline
+   #else
+      #define __forceinline
+   #endif
+#endif
 
 #ifndef STB_FORCEINLINE
     #if defined(_MSC_VER) && (_MSC_VER >= 1200)
@@ -1574,13 +1596,22 @@ static int set_file_offset(stb_vorbis *f, stb_vorbis_int64 loc)
    #endif
 
    #ifndef STB_VORBIS_NO_STDIO
-   if (loc + f->f_start < loc) {
+   // reject negative or huge offsets
+   if (loc < 0 || loc > ((stb_vorbis_int64)1 << 62)) {
       loc = -1;
       f->eof = 1;
    } else {
       loc += f->f_start;
    }
-   if (!fseek(f->f, loc, SEEK_SET))
+   #if defined(_MSC_VER) && _MSC_VER >= 1400
+   if (!_fseeki64(f->f, loc, SEEK_SET))
+      return 1;
+   #elif defined(_MSC_VER)
+   // old MSVC doesn't have 64-bit seeks, just bail if we have to do one
+   if (loc < INT_MIN || loc > INT_MAX)
+      return 1;
+   #endif
+   if (!fseek(f->f, (long) loc, SEEK_SET))
       return 1;
    f->eof = 1;
    fseek(f->f, f->f_start, SEEK_END);
@@ -5549,8 +5580,7 @@ int stb_vorbis_get_frame_short(stb_vorbis *f, int num_c, short **buffer, int num
 static void convert_channels_short_interleaved(int buf_c, short *buffer, int data_c, float **data, int d_offset, int len)
 {
    int i;
-   if (buf_c != data_c && buf_c <= 2 && data_c <= 6) {
-      assert(buf_c == 2);
+   if (buf_c != data_c && buf_c == 2 && data_c <= 6) {
       for (i=0; i < buf_c; ++i)
          compute_stereo_samples(buffer, data_c, data, d_offset, len);
    } else {
